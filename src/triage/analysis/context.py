@@ -200,6 +200,21 @@ def _matches(path: PurePosixPath, patterns: tuple[str, ...]) -> bool:
     return any(path.match(pattern) for pattern in patterns)
 
 
+def reads(path: str, profile: SelectionProfile) -> bool:
+    """Whether the gather would read this path.
+
+    The invalidation rule (ADR-0015) asks this of every file a merge touched, so
+    that "can this change the summary" has exactly one definition and cannot
+    drift from what the gather actually opens.
+    """
+    relative = PurePosixPath(path)
+    if any(part in EXCLUDED_DIRECTORIES for part in relative.parts[:-1]):
+        return False
+    if _matches(relative, NEVER_READ):
+        return False
+    return _matches(relative, profile.patterns)
+
+
 def _walk(root: Path) -> list[PurePosixPath]:
     found: list[PurePosixPath] = []
     for dirpath, dirnames, filenames in os.walk(root):

@@ -131,6 +131,8 @@ class TriageRepository(Protocol):
 
     async def last_summarised_commit(self, repo_url: str) -> str | None: ...
 
+    async def advance_source_commit(self, repo_url: str, commit: str) -> int: ...
+
 
 def _to_record(row: TicketRow) -> TicketRecord:
     return TicketRecord(
@@ -316,6 +318,16 @@ class SqlRepository:
         async with self._sessionmaker() as session:
             return await session.scalar(stmt)
 
+    async def advance_source_commit(self, repo_url: str, commit: str) -> int:
+        stmt = select(SystemMapRow).where(SystemMapRow.payload["repo_url"].astext == repo_url)
+        async with self._sessionmaker() as session, session.begin():
+            rows = list((await session.scalars(stmt)).all())
+            for row in rows:
+                row.source_commit = commit
+                row.payload = {**row.payload, "source_commit": commit}
+            await session.flush()
+        return len(rows)
+
 
 def _to_analysis_record(row: AnalysisResultRow) -> AnalysisResultRecord:
     return AnalysisResultRecord(
@@ -458,3 +470,16 @@ class InMemoryRepository:
             if entry.payload.get("repo_url") == repo_url and entry.source_commit:
                 return entry.source_commit
         return None
+
+    async def advance_source_commit(self, repo_url: str, commit: str) -> int:
+        moved = 0
+        for key, entry in self.system_map.items():
+            if entry.payload.get("repo_url") != repo_url:
+                continue
+            self.system_map[key] = replace(
+                entry,
+                source_commit=commit,
+                payload={**entry.payload, "source_commit": commit},
+            )
+            moved += 1
+        return moved

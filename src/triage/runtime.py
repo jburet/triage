@@ -27,6 +27,7 @@ from triage.integrations.base import (
     JiraClient,
     SlackClient,
 )
+from triage.integrations.github import GitHubClient, dry_run_github
 from triage.llm import LiteLLMClient, StructuredLLM
 
 log = structlog.get_logger(__name__)
@@ -41,6 +42,7 @@ class Deps:
     slack: SlackClient
     repo: TriageRepository
     runner: AnalysisRunner
+    github: GitHubClient
     config: Config
 
 
@@ -70,11 +72,13 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
             slack=FakeSlackClient(),
             repo=InMemoryRepository(),
             runner=FakeAnalysisRunner(default=dry_run_result),
+            github=dry_run_github(),
             config=config,
         )
 
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+    from triage.integrations.github import GitHubRestClient
     from triage.integrations.jira import JiraRestClient
     from triage.integrations.slack import SlackWebClient
 
@@ -88,6 +92,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
         slack=SlackWebClient(settings.slack_bot_token),
         repo=repo,
         runner=_build_runner(settings, config, repo),
+        github=GitHubRestClient(settings.github_token),
         config=config,
     )
 

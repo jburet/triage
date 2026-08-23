@@ -129,6 +129,9 @@ class Settings(BaseSettings):
 
     slack_bot_token: str = ""
 
+    # Read-only, and only ever used to compare two commits (ADR-0015).
+    github_token: str = ""
+
     # Jira Cloud: basic auth with an Atlassian account email and an API token
     # (ADR-0013), not a bearer token.
     jira_base_url: str = ""

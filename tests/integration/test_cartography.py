@@ -5,6 +5,8 @@ messages, the requests the runner was given — rather than on summary prose,
 which is canned here. Summary quality is measured by ``evals/cartography.py``.
 """
 
+from dataclasses import replace
+
 import pytest
 
 from tests.conftest import (
@@ -261,3 +263,120 @@ async def test_a_terraform_summary_with_no_modules_persists_no_module_rows(confi
 
     assert state["entries_written"] == 1
     assert set(deps.repo.system_map) == {(SystemMapKind.SERVICE, "payments-api")}
+
+
+# --- Phase 4: incremental refresh (ADR-0006, ADR-0015) ----------------------
+
+
+async def summarised_at(config, commit="1111111"):
+    """A map already built from ``commit``, ready for a merge event to land on."""
+    deps = build_deps(config, runner=canned_runner())
+    await run(deps, {"repos": [{"url": PAYMENTS, "commit": commit}]})
+    return deps
+
+
+async def test_a_merge_touching_nothing_the_summariser_reads_is_not_re_summarised(config):
+    deps = await summarised_at(config)
+    runner = FakeAnalysisRunner(results={AnalysisKind.SUMMARIZE_REPO: an_analysis_result()})
+    incremental = build_deps(
+        config,
+        repo=deps.repo,
+        runner=runner,
+        changed={PAYMENTS: ["CHANGELOG.md", "tests/test_api.py"]},
+    )
+
+    state = await run(incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert runner.requests == []
+    assert [carried.repo_url for carried in state["carried_forward"]] == [PAYMENTS]
+
+
+async def test_a_merge_that_is_not_re_summarised_still_moves_the_commit_forward(config):
+    deps = await summarised_at(config)
+    incremental = build_deps(
+        config, repo=deps.repo, runner=canned_runner(), changed={PAYMENTS: ["CHANGELOG.md"]}
+    )
+
+    await run(incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert await deps.repo.last_summarised_commit(PAYMENTS) == "9f2c1ab"
+    entry = await deps.repo.system_map_for_service("payments-api")
+    assert entry.source_commit == "9f2c1ab"
+
+
+async def test_a_merge_touching_code_the_summariser_reads_is_re_summarised(config):
+    deps = await summarised_at(config)
+    runner = FakeAnalysisRunner(results={AnalysisKind.SUMMARIZE_REPO: an_analysis_result()})
+    incremental = build_deps(
+        config, repo=deps.repo, runner=runner, changed={PAYMENTS: ["src/payments/api.py"]}
+    )
+
+    state = await run(incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert [request.commit for request in runner.requests] == ["9f2c1ab"]
+    assert not state.get("carried_forward")
+    assert await deps.repo.last_summarised_commit(PAYMENTS) == "9f2c1ab"
+
+
+async def test_the_comparison_is_made_against_the_last_summarised_commit(config):
+    deps = await summarised_at(config, commit="1111111")
+    incremental = build_deps(
+        config, repo=deps.repo, runner=canned_runner(), changed={PAYMENTS: ["docs/x.md"]}
+    )
+
+    await run(incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert incremental.github.comparisons == [(PAYMENTS, "1111111", "9f2c1ab")]
+
+
+async def test_a_merge_for_a_repo_with_no_prior_summary_falls_back_to_a_full_summary(config):
+    runner = FakeAnalysisRunner(results={AnalysisKind.SUMMARIZE_REPO: an_analysis_result()})
+    deps = build_deps(config, runner=runner)
+
+    state = await run(deps, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert [request.commit for request in runner.requests] == ["9f2c1ab"]
+    assert deps.github.comparisons == []
+    assert state["entries_written"] == 1
+
+
+async def test_a_comparison_that_cannot_be_made_re_summarises_rather_than_assuming(config):
+    """Failing toward completeness: an unanswerable comparison must never read as
+    'nothing changed', which would leave the map silently stale."""
+    from triage.integrations.github import FakeGitHubClient, GitHubError
+
+    deps = await summarised_at(config)
+    runner = FakeAnalysisRunner(results={AnalysisKind.SUMMARIZE_REPO: an_analysis_result()})
+    incremental = build_deps(config, repo=deps.repo, runner=runner)
+    incremental = replace(
+        incremental, github=FakeGitHubClient(error=GitHubError("502 from GitHub"))
+    )
+
+    await run(incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}})
+
+    assert [request.commit for request in runner.requests] == ["9f2c1ab"]
+
+
+async def test_a_full_run_re_summarises_regardless_of_what_the_diff_says(config):
+    """The weekly cron's entry point (ADR-0006)."""
+    deps = await summarised_at(config)
+    runner = FakeAnalysisRunner(results={AnalysisKind.SUMMARIZE_REPO: an_analysis_result()})
+    incremental = build_deps(
+        config, repo=deps.repo, runner=runner, changed={PAYMENTS: ["CHANGELOG.md"]}
+    )
+
+    state = await run(
+        incremental, {"merge_event": {"repo_url": PAYMENTS, "commit": "9f2c1ab"}, "full": True}
+    )
+
+    assert [request.commit for request in runner.requests] == ["9f2c1ab"]
+    assert incremental.github.comparisons == []
+    assert not state.get("carried_forward")
+
+
+async def test_a_full_run_with_no_repos_named_covers_every_declared_repository(config):
+    deps = build_deps(config, runner=canned_runner())
+
+    state = await run(deps, {"full": True})
+
+    assert state["entries_written"] == 2

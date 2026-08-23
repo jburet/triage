@@ -73,6 +73,17 @@ class Summarised(BaseModel):
     summary: RepoSummary | TerraformSummary
 
 
+class CarriedForward(BaseModel):
+    """A repository this run deliberately did not re-summarise, and why (ADR-0015).
+
+    Its map rows are unchanged but are now known to be current as of ``commit``.
+    """
+
+    repo_url: str
+    commit: str
+    reason: str
+
+
 class SummaryFailure(BaseModel):
     """A repository this run could not summarise, and why. Never fatal to the run."""
 
@@ -92,6 +103,7 @@ class CartographyState(TypedDict, total=False):
     full: bool
 
     targets: list[RepoTarget]
+    carried_forward: list[CarriedForward]
     summaries: list[Summarised]
     system_map: SystemMap
     failures: list[SummaryFailure]

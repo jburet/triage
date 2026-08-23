@@ -167,6 +167,22 @@ async def persist_map(
     return {"entries_written": written}
 
 
+async def carry_forward(
+    state: CartographyState, config: RunnableConfig | None = None
+) -> CartographyState:
+    """Move the recorded commit on rows this run judged still accurate (ADR-0015).
+
+    A no-op for every run that summarised everything it was asked to, which is
+    why it sits on the main path rather than behind a branch: the alternative is
+    a route that has to reason about a run doing both at once.
+    """
+    deps = deps_from_runnable_config(config)
+    carried = state.get("carried_forward", [])
+    for entry in carried:
+        await deps.repo.advance_source_commit(entry.repo_url, entry.commit)
+    return {}
+
+
 async def notify_platform(
     state: CartographyState, config: RunnableConfig | None = None
 ) -> CartographyState:

@@ -150,3 +150,31 @@ async def test_every_kind_round_trips_through_its_payload(kind):
     await repo.upsert_system_map_entries([row(entry, kind)])
     (stored,) = repo.system_map.values()
     assert stored.payload["repo_url"] == entry.repo_url
+
+
+async def test_advancing_the_commit_moves_every_row_of_that_repo_without_touching_the_summary():
+    """The carry-forward path: nothing the summariser reads changed, so the map is
+    unchanged but is now known to be current as of the merged commit (ADR-0015)."""
+    repo = InMemoryRepository()
+    await repo.upsert_system_map_entries(
+        [
+            row(a_service_entry(), SystemMapKind.SERVICE),
+            row(a_module_entry(), SystemMapKind.TERRAFORM_MODULE),
+        ]
+    )
+    before = await repo.system_map_for_service("payments-api")
+
+    moved = await repo.advance_source_commit("github.com/org/payments-api", "ffffff1")
+
+    after = await repo.system_map_for_service("payments-api")
+    assert moved == 1
+    assert after.source_commit == "ffffff1"
+    assert after.summary == before.summary
+    assert await repo.last_summarised_commit("github.com/org/payments-api") == "ffffff1"
+    assert await repo.last_summarised_commit("github.com/org/infra") == "abc1234"
+
+
+async def test_advancing_the_commit_of_a_repo_the_map_does_not_know_changes_nothing():
+    repo = InMemoryRepository()
+
+    assert await repo.advance_source_commit("github.com/org/unknown", "ffffff1") == 0
