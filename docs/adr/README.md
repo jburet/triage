@@ -9,7 +9,7 @@ proposed rather than agreed: the alternative was leaving twelve blockers in plac
 and every value that could be made configurable is in `config.yaml` so the SRE team
 can override it without touching code.
 
-0013 records a later change to a decision that draft had already taken.
+0013 and 0014 record later changes to decisions that draft had already taken.
 
 | # | Decision | Status |
 |---|---|---|
@@ -26,6 +26,7 @@ can override it without touching code.
 | [0011](0011-langgraph-platform-licence.md) | LangGraph Platform tier, and the fallback | Proposed |
 | [0012](0012-backup-and-retention.md) | Backup and retention | Proposed |
 | [0013](0013-jira-over-rest.md) | Jira over REST v3, not MCP | Accepted, implemented |
+| [0014](0014-analysis-entrypoint-context-gather.md) | The analysis entrypoint gathers context, it does not agent | Accepted, implemented |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

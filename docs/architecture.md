@@ -17,13 +17,13 @@ For what is actually built today, see [§10 Implementation status](#10-implement
 | State | LangGraph Platform's PostgreSQL for everything: checkpoints (managed by the Platform) and Triage tables |
 | Signal ingestion | Webhooks (Datadog, GitHub) via the ingress; DB review and F0 refresh as Platform crons |
 | External systems | MCP servers when they exist, Python tools otherwise; Jira has no MCP server, so REST v3 ([ADR-0013](adr/0013-jira-over-rest.md)) |
-| Code / Terraform analysis | Claude Agent SDK in a gVisor Kubernetes Job per analysis |
+| Code / Terraform analysis | A gVisor Kubernetes Job per analysis; F0 summaries are a bounded context gather plus one structured call ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)) |
 | Git access | No shared cache: each analysis Job clones the repo at the required commit |
 | Configuration | YAML for static config; PostgreSQL for what F0 discovers |
 | Observability of Triage | LangSmith self-hosted |
 | Concurrency / scheduling | Platform task queue for concurrency; Platform crons for scheduling (APScheduler removed) |
 | Jira "Validated" | Ticket enters the team backlog; no automated action |
-| Agent SDK isolation | Sandbox (gVisor or equivalent) per run, read-only |
+| Analysis isolation | Sandbox (gVisor or equivalent) per run, read-only |
 
 ---
 
@@ -182,7 +182,9 @@ Incremental on every merge, with a weekly full re-summarise by cron
 
 LiteLLM config exposes three aliases (`triage`, `analysis`, `diagnosis`) so graph code never references a model name directly.
 
-Claude Agent SDK: Sonnet for all analysis (F0, F1, F3). It runs in a Kubernetes Job (gVisor runtime class) launched by the graph node; the Job shallow-clones the repo at the required commit, runs the analysis, returns a structured result, and is deleted. Nothing persists between Jobs.
+Analysis Jobs: the `analysis` tier for all analysis (F0, F1, F3). One runs in a Kubernetes Job (gVisor runtime class) launched by the graph node; the Job shallow-clones the repo at the required commit, runs the analysis entrypoint, returns a structured result, and is deleted. Nothing persists between Jobs.
+
+The F0 summarisation kinds do not run an agent inside the Job. The entrypoint walks the clone, reads the files that decide the answer in priority order until a byte budget is spent, lists back what it did not read, and makes one structured call — testable offline, with a cost known before the run ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)). The investigative kinds M3 adds may choose differently: following a reference is worth more when the question is specific.
 Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $50 per day
 ([ADR-0007](adr/0007-model-tiers-and-budgets.md)). Structured output uses tool calling, not
 `response_format`, since every model behind the proxy is an Anthropic one.
