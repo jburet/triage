@@ -28,6 +28,7 @@ not built yet; see the milestone table in `docs/architecture.md`.
 
 ```bash
 make dev            # uv sync, start Postgres, apply migrations
+make proxy          # start the local LiteLLM proxy (optional, see Models)
 make test           # full suite — no network, no model spend
 make run-fixture    # run the pipeline on a fixture diagnosis, in dry-run mode
 ```
@@ -61,6 +62,30 @@ Pick a different fixture with `make run-fixture FIXTURE=tests/fixtures/diagnoses
 Graph code asks for a **tier** — `triage`, `analysis` or `diagnosis` — never for a
 model. The tier-to-model mapping and the budget guardrails live in the LiteLLM
 proxy configuration (ADR-0007). No model name appears anywhere under `src/`.
+
+There are two ways to reach a model, chosen by `TRIAGE_LLM_PROVIDER`:
+
+| | `litellm` | `anthropic` |
+|---|---|---|
+| Resolves the tier | the proxy | `TRIAGE_MODEL_*` in `.env` |
+| Daily $50 cap | enforced | not enforced |
+| Needs | `TRIAGE_LITELLM_URL` + `TRIAGE_LITELLM_API_KEY` | an API key |
+
+Through a proxy, the tier is sent *as* the model name — `triage`, `analysis`,
+`diagnosis` — which is what a proxy configured for Triage publishes. A shared
+proxy nobody will re-configure publishes its own names instead: fill all three
+`TRIAGE_MODEL_*` with what that proxy calls those models and they are used as the
+model name. Filling only some is refused, since it would fail on one tier at
+whatever hour that node first runs. Either way graph code asks for a tier and no
+model name appears under `src/`.
+
+`make proxy` runs LiteLLM and its own small Postgres from `docker-compose.yml` on
+`localhost:4000`, with the same three aliases production uses. It reads the same
+`TRIAGE_MODEL_*` and the same key as the direct client, so switching provider does
+not change which model answers — that is what makes a local run through one path
+evidence about the other. `auto`, the default, prefers the *direct* client
+whenever a key is set, so a proxy you deliberately started needs
+`TRIAGE_LLM_PROVIDER=litellm`.
 
 ## Running the graph in LangGraph Studio
 

@@ -120,7 +120,7 @@ async def update_existing_ticket(
             f"Recurrence #{ticket.occurrence_count} of *{key}* on `{diagnosis.service}`; "
             f"evidence appended, no new ticket. {ticket.jira_url}"
         )
-    await deps.slack.post(channel=channel, text=text)
+    await deps.slack.post(channel=channel, text=text, thread_ts=state.get("thread_ts"))
 
     await record_outcome(state, deps, PipelineOutcome.TICKET_UPDATED, ticket_id=ticket.id)
     return {

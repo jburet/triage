@@ -1,13 +1,27 @@
 """Model access, by tier.
 
 Graph code asks for a *tier* — ``triage``, ``analysis`` or ``diagnosis`` — never
-for a model. The mapping from tier to an actual Anthropic model lives in the
-LiteLLM proxy configuration, which is also where budget guardrails are enforced
-(ADR-0007). No model name appears anywhere under ``src/``.
+for a model. No model name appears anywhere under ``src/`` (ADR-0007).
+
+There are two implementations of the one method, and they are interchangeable by
+construction:
+
+- :class:`LiteLLMClient` goes through the proxy, which resolves the tier aliases
+  and enforces the per-run and per-day spend caps. This is how production runs.
+- :class:`AnthropicClient` calls the API directly with an API key, for local runs
+  and one-shots where standing up a proxy to try one alert is the reason the alert
+  never gets tried. It resolves the tier from ``TRIAGE_MODEL_*`` environment
+  variables — configuration, not code — so the "no model name under src/" rule
+  holds, and so does the reason for it: which model serves a tier is not a code
+  change.
+
+What the direct client does *not* have is the guardrails. That is the honest cost
+of the shortcut, and it is why the proxy stays the production path.
 """
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol, TypeAlias, TypeVar, cast
@@ -17,6 +31,15 @@ from pydantic import BaseModel
 Tier: TypeAlias = Literal["triage", "analysis", "diagnosis"]
 
 T = TypeVar("T", bound=BaseModel)
+
+MAX_TOKENS = 16_000
+"""Enough for the largest schema here; low enough to stay under the HTTP timeout.
+
+Both clients set it. Left to the provider's default, a summary of a fifty-module
+repository came back truncated mid-field and failed validation twice — as
+"database_access: field required", which reads like a model that ignored the
+schema and is actually a model that ran out of room.
+"""
 
 
 class StructuredOutputError(RuntimeError):
@@ -42,20 +65,48 @@ class StructuredLLM(Protocol):
 
 
 class LiteLLMClient:
-    """Real client. LiteLLM speaks the OpenAI protocol, so `model` is the alias."""
+    """Real client. LiteLLM speaks the OpenAI protocol, so `model` is the alias.
 
-    def __init__(self, base_url: str, api_key: str, *, timeout: float = 120.0) -> None:
+    The tier *is* the model name by default, which is what a proxy configured for
+    Triage publishes. A shared proxy nobody will re-configure for us publishes its
+    own names instead, so ``models`` maps tier to whatever that proxy calls it —
+    from ``TRIAGE_MODEL_*``, the same variables the direct client reads. Graph code
+    still asks for a tier and no model name appears under ``src/``: which model
+    serves a tier stays configuration (ADR-0007).
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        models: Mapping[Tier, str] | None = None,
+        timeout: float = 120.0,
+    ) -> None:
         self._base_url = base_url
         self._api_key = api_key
+        self._models = dict(models or {})
         self._timeout = timeout
         self._cache: dict[Tier, Any] = {}
+
+    def model_for(self, tier: Tier) -> str:
+        return self._models.get(tier, tier)
 
     def _chat(self, tier: Tier) -> Any:
         if tier not in self._cache:
             from langchain_openai import ChatOpenAI
 
             self._cache[tier] = ChatOpenAI(
-                model=tier,
+                model=self.model_for(tier),
+                max_tokens=MAX_TOKENS,
+                # `with_structured_output` sends `parallel_tool_calls: false`, which is
+                # right for OpenAI and fatal behind a Bedrock-backed proxy: LiteLLM
+                # cannot translate it, sweeps the unsupported parameters into
+                # `additionalModelRequestFields`, and Bedrock then rejects the request
+                # with "the additional field tool_choice/type conflicts with the
+                # existing field toolConfig.toolChoice.tool". Nothing is lost — one
+                # tool is named by `tool_choice`, so there is no parallelism to forbid.
+                disabled_params={"parallel_tool_calls": None},
                 base_url=self._base_url,
                 api_key=self._api_key,
                 timeout=self._timeout,
@@ -120,3 +171,89 @@ class FakeLLM:
 
     def calls_for(self, schema: type[BaseModel]) -> list[RecordedCall]:
         return [call for call in self.calls if call.schema is schema]
+
+
+DEFAULT_TIMEOUT = 300.0
+
+
+def tool_name(schema: type[BaseModel]) -> str:
+    """A tool name Anthropic accepts, derived from the schema being asked for."""
+    return re.sub(r"[^a-zA-Z0-9_-]", "_", schema.__name__)[:64]
+
+
+class AnthropicClient:
+    """Direct Anthropic access, for local development without the LiteLLM proxy.
+
+    Structured output is tool use, as it is through the proxy: one tool whose input
+    schema *is* the Pydantic schema, and ``tool_choice`` forcing it. Keeping both
+    clients on the same mechanism is the point — a local run that answered through
+    a different path would not be evidence about the production one.
+
+    Two things are deliberately not sent. ``temperature`` is rejected outright by
+    the current models, and the proxy path only sets it because the OpenAI-shaped
+    client insists on one. And ``effort`` is not sent either: it is a per-model
+    capability, the operator chooses the models here, and a request carrying it to
+    a model that does not take it fails the run rather than costing a little more.
+    """
+
+    def __init__(
+        self,
+        api_key: str | None,
+        models: Mapping[Tier, str],
+        *,
+        timeout: float = DEFAULT_TIMEOUT,
+        max_tokens: int = MAX_TOKENS,
+        client: Any = None,
+    ) -> None:
+        self._api_key = api_key
+        self._models = dict(models)
+        self._timeout = timeout
+        self._max_tokens = max_tokens
+        self._client = client
+
+    def _anthropic(self) -> Any:
+        """The SDK client. With no key, the SDK resolves its own credentials.
+
+        An unset key is not an error here: the SDK reads ``ANTHROPIC_API_KEY`` and
+        the profile written by ``ant auth login``, and refusing those would make
+        the local path harder to use than the proxy it exists to avoid.
+        """
+        if self._client is None:
+            from anthropic import AsyncAnthropic
+
+            self._client = (
+                AsyncAnthropic(api_key=self._api_key, timeout=self._timeout)
+                if self._api_key
+                else AsyncAnthropic(timeout=self._timeout)
+            )
+        return self._client
+
+    def model_for(self, tier: Tier) -> str:
+        try:
+            return self._models[tier]
+        except KeyError as exc:
+            raise LookupError(
+                f"no model configured for tier {tier!r}: set TRIAGE_MODEL_{tier.upper()}"
+            ) from exc
+
+    async def call(self, tier: Tier, prompt: str, schema: type[T]) -> T:
+        name = tool_name(schema)
+        message = await self._anthropic().messages.create(
+            model=self.model_for(tier),
+            max_tokens=self._max_tokens,
+            tools=[
+                {
+                    "name": name,
+                    "description": (schema.__doc__ or f"Return a {schema.__name__}.").strip(),
+                    "input_schema": schema.model_json_schema(),
+                }
+            ],
+            tool_choice={"type": "tool", "name": name},
+            messages=[{"role": "user", "content": prompt}],
+        )
+        if getattr(message, "stop_reason", None) == "refusal":
+            raise StructuredOutputError(tier, schema)
+        for block in message.content:
+            if getattr(block, "type", None) == "tool_use":
+                return schema.model_validate(block.input)
+        raise StructuredOutputError(tier, schema)

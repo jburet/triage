@@ -8,45 +8,10 @@ that an absent service is ``None`` rather than an empty entry.
 
 import pytest
 
-from tests.conftest import a_repo_summary, a_terraform_summary
-from triage.db.repo import InMemoryRepository, SystemMapEntry
-from triage.schemas import ServiceEntry, SystemMapKind, TerraformModuleEntry
-
-
-def a_service_entry(name: str = "payments-api", **overrides: object) -> ServiceEntry:
-    base: dict[str, object] = {
-        "name": name,
-        "repo_url": "github.com/org/payments-api",
-        "team": "payments",
-        "source_commit": "9f2c1ab",
-        "summary": a_repo_summary(service=name),
-    }
-    base.update(overrides)
-    return ServiceEntry.model_validate(base)
-
-
-def a_module_entry(name: str = "modules/payments", **overrides: object) -> TerraformModuleEntry:
-    terraform = a_terraform_summary()
-    base: dict[str, object] = {
-        "name": name,
-        "repo_url": "github.com/org/infra",
-        "team": "platform",
-        "source_commit": "abc1234",
-        "mapping": terraform.modules[0],
-        "resources": terraform.resources,
-    }
-    base.update(overrides)
-    return TerraformModuleEntry.model_validate(base)
-
-
-def row(entry: ServiceEntry | TerraformModuleEntry, kind: SystemMapKind) -> SystemMapEntry:
-    return SystemMapEntry(
-        kind=kind,
-        name=entry.name,
-        team=entry.team,
-        source_commit=entry.source_commit,
-        payload=entry.model_dump(mode="json"),
-    )
+from tests.conftest import a_module_entry, a_service_entry
+from tests.conftest import map_row as row
+from triage.db.repo import InMemoryRepository
+from triage.schemas import SystemMapKind
 
 
 async def test_entries_are_keyed_by_kind_and_name():

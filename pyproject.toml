@@ -5,6 +5,7 @@ description = "Turns a production signal into a ticket a developer can act on wi
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=1.0",
     "langgraph>=0.2.60",
     "langgraph-checkpoint-postgres>=2.0.0",
     "langchain-core>=0.3.29",
@@ -12,7 +13,9 @@ dependencies = [
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "pyyaml>=6.0.2",
-    "sqlalchemy>=2.0.36",
+    # `sqlalchemy[asyncio]`, not bare sqlalchemy: the async session needs greenlet, and
+    # without it every write through SqlRepository fails at commit rather than at import.
+    "sqlalchemy[asyncio]>=2.0.36",
     "alembic>=1.14",
     "psycopg[binary]>=3.2",
     "fastapi>=0.115",

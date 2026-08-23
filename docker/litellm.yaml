@@ -1,0 +1,47 @@
+# The local LiteLLM proxy: the same three tier aliases production resolves (ADR-0007).
+#
+# Graph code asks for `triage`, `analysis` or `diagnosis` and never for a model,
+# so this file is where the mapping lives. It reads the *same* three variables as
+# the direct client (`TRIAGE_MODEL_*` in `.env`), which is the point: switching
+# TRIAGE_LLM_PROVIDER between `litellm` and `anthropic` must not change which
+# model answers, or a local run through one path says nothing about the other.
+
+model_list:
+  - model_name: triage
+    litellm_params:
+      model: os.environ/TRIAGE_MODEL_TRIAGE
+      custom_llm_provider: anthropic
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: ["temperature"]
+  - model_name: analysis
+    litellm_params:
+      model: os.environ/TRIAGE_MODEL_ANALYSIS
+      custom_llm_provider: anthropic
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: ["temperature"]
+  - model_name: diagnosis
+    litellm_params:
+      model: os.environ/TRIAGE_MODEL_DIAGNOSIS
+      custom_llm_provider: anthropic
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: ["temperature"]
+
+litellm_settings:
+  # ADR-0007's daily cap. It needs the database wired in docker-compose.yml:
+  # with no DATABASE_URL the proxy starts anyway, warns once, and enforces
+  # nothing — a proxy that looks like production and silently is not.
+  #
+  # The per-run 500k cap is *not* here. A run is a graph invocation spanning many
+  # requests, and LiteLLM counts per key, not per caller; enforcing it would mean
+  # minting a virtual key per run. Locally that is unnecessary — the daily cap
+  # bounds the damage — but do not read this file as production's guardrails.
+  max_budget: 50
+  budget_duration: 1d
+  # `temperature` is dropped above because the current models reject it and the
+  # OpenAI-shaped client on the Triage side always sends one.
+  drop_params: true
+  request_timeout: 300
+  num_retries: 2
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

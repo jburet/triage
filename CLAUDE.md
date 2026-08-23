@@ -9,9 +9,11 @@ developer can act on without further investigation. It is **read-only on every p
 system, writes only to Slack and Jira, and never invents** — an unfillable field is an
 `Unknown` with a reason, enforced by the Pydantic schemas rather than by prompt text.
 
-Current state (see `docs/architecture.md` §10): only **M1, the shared ticket pipeline**
-(`Diagnosis` → Jira ticket / Slack notice) exists. Collectors (F0 cartography, F1 incidents,
-F3 DB review), the Analysis sub-graph, the FastAPI ingress and the infra track are not built.
+Current state (see `docs/architecture.md` §10): **M1 (ticket pipeline), M2 (F0 cartography)
+and M3 (Analysis sub-graph, F1 incidents, Datadog collection, alert poller)** exist in code.
+Nothing has run against a live Datadog, Jira, GitHub or Kubernetes: every test replays a
+fixture. F3 (daily DB review), the FastAPI ingress, the analysis Job image for the
+investigative kinds, and the whole infra track are not built.
 Design docs: `docs/roadmap.md` (product), `docs/architecture.md` (system),
 `docs/ticket-spec.md` (what a finished ticket must contain), `docs/adr/` (decisions, each
 with the condition that would make it wrong — add an ADR when changing one).
@@ -22,6 +24,8 @@ Python 3.12, `uv`-managed. CI (`.github/workflows/ci.yml`) runs exactly `make li
 
 ```bash
 make dev                 # uv sync --all-extras, create .env, start Postgres (docker compose), alembic upgrade head
+make proxy               # local LiteLLM on :4000 from docker/litellm.yaml — the three tier
+                         # aliases and the daily cap; needs TRIAGE_LLM_PROVIDER=litellm to be used
 make lint                # ruff check + ruff format --check (src tests evals scripts) + mypy --strict
 make test                # uv run pytest -q  — offline: no DB, no network, no model spend
 uv run pytest tests/integration/test_ticket_pipeline.py -k oom      # single file / test
@@ -31,6 +35,8 @@ make capture-datadog ARGS="find 'pod down'"   # then `triggers <id>`, then
                          # `capture <id> <iso-time> --slug <name> --scope service:<x>`; read-only,
                          # writes tests/fixtures/datadog/<slug>/, needs a Datadog key
 make evals               # scored fixture suite against real models — spends money, not in CI
+make evals-incident      # scores F1 classification and qualification on the captured alert
+make capture-datadog ARGS="capture <monitor> <iso-time> --slug <name> --scope service:x"
 langgraph dev            # LangGraph Studio; langgraph.json registers `ticket_pipeline`
 make migrate             # alembic upgrade head
 ```
@@ -41,11 +47,15 @@ in-memory. Secrets come from `.env` with the `TRIAGE_` prefix (`src/triage/confi
 
 ## Architecture
 
-**Graph wiring** — `src/triage/graphs/ticket_pipeline.py` builds a LangGraph `StateGraph`
-over `TicketPipelineState` (`graphs/state.py`, a `total=False` TypedDict whose only input
-is `diagnosis`). One module per node under `src/triage/nodes/`; routing functions live in
-the graph module. Flow: `record_diagnosis → dedup_check → (update_existing_ticket | confidence_gate) → (notify_below_threshold | compose_ticket → self_review → create_ticket | retry | notify_review_exhausted)`.
-The compose/review retry budget counts composes (`thresholds.max_compose_attempts`).
+**Graph wiring** — one `StateGraph` per graph in `src/triage/graphs/`, one state TypedDict
+each in `graphs/state.py` (all `total=False`), one module per node under `src/triage/nodes/`,
+routing functions in the graph module. `langgraph.json` registers five:
+
+- `ticket_pipeline` — `record_diagnosis → dedup_check → (update_existing_ticket | confidence_gate) → (notify_below_threshold | compose_ticket → self_review → create_ticket | retry | notify_review_exhausted)`. The retry budget counts composes (`thresholds.max_compose_attempts`).
+- `cartography` — F0; see ADR-0006, ADR-0015.
+- `analysis` — `select_hypotheses → run_analyses → diagnose`. Shared by F1 and F3.
+- `incident` — F1: `open_incident → classify_alert → collect → follow_up ⟲ → qualify → [analysis] → [ticket_pipeline] → draft_postmortem? → settle_signal`. `IncidentState` inherits `AnalysisState` and `TicketPipelineState` so both compiled sub-graphs can be added as nodes.
+- `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
 
 **Dependency injection** — nodes are plain async functions; collaborators arrive as a
 `Deps` dataclass (`runtime.py`) in `RunnableConfig["configurable"]["deps"]`, read via
@@ -53,10 +63,20 @@ The compose/review retry budget counts composes (`thresholds.max_compose_attempt
 the fallback when nothing injects deps (Studio). Never reach for module-level clients.
 
 **LLM access by tier only** — `llm.py` exposes `StructuredLLM.call(tier, prompt, schema)`
-with `tier ∈ {"triage", "analysis", "diagnosis"}` (Haiku/Sonnet/Opus, mapped in the LiteLLM
-proxy, ADR-0007). **No model name may appear under `src/`.** Every call returns a validated
-Pydantic model via `function_calling` (tool use), never `response_format`. Prose-only output
-still goes through a schema with a prose field.
+with `tier ∈ {"triage", "analysis", "diagnosis"}` (ADR-0007). **No model name may appear
+under `src/`.** Two interchangeable implementations, chosen by `TRIAGE_LLM_PROVIDER`
+(`auto` by default): `LiteLLMClient` through the proxy, which resolves the aliases and
+enforces the spend caps — this is production — and `AnthropicClient` straight to the API
+with `TRIAGE_ANTHROPIC_API_KEY`, for local runs where standing up a proxy is why the alert
+never gets tried. The direct client reads its three model ids from `TRIAGE_MODEL_*`, so the
+rule holds; it has no spend caps, which is its whole cost. `make proxy` runs the proxy
+locally (`docker/litellm.yaml`, same aliases, same `TRIAGE_MODEL_*`, own Postgres for the
+spend it counts) — so the two paths differ in guardrails, not in which model answers. Through
+a proxy the tier is sent as the model name; a shared proxy that publishes its own names is
+reached by filling all three `TRIAGE_MODEL_*` (all or none — half is refused at startup). Both
+return a validated Pydantic
+model from one forced tool call, never `response_format`. Prose-only output still goes
+through a schema with a prose field.
 
 **Prompts as files** — `src/triage/prompts/*.md`, loaded with `prompts.render(name, **sections)`:
 instructions first, then each input as a `<tag>…</tag>` JSON block (never string
@@ -68,12 +88,25 @@ placeholders like "N/A", "TBD", "unknown") and `Unknown{reason}`; `MaybeUnknown 
 three-level enum, deliberately not a number (ADR-0002).
 
 **Integrations** — `integrations/base.py` holds the `JiraClient`/`SlackClient` protocols and
-their recording fakes; `jira.py` (REST v3 over httpx, basic auth email+token, ADR-0013,
-unverified against a live server), `slack.py`, `adf.py` (Atlassian Document Format
-rendering). A ticket key the model was not shown is discarded at dedup.
+their recording fakes; `jira.py` (REST v3 over httpx, basic auth email+token, ADR-0013),
+`slack.py` (every notice about one incident carries `thread_ts`), `adf.py`, `github.py`,
+`datadog.py` (six read-only REST calls, per-endpoint concurrency gates for the measured rate
+limits, `FakeDatadogClient` replaying `tests/fixtures/datadog/`), `platform.py` (creates runs
+on the LangGraph Platform; absent → in-process, ADR-0011). All are unverified against live
+services. A ticket key the model was not shown is discarded at dedup.
+
+**F1 collection** — `src/triage/collect/` is pure functions over Datadog responses, with no
+graph knowledge: `recipes.py` (window rule, alert-class recipes, the monitor-query idiom),
+`reduce.py` (log templating, event diffing, timeseries downsampling), `sweep.py` (the fixed
+sweep, the emptiness widening, the bounded follow-up loop), `budget.py` (fit to
+`collection.max_prompt_bytes`, stating every cut). `src/triage/scope.py` resolves an alert to
+a team by glob pattern and to an environment through the cluster map — never from an `env:`
+tag, which no alert carries usefully (ADR-0017).
 
 **Persistence** — nodes depend on the `TriageRepository` protocol (`db/repo.py`), never on
-the ORM; `InMemoryRepository` is used in tests and dry-run, `SqlRepository` otherwise.
+the ORM; a `signals` row is one alert *cycle* (monitor, firing group, duration, recovery) and
+its status carries the persistence gate — `received → waiting → analysing → diagnosed →
+ticketed|discarded`, with the terminal `self_recovered` and `out_of_scope` (ADR-0018); `InMemoryRepository` is used in tests and dry-run, `SqlRepository` otherwise.
 Tables live in a dedicated `triage` Postgres schema (shared DB with LangGraph Platform
 checkpoints, which Triage never touches). Migrations under `db/migrations/` must stay
 scoped to `triage.`; `tests/unit/test_migrations.py` renders `alembic upgrade head --sql`
@@ -86,8 +119,13 @@ assembles a `Deps` of fakes, `run_config(deps)` wraps it for `graph.ainvoke`. `F
 responses are keyed by the *schema* the node asks for; a sequence is consumed call by call
 with the last element repeating ("fail twice then pass" = `[a_verdict(False), a_verdict(False), a_verdict()]`).
 Fixture diagnoses live in `tests/fixtures/diagnoses/*.json` (`oom_payments` = ticket path,
-`latency_low_confidence` = Slack-notice path); `tests/integration/` runs the whole graph
-against them, `tests/unit/` covers schemas, rules, ADF and LLM plumbing. Tests must stay
+`latency_low_confidence` = Slack-notice path). `tests/fixtures/datadog/hcl_software_uat_20260822/`
+is one real incident captured by hand on 2026-08-23 — the alert that settled ADR-0016, 0017
+and 0018 — and every number the collection tests assert was measured on it. Datadog retains
+logs and spans about fifteen days, so it **cannot be re-captured**: treat those files as the
+permanent record they are. `conftest` replays it through `fake_datadog()`, `captured_alert()`
+and `pod_down_alert()`. `tests/integration/` runs whole graphs, `tests/unit/` covers schemas,
+rules, reduction, ADF and LLM plumbing. Tests must stay
 offline; anything that spends money belongs in `evals/`.
 
 ## Working conventions

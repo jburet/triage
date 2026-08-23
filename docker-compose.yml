@@ -6,7 +6,9 @@ services:
       POSTGRES_PASSWORD: triage
       POSTGRES_DB: triage
     ports:
-      - "5432:5432"
+      # 5432 is often already taken by another project's Postgres; this lets a
+      # checkout move without editing a tracked file.
+      - "${TRIAGE_POSTGRES_PORT:-5432}:5432"
     volumes:
       - triage-pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -15,5 +17,49 @@ services:
       timeout: 5s
       retries: 10
 
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    command: ["--config", "/etc/litellm/config.yaml", "--port", "4000"]
+    depends_on:
+      litellm-db:
+        condition: service_healthy
+    environment:
+      LITELLM_MASTER_KEY: ${TRIAGE_LITELLM_API_KEY:-sk-local-dev}
+      # Without a database the proxy starts, warns once, and enforces no budget
+      # at all — so the daily cap in docker/litellm.yaml needs this line.
+      DATABASE_URL: postgresql://litellm:litellm@litellm-db:5432/litellm
+      STORE_MODEL_IN_DB: "False"
+      ANTHROPIC_API_KEY: ${TRIAGE_ANTHROPIC_API_KEY:-${ANTHROPIC_API_KEY:-}}
+      TRIAGE_MODEL_TRIAGE: ${TRIAGE_MODEL_TRIAGE:-claude-haiku-4-5}
+      TRIAGE_MODEL_ANALYSIS: ${TRIAGE_MODEL_ANALYSIS:-claude-sonnet-5}
+      TRIAGE_MODEL_DIAGNOSIS: ${TRIAGE_MODEL_DIAGNOSIS:-claude-opus-5}
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./docker/litellm.yaml:/etc/litellm/config.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:4000/health/liveliness || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # The proxy's own spend store, deliberately not Triage's database: these are
+  # LiteLLM's twenty-odd Prisma tables, they are not Triage data, and no port is
+  # published for them because nothing outside the proxy reads them.
+  litellm-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: litellm
+      POSTGRES_DB: litellm
+    volumes:
+      - litellm-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   triage-pgdata:
+  litellm-pgdata:

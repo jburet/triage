@@ -26,8 +26,17 @@ class SlackWebClient:
             self._client = AsyncWebClient(token=self._token)
         return self._client
 
-    async def post(self, *, channel: str, text: str, attachment: str | None = None) -> str:
-        response = await self._web().chat_postMessage(channel=channel, text=text)
+    async def post(
+        self,
+        *,
+        channel: str,
+        text: str,
+        attachment: str | None = None,
+        thread_ts: str | None = None,
+    ) -> str:
+        response = await self._web().chat_postMessage(
+            channel=channel, text=text, thread_ts=thread_ts
+        )
         timestamp = str(response["ts"])
         if attachment:
             await self._web().files_upload_v2(

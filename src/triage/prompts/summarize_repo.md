@@ -19,8 +19,11 @@ establish:
 
 Areas:
 
-- **service** — the name this repository deploys as. Take it from the manifest, chart
-  or container name; if you are falling back on the repository name, say so.
+- **service** — the name this repository deploys as, as an identifier and nothing
+  else: `zeenea-platform`, not `zeenea-platform (from the Helm chart, though the build
+  names it differently)`. Take it from the manifest, chart or container name. When the
+  sources disagree, use the one the cluster runs — the chart or the container — and put
+  the disagreement in `entry_points`, which is where a reader looking for it will be.
 - **languages** and **frameworks** — with versions when the manifest pins them.
 - **entry_points** — where execution starts: the HTTP server, each consumer, each
   scheduled job, each CLI. `path` is relative to the repository root.

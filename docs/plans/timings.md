@@ -37,3 +37,32 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 plan rewrite (phases 2 and 4) | writing | 240 |
 | 2026-08-23 | promote capture script to scripts/ | write, smoke-test, regenerate fixtures | 420 |
 | 2026-08-23 | promote capture script to scripts/ | make lint + make test | 7 |
+| 2026-08-23 | M3 phase 1 | pytest tests/integration/test_analysis.py | 4 |
+| 2026-08-23 | M3 phase 1 | make lint | 12 |
+| 2026-08-23 | M3 phase 1 | make test (315 passed) | 10 |
+| 2026-08-23 | M3 phase 2 | pytest tests/unit/test_collection.py | 1 |
+| 2026-08-23 | M3 phase 2 | pytest tests/integration/test_collect.py | 1 |
+| 2026-08-23 | M3 phase 2 | make lint | 2 |
+| 2026-08-23 | M3 phase 2 | make test (341 passed) | 2 |
+| 2026-08-23 | M3 phase 3 | pytest tests/integration/test_incident.py | 1 |
+| 2026-08-23 | M3 phase 3 | make lint | 2 |
+| 2026-08-23 | M3 phase 3 | make test (361 passed) | 3 |
+| 2026-08-23 | M3 phase 4 | pytest tests/integration/test_poller.py | 1 |
+| 2026-08-23 | M3 phase 4 | make lint | 2 |
+| 2026-08-23 | M3 phase 4 | make test (374 passed) | 2 |
+| 2026-08-23 | M3 one-shot harness | scripts/run_incident against captured fixtures (offline smoke) | 2 |
+| 2026-08-23 | M3 one-shot | run_incident --collect-only on a live alert (12 Datadog calls) | 2 |
+| 2026-08-23 | M3 scoping fixes | make test (376 passed) | 2 |
+| 2026-08-23 | M3 one-shot | run_incident on the pod-down alert (9 Datadog calls) | 1 |
+| 2026-08-23 | M3 scope fixes | make test (379 passed) | 2 |
+| 2026-08-23 | direct Anthropic client | make lint + make test (389 passed) | 6 |
+| 2026-08-23 | local LiteLLM | docker compose pull + first start (image ~1 GB) | 16 |
+| 2026-08-23 | local LiteLLM | make proxy, cold: db + 151 prisma migrations + health | 20 |
+| 2026-08-23 | local LiteLLM | make lint + make test (389 passed) | 8 |
+| 2026-08-23 | external proxy addressing | make lint + make test (391 passed) | 5 |
+| 2026-08-23 | one-shot | run_incident --prompts on the pod-down alert (no reachable proxy) | 22 |
+| 2026-08-23 | one-shot | run_incident full chain on the pod-down alert, real models | 118 |
+| 2026-08-23 | proxy fix | make lint + make test (392 passed) | 6 |
+| 2026-08-23 | F0 on real repos | run_cartography --local --db, datacatalog + platform-infra | 60 |
+| 2026-08-23 | F1 on plt-merck-qa | run_incident --db --local, 3 real analyses | 93 |
+| 2026-08-23 | tenant + entrypoint work | make lint + make test (395 passed) | 7 |

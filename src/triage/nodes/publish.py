@@ -57,6 +57,7 @@ async def create_ticket(
 
     await deps.slack.post(
         channel=team.slack_channel,
+        thread_ts=state.get("thread_ts"),
         text=(
             f":memo: *{issue.key}* — {draft.summary}\n"
             f"Service `{diagnosis.service}`, confidence "
@@ -96,7 +97,9 @@ async def notify_below_threshold(
         f"*Best guess:* {render_field(diagnosis.probable_cause)}\n"
         + (f"*Still unknown:*\n{unknowns}" if unknowns else "")
     )
-    await deps.slack.post(channel=_channel(deps, diagnosis.team), text=text)
+    await deps.slack.post(
+        channel=_channel(deps, diagnosis.team), text=text, thread_ts=state.get("thread_ts")
+    )
 
     await record_outcome(state, deps, PipelineOutcome.BELOW_THRESHOLD)
     return {"outcome": PipelineOutcome.BELOW_THRESHOLD, "ticket_key": None, "ticket_url": None}
@@ -127,6 +130,7 @@ async def notify_review_exhausted(
         channel=_channel(deps, diagnosis.team),
         text=text,
         attachment=f"# {draft.summary}\n\n{draft.to_markdown()}",
+        thread_ts=state.get("thread_ts"),
     )
 
     await record_outcome(state, deps, PipelineOutcome.REVIEW_EXHAUSTED)

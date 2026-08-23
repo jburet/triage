@@ -37,8 +37,10 @@ def test_every_model_table_is_created(rendered_sql, table):
     [(t.name, c.name) for t in Base.metadata.sorted_tables for c in t.columns],
 )
 def test_every_model_column_is_created(rendered_sql, table, column):
+    """Created with the table, or added by a later migration — both count."""
     body = rendered_sql.split(f"CREATE TABLE triage.{table} (", 1)[1].split(");", 1)[0]
-    assert f"\n    {column} " in body
+    added = f"ALTER TABLE triage.{table} ADD COLUMN {column} " in rendered_sql
+    assert f"\n    {column} " in body or added
 
 
 def test_migrations_are_scoped_to_the_triage_schema(rendered_sql):

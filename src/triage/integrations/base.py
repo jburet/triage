@@ -28,8 +28,20 @@ class JiraClient(Protocol):
 
 
 class SlackClient(Protocol):
-    async def post(self, *, channel: str, text: str, attachment: str | None = None) -> str:
-        """Post a message. Returns the message timestamp, Slack's thread handle."""
+    async def post(
+        self,
+        *,
+        channel: str,
+        text: str,
+        attachment: str | None = None,
+        thread_ts: str | None = None,
+    ) -> str:
+        """Post a message, optionally into a thread. Returns Slack's message timestamp.
+
+        ``thread_ts`` is here from the start (ADR-0017): F1 posts several notices
+        about one incident and they belong in one thread, and adding it later
+        would be a signature change through every notify path.
+        """
         ...
 
 
@@ -52,6 +64,7 @@ class RecordedMessage:
     channel: str
     text: str
     attachment: str | None
+    thread_ts: str | None = None
 
 
 @dataclass
@@ -83,6 +96,18 @@ class FakeSlackClient:
 
     messages: list[RecordedMessage] = field(default_factory=list)
 
-    async def post(self, *, channel: str, text: str, attachment: str | None = None) -> str:
-        self.messages.append(RecordedMessage(channel=channel, text=text, attachment=attachment))
-        return f"{len(self.messages)}.000000"
+    async def post(
+        self,
+        *,
+        channel: str,
+        text: str,
+        attachment: str | None = None,
+        thread_ts: str | None = None,
+    ) -> str:
+        self.messages.append(
+            RecordedMessage(channel=channel, text=text, attachment=attachment, thread_ts=thread_ts)
+        )
+        return thread_ts or f"{len(self.messages)}.000000"
+
+    def in_thread(self, thread_ts: str) -> list[RecordedMessage]:
+        return [message for message in self.messages if message.thread_ts == thread_ts]

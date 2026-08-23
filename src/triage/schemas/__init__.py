@@ -29,6 +29,7 @@ from triage.schemas.common import (
 from triage.schemas.diagnosis import (
     AcceptanceCriterion,
     Diagnosis,
+    DiagnosisDraft,
     Evidence,
     EvidenceKind,
     Impact,
@@ -38,6 +39,7 @@ from triage.schemas.diagnosis import (
     Symptom,
 )
 from triage.schemas.hypothesis import CauseType, Hypothesis
+from triage.schemas.postmortem import Postmortem
 from triage.schemas.signal import Signal, SignalStatus
 from triage.schemas.system_map import (
     DatabaseAccess,
@@ -80,6 +82,7 @@ __all__ = [
     "DedupDecision",
     "DependencyKind",
     "Diagnosis",
+    "DiagnosisDraft",
     "Endpoint",
     "EntryPoint",
     "EntryPointKind",
@@ -99,6 +102,7 @@ __all__ = [
     "OpenQuestion",
     "Payload",
     "PipelineOutcome",
+    "Postmortem",
     "RepoSummary",
     "ReviewVerdict",
     "RuledOut",

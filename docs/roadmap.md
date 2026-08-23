@@ -61,6 +61,10 @@ A ticket is complete only if a developer could start working on it without askin
 - Terraform analysis, **code only** (no state comparison): resources, sizing, networking, managed databases, mapping modules ↔ services.
 - Output: a system map used by every other feature to locate code, infra and owners.
 - Refreshed on every merge to `main`.
+- **Workload mapping** (M6): the map is keyed on the name a repository deploys as, which no
+  per-tenant instance of the mono-tenant `platform` ever matches. The running workload's own
+  container image resolves the repository, the architecture document seeds which IaC
+  repository provisions it, and naming patterns are the fallback rather than the rule.
 
 ## F1 — Incident to ticket
 

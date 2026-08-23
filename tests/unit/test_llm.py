@@ -50,3 +50,16 @@ async def test_fake_refuses_a_schema_it_was_not_given():
     llm = FakeLLM(responses={})
     with pytest.raises(AssertionError, match="TicketDraft"):
         await llm.call("analysis", "a", TicketDraft)
+
+
+def test_parallel_tool_calls_is_never_sent():
+    """A Bedrock-backed proxy 400s on it, and one named tool has nothing to parallelise.
+
+    LiteLLM cannot translate `parallel_tool_calls` for Bedrock, sweeps the
+    unsupported parameters into `additionalModelRequestFields`, and Bedrock then
+    rejects the whole request: "the additional field tool_choice/type conflicts
+    with the existing field toolConfig.toolChoice.tool". Found on a live run.
+    """
+    chat = LiteLLMClient("http://proxy.invalid/v1", "key")._chat("analysis")
+
+    assert "parallel_tool_calls" in chat.disabled_params

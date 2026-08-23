@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from datetime import datetime
+from typing import Any, TypedDict
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.schemas.alert import Alert
+from triage.schemas.analysis import AnalysisFindings, AnalysisResult
+from triage.schemas.collection import AlertClassification, Collection, Qualification
+from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.hypothesis import Hypothesis
+from triage.schemas.signal import Signal
 from triage.schemas.system_map import RepoSummary, SystemMap, TerraformSummary
 from triage.schemas.ticket import DedupDecision, PipelineOutcome, ReviewVerdict, TicketDraft
 
@@ -27,6 +34,10 @@ class TicketPipelineState(TypedDict, total=False):
     outcome: PipelineOutcome
     ticket_key: str | None
     ticket_url: str | None
+
+    # The Slack thread the calling feature opened, if any: every notice about one
+    # incident belongs under the message that announced it.
+    thread_ts: str | None
 
     # Monotonic clock reading taken at entry, for the time-to-ticket metric.
     started_at: float
@@ -109,3 +120,103 @@ class CartographyState(TypedDict, total=False):
     failures: list[SummaryFailure]
     unowned: list[str]
     entries_written: int
+
+
+class Deferred(BaseModel):
+    """A hypothesis that was ranked but not analysed, and why (ADR-0005).
+
+    It is not discarded: a developer who is told what was *not* looked at can
+    reopen it, and a developer who is told nothing repeats the ranking by hand.
+    """
+
+    hypothesis: Hypothesis
+    reason: Filled
+
+
+class Investigated(BaseModel):
+    """One hypothesis after the branch it was routed to has run.
+
+    ``result`` is ``None`` only for a dependency cause, which no runner examines;
+    a hypothesis whose repository or commit could not be resolved carries a
+    *failed* result naming that, so the failure paths stay one path.
+    """
+
+    hypothesis: Hypothesis
+    repo_url: str | None = None
+    commit: str | None = None
+    base_commit: str | None = None
+    result: AnalysisResult | None = None
+
+    @property
+    def failed(self) -> bool:
+        return self.result is not None and not self.result.succeeded
+
+    @property
+    def findings(self) -> AnalysisFindings | None:
+        if self.result is None or not self.result.succeeded:
+            return None
+        payload = self.result.result
+        return payload if isinstance(payload, AnalysisFindings) else None
+
+
+class AnalysisState(TypedDict, total=False):
+    """Input is ``hypotheses`` plus who they are about; output is ``diagnosis``.
+
+    ``context`` is whatever the calling feature already collected — the F1
+    telemetry, the F3 query statistics — passed through to the synthesis prompt
+    untouched, because the sub-graph is shared and must not know which of them
+    produced it.
+    """
+
+    hypotheses: list[Hypothesis]
+    feature: Feature
+    service: str
+    team: str
+    signal_id: UUID | None
+    context: dict[str, Any]
+
+    selected: list[Hypothesis]
+    deferred: list[Deferred]
+    investigated: list[Investigated]
+    diagnosis: Diagnosis
+    synthesis_attempts: int
+
+
+class IncidentState(AnalysisState, TicketPipelineState, total=False):
+    """F1, from a persisted alert to a ticket and a post-mortem (architecture §2.3).
+
+    The input is a ``Signal`` the poller already stored, never a raw webhook body:
+    by the time this graph runs, the alert has been in ``error`` for the
+    persistence gate (ADR-0018) and somebody owns it.
+    """
+
+    signal: Signal
+    alert: Alert
+
+    classification: AlertClassification
+    window: TimeWindow
+    collection: Collection
+    followup_done: bool
+
+    qualification: Qualification
+    postmortem: str
+
+
+class PollerState(TypedDict, total=False):
+    """One tick of the alert poller (ADR-0017).
+
+    Everything it did is reported back rather than only logged: a tick that
+    skipped a span, refused an alert as out of scope or launched three runs is
+    the only observable the cron has.
+    """
+
+    now: datetime | None
+
+    events_seen: int
+    created: list[UUID]
+    launched: list[UUID]
+    recovered: list[Signal]
+    out_of_scope: list[UUID]
+    unmapped: list[UUID]
+    flapping: list[str]
+    skipped_span: str | None

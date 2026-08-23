@@ -7,9 +7,11 @@ import pytest
 
 from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
 from triage.config import Config, load_config
-from triage.db.repo import InMemoryRepository
+from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
+from triage.integrations.datadog import FakeDatadogClient
 from triage.integrations.github import FakeGitHubClient
+from triage.integrations.platform import FakePlatformClient
 from triage.llm import FakeLLM
 from triage.runtime import DEPS_KEY, Deps
 from triage.schemas import (
@@ -18,15 +20,31 @@ from triage.schemas import (
     AnalysisRequest,
     AnalysisResult,
     AnalysisStatus,
+    CauseType,
     DedupDecision,
     Diagnosis,
+    DiagnosisDraft,
+    Hypothesis,
     RepoSummary,
     ReviewVerdict,
+    ServiceEntry,
+    SystemMapKind,
+    TerraformModuleEntry,
     TerraformSummary,
     TicketDraft,
 )
+from triage.schemas.alert import Alert
+from triage.schemas.collection import (
+    AlertClass,
+    AlertClassification,
+    FollowUpPlan,
+    Qualification,
+)
+from triage.schemas.postmortem import Postmortem
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
+DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
+CAPTURE = "hcl_software_uat_20260822"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -208,21 +226,242 @@ def canned_runner() -> FakeAnalysisRunner:
     return FakeAnalysisRunner(results={kind: an_analysis_result(kind) for kind in AnalysisKind})
 
 
+def a_service_entry(name: str = "payments-api", **overrides: object) -> ServiceEntry:
+    base: dict[str, object] = {
+        "name": name,
+        "repo_url": "github.com/org/payments-api",
+        "team": "payments",
+        "source_commit": "9f2c1ab",
+        "summary": a_repo_summary(service=name),
+    }
+    base.update(overrides)
+    return ServiceEntry.model_validate(base)
+
+
+def a_module_entry(name: str = "modules/payments", **overrides: object) -> TerraformModuleEntry:
+    terraform = a_terraform_summary()
+    base: dict[str, object] = {
+        "name": name,
+        "repo_url": "github.com/org/infra",
+        "team": "platform",
+        "source_commit": "abc1234",
+        "mapping": terraform.modules[0],
+        "resources": terraform.resources,
+    }
+    base.update(overrides)
+    return TerraformModuleEntry.model_validate(base)
+
+
+def map_row(entry: ServiceEntry | TerraformModuleEntry, kind: SystemMapKind) -> SystemMapEntry:
+    return SystemMapEntry(
+        kind=kind,
+        name=entry.name,
+        team=entry.team,
+        source_commit=entry.source_commit,
+        payload=entry.model_dump(mode="json"),
+    )
+
+
+def mapped(*entries: ServiceEntry | TerraformModuleEntry) -> InMemoryRepository:
+    """A repository whose system map already knows these services and modules."""
+    repo = InMemoryRepository()
+    for entry in entries:
+        kind = (
+            SystemMapKind.SERVICE
+            if isinstance(entry, ServiceEntry)
+            else SystemMapKind.TERRAFORM_MODULE
+        )
+        repo.system_map[(kind, entry.name)] = map_row(entry, kind)
+    return repo
+
+
+def a_hypothesis(
+    cause_type: CauseType = CauseType.APP, rank_score: float = 0.9, **overrides: object
+) -> Hypothesis:
+    base: dict[str, object] = {
+        "cause_type": cause_type,
+        "service": "payments-api",
+        "commit": None if cause_type is CauseType.DEPENDENCY else "9f2c1ab",
+        "description": f"A {cause_type.value} cause: the idempotency cache grows unbounded.",
+        "rank_score": rank_score,
+    }
+    base.update(overrides)
+    return Hypothesis.model_validate(base)
+
+
+def a_synthesis(**overrides: object) -> DiagnosisDraft:
+    """A synthesis that satisfies Diagnosis, so tests can break one rule at a time."""
+    base: dict[str, object] = {
+        "chosen_hypothesis": 0,
+        "symptom": {
+            "description": "Pods were OOM-killed 11 times between 02:10 and 02:55 UTC.",
+            "window": {"start": "2026-08-22T02:10:00Z", "end": "2026-08-22T02:55:00Z"},
+        },
+        "impact": {
+            "users": "4.1% of POST /payments callers received a 502.",
+            "services": ["payments-api"],
+            "slos": "38% of the monthly error budget was consumed.",
+        },
+        "probable_cause": "An unbounded idempotency-key cache grows until the memory limit.",
+        "confidence": "medium",
+        "confidence_rationale": "The metric and the code agree, but no heap dump confirms it.",
+        "evidence": [
+            {
+                "kind": "metric",
+                "description": "container.memory.usage rose from 320 MB to the 1 GB limit.",
+                "url": "https://app.datadoghq.eu/metric/1",
+            }
+        ],
+        "paths": ["src/payments/idempotency.py"],
+        "expected_change": {
+            "statement": "Working set stays under 700 MB for 24 h.",
+            "how_to_verify": "The payments-overview dashboard, memory panel.",
+        },
+        "out_of_scope": ["Do not raise the container memory limit."],
+        "ruled_out": [],
+        "unknowns": [],
+    }
+    base.update(overrides)
+    return DiagnosisDraft.model_validate(base)
+
+
+def captured(name: str, slug: str = CAPTURE) -> dict:
+    """One response from the Datadog capture, verbatim as the API returned it."""
+    return json.loads((DATADOG_DIR / slug / f"{name}.json").read_text())
+
+
+def captured_alert(slug: str = CAPTURE) -> Alert:
+    """The StatefulSet-replicas alert, parsed from the event the poller would have read."""
+    events = captured("events_kube_namespace", slug)["data"]
+    firing = next(
+        event
+        for event in events
+        if Alert.is_monitor_alert(event)
+        and event["attributes"]["attributes"].get("monitor-alert-event", {}).get("alert_type")
+        == "error"
+    )
+    return Alert.from_event(firing)
+
+
+def pod_down_alert(slug: str = CAPTURE) -> Alert:
+    """The same incident seen through the event monitor whose query *is* re-runnable.
+
+    Its query counts container deletion events, so re-running it returns the three
+    kills and their exit codes — which is the case behaviour 2.3 is about.
+    """
+    monitor = captured("monitor", slug)
+    return captured_alert(slug).model_copy(
+        update={
+            "monitor_id": monitor["id"],
+            "monitor_name": monitor["name"],
+            "monitor_query": monitor["query"],
+            "monitor_options": monitor["options"],
+        }
+    )
+
+
+def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
+    """A client that replays the capture, keyed by what the query is about.
+
+    Spans are deliberately absent from both the window and the widened check: the
+    captured tenant has no APM at all, which is the case that separates "not
+    instrumented" from "nothing happened" (ADR-0016).
+    """
+    responses: dict[str, dict[str, object]] = {
+        "events": {
+            "container_name:platform": captured("monitor_query_events", slug),
+            "service:plt-hcl-software-uat": captured("events_service", slug),
+            "kube_namespace:hcl-software-uat": captured("events_kube_namespace", slug),
+        },
+        "logs": {"plt-hcl-software-uat": captured("logs_at_alert", slug)},
+        "logs_aggregate": {"plt-hcl-software-uat": captured("logs_aggregate", slug)},
+        "metrics": {
+            "kubernetes.containers.restarts": captured(
+                "metric_kubernetes_containers_restarts", slug
+            ),
+            "kubernetes.memory.usage_pct": captured("metric_kubernetes_memory_usage_pct", slug),
+            "statefulset.replicas_ready": captured(
+                "metric_kubernetes_state_statefulset_replicas_ready", slug
+            ),
+            "statefulset.replicas_desired": captured(
+                "metric_kubernetes_state_statefulset_replicas_desired", slug
+            ),
+        },
+        "monitor": {str(captured("monitor", slug)["id"]): captured("monitor", slug)},
+    }
+    responses.update(overrides)  # type: ignore[arg-type]
+    return FakeDatadogClient(responses=responses)
+
+
+def a_classification(alert_class: AlertClass = AlertClass.CRASH_RESTART) -> AlertClassification:
+    return AlertClassification(
+        alert_class=alert_class,
+        reason="The monitor counts container deletion events over five minutes.",
+    )
+
+
+def a_qualification(*causes: dict[str, object], **overrides: object) -> Qualification:
+    base: dict[str, object] = {
+        "summary": "The pod was killed three times with exit code 137 after failing "
+        "its liveness probe during startup.",
+        "causes": list(causes)
+        or [
+            {
+                "cause_type": "infra",
+                "service": "plt-hcl-software-uat",
+                "description": "The liveness probe is shorter than the pod's own startup.",
+                "rank_score": 0.9,
+            }
+        ],
+    }
+    base.update(overrides)
+    return Qualification.model_validate(base)
+
+
+def a_follow_up(*requests: dict[str, object], done: bool = False) -> FollowUpPlan:
+    return FollowUpPlan.model_validate({"done": done, "requests": list(requests)})
+
+
+def a_postmortem(**overrides: object) -> Postmortem:
+    base: dict[str, object] = {
+        "timeline": "00:43 probe failures; 00:43:54 container killed with exit code 137.",
+        "what_happened": "The tenant's platform pod restarted three times in four minutes.",
+        "why_it_happened": "The liveness probe is shorter than the startup. Confidence: medium.",
+        "what_would_have_helped": "No APM on this tenant, so no request-level view.",
+    }
+    base.update(overrides)
+    return Postmortem.model_validate(base)
+
+
 def build_deps(
     config: Config,
     *,
     dedup: object = None,
     drafts: object = None,
     verdicts: object = None,
+    syntheses: object = None,
+    postmortems: object = None,
+    classifications: object = None,
+    qualifications: object = None,
+    follow_ups: object = None,
     repo: InMemoryRepository | None = None,
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
+    datadog: FakeDatadogClient | None = None,
+    platform: FakePlatformClient | None = None,
 ) -> Deps:
     """Assemble fakes. Anything not supplied gets a sensible passing default."""
     responses: dict[type, object] = {
         DedupDecision: dedup if dedup is not None else [no_match()],
         TicketDraft: drafts if drafts is not None else [a_draft()],
         ReviewVerdict: verdicts if verdicts is not None else [a_verdict()],
+        DiagnosisDraft: syntheses if syntheses is not None else [a_synthesis()],
+        AlertClassification: classifications
+        if classifications is not None
+        else [a_classification()],
+        Qualification: qualifications if qualifications is not None else [a_qualification()],
+        FollowUpPlan: follow_ups if follow_ups is not None else [a_follow_up(done=True)],
+        Postmortem: postmortems if postmortems is not None else [a_postmortem()],
     }
     return Deps(
         llm=FakeLLM(responses=responses),  # type: ignore[arg-type]
@@ -231,6 +470,8 @@ def build_deps(
         repo=repo or InMemoryRepository(),
         runner=runner or canned_runner(),
         github=FakeGitHubClient(changed=changed or {}),
+        datadog=datadog or FakeDatadogClient(),
+        platform=platform,
         config=config,
     )
 
