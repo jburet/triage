@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import functools
 from enum import StrEnum
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any
 
@@ -63,6 +64,15 @@ class Repo(BaseModel):
     url: str
     team: str
     kind: RepoKind
+    serves: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Service-name patterns this repository is deployed as. A multi-tenant "
+            "platform runs one instance per customer — plt-merck-qa, plt-hcl-software-uat "
+            "— and none of them is its own repository, so the system map, which is "
+            "keyed on the name a repository says it deploys as, will never contain them."
+        ),
+    )
 
 
 class Database(BaseModel):
@@ -144,6 +154,21 @@ class Config(BaseModel):
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     collection: CollectionConfig = Field(default_factory=CollectionConfig)
 
+    def repo_serving(self, service: str, kind: RepoKind) -> Repo | None:
+        """The repository declared as deploying this service, when exactly one is.
+
+        The system map is keyed on the name a repository says it deploys as, which
+        no per-customer instance of a multi-tenant platform will ever match. Two
+        candidates is an ambiguity: analysing either would read a tree that does
+        not run this tenant, so nothing is returned and the caller says why.
+        """
+        matches = [
+            repo
+            for repo in self.repos
+            if repo.kind is kind and any(fnmatch(service, pattern) for pattern in repo.serves)
+        ]
+        return matches[0] if len(matches) == 1 else None
+
     def environment_of(self, cluster: str | None) -> str | None:
         """The environment a cluster runs, or None — never a guess (ADR-0017)."""
         return self.clusters.get(cluster) if cluster else None
@@ -190,7 +215,13 @@ class Config(BaseModel):
 class Settings(BaseSettings):
     """Secrets and endpoints. Never committed; see ``.env.example``."""
 
-    model_config = SettingsConfigDict(env_prefix="TRIAGE_", env_file=".env", extra="ignore")
+    # The .env belongs to the checkout, not to whatever directory the process was
+    # started in: the analysis entrypoint runs with a throwaway clone as its working
+    # directory, and a CWD-relative env file silently gave it stock defaults — a
+    # proxy on localhost that is not there — rather than the configuration.
+    model_config = SettingsConfigDict(
+        env_prefix="TRIAGE_", env_file=(".env", DEFAULT_CONFIG_PATH.parent / ".env"), extra="ignore"
+    )
 
     # How model calls are made. ``auto`` prefers the proxy and falls back to the
     # direct Anthropic client when an API key is set and no proxy is configured —

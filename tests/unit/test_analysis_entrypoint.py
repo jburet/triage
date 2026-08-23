@@ -12,11 +12,16 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import a_repo_summary, a_terraform_summary, an_analysis_request
+from tests.conftest import (
+    a_repo_summary,
+    a_terraform_summary,
+    an_analysis_request,
+    some_findings,
+)
 from triage.analysis.context import ContextBudget
 from triage.analysis.entrypoint import analyse, report
 from triage.llm import FakeLLM, StructuredOutputError
-from triage.schemas.analysis import AnalysisKind, AnalysisResult
+from triage.schemas.analysis import AnalysisFindings, AnalysisKind, AnalysisResult
 from triage.schemas.common import Unknown
 from triage.schemas.system_map import RepoSummary, TerraformSummary
 
@@ -146,13 +151,35 @@ async def test_an_area_the_model_could_not_determine_stays_unknown(application_r
     assert isinstance(result.result.endpoints, Unknown)
 
 
-async def test_a_kind_with_no_summariser_is_a_stated_failure(application_repo):
+async def test_a_kind_with_no_analyser_is_a_stated_failure(application_repo):
+    """diff_analysis reads a patch between two commits, which is not this gather."""
     llm = FakeLLM(responses={})
 
-    result = await analyse(an_analysis_request(AnalysisKind.CODE_ANALYSIS), application_repo, llm)
+    result = await analyse(an_analysis_request(AnalysisKind.DIFF_ANALYSIS), application_repo, llm)
 
     assert not result.succeeded
-    assert "code_analysis" in (result.error or "")
+    assert "diff_analysis" in (result.error or "")
+
+
+@pytest.mark.parametrize(
+    ("kind", "repository", "expected_file"),
+    [
+        (AnalysisKind.CODE_ANALYSIS, "application_repo", "src/payments/main.py"),
+        (AnalysisKind.IAC_ANALYSIS, "terraform_repo", "main.tf"),
+    ],
+)
+async def test_an_investigation_answers_from_the_files_its_kind_selects(
+    kind, repository, expected_file, request
+):
+    """The question is the same shape either way; which files are opened is not."""
+    llm = FakeLLM(responses={AnalysisFindings: [some_findings()]})
+
+    result = await analyse(an_analysis_request(kind), request.getfixturevalue(repository), llm)
+
+    assert result.succeeded
+    assert isinstance(result.result, AnalysisFindings)
+    shown = tagged(llm.calls[0].prompt, "repository")
+    assert expected_file in [item["path"] for item in shown["files"]]
 
 
 async def test_a_tier_that_returns_nothing_parsable_is_a_stated_failure(application_repo):

@@ -98,7 +98,19 @@ class RepoSummary(BaseModel):
     """Structured summary of one application repository (roadmap F0)."""
 
     repo_url: str
-    service: Filled = Field(description="Service name this repository deploys as.")
+    # Bounded because it is a key: the system map is looked up by it, and the
+    # database column is 256 characters. Asked for it unbounded, a model answered
+    # `platform (deploys as "zeenea-platform"; from helm chart … but build.sbt
+    # names the sbt root project …)` — a correct sentence in a field that has to
+    # be a name.
+    service: Filled = Field(
+        max_length=128,
+        description=(
+            "The service name this repository deploys as, and nothing else — an "
+            "identifier, not a sentence. Where it comes from belongs in the areas "
+            "below, not here."
+        ),
+    )
     languages: Listed[Filled] | Unknown
     frameworks: Listed[Filled] | Unknown
     entry_points: Listed[EntryPoint] | Unknown

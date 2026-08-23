@@ -13,7 +13,9 @@ dependencies = [
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "pyyaml>=6.0.2",
-    "sqlalchemy>=2.0.36",
+    # `sqlalchemy[asyncio]`, not bare sqlalchemy: the async session needs greenlet, and
+    # without it every write through SqlRepository fails at commit rather than at import.
+    "sqlalchemy[asyncio]>=2.0.36",
     "alembic>=1.14",
     "psycopg[binary]>=3.2",
     "fastapi>=0.115",

@@ -6,7 +6,9 @@ services:
       POSTGRES_PASSWORD: triage
       POSTGRES_DB: triage
     ports:
-      - "5432:5432"
+      # 5432 is often already taken by another project's Postgres; this lets a
+      # checkout move without editing a tracked file.
+      - "${TRIAGE_POSTGRES_PORT:-5432}:5432"
     volumes:
       - triage-pgdata:/var/lib/postgresql/data
     healthcheck:

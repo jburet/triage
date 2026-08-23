@@ -149,7 +149,12 @@ class Qualification(BaseModel):
     """Output of ``qualify``: what the telemetry shows, and what could explain it."""
 
     summary: Filled = Field(description="What the collected telemetry shows, without a cause.")
-    causes: list[ProposedCause] = Field(default_factory=list)
+    # At least one. A qualification with no cause is not a qualification, and the
+    # failure it hides is specific: asked for a summary and a list, a model once
+    # answered with the whole list serialised as XML *inside* the summary. That
+    # validated, produced no hypotheses, analysed nothing, and ended as a
+    # low-confidence diagnosis — the expensive way to say the schema was too loose.
+    causes: list[ProposedCause] = Field(min_length=1)
 
 
 class AlertClassification(BaseModel):

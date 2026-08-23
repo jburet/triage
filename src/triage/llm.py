@@ -32,6 +32,15 @@ Tier: TypeAlias = Literal["triage", "analysis", "diagnosis"]
 
 T = TypeVar("T", bound=BaseModel)
 
+MAX_TOKENS = 16_000
+"""Enough for the largest schema here; low enough to stay under the HTTP timeout.
+
+Both clients set it. Left to the provider's default, a summary of a fifty-module
+repository came back truncated mid-field and failed validation twice — as
+"database_access: field required", which reads like a model that ignored the
+schema and is actually a model that ran out of room.
+"""
+
 
 class StructuredOutputError(RuntimeError):
     """The model returned nothing that parsed as the requested schema."""
@@ -89,6 +98,7 @@ class LiteLLMClient:
 
             self._cache[tier] = ChatOpenAI(
                 model=self.model_for(tier),
+                max_tokens=MAX_TOKENS,
                 # `with_structured_output` sends `parallel_tool_calls: false`, which is
                 # right for OpenAI and fatal behind a Bedrock-backed proxy: LiteLLM
                 # cannot translate it, sweeps the unsupported parameters into
@@ -162,9 +172,6 @@ class FakeLLM:
     def calls_for(self, schema: type[BaseModel]) -> list[RecordedCall]:
         return [call for call in self.calls if call.schema is schema]
 
-
-MAX_TOKENS = 16_000
-"""Enough for the largest schema here; low enough to stay under the HTTP timeout."""
 
 DEFAULT_TIMEOUT = 300.0
 

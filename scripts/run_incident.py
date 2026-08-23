@@ -54,6 +54,8 @@ from triage.scope import resolve
 
 BOLD, DIM, RESET = "\033[1m", "\033[2m", "\033[0m"
 
+ANALYSIS_ENTRYPOINT = [sys.executable, "-m", "triage.analysis.entrypoint"]
+
 SUBGRAPHS = frozenset({"analysis", "ticket_pipeline"})
 """Their inner nodes stream separately; the parent update is the same thing again."""
 
@@ -541,6 +543,11 @@ async def main(argv: list[str]) -> int:
     )
     parser.add_argument("--db", action="store_true", help="read the real system map from Postgres")
     parser.add_argument(
+        "--local",
+        action="store_true",
+        help="run the analyses here, in a throwaway clone, instead of submitting Jobs",
+    )
+    parser.add_argument(
         "--collect-only",
         action="store_true",
         help="stop after the sweep: the collection half needs no model beyond the class",
@@ -601,6 +608,11 @@ async def main(argv: list[str]) -> int:
         assert isinstance(repo, InMemoryRepository)
         seed_map(repo, args.mappings)
 
+    if args.local:
+        from triage.analysis.runner import LocalAnalysisRunner
+
+        deps = Deps(**{**deps.__dict__, "runner": LocalAnalysisRunner(ANALYSIS_ENTRYPOINT)})
+
     spy = PromptSpy(deps.llm, show=args.prompts, limit=args.prompt_chars)
     deps = Deps(**{**deps.__dict__, "datadog": recorder, "repo": repo, "llm": spy})
 
@@ -612,6 +624,15 @@ async def main(argv: list[str]) -> int:
         for other in transitions[:20]:
             print(indent(f"{other.fired_at.isoformat()} {other.status.value} {other.group}"))
         return 1
+
+    if args.db:
+        # The signals table deduplicates on the Datadog event id, which is the
+        # poller's guarantee and this harness's problem: replaying one alert twice
+        # is the normal thing to do here. The replay gets its own id and says so,
+        # rather than the run dying on a unique constraint.
+        stamp = datetime.now(UTC).strftime("%H%M%S")
+        alert = alert.model_copy(update={"event_id": f"{alert.event_id}:replay-{stamp}"})
+        print(indent(f"{DIM}--db: stored as a replay signal, event id suffixed{RESET}"))
 
     show_alert(alert, transitions)
     show_gate(alert, deps, recovery_of(alert, transitions))

@@ -21,6 +21,7 @@ from triage.graphs.state import AnalysisState, Investigated
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult
 from triage.schemas.hypothesis import CauseType, Hypothesis
+from triage.scope import deployed_repo
 
 KIND_FOR_CAUSE: dict[CauseType, AnalysisKind] = {
     CauseType.APP: AnalysisKind.CODE_ANALYSIS,
@@ -97,32 +98,34 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
             result=None,
         )
 
-    entry = await deps.repo.system_map_for_service(hypothesis.service)
-    if entry is None:
+    repo_url, mapped_commit = await deployed_repo(deps.config, deps.repo, hypothesis.service)
+    if repo_url is None:
         return Investigated(
             hypothesis=hypothesis,
             result=AnalysisResult.failed(
                 kind,
-                f"service {hypothesis.service!r} is not in the system map, so no "
+                f"service {hypothesis.service!r} is not in the system map and no "
+                f"repository in config.yaml declares it under `serves`, so no "
                 f"repository could be resolved for it",
             ),
         )
-    commit = hypothesis.commit or entry.source_commit
+
+    commit = hypothesis.commit or mapped_commit
     if commit is None:
         return Investigated(
             hypothesis=hypothesis,
-            repo_url=entry.repo_url,
+            repo_url=repo_url,
             result=AnalysisResult.failed(
                 kind, f"no deployed commit is known for {hypothesis.service}"
             ),
         )
     base_commit = None
     if hypothesis.cause_type is CauseType.DEPLOYMENT:
-        base_commit = hypothesis.base_commit or entry.source_commit
+        base_commit = hypothesis.base_commit or mapped_commit
         if not base_commit or base_commit == commit:
             return Investigated(
                 hypothesis=hypothesis,
-                repo_url=entry.repo_url,
+                repo_url=repo_url,
                 commit=commit,
                 result=AnalysisResult.failed(
                     kind,
@@ -131,7 +134,7 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
             )
     return Investigated(
         hypothesis=hypothesis,
-        repo_url=entry.repo_url,
+        repo_url=repo_url,
         commit=commit,
         base_commit=base_commit,
         result=None,

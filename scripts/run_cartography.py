@@ -5,6 +5,7 @@
     make run-cartography REPOS="--merge github.com/org/payments-api@9f2c1ab"
     make run-cartography REPOS="--full"
     make run-cartography LOCAL=1
+    make run-cartography REPOS="--local --db github.com/org/platform@10f05e8"
 
 Needs no database and no credentials: with ``TRIAGE_DRY_RUN=1`` the repository
 is in-memory and Slack is a recording fake. By default the analysis runner is
@@ -15,6 +16,9 @@ routing, and every repository comes back unsummarised.
 here and runs the entrypoint against the real model tier: the same trade
 ``make run-fixture`` makes, and the only way to see the merge on real summaries
 without a cluster. It needs network, a clone per repository, and spends money.
+
+``--db`` persists the map to Postgres instead of the in-memory repository, which
+is what an incident run in another process reads.
 
 ``--merge`` sends one repository in as a merge event, which is the incremental
 path (ADR-0015). In dry run no GitHub comparison is made, so it always decides to
@@ -66,6 +70,15 @@ async def main(argv: list[str]) -> int:
     arguments = [arg for arg in argv[1:] if not arg.startswith("--")]
     if "--local" in flags:
         deps = replace(deps, runner=LocalAnalysisRunner(ENTRYPOINT))
+    if "--db" in flags:
+        # The map is the point of F0, and an in-memory one dies with the process:
+        # the incident run that needs it is a different process.
+        from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+        from triage.db.repo import SqlRepository
+
+        engine = create_async_engine(settings.database_url, pool_pre_ping=True)
+        deps = replace(deps, repo=SqlRepository(async_sessionmaker(engine, expire_on_commit=False)))
     refs = parse_refs(arguments)
 
     if "--merge" in flags:

@@ -63,3 +63,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | one-shot | run_incident --prompts on the pod-down alert (no reachable proxy) | 22 |
 | 2026-08-23 | one-shot | run_incident full chain on the pod-down alert, real models | 118 |
 | 2026-08-23 | proxy fix | make lint + make test (392 passed) | 6 |
+| 2026-08-23 | F0 on real repos | run_cartography --local --db, datacatalog + platform-infra | 60 |
+| 2026-08-23 | F1 on plt-merck-qa | run_incident --db --local, 3 real analyses | 93 |
+| 2026-08-23 | tenant + entrypoint work | make lint + make test (395 passed) | 7 |

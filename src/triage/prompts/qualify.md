@@ -43,6 +43,12 @@ Read the collection carefully, in these ways:
   repeated, not forty-five facts; a single error line appearing once, at the right
   second, is often the whole story.
 
+Each cause goes in the `causes` list as its own object, with its own
+`cause_type`, `service`, `description` and `rank_score`. Never write them out as
+text inside `summary`: the summary is prose for a human, the causes are what the
+rest of the investigation runs on, and a cause that is only in the summary is a
+cause nobody analyses.
+
 Never invent. Do not name a commit, a version, a file or a release — you do not
 have them, and the deployed commit is resolved from the system map after you
 answer. Every cause must point at something in the collection or in the system

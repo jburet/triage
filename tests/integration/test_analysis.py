@@ -16,7 +16,7 @@ from tests.conftest import (
     some_findings,
 )
 from triage.analysis.runner import FakeAnalysisRunner
-from triage.config import Config
+from triage.config import Config, Repo, RepoKind
 from triage.graphs.analysis import build_graph
 from triage.runtime import Deps
 from triage.schemas import (
@@ -213,3 +213,46 @@ async def test_a_synthesis_that_cannot_be_fixed_is_degraded_to_low(config: Confi
     diagnosis = result["diagnosis"]
     assert diagnosis.confidence is Confidence.LOW
     assert "No checkable evidence" in diagnosis.evidence[0].description
+
+
+async def test_a_tenant_instance_is_analysed_in_the_repository_declared_as_serving_it(
+    config: Config,
+):
+    """plt-merck-qa is one customer's instance of a platform, not its own repository.
+
+    The system map is keyed on the name a repository says it deploys as, so no
+    tenant will ever be in it; without this the whole class of alert resolves to
+    "not in the system map" and nothing is ever read.
+    """
+    repo = mapped(
+        a_service_entry(
+            "platform",
+            repo_url="github.com/org/platform",
+            team="platform",
+            source_commit="abc1234",
+        )
+    )
+    declared = config.model_copy(
+        update={
+            "repos": [
+                *config.repos,
+                Repo(
+                    url="github.com/org/platform",
+                    team="platform",
+                    kind=RepoKind.APPLICATION,
+                    serves=["plt-*"],
+                ),
+            ]
+        }
+    )
+    deps = build_deps(declared, repo=repo)
+
+    await run(
+        deps,
+        hypotheses=[a_hypothesis(service="plt-merck-qa", commit=None)],
+        team="platform",
+    )
+
+    request = deps.runner.requests[0]
+    assert request.repo_url == "github.com/org/platform"
+    assert request.commit == "abc1234"

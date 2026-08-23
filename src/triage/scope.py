@@ -28,7 +28,8 @@ import re
 from dataclasses import dataclass
 from fnmatch import fnmatch
 
-from triage.config import Config, Team
+from triage.config import Config, RepoKind, Team
+from triage.db.repo import TriageRepository
 from triage.schemas.alert import Alert
 
 ENV_FILTER = re.compile(r"\benv:([\w.-]+)")
@@ -112,3 +113,28 @@ def resolve(config: Config, alert: Alert) -> Routing:
         reason=f"{service} in {environment} is owned by {team.name}"
         + ("" if config.environment_of(scope.cluster) else ", from the monitor's own env: filter"),
     )
+
+
+async def deployed_repo(
+    config: Config,
+    repository: TriageRepository,
+    service: str,
+    kind: RepoKind = RepoKind.APPLICATION,
+) -> tuple[str | None, str | None]:
+    """The repository and commit to read this service in, and where they came from.
+
+    F0's map first: it is keyed on the name a repository says it deploys as, and
+    when the service *is* that name the commit is the one actually summarised.
+    Otherwise config.yaml's ``serves`` patterns, because a per-customer instance of
+    a multi-tenant platform — the majority of what this monitor fires for — is not
+    its own repository and will never be in the map. The commit is then the last
+    one F0 summarised for that repository: a fact about the repository, not a claim
+    about which build this tenant runs, and the diagnosis says so.
+    """
+    entry = await repository.system_map_for_service(service)
+    if entry is not None:
+        return entry.repo_url, entry.source_commit
+    declared = config.repo_serving(service, kind)
+    if declared is None:
+        return None, None
+    return declared.url, await repository.last_summarised_commit(declared.url)

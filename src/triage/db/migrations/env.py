@@ -10,7 +10,7 @@ from logging.config import fileConfig
 from typing import Any
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 
 from triage.config import get_settings
 from triage.db.models import SCHEMA, Base
@@ -59,6 +59,12 @@ def run_migrations_online() -> None:
     connectable = engine_from_config(section, prefix="sqlalchemy.", poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
+        # Before anything else: Alembic keeps its own version table in this schema
+        # and creates it before running 0001, which is what creates the schema. On
+        # an empty database that is a deadlock — "schema triage does not exist" —
+        # and `make dev` could never have worked on a fresh volume.
+        connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
+        connection.commit()
         context.configure(
             connection=connection,
             target_metadata=target_metadata,

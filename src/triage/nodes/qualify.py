@@ -14,24 +14,29 @@ a ref that does not exist, and its failure looks like an infrastructure problem
 rather than a fabrication.
 """
 
+import structlog
 from langchain_core.runnables import RunnableConfig
+from pydantic import ValidationError
 
 from triage.graphs.state import IncidentState
+from triage.llm import StructuredOutputError
 from triage.nodes.collect import alert_payload, collection_payload
 from triage.prompts import render
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.collection import ProposedCause, Qualification
 from triage.schemas.hypothesis import CauseType, Hypothesis
+from triage.scope import deployed_repo
+
+log = structlog.get_logger(__name__)
 
 NEEDS_COMMIT = (CauseType.APP, CauseType.DEPLOYMENT)
 
 
 async def _resolve(deps: Deps, cause: ProposedCause) -> Hypothesis:
-    entry = await deps.repo.system_map_for_service(cause.service)
-    commit = entry.source_commit if entry else None
+    repo_url, commit = await deployed_repo(deps.config, deps.repo, cause.service)
     cause_type = cause.cause_type
     if cause_type in NEEDS_COMMIT and not commit:
-        cause_type = CauseType.DEPENDENCY if entry is None else CauseType.INFRA
+        cause_type = CauseType.DEPENDENCY if repo_url is None else CauseType.INFRA
     return Hypothesis(
         cause_type=cause_type,
         service=cause.service,
@@ -41,31 +46,47 @@ async def _resolve(deps: Deps, cause: ProposedCause) -> Hypothesis:
     )
 
 
+async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
+    """Ask once; ask again with the error. Then let it fail.
+
+    Everything downstream is built from the causes, so an answer that does not
+    parse costs the collection that produced it. The one observed failure —
+    the causes written as markup inside the summary — is exactly the kind a model
+    fixes when shown the validator's complaint.
+    """
+    try:
+        return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+    except (StructuredOutputError, ValidationError) as exc:
+        log.warning("qualification_rejected", error=str(exc))
+        sections["correction"] = (
+            f"Your previous answer did not satisfy the schema and was discarded. "
+            f"Answer again, putting each cause in the `causes` list as a separate "
+            f"object — never as text inside `summary`. The validator reported:\n{exc}"
+        )
+    return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+
+
 async def qualify(state: IncidentState, config: RunnableConfig | None = None) -> IncidentState:
     deps = deps_from_runnable_config(config)
     alert = state["alert"]
     service = state.get("service") or alert.scope.workload or ""
     entry = await deps.repo.system_map_for_service(service)
 
-    qualification = await deps.llm.call(
-        "analysis",
-        render(
-            "qualify",
-            alert=alert_payload(alert),
-            collected=collection_payload(state["collection"], deps.config.collection),
-            system_map=(
-                entry.model_dump(mode="json")
-                if entry
-                else {
-                    "service": service,
-                    "known": False,
-                    "note": "F0 has no cartography for this workload: its repository, "
-                    "entry points and dependencies are unknown.",
-                }
-            ),
+    sections: dict[str, object] = {
+        "alert": alert_payload(alert),
+        "collected": collection_payload(state["collection"], deps.config.collection),
+        "system_map": (
+            entry.model_dump(mode="json")
+            if entry
+            else {
+                "service": service,
+                "known": False,
+                "note": "F0 has no cartography for this workload: its repository, "
+                "entry points and dependencies are unknown.",
+            }
         ),
-        Qualification,
-    )
+    }
+    qualification = await _qualified(deps, sections)
     hypotheses = [await _resolve(deps, cause) for cause in qualification.causes]
     return {
         "qualification": qualification,

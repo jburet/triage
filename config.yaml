@@ -32,6 +32,12 @@ repos:
   - url: github.com/org/payments-api
     team: payments
     kind: application
+    # `serves` names the service patterns this repository is deployed as. The
+    # system map is keyed on the name a repository says it deploys as, so a
+    # multi-tenant platform — one instance per customer, plt-merck-qa,
+    # plt-hcl-software-uat — needs this or every one of its alerts resolves to
+    # "not in the system map" and nothing is ever read.
+    serves: ["payments-*"]
   - url: github.com/org/infra
     team: platform
     kind: terraform
