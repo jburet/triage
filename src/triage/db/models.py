@@ -12,6 +12,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    BigInteger,
     DateTime,
     ForeignKey,
     Index,
@@ -53,17 +54,48 @@ class TimestampMixin:
 
 
 class SignalRow(Base, TimestampMixin):
-    """Every ingested alert or database tick, with its raw payload (ADR-0012: 90 d)."""
+    """Every ingested alert or database tick, with its raw payload (ADR-0012: 90 d).
+
+    The Datadog columns are what makes the poller idempotent and the persistence
+    gate measurable: ``external_id`` is the event id the overlapping window
+    deduplicates on, and the monitor, group and duration are what one alert
+    *cycle* is keyed and judged on (ADR-0017, ADR-0018).
+    """
 
     __tablename__ = "signals"
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     feature: Mapped[str] = mapped_column(String(8))
     source: Mapped[str] = mapped_column(String(64))
-    external_id: Mapped[str | None] = mapped_column(String(256), index=True)
+    external_id: Mapped[str | None] = mapped_column(String(256), index=True, unique=True)
     service: Mapped[str] = mapped_column(String(128), index=True)
+    team: Mapped[str | None] = mapped_column(String(128))
+    monitor_id: Mapped[int | None] = mapped_column(BigInteger)
+    # Not "group": it is a reserved word in SQL, and a column that must be quoted
+    # everywhere is a column that will eventually not be.
+    firing_group: Mapped[str | None] = mapped_column(Text)
+    cycle_key: Mapped[str | None] = mapped_column(String(128), index=True)
+    fired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    recovered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    duration_seconds: Mapped[float | None] = mapped_column()
     status: Mapped[str] = mapped_column(String(32))
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+    __table_args__ = (Index("ix_signals_monitor_group", "monitor_id", "firing_group"),)
+
+
+class PollerWatermarkRow(Base, TimestampMixin):
+    """Where the alert poller got to (ADR-0017).
+
+    One row per poller name. The query runs from ``watermark - 2 min`` and
+    deduplicates on the event id, so this is a *hint* rather than a cursor that
+    has to be exact against Datadog's own ingestion lag.
+    """
+
+    __tablename__ = "poller_watermarks"
+
+    name: Mapped[str] = mapped_column(String(64), primary_key=True)
+    watermark: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class DiagnosisRow(Base, TimestampMixin):

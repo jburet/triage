@@ -80,11 +80,11 @@ Scored in `evals/`, not here, because it depends on model output: fed the captur
 
 ## Phase 3: F1 end to end and post-mortem
 
-- [ ] 3.1 The `incident` graph, fed an alert fixture with all fakes, ends in a Jira ticket (the `oom_payments` path) and the Slack channel of the owning team has both the immediate notice and the ticket notice.
-- [ ] 3.2 A Slack notice is posted when the persistence gate opens and analysis starts, naming the service, alert, how long it has been firing, and that Triage is investigating; it is the thread the later notices reply to.
-- [ ] 3.3 After a ticket is created, a post-mortem draft (timeline + diagnosis) is added as a Jira comment on that ticket and the Slack thread receives a link, not the text (ADR-0010).
-- [ ] 3.4 No post-mortem is drafted when the pipeline ends without a ticket.
-- [ ] 3.5 `Signal.status` moves `received → waiting → analysing → diagnosed → ticketed|discarded`, terminates at `out_of_scope` or `self_recovered` without ever reaching `analysing`, and reaches `failed` on an unhandled error — all observable through the repository.
+- [x] 3.1 The `incident` graph, fed an alert fixture with all fakes, ends in a Jira ticket (the `oom_payments` path) and the Slack channel of the owning team has both the immediate notice and the ticket notice.
+- [x] 3.2 A Slack notice is posted when the persistence gate opens and analysis starts, naming the service, alert, how long it has been firing, and that Triage is investigating; it is the thread the later notices reply to.
+- [x] 3.3 After a ticket is created, a post-mortem draft (timeline + diagnosis) is added as a Jira comment on that ticket and the Slack thread receives a link, not the text (ADR-0010).
+- [x] 3.4 No post-mortem is drafted when the pipeline ends without a ticket.
+- [x] 3.5 `Signal.status` moves `received → waiting → analysing → diagnosed → ticketed|discarded`, terminates at `out_of_scope` or `self_recovered` without ever reaching `analysing`, and reaches `failed` on an unhandled error — all observable through the repository.
 
 ## Phase 4: alert poller (ADR-0017, ADR-0018, ADR-0011)
 

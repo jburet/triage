@@ -34,6 +34,10 @@ class TicketPipelineState(TypedDict, total=False):
     ticket_key: str | None
     ticket_url: str | None
 
+    # The Slack thread the calling feature opened, if any: every notice about one
+    # incident belongs under the message that announced it.
+    thread_ts: str | None
+
     # Monotonic clock reading taken at entry, for the time-to-ticket metric.
     started_at: float
 
@@ -177,7 +181,7 @@ class AnalysisState(TypedDict, total=False):
     synthesis_attempts: int
 
 
-class IncidentState(TypedDict, total=False):
+class IncidentState(AnalysisState, TicketPipelineState, total=False):
     """F1, from a persisted alert to a ticket and a post-mortem (architecture §2.3).
 
     The input is a ``Signal`` the poller already stored, never a raw webhook body:
@@ -187,8 +191,6 @@ class IncidentState(TypedDict, total=False):
 
     signal: Signal
     alert: Alert
-    team: str
-    service: str
 
     classification: AlertClassification
     window: TimeWindow
@@ -196,11 +198,4 @@ class IncidentState(TypedDict, total=False):
     followup_done: bool
 
     qualification: Qualification
-    hypotheses: list[Hypothesis]
-    diagnosis: Diagnosis
-
-    thread_ts: str | None
-    outcome: PipelineOutcome
-    ticket_key: str | None
-    ticket_url: str | None
     postmortem: str

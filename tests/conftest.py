@@ -39,6 +39,7 @@ from triage.schemas.collection import (
     FollowUpPlan,
     Qualification,
 )
+from triage.schemas.postmortem import Postmortem
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
@@ -420,6 +421,17 @@ def a_follow_up(*requests: dict[str, object], done: bool = False) -> FollowUpPla
     return FollowUpPlan.model_validate({"done": done, "requests": list(requests)})
 
 
+def a_postmortem(**overrides: object) -> Postmortem:
+    base: dict[str, object] = {
+        "timeline": "00:43 probe failures; 00:43:54 container killed with exit code 137.",
+        "what_happened": "The tenant's platform pod restarted three times in four minutes.",
+        "why_it_happened": "The liveness probe is shorter than the startup. Confidence: medium.",
+        "what_would_have_helped": "No APM on this tenant, so no request-level view.",
+    }
+    base.update(overrides)
+    return Postmortem.model_validate(base)
+
+
 def build_deps(
     config: Config,
     *,
@@ -427,6 +439,7 @@ def build_deps(
     drafts: object = None,
     verdicts: object = None,
     syntheses: object = None,
+    postmortems: object = None,
     classifications: object = None,
     qualifications: object = None,
     follow_ups: object = None,
@@ -446,6 +459,7 @@ def build_deps(
         else [a_classification()],
         Qualification: qualifications if qualifications is not None else [a_qualification()],
         FollowUpPlan: follow_ups if follow_ups is not None else [a_follow_up(done=True)],
+        Postmortem: postmortems if postmortems is not None else [a_postmortem()],
     }
     return Deps(
         llm=FakeLLM(responses=responses),  # type: ignore[arg-type]

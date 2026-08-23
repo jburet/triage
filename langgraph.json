@@ -5,7 +5,8 @@
   "graphs": {
     "ticket_pipeline": "./src/triage/graphs/ticket_pipeline.py:graph",
     "cartography": "./src/triage/graphs/cartography.py:graph",
-    "analysis": "./src/triage/graphs/analysis.py:graph"
+    "analysis": "./src/triage/graphs/analysis.py:graph",
+    "incident": "./src/triage/graphs/incident.py:graph"
   },
   "env": ".env"
 }

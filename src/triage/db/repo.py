@@ -20,16 +20,27 @@ from triage.db.models import (
     AnalysisResultRow,
     DiagnosisRow,
     EvaluationRow,
+    PollerWatermarkRow,
+    SignalRow,
     SystemMapRow,
     TicketRow,
 )
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.common import Feature
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.signal import Signal, SignalStatus
 from triage.schemas.system_map import ServiceEntry, SystemMapKind
 from triage.schemas.ticket import PipelineOutcome
 
 OPEN_TICKET_STATES = ("Proposed by agent", "Validated", "In progress")
+
+OPEN_SIGNAL_STATES = (
+    SignalStatus.RECEIVED,
+    SignalStatus.WAITING,
+    SignalStatus.ANALYSING,
+    SignalStatus.DIAGNOSED,
+)
+"""Cycles the poller still has to decide about. Everything else is settled."""
 
 
 @dataclass(frozen=True)
@@ -80,6 +91,22 @@ class SystemMapEntry:
 
 
 class TriageRepository(Protocol):
+    async def save_signal(self, signal: Signal) -> Signal: ...
+
+    async def signal_by_external_id(self, external_id: str) -> Signal | None: ...
+
+    async def signals_for_cycle(
+        self, monitor_id: int | None, group: str | None
+    ) -> list[Signal]: ...
+
+    async def open_signals(self) -> list[Signal]: ...
+
+    async def update_signal(self, signal: Signal) -> Signal: ...
+
+    async def get_watermark(self, name: str) -> datetime | None: ...
+
+    async def set_watermark(self, name: str, moment: datetime) -> None: ...
+
     async def open_tickets_for_service(self, service: str) -> list[TicketRecord]: ...
 
     async def get_ticket(self, jira_key: str) -> TicketRecord | None: ...
@@ -147,11 +174,94 @@ def _to_record(row: TicketRow) -> TicketRecord:
     )
 
 
+def _to_signal(row: SignalRow) -> Signal:
+    return Signal(
+        signal_id=row.id,
+        feature=Feature(row.feature),
+        source=row.source,
+        external_id=row.external_id,
+        service=row.service,
+        team=row.team,
+        monitor_id=row.monitor_id,
+        group=row.firing_group,
+        cycle_key=row.cycle_key,
+        fired_at=row.fired_at,
+        recovered_at=row.recovered_at,
+        duration_seconds=row.duration_seconds,
+        received_at=row.created_at,
+        status=SignalStatus(row.status),
+        payload=row.payload,
+    )
+
+
+def _signal_columns(signal: Signal) -> dict[str, Any]:
+    return {
+        "feature": signal.feature.value,
+        "source": signal.source,
+        "external_id": signal.external_id,
+        "service": signal.service,
+        "team": signal.team,
+        "monitor_id": signal.monitor_id,
+        "firing_group": signal.group,
+        "cycle_key": signal.cycle_key,
+        "fired_at": signal.fired_at,
+        "recovered_at": signal.recovered_at,
+        "duration_seconds": signal.duration_seconds,
+        "status": signal.status.value,
+        "payload": signal.payload,
+    }
+
+
 class SqlRepository:
     """PostgreSQL-backed implementation."""
 
     def __init__(self, sessionmaker: async_sessionmaker[AsyncSession]) -> None:
         self._sessionmaker = sessionmaker
+
+    async def save_signal(self, signal: Signal) -> Signal:
+        async with self._sessionmaker() as session, session.begin():
+            await session.merge(SignalRow(id=signal.signal_id, **_signal_columns(signal)))
+        return signal
+
+    async def update_signal(self, signal: Signal) -> Signal:
+        return await self.save_signal(signal)
+
+    async def signal_by_external_id(self, external_id: str) -> Signal | None:
+        async with self._sessionmaker() as session:
+            row = await session.scalar(
+                select(SignalRow).where(SignalRow.external_id == external_id)
+            )
+        return _to_signal(row) if row else None
+
+    async def signals_for_cycle(self, monitor_id: int | None, group: str | None) -> list[Signal]:
+        stmt = (
+            select(SignalRow)
+            .where(SignalRow.monitor_id == monitor_id, SignalRow.firing_group == group)
+            .order_by(SignalRow.created_at.desc())
+            .limit(50)
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.scalars(stmt)).all()
+        return [_to_signal(row) for row in rows]
+
+    async def open_signals(self) -> list[Signal]:
+        stmt = select(SignalRow).where(
+            SignalRow.status.in_([status.value for status in OPEN_SIGNAL_STATES])
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.scalars(stmt)).all()
+        return [_to_signal(row) for row in rows]
+
+    async def get_watermark(self, name: str) -> datetime | None:
+        async with self._sessionmaker() as session:
+            moment: datetime | None = await session.scalar(
+                select(PollerWatermarkRow.watermark).where(PollerWatermarkRow.name == name)
+            )
+        return moment
+
+    async def set_watermark(self, name: str, moment: datetime) -> None:
+        async with self._sessionmaker() as session, session.begin():
+            await session.merge(PollerWatermarkRow(name=name, watermark=moment))
 
     async def open_tickets_for_service(self, service: str) -> list[TicketRecord]:
         stmt = (
@@ -354,11 +464,42 @@ class EvaluationRecord:
 class InMemoryRepository:
     """Test and dry-run double. Same semantics, no database."""
 
+    signals: dict[UUID, Signal] = field(default_factory=dict)
+    watermarks: dict[str, datetime] = field(default_factory=dict)
     tickets: dict[str, TicketRecord] = field(default_factory=dict)
     diagnoses: dict[UUID, Diagnosis] = field(default_factory=dict)
     evaluations: list[EvaluationRecord] = field(default_factory=list)
     analysis_results: dict[str, AnalysisResultRecord] = field(default_factory=dict)
     system_map: dict[tuple[SystemMapKind, str], SystemMapEntry] = field(default_factory=dict)
+
+    async def save_signal(self, signal: Signal) -> Signal:
+        self.signals[signal.signal_id] = signal
+        return signal
+
+    async def update_signal(self, signal: Signal) -> Signal:
+        return await self.save_signal(signal)
+
+    async def signal_by_external_id(self, external_id: str) -> Signal | None:
+        return next(
+            (signal for signal in self.signals.values() if signal.external_id == external_id),
+            None,
+        )
+
+    async def signals_for_cycle(self, monitor_id: int | None, group: str | None) -> list[Signal]:
+        return [
+            signal
+            for signal in self.signals.values()
+            if signal.monitor_id == monitor_id and signal.group == group
+        ]
+
+    async def open_signals(self) -> list[Signal]:
+        return [signal for signal in self.signals.values() if signal.status in OPEN_SIGNAL_STATES]
+
+    async def get_watermark(self, name: str) -> datetime | None:
+        return self.watermarks.get(name)
+
+    async def set_watermark(self, name: str, moment: datetime) -> None:
+        self.watermarks[name] = moment
 
     async def open_tickets_for_service(self, service: str) -> list[TicketRecord]:
         return [

@@ -67,4 +67,14 @@ async def qualify(state: IncidentState, config: RunnableConfig | None = None) ->
         Qualification,
     )
     hypotheses = [await _resolve(deps, cause) for cause in qualification.causes]
-    return {"qualification": qualification, "hypotheses": hypotheses}
+    return {
+        "qualification": qualification,
+        "hypotheses": hypotheses,
+        # What the shared Analysis sub-graph is given as context: it must not have
+        # to know that an F1 collection is what produced these hypotheses.
+        "context": {
+            "alert": alert_payload(alert),
+            "telemetry_summary": qualification.summary,
+            "collected": collection_payload(state["collection"], deps.config.collection),
+        },
+    }
