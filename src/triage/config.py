@@ -202,6 +202,11 @@ class Settings(BaseSettings):
     jira_user_email: str = ""
     jira_api_token: str = ""
 
+    # LangGraph Platform. Unset means the in-process fallback (ADR-0011): the same
+    # graph, the same thread id, no queue.
+    platform_url: str = ""
+    platform_api_key: str = ""
+
     # Datadog: read-only collection for F1. ``datadog_site`` is the API host;
     # the application key is scoped and belongs to a service account, not a person.
     datadog_site: str = "api.datadoghq.eu"

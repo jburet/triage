@@ -6,7 +6,8 @@
     "ticket_pipeline": "./src/triage/graphs/ticket_pipeline.py:graph",
     "cartography": "./src/triage/graphs/cartography.py:graph",
     "analysis": "./src/triage/graphs/analysis.py:graph",
-    "incident": "./src/triage/graphs/incident.py:graph"
+    "incident": "./src/triage/graphs/incident.py:graph",
+    "alert_poller": "./src/triage/graphs/poller.py:graph"
   },
   "env": ".env"
 }

@@ -88,15 +88,15 @@ Scored in `evals/`, not here, because it depends on model output: fed the captur
 
 ## Phase 4: alert poller (ADR-0017, ADR-0018, ADR-0011)
 
-- [ ] 4.1 One tick against a fixture page of monitor-alert events persists one `Signal` per (monitor id, firing group) in `error`, with the Datadog event id as `external_id`, and advances the watermark. A second tick over the same page persists nothing new and creates no run.
-- [ ] 4.2 Each tick queries from `watermark − 2 min`; an event inside that overlap which was already stored is deduplicated on `external_id`, and a re-notification of an open cycle does not create a second signal.
-- [ ] 4.3 An alert whose service matches a team's `service_patterns` resolves to that team; one matching no team is persisted `out_of_scope` and posts nothing to Slack; one that resolves to a team but names a service unknown to the system map posts the notice to that team's channel and is never analysed.
-- [ ] 4.4 An alert with no `service:` tag resolves through `kube_namespace` / `kube_stateful_set` against `namespace_patterns`, which is how the captured StatefulSet alert reaches a team at all.
-- [ ] 4.5 Environment comes from `clusters:` mapping `kube_cluster_name`, never from an `env:` tag. A cluster mapping to an environment outside the team's `environments` is `out_of_scope`; an unmapped cluster is `out_of_scope` with that reason, never assumed to be production.
-- [ ] 4.6 A cycle that recovers before `thresholds.alert_persistence_minutes` is stored `self_recovered` with its duration and never analysed; a cycle still in `error` when the gate is reached creates a run for the `incident` graph.
-- [ ] 4.7 `thresholds.flap_count` self-recovered cycles for the same monitor and group inside `thresholds.flap_window_hours` produce one flapping `Diagnosis` through the ticket pipeline, after which the counter for that pair resets.
-- [ ] 4.8 After a gap longer than the catch-up bound the poller replays at most 30 minutes, posts one Slack line naming the skipped span and how many events it contained, and does not silently advance the watermark past them.
-- [ ] 4.9 With `TRIAGE_PLATFORM_URL` set a run is created on the Platform for the `incident` graph; without it the graph is invoked in-process with the Postgres checkpointer. Same graph, same thread id either way.
+- [x] 4.1 One tick against a fixture page of monitor-alert events persists one `Signal` per (monitor id, firing group) in `error`, with the Datadog event id as `external_id`, and advances the watermark. A second tick over the same page persists nothing new and creates no run.
+- [x] 4.2 Each tick queries from `watermark − 2 min`; an event inside that overlap which was already stored is deduplicated on `external_id`, and a re-notification of an open cycle does not create a second signal.
+- [x] 4.3 An alert whose service matches a team's `service_patterns` resolves to that team; one matching no team is persisted `out_of_scope` and posts nothing to Slack; one that resolves to a team but names a service unknown to the system map posts the notice to that team's channel and is never analysed.
+- [x] 4.4 An alert with no `service:` tag resolves through `kube_namespace` / `kube_stateful_set` against `namespace_patterns`, which is how the captured StatefulSet alert reaches a team at all.
+- [x] 4.5 Environment comes from `clusters:` mapping `kube_cluster_name`, never from an `env:` tag. A cluster mapping to an environment outside the team's `environments` is `out_of_scope`; an unmapped cluster is `out_of_scope` with that reason, never assumed to be production.
+- [x] 4.6 A cycle that recovers before `thresholds.alert_persistence_minutes` is stored `self_recovered` with its duration and never analysed; a cycle still in `error` when the gate is reached creates a run for the `incident` graph.
+- [x] 4.7 `thresholds.flap_count` self-recovered cycles for the same monitor and group inside `thresholds.flap_window_hours` produce one flapping `Diagnosis` through the ticket pipeline, after which the counter for that pair resets.
+- [x] 4.8 After a gap longer than the catch-up bound the poller replays at most 30 minutes, posts one Slack line naming the skipped span and how many events it contained, and does not silently advance the watermark past them.
+- [x] 4.9 With `TRIAGE_PLATFORM_URL` set a run is created on the Platform for the `incident` graph; without it the graph is invoked in-process with the Postgres checkpointer. Same graph, same thread id either way.
 
 ## Out of scope
 

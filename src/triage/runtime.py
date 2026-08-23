@@ -29,6 +29,7 @@ from triage.integrations.base import (
 )
 from triage.integrations.datadog import DatadogClient, FakeDatadogClient
 from triage.integrations.github import GitHubClient, dry_run_github
+from triage.integrations.platform import PlatformClient
 from triage.llm import LiteLLMClient, StructuredLLM
 
 log = structlog.get_logger(__name__)
@@ -45,6 +46,7 @@ class Deps:
     runner: AnalysisRunner
     github: GitHubClient
     datadog: DatadogClient
+    platform: PlatformClient | None
     config: Config
 
 
@@ -76,6 +78,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
             runner=FakeAnalysisRunner(default=dry_run_result),
             github=dry_run_github(),
             datadog=FakeDatadogClient(),
+            platform=None,
             config=config,
         )
 
@@ -84,6 +87,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
     from triage.integrations.datadog import DatadogRestClient
     from triage.integrations.github import GitHubRestClient
     from triage.integrations.jira import JiraRestClient
+    from triage.integrations.platform import PlatformRestClient
     from triage.integrations.slack import SlackWebClient
 
     engine = create_async_engine(settings.database_url, pool_pre_ping=True)
@@ -99,6 +103,11 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
         github=GitHubRestClient(settings.github_token),
         datadog=DatadogRestClient(
             settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
+        ),
+        platform=(
+            PlatformRestClient(settings.platform_url, settings.platform_api_key)
+            if settings.platform_url
+            else None
         ),
         config=config,
     )

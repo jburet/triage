@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, TypedDict
 from uuid import UUID
 
@@ -199,3 +200,23 @@ class IncidentState(AnalysisState, TicketPipelineState, total=False):
 
     qualification: Qualification
     postmortem: str
+
+
+class PollerState(TypedDict, total=False):
+    """One tick of the alert poller (ADR-0017).
+
+    Everything it did is reported back rather than only logged: a tick that
+    skipped a span, refused an alert as out of scope or launched three runs is
+    the only observable the cron has.
+    """
+
+    now: datetime | None
+
+    events_seen: int
+    created: list[UUID]
+    launched: list[UUID]
+    recovered: list[Signal]
+    out_of_scope: list[UUID]
+    unmapped: list[UUID]
+    flapping: list[str]
+    skipped_span: str | None

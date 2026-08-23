@@ -11,6 +11,7 @@ from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
 from triage.integrations.datadog import FakeDatadogClient
 from triage.integrations.github import FakeGitHubClient
+from triage.integrations.platform import FakePlatformClient
 from triage.llm import FakeLLM
 from triage.runtime import DEPS_KEY, Deps
 from triage.schemas import (
@@ -447,6 +448,7 @@ def build_deps(
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
     datadog: FakeDatadogClient | None = None,
+    platform: FakePlatformClient | None = None,
 ) -> Deps:
     """Assemble fakes. Anything not supplied gets a sensible passing default."""
     responses: dict[type, object] = {
@@ -469,6 +471,7 @@ def build_deps(
         runner=runner or canned_runner(),
         github=FakeGitHubClient(changed=changed or {}),
         datadog=datadog or FakeDatadogClient(),
+        platform=platform,
         config=config,
     )
 
