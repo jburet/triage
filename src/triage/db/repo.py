@@ -7,6 +7,7 @@ no behavioural difference in the branches that matter.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Any, Protocol
@@ -15,10 +16,17 @@ from uuid import UUID, uuid4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from triage.db.models import AnalysisResultRow, DiagnosisRow, EvaluationRow, TicketRow
+from triage.db.models import (
+    AnalysisResultRow,
+    DiagnosisRow,
+    EvaluationRow,
+    SystemMapRow,
+    TicketRow,
+)
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.common import Feature
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.system_map import ServiceEntry, SystemMapKind
 from triage.schemas.ticket import PipelineOutcome
 
 OPEN_TICKET_STATES = ("Proposed by agent", "Validated", "In progress")
@@ -52,6 +60,23 @@ class AnalysisResultRecord:
     status: AnalysisStatus
     result: dict[str, Any] | None = None
     error: str | None = None
+
+
+@dataclass(frozen=True)
+class SystemMapEntry:
+    """One row of the map: what it is, who owns it, and the commit it was read from.
+
+    ``team`` is nullable because ownership comes from ``config.yaml`` and a repo
+    can be summarised before anyone declares a team for it. That is a real
+    absence rather than an unfilled answer, so it is ``None`` and not an
+    :class:`~triage.schemas.common.Unknown`.
+    """
+
+    kind: SystemMapKind
+    name: str
+    team: str | None
+    source_commit: str | None
+    payload: dict[str, Any]
 
 
 class TriageRepository(Protocol):
@@ -99,6 +124,12 @@ class TriageRepository(Protocol):
         result: dict[str, Any] | None = None,
         error: str | None = None,
     ) -> AnalysisResultRecord: ...
+
+    async def upsert_system_map_entries(self, entries: Sequence[SystemMapEntry]) -> int: ...
+
+    async def system_map_for_service(self, service: str) -> ServiceEntry | None: ...
+
+    async def last_summarised_commit(self, repo_url: str) -> str | None: ...
 
 
 def _to_record(row: TicketRow) -> TicketRecord:
@@ -245,6 +276,46 @@ class SqlRepository:
             await session.flush()
             return _to_analysis_record(row)
 
+    async def upsert_system_map_entries(self, entries: Sequence[SystemMapEntry]) -> int:
+        async with self._sessionmaker() as session, session.begin():
+            for entry in entries:
+                row = await session.scalar(
+                    select(SystemMapRow).where(
+                        SystemMapRow.kind == entry.kind.value, SystemMapRow.name == entry.name
+                    )
+                )
+                if row is None:
+                    row = SystemMapRow(kind=entry.kind.value, name=entry.name)
+                    session.add(row)
+                row.team = entry.team
+                row.source_commit = entry.source_commit
+                row.payload = entry.payload
+            await session.flush()
+        return len(entries)
+
+    async def system_map_for_service(self, service: str) -> ServiceEntry | None:
+        async with self._sessionmaker() as session:
+            row = await session.scalar(
+                select(SystemMapRow).where(
+                    SystemMapRow.kind == SystemMapKind.SERVICE.value,
+                    SystemMapRow.name == service,
+                )
+            )
+        return ServiceEntry.model_validate(row.payload) if row else None
+
+    async def last_summarised_commit(self, repo_url: str) -> str | None:
+        stmt = (
+            select(SystemMapRow.source_commit)
+            .where(
+                SystemMapRow.payload["repo_url"].astext == repo_url,
+                SystemMapRow.source_commit.is_not(None),
+            )
+            .order_by(SystemMapRow.updated_at.desc())
+            .limit(1)
+        )
+        async with self._sessionmaker() as session:
+            return await session.scalar(stmt)
+
 
 def _to_analysis_record(row: AnalysisResultRow) -> AnalysisResultRecord:
     return AnalysisResultRecord(
@@ -275,6 +346,7 @@ class InMemoryRepository:
     diagnoses: dict[UUID, Diagnosis] = field(default_factory=dict)
     evaluations: list[EvaluationRecord] = field(default_factory=list)
     analysis_results: dict[str, AnalysisResultRecord] = field(default_factory=dict)
+    system_map: dict[tuple[SystemMapKind, str], SystemMapEntry] = field(default_factory=dict)
 
     async def open_tickets_for_service(self, service: str) -> list[TicketRecord]:
         return [
@@ -371,3 +443,18 @@ class InMemoryRepository:
         )
         self.analysis_results[job_name] = record
         return record
+
+    async def upsert_system_map_entries(self, entries: Sequence[SystemMapEntry]) -> int:
+        for entry in entries:
+            self.system_map[(entry.kind, entry.name)] = entry
+        return len(entries)
+
+    async def system_map_for_service(self, service: str) -> ServiceEntry | None:
+        entry = self.system_map.get((SystemMapKind.SERVICE, service))
+        return ServiceEntry.model_validate(entry.payload) if entry else None
+
+    async def last_summarised_commit(self, repo_url: str) -> str | None:
+        for entry in reversed(list(self.system_map.values())):
+            if entry.payload.get("repo_url") == repo_url and entry.source_commit:
+                return entry.source_commit
+        return None
