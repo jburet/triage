@@ -27,6 +27,7 @@ can override it without touching code.
 | [0012](0012-backup-and-retention.md) | Backup and retention | Proposed |
 | [0013](0013-jira-over-rest.md) | Jira over REST v3, not MCP | Accepted, implemented |
 | [0014](0014-analysis-entrypoint-context-gather.md) | The analysis entrypoint gathers context, it does not agent | Accepted, implemented |
+| [0015](0015-incremental-refresh-unit.md) | The unit of incremental refresh is the whole repository summary | Accepted, implemented |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

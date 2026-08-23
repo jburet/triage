@@ -7,6 +7,11 @@ Status: Proposed. Resolves architecture open item 6.
 Incremental on every merge to `main`: clone, diff against the last summarised
 commit, re-summarise only the touched areas. A full re-summarise weekly, by cron.
 
+What "touched areas" means is defined by
+[ADR-0015](0015-incremental-refresh-unit.md), which narrows it: the unit of
+invalidation is the whole repository summary, because ADR-0014's entrypoint
+produces one document per repository and cannot refresh part of it.
+
 ## Why
 
 The roadmap asks for a refresh on every merge. A full re-summarise of every

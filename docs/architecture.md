@@ -167,7 +167,10 @@ repo_list (YAML) or merge_webhook
 ```
 
 Incremental on every merge, with a weekly full re-summarise by cron
-([ADR-0006](adr/0006-f0-refresh-strategy.md)).
+([ADR-0006](adr/0006-f0-refresh-strategy.md)). A merge is compared against the commit the
+map records: a change to nothing the summariser reads moves the recorded commit and leaves
+the summary standing, anything else re-summarises the whole repository
+([ADR-0015](adr/0015-incremental-refresh-unit.md)).
 
 `build_system_map` is a rule, not a model call as first sketched: a summary names the
 service it deploys as, a module names the services it provisions for, and `config.yaml`
@@ -220,7 +223,7 @@ Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $5
 | Datadog | MCP | read |
 | Kubernetes | Python (read-only ServiceAccount) | read |
 | PostgreSQL (target DBs) | Python (read-only role) | read |
-| GitHub | MCP | read |
+| GitHub | MCP for repository reads; Python (REST, `httpx`) for the one commit comparison F0's incremental refresh needs ([ADR-0015](adr/0015-incremental-refresh-unit.md)) | read |
 | Jira | Python (REST v3, `httpx`) | read + write |
 | Slack | Python SDK (slack_sdk) | write |
 | Code | Claude Agent SDK in analysis Job (shallow clone) | read |
@@ -303,6 +306,8 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 10 | Post-mortem draft as a Jira comment, linked from Slack | [0010](adr/0010-postmortem-destination.md) |
 | 11 | Platform Enterprise licence, with an in-process fallback | [0011](adr/0011-langgraph-platform-licence.md) |
 | 12 | Nightly full dump, 30 d; payloads 90 d; product memory kept | [0012](adr/0012-backup-and-retention.md) |
+| 14 | F0 summaries are a bounded context gather plus one structured call | [0014](adr/0014-analysis-entrypoint-context-gather.md) |
+| 15 | Incremental refresh invalidates a whole repository summary, or none of it | [0015](adr/0015-incremental-refresh-unit.md) |
 
 ---
 
@@ -312,20 +317,39 @@ reasoning and, more usefully, the condition that would make each one wrong.
 |---|---|---|
 | M0 | Repo, schemas, config, model tiers, persistence, migrations, CI | **Done** |
 | M1 | Ticket pipeline sub-graph (§2.2), end to end against fixtures | **Done** |
-| M2 | F0 cartography, analysis Job contract and gVisor template, `system_map` | Not started |
+| M2 | F0 cartography (§2.5), analysis Job contract, `system_map` | **Done in code**; the Job template and its cluster objects are the infra track |
 | M3 | Analysis sub-graph (§2.1), F1 incident graph (§2.3), Datadog ingress | Not started |
 | M4 | F3 daily database review (§2.4) | Not started |
 | M5 | Alert coverage audit, self-evaluation reporting, incident memory | Not started |
 | Infra | Self-hosted Platform, LiteLLM proxy, LangSmith, NetworkPolicies, backups | Not started |
 
-What exists today is the shared ticket pipeline and everything underneath it. It is
-built and tested standalone, driven by fixture `Diagnosis` objects, so the product
-definition can be validated before any collector exists — which is the roadmap's own
+What exists today is the shared ticket pipeline, and the cartography graph that fills
+the system map. Both are built and tested standalone — the pipeline against fixture
+`Diagnosis` objects, cartography against a fake analysis runner — so the product
+definition can be validated before any collector exists, which is the roadmap's own
 delivery order.
 
-The tables in §4 are all migrated, including those M2–M4 will fill. The tools in §5
-are protocols with fakes; only Jira and Slack have real implementations, and the
-Jira one is unverified against a live server (see its module docstring).
+M2 delivers, in code: the graph → analysis contract (`AnalysisRequest`/`AnalysisResult`
+with a per-kind payload schema), three runners behind one protocol (fake, local
+subprocess, Kubernetes Job), the two F0 summarisers and the entrypoint that produces
+them ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)), the `cartography`
+graph, the `system_map` rows keyed by `(kind, name)`, and the incremental refresh
+([ADR-0015](adr/0015-incremental-refresh-unit.md)).
 
-Not yet built, and worth stating plainly: the ingress service, every collector, the
-Analysis sub-graph, the analysis Job image and template, and the whole infra track.
+What M2 does **not** deliver, and should not be assumed to work:
+
+- **No analysis has ever run.** `KubernetesJobApi` and `GitHubRestClient` are written
+  from the API references and are unverified against a live cluster and a live GitHub,
+  exactly as the Jira client is against a live Jira. Every test uses a fake.
+- **Summary quality is unmeasured.** `evals/cartography.py` scores the two summarisers
+  against real public repositories, costs money, needs network, and has never been run.
+- **Nothing triggers it.** The GitHub merge webhook lands with the M3 ingress, and the
+  weekly full pass needs a Platform cron — both infra track. Today `cartography` is
+  invoked by hand (`make run-cartography`) or from Studio.
+- **The sandbox does not exist.** The Job manifest, the gVisor runtime class, the
+  NetworkPolicy and the narrow database role the Job writes its result with are the
+  infra track; `config.analysis.job` only *names* them.
+
+The tables in §4 are all migrated, including those M3–M4 will fill. Still not built:
+the ingress service, the F1 and F3 collectors, the Analysis sub-graph, the analysis Job
+image, and the whole infra track.

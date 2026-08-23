@@ -26,3 +26,10 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M2 phase 3.1-3.4 | pytest tests/integration/test_cartography.py | 1 |
 | 2026-08-23 | M2 phase 3 | make lint | 1 |
 | 2026-08-23 | M2 phase 3 | make test (276 passed) | 2 |
+| 2026-08-23 | M2 phase 4.1 | pytest tests/unit/test_invalidation.py | 1 |
+| 2026-08-23 | M2 phase 4.1 | pytest tests/integration/test_github_client.py | 1 |
+| 2026-08-23 | M2 phase 4.1 | pytest tests/unit/test_system_map_repo.py | 1 |
+| 2026-08-23 | M2 phase 4.1-4.3 | pytest tests/integration/test_cartography.py | 1 |
+| 2026-08-23 | M2 phase 4 | run_cartography --merge (dry run, no spend) | 2 |
+| 2026-08-23 | M2 phase 4 | make lint | 1 |
+| 2026-08-23 | M2 phase 4 | make test (304 passed) | 2 |

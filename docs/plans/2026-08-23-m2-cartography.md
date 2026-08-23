@@ -32,8 +32,10 @@ Phase 1 and Phase 3 of this one.
 
 - [x] 2.1 Summarising an application repo yields a `RepoSummary` with languages, frameworks, entry points, endpoints, inter-service dependencies, database access patterns and observability setup — every one either filled or an explicit `Unknown` with a reason.
 - [x] 2.2 Summarising a Terraform repo yields a `TerraformSummary` listing resources, sizing, networking, managed databases and a module ↔ service mapping, from code only (no state is read).
-- [x] 2.3 Both summaries are produced by the `analysis` tier and pass `evals/` scoring on at least one real public repo each (evals, not CI).
-      Suite is `evals/cartography.py` (`make evals-cartography`); **unrun** — it needs network and spend.
+- [ ] 2.3 Both summaries are produced by the `analysis` tier and pass `evals/` scoring on at least one real public repo each (evals, not CI).
+      Produced by the `analysis` tier: done. Scoring: **not done** — `evals/cartography.py`
+      (`make evals-cartography`) exists and has never been run, so nothing here has passed
+      anything. Unticked deliberately: the suite existing is not the suite passing.
 
 ## Phase 3: system map
 
@@ -45,9 +47,15 @@ Phase 1 and Phase 3 of this one.
 
 ## Phase 4: incremental refresh (ADR-0006)
 
-- [ ] 4.1 A `merge_event` for a repo re-summarises only the areas touched between the last summarised commit and the new one, and updates `source_commit`.
-- [ ] 4.2 A `merge_event` for a repo with no prior summary falls back to a full summary of that repo.
-- [ ] 4.3 A run flagged `full=True` re-summarises every repo regardless of diff; this is the entrypoint the weekly cron will call.
+- [x] 4.1 A `merge_event` for a repo re-summarises only the areas touched between the last summarised commit and the new one, and updates `source_commit`.
+      Narrowed by [ADR-0015](../adr/0015-incremental-refresh-unit.md): the unit is the whole
+      repository summary, not the area. A merge touching nothing the summariser reads is not
+      re-summarised at all and only its `source_commit` moves; anything else re-summarises the
+      whole repository. Partial re-summarising is not possible under ADR-0014's entrypoint
+      without either losing what it did not look at or keeping what was deleted.
+- [x] 4.2 A `merge_event` for a repo with no prior summary falls back to a full summary of that repo.
+- [x] 4.3 A run flagged `full=True` re-summarises every repo regardless of diff; this is the entrypoint the weekly cron will call.
+      The cron itself is infra track; nothing schedules this yet.
 
 ## Out of scope
 
@@ -57,5 +65,12 @@ Phase 1 and Phase 3 of this one.
 
 ## Open risks
 
-- The Claude Agent SDK inside the Job is assumed to be able to emit a JSON document matching the per-kind schema. If it cannot reliably, Phase 2 needs a second `analysis`-tier call to coerce prose into the schema, and 1.4 is the guard that surfaces it.
-- ADR-0006's diff heuristic ("touched areas") is undefined. Plan assumes "files changed → their top-level package"; if that misses dependencies, the ADR says fix the invalidation rule, not the cadence.
+- ~~The Claude Agent SDK inside the Job is assumed to be able to emit a JSON document matching the per-kind schema.~~ Closed for the two F0 kinds by
+  [ADR-0014](../adr/0014-analysis-entrypoint-context-gather.md): there is no agent, and
+  `StructuredLLM.call` validates through tool use, so no coercion pass was needed. 1.4 remains
+  the guard for the investigative kinds M3 adds.
+- ~~ADR-0006's diff heuristic ("touched areas") is undefined.~~ Defined in
+  [ADR-0015](../adr/0015-incremental-refresh-unit.md), and not as the plan assumed: a path
+  matters when `context.reads` says the gather would read it, and any such path invalidates the
+  whole repository summary. The top-level-package assumption survives only as the recorded
+  `areas`, which no longer narrow the work.
