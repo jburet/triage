@@ -30,9 +30,10 @@ Phase 1 and Phase 3 of this one.
 
 ## Phase 2: repository and Terraform summaries
 
-- [ ] 2.1 Summarising an application repo yields a `RepoSummary` with languages, frameworks, entry points, endpoints, inter-service dependencies, database access patterns and observability setup — every one either filled or an explicit `Unknown` with a reason.
-- [ ] 2.2 Summarising a Terraform repo yields a `TerraformSummary` listing resources, sizing, networking, managed databases and a module ↔ service mapping, from code only (no state is read).
-- [ ] 2.3 Both summaries are produced by the `analysis` tier and pass `evals/` scoring on at least one real public repo each (evals, not CI).
+- [x] 2.1 Summarising an application repo yields a `RepoSummary` with languages, frameworks, entry points, endpoints, inter-service dependencies, database access patterns and observability setup — every one either filled or an explicit `Unknown` with a reason.
+- [x] 2.2 Summarising a Terraform repo yields a `TerraformSummary` listing resources, sizing, networking, managed databases and a module ↔ service mapping, from code only (no state is read).
+- [x] 2.3 Both summaries are produced by the `analysis` tier and pass `evals/` scoring on at least one real public repo each (evals, not CI).
+      Suite is `evals/cartography.py` (`make evals-cartography`); **unrun** — it needs network and spend.
 
 ## Phase 3: system map
 

@@ -18,3 +18,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M2 phase 2.1-2.2 | pytest tests/unit/test_summaries.py | 1 |
 | 2026-08-23 | M2 phase 2.1-2.2 | make lint | 1 |
 | 2026-08-23 | M2 phase 2.1-2.2 | make test (247 passed) | 2 |
+| 2026-08-23 | M2 phase 2.3 | make lint | 1 |
+| 2026-08-23 | M2 phase 2.3 | make test (247 passed) | 1 |

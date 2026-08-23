@@ -1,4 +1,4 @@
-.PHONY: help install env dev db migrate lint test run-fixture evals clean
+.PHONY: help install env dev db migrate lint test run-fixture evals evals-cartography clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,9 @@ run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mo
 
 evals: ## Score the fixture suite against the real models (spends money)
 	uv run python -m evals.run
+
+evals-cartography: ## Score F0 summaries against real public repos (network + spends money)
+	uv run python -m evals.cartography
 
 clean:
 	rm -rf .mypy_cache .ruff_cache .pytest_cache
