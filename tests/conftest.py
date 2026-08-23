@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
-from triage.config import Config, load_config
+from triage.config import Config, Repo, RepoKind, load_config
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
 from triage.integrations.datadog import FakeDatadogClient
@@ -68,6 +68,18 @@ def all_fixture_names() -> list[str]:
 @pytest.fixture
 def config() -> Config:
     return load_config(REPO_ROOT / "config.yaml")
+
+
+def declaring(
+    *urls: str,
+    team: str = "platform",
+    kind: RepoKind = RepoKind.APPLICATION,
+    serves: tuple[str, ...] = (),
+) -> Config:
+    """The shipped config with exactly these repositories declared."""
+    base = load_config(REPO_ROOT / "config.yaml")
+    repos = [Repo(url=url, team=team, kind=kind, serves=list(serves)) for url in urls]
+    return base.model_copy(update={"repos": repos})
 
 
 @pytest.fixture

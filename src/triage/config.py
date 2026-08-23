@@ -169,6 +169,16 @@ class Config(BaseModel):
         ]
         return matches[0] if len(matches) == 1 else None
 
+    def repo_named(self, name: str) -> Repo | None:
+        """The declared repository whose URL ends in this name.
+
+        The seed and a container image both name a repository without a host, so
+        this is the join between them and the URLs config.yaml declares.
+        """
+        return next(
+            (repo for repo in self.repos if repo.url.rstrip("/").rsplit("/", 1)[-1] == name), None
+        )
+
     def environment_of(self, cluster: str | None) -> str | None:
         """The environment a cluster runs, or None — never a guess (ADR-0017)."""
         return self.clusters.get(cluster) if cluster else None

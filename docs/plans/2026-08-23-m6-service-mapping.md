@@ -84,7 +84,7 @@ ECR under the repository's own name. So:
 - [x] 1.2 The seed is versioned in the repository as data (`config/repository-map.yaml`),
       generated from the document by a script and reviewed as a diff — the document is
       someone's Markdown and will be edited without telling us.
-- [ ] 1.3 A repository in the seed that is not declared in `config.yaml` is listed in the
+- [x] 1.3 A repository in the seed that is not declared in `config.yaml` is listed in the
       mapping report as unclaimed, with its team unknown; nothing is invented for it.
 - [ ] 1.4 `Tenancy.MONO_TENANT` on a repository is what allows a service name to differ from
       the repository's declared service; for a multi-tenant repository the two must match or
