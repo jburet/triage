@@ -7,6 +7,7 @@ here — that split is what stops the two drifting.
 from __future__ import annotations
 
 import functools
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,17 @@ from triage.schemas.common import Confidence, Feature
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.yaml"
 
 
+PLATFORM_TEAM = "platform"
+"""The team that owns Triage itself, and hears about the system it cannot attribute."""
+
+
+class RepoKind(StrEnum):
+    """What kind of summary a repository earns. An undeclared kind fails config load."""
+
+    APPLICATION = "application"
+    TERRAFORM = "terraform"
+
+
 class Team(BaseModel):
     name: str
     slack_channel: str
@@ -28,7 +40,7 @@ class Team(BaseModel):
 class Repo(BaseModel):
     url: str
     team: str
-    kind: str
+    kind: RepoKind
 
 
 class Database(BaseModel):
@@ -80,6 +92,19 @@ class Config(BaseModel):
             if team.name == name:
                 return team
         raise KeyError(f"team {name!r} is not declared in config.yaml")
+
+    def declares_team(self, name: str) -> bool:
+        return any(team.name == name for team in self.teams)
+
+    def platform_channel(self) -> str:
+        """Where Triage reports on itself. A missing platform team is a config error."""
+        try:
+            return self.team(PLATFORM_TEAM).slack_channel
+        except KeyError as exc:
+            raise KeyError(
+                f"config.yaml declares no {PLATFORM_TEAM!r} team, so Triage has nowhere "
+                f"to report what it could not attribute"
+            ) from exc
 
     def confidence_threshold(self, feature: Feature) -> Confidence:
         try:
