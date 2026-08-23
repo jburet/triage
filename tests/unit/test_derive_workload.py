@@ -11,7 +11,7 @@ from tests.conftest import TENANT, captured, declaring, running_image
 from triage.mapping.derive import derive_workload
 from triage.mapping.seed import load_seed
 from triage.schemas.common import Unknown
-from triage.schemas.system_map import MappingOutcome
+from triage.schemas.system_map import MappingOutcome, MappingSource, Tenancy
 
 DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 
@@ -103,3 +103,46 @@ def test_an_image_pinned_only_by_digest_says_it_carries_no_tag(config, seed):
 
     assert isinstance(entry.deployed_commit, Unknown)
     assert "carries no tag" in entry.deployed_commit.reason
+
+
+def test_a_service_with_no_image_event_falls_back_to_the_serves_pattern(seed):
+    """The M3 stopgap, kept: a tenant that has been quiet for a week is still mapped."""
+    config = declaring("github.com/zeenea/platform", serves=("plt-*",))
+
+    derivation = derive_workload(config, seed, "plt-merck-qa", [])
+
+    assert derivation.outcome is MappingOutcome.MAPPED
+    assert derivation.entry.source is MappingSource.PATTERN
+    assert derivation.entry.repo_url == "github.com/zeenea/platform"
+    assert derivation.entry.image is None
+
+
+def test_a_pattern_mapping_still_takes_its_tenancy_from_the_seed(seed):
+    config = declaring("github.com/zeenea/platform", serves=("plt-*",))
+    entry = derive_workload(config, seed, "plt-merck-qa", []).entry
+    assert entry.tenancy is Tenancy.MONO_TENANT
+    assert entry.iac_repo == "platform-infra"
+
+
+def test_a_pattern_mapping_never_claims_to_know_the_deployed_commit(seed):
+    config = declaring("github.com/zeenea/platform", serves=("plt-*",))
+    entry = derive_workload(config, seed, "plt-merck-qa", []).entry
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "naming pattern, not an observation" in entry.deployed_commit.reason
+
+
+def test_a_pattern_onto_a_repository_the_seed_does_not_name_leaves_tenancy_unknown(seed):
+    config = declaring("github.com/org/payments-api", serves=("payments-*",))
+
+    entry = derive_workload(config, seed, "payments-api", []).entry
+
+    assert isinstance(entry.tenancy, Unknown)
+    assert "payments-api" in entry.tenancy.reason
+
+
+def test_with_neither_an_image_nor_a_pattern_there_is_no_mapping(config, seed):
+    derivation = derive_workload(config, seed, "ledger-api", [])
+
+    assert derivation.outcome is MappingOutcome.NOT_MAPPED
+    assert derivation.entry is None
+    assert "no serves pattern" in derivation.reason

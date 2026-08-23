@@ -101,7 +101,7 @@ ECR under the repository's own name. So:
       recorded as `Filled`; when it cannot be, `deployed_commit` is an `Unknown` whose reason
       says the image was found but its commit was not — the two are different failures and
       the diagnosis reads differently for each.
-- [ ] 2.4 A service with no image event inside the collection window falls back to the seed's
+- [x] 2.4 A service with no image event inside the collection window falls back to the seed's
       tenancy plus `config.yaml` patterns, recording `source = pattern`; with neither, the
       mapping is absent and the caller says "not mapped", as it does today.
 - [ ] 2.5 Re-running the derivation for a service whose image digest is unchanged rewrites

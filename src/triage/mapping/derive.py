@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from triage.config import Config
+from triage.config import Config, RepoKind
 from triage.mapping.images import ObservedImage, commit_in_tag, latest_image
 from triage.mapping.resolve import naming_conflict
 from triage.mapping.seed import seed_for
@@ -87,21 +87,67 @@ def _from_image(
     )
 
 
+def _from_pattern(config: Config, seed: Sequence[SeedEntry], service: str) -> Derivation:
+    """The fallback: what config.yaml's ``serves`` patterns declare, and nothing more.
+
+    The naming rule of 1.4 is deliberately not applied here. A pattern is a
+    person's statement that this repository is deployed under these names —
+    which is the whole point of the stopgap — while the seed is a document that
+    person did not write.
+    """
+    declared = config.repo_serving(service, RepoKind.APPLICATION)
+    if declared is None:
+        return Derivation(
+            service=service,
+            outcome=MappingOutcome.NOT_MAPPED,
+            reason=(
+                f"no event in the window carries an image for {service} and no serves pattern "
+                f"in config.yaml claims it, so nothing states which repository it runs"
+            ),
+        )
+    repository = declared.url.rstrip("/").rsplit("/", 1)[-1]
+    entry = seed_for(list(seed), repository)
+    iac = config.repo_named(entry.iac_repo) if entry and entry.iac_repo else None
+    return Derivation(
+        service=service,
+        outcome=MappingOutcome.MAPPED,
+        reason=(
+            f"no event in the window carries an image for {service}; config.yaml's serves "
+            f"patterns declare it to be {declared.url}"
+        ),
+        entry=WorkloadEntry(
+            service=service,
+            repository=repository,
+            repo_url=declared.url,
+            deployed_commit=Unknown(
+                reason=(
+                    f"{service} emitted no image event in the window, so nothing says which "
+                    f"build it runs — the mapping itself is a naming pattern, not an observation"
+                )
+            ),
+            iac_repo=entry.iac_repo if entry else None,
+            iac_repo_url=iac.url if iac else None,
+            tenancy=entry.tenancy
+            if entry
+            else Unknown(
+                reason=(
+                    f"the seed names no repository {repository!r}, so whether it runs one "
+                    f"deployment per customer is stated nowhere"
+                )
+            ),
+            source=MappingSource.PATTERN,
+        ),
+    )
+
+
 def derive_workload(
     config: Config,
     seed: Sequence[SeedEntry],
     service: str,
     events: Sequence[dict[str, Any]],
 ) -> Derivation:
-    """Which repository this service runs, from the images its own events carry."""
+    """Which repository this service runs: from its own images, else from a pattern."""
     image = latest_image(events)
     if image is None:
-        return Derivation(
-            service=service,
-            outcome=MappingOutcome.NOT_MAPPED,
-            reason=(
-                f"no event in the window carries an image for {service}, so nothing states "
-                f"which repository it runs"
-            ),
-        )
+        return _from_pattern(config, seed, service)
     return _from_image(config, seed, service, image)
