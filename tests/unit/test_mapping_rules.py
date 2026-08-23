@@ -1,8 +1,10 @@
 """The pure rules of the mapping: who claims a repository, and what may be named after what."""
 
+import pytest
+
 from tests.conftest import declaring
-from triage.mapping.resolve import unclaimed
-from triage.mapping.seed import load_seed
+from triage.mapping.resolve import naming_conflict, unclaimed
+from triage.mapping.seed import load_seed, seed_for
 
 
 def test_a_seed_repository_no_team_declares_is_unclaimed():
@@ -34,3 +36,34 @@ def test_a_repository_whose_name_only_prefixes_a_declared_one_is_not_claimed():
     that conflated them would point every platform analysis at the Terraform."""
     config = declaring("github.com/zeenea/platform-infra")
     assert config.repo_named("platform") is None
+
+
+@pytest.fixture(scope="module")
+def seed():
+    return load_seed()
+
+
+def test_a_mono_tenant_repository_may_run_under_a_customers_name(seed):
+    """The reason this milestone exists: `plt-hcl-software-uat` is a tenant of `platform`."""
+    platform = seed_for(seed, "platform")
+    assert naming_conflict(platform, "plt-hcl-software-uat") is None
+
+
+def test_a_multi_tenant_repository_running_under_another_name_is_a_conflict(seed):
+    studio = seed_for(seed, "studio")
+    reason = naming_conflict(studio, "studio-merck")
+    assert reason is not None
+    assert "studio-merck" in reason
+    assert "multi_tenant" in reason
+
+
+def test_a_multi_tenant_repository_running_under_its_own_name_is_no_conflict(seed):
+    studio = seed_for(seed, "studio")
+    assert naming_conflict(studio, "studio") is None
+
+
+def test_a_repository_with_no_tenancy_model_gets_no_licence_to_differ(seed):
+    """`zeenea-api-gateway` is a routing layer, not a mono-tenant workload: a second
+    name for it is a mapping to check, not a tenant."""
+    gateway = seed_for(seed, "zeenea-api-gateway")
+    assert naming_conflict(gateway, "zeenea-api-gateway-merck") is not None

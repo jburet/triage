@@ -86,7 +86,7 @@ ECR under the repository's own name. So:
       someone's Markdown and will be edited without telling us.
 - [x] 1.3 A repository in the seed that is not declared in `config.yaml` is listed in the
       mapping report as unclaimed, with its team unknown; nothing is invented for it.
-- [ ] 1.4 `Tenancy.MONO_TENANT` on a repository is what allows a service name to differ from
+- [x] 1.4 `Tenancy.MONO_TENANT` on a repository is what allows a service name to differ from
       the repository's declared service; for a multi-tenant repository the two must match or
       the mapping is reported as a conflict.
 
