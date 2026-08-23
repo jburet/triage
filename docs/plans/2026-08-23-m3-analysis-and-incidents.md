@@ -159,7 +159,9 @@ A second live run, on `Zeenea service or platform pod down in prod` for
   from the same incident after that.
 - **The tenant pattern is an assumption.** `plt-<customer>[-<env>]` held across every group
   observed, but it is a naming convention, not a contract; 4.3 fails loudly (out of scope
-  with a reason) rather than guessing when it does not match.
+  with a reason) rather than guessing when it does not match. `Repo.serves` in `config.yaml`
+  carries the same assumption into repository resolution. Replaced by derivation from the
+  workload's own image in [M6](2026-08-23-m6-service-mapping.md).
 - **Rate limits are tight where it hurts and undocumented.** Measured from response headers
   on 2026-08-23: `spans_public_api` **5 per 60 s**, `logs_public_search_api` 3 per 10 s,
   `logs_public_analytics_aggregate` 2 per 10 s; events search and monitor reads are
