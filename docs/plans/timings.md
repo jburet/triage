@@ -61,3 +61,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | local LiteLLM | make lint + make test (389 passed) | 8 |
 | 2026-08-23 | external proxy addressing | make lint + make test (391 passed) | 5 |
 | 2026-08-23 | one-shot | run_incident --prompts on the pod-down alert (no reachable proxy) | 22 |
+| 2026-08-23 | one-shot | run_incident full chain on the pod-down alert, real models | 118 |
+| 2026-08-23 | proxy fix | make lint + make test (392 passed) | 6 |

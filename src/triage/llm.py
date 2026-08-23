@@ -89,6 +89,14 @@ class LiteLLMClient:
 
             self._cache[tier] = ChatOpenAI(
                 model=self.model_for(tier),
+                # `with_structured_output` sends `parallel_tool_calls: false`, which is
+                # right for OpenAI and fatal behind a Bedrock-backed proxy: LiteLLM
+                # cannot translate it, sweeps the unsupported parameters into
+                # `additionalModelRequestFields`, and Bedrock then rejects the request
+                # with "the additional field tool_choice/type conflicts with the
+                # existing field toolConfig.toolChoice.tool". Nothing is lost — one
+                # tool is named by `tool_choice`, so there is no parallelism to forbid.
+                disabled_params={"parallel_tool_calls": None},
                 base_url=self._base_url,
                 api_key=self._api_key,
                 timeout=self._timeout,
