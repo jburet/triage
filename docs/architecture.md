@@ -59,7 +59,7 @@ flowchart LR
         PY_DD[Python: Datadog REST v1/v2]
         MCP_GH[MCP GitHub - read only]
         PY_JIRA[Python: Jira REST v3]
-        PY_K8S[Python: k8s read-only]
+        PY_K8S[Python: k8s - submits analysis Jobs]
         PY_PG[Python: PostgreSQL stats]
         SBX[Analysis Job - gVisor, Claude Agent SDK, shallow clone]
         LLM[LiteLLM proxy -> Anthropic]
@@ -76,7 +76,9 @@ flowchart LR
     G0 --> PG
     GT --> PY_JIRA
     GA --> SBX --> MCP_GH
-    G1 & G3 --> PY_DD & PY_K8S & PY_PG
+    G1 --> PY_DD
+    G3 --> PY_DD & PY_PG
+    GA --> PY_K8S
     LGP --> LLM
     LS[LangSmith self-hosted] -.traces.- LGP
 ```
@@ -197,7 +199,7 @@ LiteLLM config exposes three aliases (`triage`, `analysis`, `diagnosis`) so grap
 
 Analysis Jobs: the `analysis` tier for all analysis (F0, F1, F3). One runs in a Kubernetes Job (gVisor runtime class) launched by the graph node; the Job shallow-clones the repo at the required commit, runs the analysis entrypoint, returns a structured result, and is deleted. Nothing persists between Jobs.
 
-The F0 summarisation kinds do not run an agent inside the Job. The entrypoint walks the clone, reads the files that decide the answer in priority order until a byte budget is spent, lists back what it did not read, and makes one structured call — testable offline, with a cost known before the run ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)). The investigative kinds M3 adds may choose differently: following a reference is worth more when the question is specific.
+The F0 summarisation kinds do not run an agent inside the Job. The entrypoint walks the clone, reads the files that decide the answer in priority order until a byte budget is spent, lists back what it did not read, and makes one structured call — testable offline, with a cost known before the run ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)). The investigative kinds — `code_analysis`, `iac_analysis`, `diff_analysis` — have no entrypoint yet: M3 submits them and the image refuses them by name (see §10). They may choose differently when they are built, because following a reference is worth more when the question is specific.
 Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $50 per day
 ([ADR-0007](adr/0007-model-tiers-and-budgets.md)). Structured output uses tool calling, not
 `response_format`, since every model behind the proxy is an Anthropic one.
@@ -223,8 +225,8 @@ Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $5
 
 | System | Access | Read/Write |
 |---|---|---|
-| Datadog | Python (REST v1/v2, `httpx`, scoped app key) | read |
-| Kubernetes | Python (read-only ServiceAccount) | read |
+| Datadog | Python (REST v1/v2, `httpx`, scoped app key on a service account) | read |
+| Kubernetes | Python — creates and deletes the analysis Jobs. F1 reads *no* cluster state: every Kubernetes fact the reference incident needed (probe failures, kill reason, exit code, restart and replica counts, the full before/after StatefulSet spec) came from Datadog events, so the read-only cluster reader was dropped rather than deferred | write (Jobs) |
 | PostgreSQL (target DBs) | Python (read-only role) | read |
 | GitHub | MCP for repository reads; Python (REST, `httpx`) for the one commit comparison F0's incremental refresh needs ([ADR-0015](adr/0015-incremental-refresh-unit.md)) | read |
 | Jira | Python (REST v3, `httpx`) | read + write |
@@ -324,13 +326,13 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | M0 | Repo, schemas, config, model tiers, persistence, migrations, CI | **Done** |
 | M1 | Ticket pipeline sub-graph (§2.2), end to end against fixtures | **Done** |
 | M2 | F0 cartography (§2.5), analysis Job contract, `system_map` | **Done in code**; the Job template and its cluster objects are the infra track |
-| M3 | Analysis sub-graph (§2.1), F1 incident graph (§2.3), Datadog ingress | Not started |
+| M3 | Analysis sub-graph (§2.1), F1 incident graph (§2.3), Datadog collection and the alert poller | **Done in code**; never run against a live Datadog org, and the Platform cron that would tick the poller is the infra track |
 | M4 | F3 daily database review (§2.4) | Not started |
 | M5 | Alert coverage audit, self-evaluation reporting, incident memory | Not started |
 | Infra | Self-hosted Platform, LiteLLM proxy, LangSmith, NetworkPolicies, backups | Not started |
 
-What exists today is the shared ticket pipeline, and the cartography graph that fills
-the system map. Both are built and tested standalone — the pipeline against fixture
+What exists today is the shared ticket pipeline, the cartography graph that fills the
+system map, and F1 end to end from a polled alert to a ticket and a post-mortem draft. Both are built and tested standalone — the pipeline against fixture
 `Diagnosis` objects, cartography against a fake analysis runner — so the product
 definition can be validated before any collector exists, which is the roadmap's own
 delivery order.
@@ -356,6 +358,40 @@ What M2 does **not** deliver, and should not be assumed to work:
   NetworkPolicy and the narrow database role the Job writes its result with are the
   infra track; `config.analysis.job` only *names* them.
 
-The tables in §4 are all migrated, including those M3–M4 will fill. Still not built:
-the ingress service, the F1 and F3 collectors, the Analysis sub-graph, the analysis Job
-image, and the whole infra track.
+M3 delivers, in code: the Analysis sub-graph (rank, fan out by cause type, synthesise a
+`Diagnosis` that must earn its own confidence), F1's Datadog collection — the alert
+class recipes, the sweep, the reduction, the follow-up loop and the prompt budget
+([ADR-0016](adr/0016-datadog-collected-by-triage.md)) — the `incident` graph composing
+both shared sub-graphs plus a post-mortem draft
+([ADR-0010](adr/0010-postmortem-destination.md)), and the alert poller with its scope
+resolution, persistence gate and flap counter
+([ADR-0017](adr/0017-alert-ingestion-by-polling.md),
+[ADR-0018](adr/0018-alert-persistence-gate.md)).
+
+What M3 does **not** deliver:
+
+- **No collection has ever run against Datadog.** `DatadogRestClient` is written from the
+  API reference and from one hand-run capture; every test replays
+  `tests/fixtures/datadog/hcl_software_uat_20260822/`. The same is true of
+  `PlatformRestClient`, which has never spoken to a Platform.
+- **One incident, one alert class.** The `crash_restart` recipe is written from a captured
+  incident; latency, error-rate, saturation and availability are written from its shape.
+  `make capture-datadog` is the tool for fixing that, one real alert per class.
+- **Qualification quality is unmeasured.** `evals/incident.py` scores it — the class, whether
+  the liveness-probe cause ranks first, and whether the model falls for the
+  `StatefulSet … deployed` event whose only change is `ready_replicas` — but it costs money
+  and has never been run.
+- **Nothing ticks the poller.** The 60-second cron is a Platform object, and the Platform is
+  the infra track; today `poll_alerts` runs by hand or from Studio.
+- **The investigative analyses have no entrypoint.** The sub-graph routes a hypothesis to
+  `code_analysis`, `iac_analysis` or `diff_analysis` and the runner submits it, but
+  `triage.analysis.entrypoint` still implements only F0's two summarisers, so against a real
+  Job every hypothesis comes back as the stated failure "this image summarises
+  summarize_repo, summarize_terraform". The sub-graph handles that correctly — an unknown in
+  the diagnosis and a confidence cap — which is exactly why it is easy to miss: the M3 plan
+  scoped Phase 1 to the fan-out and its fakes, and the image is the next thing F1 needs to be
+  useful rather than merely correct.
+
+The tables in §4 are all migrated, including those M4 will fill. Still not built: the
+ingress service (GitHub and Jira webhooks), the F3 collectors, the analysis Job image,
+and the whole infra track.
