@@ -78,7 +78,7 @@ ECR under the repository's own name. So:
 
 ## Phase 1: the seed
 
-- [ ] 1.1 The architecture document parses into one `SeedEntry` per repository row, carrying
+- [x] 1.1 The architecture document parses into one `SeedEntry` per repository row, carrying
       tenancy and deployment method; a row whose tenancy or deployment cell is unrecognised is
       reported by name rather than defaulted.
 - [ ] 1.2 The seed is versioned in the repository as data (`config/repository-map.yaml`),

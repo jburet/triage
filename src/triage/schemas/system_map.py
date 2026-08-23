@@ -165,6 +165,93 @@ class TerraformSummary(BaseModel):
     modules: Listed[ModuleMapping] | Unknown
 
 
+class Tenancy(StrEnum):
+    """How many customers one deployment of a repository serves.
+
+    The vocabulary is the architecture document's own, so that a cell nobody has
+    taught this enum about is an unrecognised row rather than a row quietly
+    filed under the nearest value (M6 1.1). ``MONO_TENANT`` is the load-bearing
+    one: it is what allows a running service to be named after a customer rather
+    than after the repository it runs.
+    """
+
+    MONO_TENANT = "mono_tenant"
+    MULTI_TENANT = "multi_tenant"
+    PER_TENANT_PROVISIONING = "per_tenant_provisioning"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class Deployer(StrEnum):
+    """What puts a repository into a cluster, and therefore where its IaC lives."""
+
+    APPLICATION_DEPLOYER = "application_deployer"
+    PLATFORM_INFRA = "platform_infra"
+    GITHUB_ACTIONS = "github_actions"
+    AWS_ORGANIZATION = "aws_organization"
+    NOT_DEPLOYED = "not_deployed"
+    """The deployer itself, and anything else nothing deploys."""
+
+
+IAC_REPO: dict[Deployer, str] = {
+    Deployer.APPLICATION_DEPLOYER: "application-deployer",
+    Deployer.PLATFORM_INFRA: "platform-infra",
+}
+"""The two deployers that are themselves repositories an ``iac_analysis`` can read."""
+
+
+class SeedEntry(BaseModel):
+    """One row of the architecture document's repository map.
+
+    The seed answers what no cluster can: whether a repository is mono-tenant,
+    and which IaC repository provisions it. It is not the map — it names no
+    tenant, no namespace and no chart path.
+    """
+
+    repository: str
+    role: str
+    tenancy: Tenancy
+    deployment: Deployer
+
+    @property
+    def iac_repo(self) -> str | None:
+        """The repository whose code defines this workload's infrastructure."""
+        return IAC_REPO.get(self.deployment)
+
+
+class MappingSource(StrEnum):
+    """What answered "which repository is this service?", in decreasing directness."""
+
+    IMAGE = "image"
+    SEED = "seed"
+    PATTERN = "pattern"
+    MANUAL = "manual"
+
+
+class WorkloadEntry(BaseModel):
+    """One running service, joined to the repository whose code it runs (M6).
+
+    Keyed on the service name Datadog uses, which for the one mono-tenant
+    application is a customer name that no repository claims. ``source`` is kept
+    because a mapping derived from the image that was running and a mapping
+    guessed from a name pattern are different facts, and a diagnosis built on the
+    second must not read like one built on the first.
+    """
+
+    service: str
+    repository: str = Field(description="Repository name, as the image and the seed name it.")
+    repo_url: str | None = Field(
+        default=None, description="From config.yaml; None when no team declares this repository."
+    )
+    image: str | None = Field(default=None, description="Image reference exactly as observed.")
+    image_digest: str | None = None
+    deployed_commit: MaybeUnknown
+    iac_repo: str | None = None
+    iac_repo_url: str | None = None
+    iac_paths: list[str] = Field(default_factory=list)
+    tenancy: Tenancy | Unknown
+    source: MappingSource
+
+
 class SystemMapKind(StrEnum):
     """The two kinds of row the map holds; with the name, it is the key of a row."""
 

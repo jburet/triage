@@ -46,6 +46,15 @@ FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
 CAPTURE = "hcl_software_uat_20260822"
 REPO_ROOT = Path(__file__).resolve().parents[1]
+ARCHITECTURE_DOC = REPO_ROOT / "docs" / "reference-aws-architecture-2026-04-20.md"
+
+SEED_HEADER = "| Repository | Role | Tech Stack | Tenancy Model | Deployment Method |"
+SEED_SEPARATOR = "| --- | --- | --- | --- | --- |"
+
+
+def seed_document(*rows: str, header: str = SEED_HEADER, separator: str = SEED_SEPARATOR) -> str:
+    """A document shaped like the architecture one, carrying only the rows a test needs."""
+    return "\n".join(["### 1.1 Repository Map", "", header, separator, *rows, ""])
 
 
 def load_diagnosis(name: str) -> Diagnosis:
