@@ -23,7 +23,7 @@ Phase 1 and Phase 3 of this one.
 
 ## Phase 1: analysis Job contract
 
-- [ ] 1.1 A node can submit an `AnalysisRequest` and receive a validated `AnalysisResult` through `Deps.runner`, with the fake returning the canned result for that kind.
+- [x] 1.1 A node can submit an `AnalysisRequest` and receive a validated `AnalysisResult` through `Deps.runner`, with the fake returning the canned result for that kind.
 - [ ] 1.2 `LocalAnalysisRunner` clones the repo at the requested commit with depth 1 into a throwaway directory, runs the analysis entrypoint there, and the directory is gone afterwards — including when the entrypoint fails.
 - [ ] 1.3 `KubernetesJobRunner` returns the row from `triage.analysis_results` matching the Job name once its status is terminal, and reports a failed result (not an exception) when the 15-minute timeout elapses or the Job errors.
 - [ ] 1.4 A result payload that does not validate against the schema for its kind is reported as a failed `AnalysisResult` naming the kind, never as a partial success.
