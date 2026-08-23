@@ -97,7 +97,7 @@ ECR under the repository's own name. So:
       `source = image` and the digest it saw.
 - [x] 2.2 An image name that matches no repository in the seed is a stated failure naming the
       image, never a fuzzy match onto the nearest repository name.
-- [ ] 2.3 The deployed commit is resolved from the image (tag or ECR image metadata) and
+- [x] 2.3 The deployed commit is resolved from the image (tag or ECR image metadata) and
       recorded as `Filled`; when it cannot be, `deployed_commit` is an `Unknown` whose reason
       says the image was found but its commit was not — the two are different failures and
       the diagnosis reads differently for each.

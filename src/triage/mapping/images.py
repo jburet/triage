@@ -24,6 +24,9 @@ from typing import Any
 
 DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 
+COMMIT_TAG = re.compile(r"^(?:sha-|sha_|git-|commit-)?([0-9a-f]{7,40})$", re.I)
+"""A tag that is a commit. Requiring a letter as well is what keeps a build number out."""
+
 
 @dataclass(frozen=True)
 class ObservedImage:
@@ -47,6 +50,21 @@ def split_reference(reference: str) -> tuple[str, str | None, str | None]:
     if head and "/" not in candidate:
         path, tag = head, candidate
     return path.rstrip("/").rsplit("/", 1)[-1], tag, digest
+
+
+def commit_in_tag(tag: str | None) -> str | None:
+    """The commit an image tag carries, when it carries one.
+
+    ``501`` is what the captured tenant was running: a build number, seven of
+    which would be indistinguishable from a short SHA. So a tag qualifies only if
+    it is hexadecimal *and* contains a letter — a decimal build number is never
+    read as a commit, at the price of missing the rare all-digit one.
+    """
+    match = COMMIT_TAG.match(tag or "")
+    if match is None:
+        return None
+    commit = match.group(1).lower()
+    return commit if any(character in "abcdef" for character in commit) else None
 
 
 def _tags(event: dict[str, Any]) -> dict[str, str]:

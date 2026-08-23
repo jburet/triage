@@ -14,7 +14,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from triage.config import Config
-from triage.mapping.images import ObservedImage, latest_image
+from triage.mapping.images import ObservedImage, commit_in_tag, latest_image
 from triage.mapping.resolve import naming_conflict
 from triage.mapping.seed import seed_for
 from triage.schemas.common import Unknown
@@ -25,6 +25,22 @@ from triage.schemas.system_map import (
     SeedEntry,
     WorkloadEntry,
 )
+
+
+def _commit_unknown(image: ObservedImage) -> Unknown:
+    """Found the image, not the commit — which is a different failure from finding neither.
+
+    The mapping still holds: the analysis reads the right repository, but at the
+    last commit F0 summarised rather than at what this tenant is running, and the
+    diagnosis has to say so.
+    """
+    tag = f"its tag {image.tag!r} is not a commit" if image.tag else "it carries no tag"
+    return Unknown(
+        reason=(
+            f"the image {image.reference} was found, but {tag} and no registry metadata "
+            f"was read, so which commit this service is running is not known"
+        )
+    )
 
 
 def _from_image(
@@ -45,6 +61,7 @@ def _from_image(
     if conflict is not None:
         return Derivation(service=service, outcome=MappingOutcome.CONFLICT, reason=conflict)
 
+    commit = commit_in_tag(image.tag)
     repo = config.repo_named(declared.repository)
     iac_repo = declared.iac_repo
     iac = config.repo_named(iac_repo) if iac_repo else None
@@ -61,9 +78,7 @@ def _from_image(
             repo_url=repo.url if repo else None,
             image=image.reference,
             image_digest=image.digest,
-            deployed_commit=Unknown(
-                reason=f"the image {image.reference} was found; its commit has not been resolved"
-            ),
+            deployed_commit=commit or _commit_unknown(image),
             iac_repo=iac_repo,
             iac_repo_url=iac.url if iac else None,
             tenancy=declared.tenancy,

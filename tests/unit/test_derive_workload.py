@@ -7,10 +7,13 @@ running in that same StatefulSet (`alpine/openssl`, its init container).
 
 import pytest
 
-from tests.conftest import TENANT, declaring, running_image
+from tests.conftest import TENANT, captured, declaring, running_image
 from triage.mapping.derive import derive_workload
 from triage.mapping.seed import load_seed
+from triage.schemas.common import Unknown
 from triage.schemas.system_map import MappingOutcome
+
+DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 
 
 @pytest.fixture(scope="module")
@@ -60,3 +63,43 @@ def test_a_seed_repository_that_cannot_run_under_this_name_is_a_conflict_not_a_f
 
     assert derivation.outcome is MappingOutcome.CONFLICT
     assert derivation.entry is None
+
+
+def test_the_deployed_commit_is_unknown_when_the_tag_is_a_build_number(config, seed):
+    """What the captured tenant was actually running: `image_tag:501`."""
+    events = captured("events_service")["data"]
+
+    entry = derive_workload(config, seed, TENANT, events).entry
+
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "'501' is not a commit" in entry.deployed_commit.reason
+    assert "was found" in entry.deployed_commit.reason
+
+
+@pytest.mark.parametrize("tag", ["9f2c1ab", "sha-9f2c1ab", "SHA-9F2C1AB", "git-9f2c1ab"])
+def test_a_tag_that_carries_a_commit_is_recorded_as_the_deployed_commit(config, seed, tag):
+    event = running_image(f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:{tag}")
+
+    entry = derive_workload(config, seed, TENANT, [event]).entry
+
+    assert entry.deployed_commit == "9f2c1ab"
+
+
+@pytest.mark.parametrize("tag", ["501", "1234567", "latest", "1.2.3", "v2"])
+def test_a_tag_that_carries_no_commit_leaves_it_unknown(config, seed, tag):
+    """Seven digits is a plausible build number and a plausible short SHA; reading it
+    as a commit would send an analysis to a commit that does not exist."""
+    event = running_image(f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:{tag}")
+
+    entry = derive_workload(config, seed, TENANT, [event]).entry
+
+    assert isinstance(entry.deployed_commit, Unknown)
+
+
+def test_an_image_pinned_only_by_digest_says_it_carries_no_tag(config, seed):
+    event = running_image(f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@{DIGEST}")
+
+    entry = derive_workload(config, seed, TENANT, [event]).entry
+
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "carries no tag" in entry.deployed_commit.reason
