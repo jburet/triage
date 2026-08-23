@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Any, TypedDict
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.schemas.analysis import AnalysisFindings, AnalysisResult
+from triage.schemas.common import Feature, Filled
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.system_map import RepoSummary, SystemMap, TerraformSummary
 from triage.schemas.ticket import DedupDecision, PipelineOutcome, ReviewVerdict, TicketDraft
 
@@ -109,3 +112,63 @@ class CartographyState(TypedDict, total=False):
     failures: list[SummaryFailure]
     unowned: list[str]
     entries_written: int
+
+
+class Deferred(BaseModel):
+    """A hypothesis that was ranked but not analysed, and why (ADR-0005).
+
+    It is not discarded: a developer who is told what was *not* looked at can
+    reopen it, and a developer who is told nothing repeats the ranking by hand.
+    """
+
+    hypothesis: Hypothesis
+    reason: Filled
+
+
+class Investigated(BaseModel):
+    """One hypothesis after the branch it was routed to has run.
+
+    ``result`` is ``None`` only for a dependency cause, which no runner examines;
+    a hypothesis whose repository or commit could not be resolved carries a
+    *failed* result naming that, so the failure paths stay one path.
+    """
+
+    hypothesis: Hypothesis
+    repo_url: str | None = None
+    commit: str | None = None
+    base_commit: str | None = None
+    result: AnalysisResult | None = None
+
+    @property
+    def failed(self) -> bool:
+        return self.result is not None and not self.result.succeeded
+
+    @property
+    def findings(self) -> AnalysisFindings | None:
+        if self.result is None or not self.result.succeeded:
+            return None
+        payload = self.result.result
+        return payload if isinstance(payload, AnalysisFindings) else None
+
+
+class AnalysisState(TypedDict, total=False):
+    """Input is ``hypotheses`` plus who they are about; output is ``diagnosis``.
+
+    ``context`` is whatever the calling feature already collected — the F1
+    telemetry, the F3 query statistics — passed through to the synthesis prompt
+    untouched, because the sub-graph is shared and must not know which of them
+    produced it.
+    """
+
+    hypotheses: list[Hypothesis]
+    feature: Feature
+    service: str
+    team: str
+    signal_id: UUID | None
+    context: dict[str, Any]
+
+    selected: list[Hypothesis]
+    deferred: list[Deferred]
+    investigated: list[Investigated]
+    diagnosis: Diagnosis
+    synthesis_attempts: int

@@ -7,7 +7,7 @@ import pytest
 
 from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
 from triage.config import Config, load_config
-from triage.db.repo import InMemoryRepository
+from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
 from triage.integrations.github import FakeGitHubClient
 from triage.llm import FakeLLM
@@ -18,10 +18,16 @@ from triage.schemas import (
     AnalysisRequest,
     AnalysisResult,
     AnalysisStatus,
+    CauseType,
     DedupDecision,
     Diagnosis,
+    DiagnosisDraft,
+    Hypothesis,
     RepoSummary,
     ReviewVerdict,
+    ServiceEntry,
+    SystemMapKind,
+    TerraformModuleEntry,
     TerraformSummary,
     TicketDraft,
 )
@@ -208,12 +214,112 @@ def canned_runner() -> FakeAnalysisRunner:
     return FakeAnalysisRunner(results={kind: an_analysis_result(kind) for kind in AnalysisKind})
 
 
+def a_service_entry(name: str = "payments-api", **overrides: object) -> ServiceEntry:
+    base: dict[str, object] = {
+        "name": name,
+        "repo_url": "github.com/org/payments-api",
+        "team": "payments",
+        "source_commit": "9f2c1ab",
+        "summary": a_repo_summary(service=name),
+    }
+    base.update(overrides)
+    return ServiceEntry.model_validate(base)
+
+
+def a_module_entry(name: str = "modules/payments", **overrides: object) -> TerraformModuleEntry:
+    terraform = a_terraform_summary()
+    base: dict[str, object] = {
+        "name": name,
+        "repo_url": "github.com/org/infra",
+        "team": "platform",
+        "source_commit": "abc1234",
+        "mapping": terraform.modules[0],
+        "resources": terraform.resources,
+    }
+    base.update(overrides)
+    return TerraformModuleEntry.model_validate(base)
+
+
+def map_row(entry: ServiceEntry | TerraformModuleEntry, kind: SystemMapKind) -> SystemMapEntry:
+    return SystemMapEntry(
+        kind=kind,
+        name=entry.name,
+        team=entry.team,
+        source_commit=entry.source_commit,
+        payload=entry.model_dump(mode="json"),
+    )
+
+
+def mapped(*entries: ServiceEntry | TerraformModuleEntry) -> InMemoryRepository:
+    """A repository whose system map already knows these services and modules."""
+    repo = InMemoryRepository()
+    for entry in entries:
+        kind = (
+            SystemMapKind.SERVICE
+            if isinstance(entry, ServiceEntry)
+            else SystemMapKind.TERRAFORM_MODULE
+        )
+        repo.system_map[(kind, entry.name)] = map_row(entry, kind)
+    return repo
+
+
+def a_hypothesis(
+    cause_type: CauseType = CauseType.APP, rank_score: float = 0.9, **overrides: object
+) -> Hypothesis:
+    base: dict[str, object] = {
+        "cause_type": cause_type,
+        "service": "payments-api",
+        "commit": None if cause_type is CauseType.DEPENDENCY else "9f2c1ab",
+        "description": f"A {cause_type.value} cause: the idempotency cache grows unbounded.",
+        "rank_score": rank_score,
+    }
+    base.update(overrides)
+    return Hypothesis.model_validate(base)
+
+
+def a_synthesis(**overrides: object) -> DiagnosisDraft:
+    """A synthesis that satisfies Diagnosis, so tests can break one rule at a time."""
+    base: dict[str, object] = {
+        "chosen_hypothesis": 0,
+        "symptom": {
+            "description": "Pods were OOM-killed 11 times between 02:10 and 02:55 UTC.",
+            "window": {"start": "2026-08-22T02:10:00Z", "end": "2026-08-22T02:55:00Z"},
+        },
+        "impact": {
+            "users": "4.1% of POST /payments callers received a 502.",
+            "services": ["payments-api"],
+            "slos": "38% of the monthly error budget was consumed.",
+        },
+        "probable_cause": "An unbounded idempotency-key cache grows until the memory limit.",
+        "confidence": "medium",
+        "confidence_rationale": "The metric and the code agree, but no heap dump confirms it.",
+        "evidence": [
+            {
+                "kind": "metric",
+                "description": "container.memory.usage rose from 320 MB to the 1 GB limit.",
+                "url": "https://app.datadoghq.eu/metric/1",
+            }
+        ],
+        "paths": ["src/payments/idempotency.py"],
+        "expected_change": {
+            "statement": "Working set stays under 700 MB for 24 h.",
+            "how_to_verify": "The payments-overview dashboard, memory panel.",
+        },
+        "out_of_scope": ["Do not raise the container memory limit."],
+        "ruled_out": [],
+        "unknowns": [],
+    }
+    base.update(overrides)
+    return DiagnosisDraft.model_validate(base)
+
+
 def build_deps(
     config: Config,
     *,
     dedup: object = None,
     drafts: object = None,
     verdicts: object = None,
+    syntheses: object = None,
     repo: InMemoryRepository | None = None,
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
@@ -223,6 +329,7 @@ def build_deps(
         DedupDecision: dedup if dedup is not None else [no_match()],
         TicketDraft: drafts if drafts is not None else [a_draft()],
         ReviewVerdict: verdicts if verdicts is not None else [a_verdict()],
+        DiagnosisDraft: syntheses if syntheses is not None else [a_synthesis()],
     }
     return Deps(
         llm=FakeLLM(responses=responses),  # type: ignore[arg-type]

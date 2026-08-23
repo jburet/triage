@@ -29,5 +29,10 @@ class Hypothesis(BaseModel):
     commit: str | None = Field(
         default=None, description="Commit to analyse at; None for dependency causes."
     )
+    base_commit: str | None = Field(
+        default=None,
+        description="Previously deployed commit, for a deployment cause: the diff runs "
+        "between it and `commit`. None when only one commit is known.",
+    )
     description: Filled
     rank_score: float = Field(ge=0.0, le=1.0, description="Relative plausibility within the set.")

@@ -53,12 +53,12 @@ from that capture, not from estimation.
 
 ## Phase 1: Analysis sub-graph (ADR-0005)
 
-- [ ] 1.1 Given one `app` hypothesis and a fake runner, `analysis` produces a `Diagnosis` whose `location` names the repo and commit from the hypothesis and whose `evidence` includes the code analysis finding.
-- [ ] 1.2 Each cause type is routed to its branch: `app` → `code_analysis`, `infra` → `iac_analysis`, `deployment` → `diff_analysis` with both commits, `dependency` → no runner call at all.
-- [ ] 1.3 Of N hypotheses, only those with `rank_score ≥ analysis.min_rank_score` are analysed, capped at `analysis.max_hypotheses`, and at least one is always analysed even if none clears the floor.
-- [ ] 1.4 Hypotheses considered but not analysed appear in the diagnosis `ruled_out` with the qualifier's reason; analysed hypotheses the `diagnosis` tier rejects appear there with the analysis finding as `why`.
-- [ ] 1.5 A failed analysis for one hypothesis does not fail the run: the diagnosis records an `unknowns` entry naming the hypothesis and the failure, and confidence for a cause that relied on it is capped at `medium`.
-- [ ] 1.6 The synthesised `Diagnosis` always passes its own validator (`_confidence_is_earned`); a synthesis that would not is retried once with the validation error fed back, then degraded to `low`.
+- [x] 1.1 Given one `app` hypothesis and a fake runner, `analysis` produces a `Diagnosis` whose `location` names the repo and commit from the hypothesis and whose `evidence` includes the code analysis finding.
+- [x] 1.2 Each cause type is routed to its branch: `app` → `code_analysis`, `infra` → `iac_analysis`, `deployment` → `diff_analysis` with both commits, `dependency` → no runner call at all.
+- [x] 1.3 Of N hypotheses, only those with `rank_score ≥ analysis.min_rank_score` are analysed, capped at `analysis.max_hypotheses`, and at least one is always analysed even if none clears the floor.
+- [x] 1.4 Hypotheses considered but not analysed appear in the diagnosis `ruled_out` with the qualifier's reason; analysed hypotheses the `diagnosis` tier rejects appear there with the analysis finding as `why`.
+- [x] 1.5 A failed analysis for one hypothesis does not fail the run: the diagnosis records an `unknowns` entry naming the hypothesis and the failure, and confidence for a cause that relied on it is capped at `medium`.
+- [x] 1.6 The synthesised `Diagnosis` always passes its own validator (`_confidence_is_earned`); a synthesis that would not is retried once with the validation error fed back, then degraded to `low`.
 
 ## Phase 2: F1 collection and qualification (ADR-0016)
 

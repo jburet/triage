@@ -152,3 +152,44 @@ class Diagnosis(BaseModel):
                 f"got {len(self.evidence)}"
             )
         return self
+
+
+class DiagnosisDraft(BaseModel):
+    """What the ``diagnosis`` tier is asked for: a :class:`Diagnosis` minus the facts it
+    must not invent, and minus the validator it must be allowed to fail.
+
+    The repository and the commit are resolved from the hypothesis that was
+    analysed, never written by the model, so the cause is chosen by *index* into
+    what was analysed rather than by free text. And the draft deliberately carries
+    no ``_confidence_is_earned``: a synthesis that cannot earn its confidence has
+    to be observable by the node in order to be fed back, and a structured-output
+    call that raises leaves nothing to feed back with.
+    """
+
+    chosen_hypothesis: int | None = Field(
+        default=None,
+        description="Index into the analysed hypotheses, as numbered in the prompt. "
+        "None when none of them is the cause.",
+    )
+    symptom: Symptom
+    impact: Impact
+    probable_cause: MaybeUnknown
+    confidence: Confidence
+    confidence_rationale: Filled = Field(
+        description="Why this confidence level and not the one above or below it."
+    )
+    evidence: list[Evidence] = Field(
+        default_factory=list,
+        description="Telemetry that supports the cause. Analysis findings are attached "
+        "automatically and must not be repeated here.",
+    )
+    paths: list[str] = Field(
+        default_factory=list, description="Suspected files, functions or symbols."
+    )
+    terraform_resource: str | None = None
+    expected_change: AcceptanceCriterion
+    out_of_scope: list[str] = Field(default_factory=list)
+    ruled_out: list[RuledOut] = Field(
+        default_factory=list, description="Hypotheses the analysis eliminated, and what did it."
+    )
+    unknowns: list[OpenQuestion] = Field(default_factory=list)

@@ -37,3 +37,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 plan rewrite (phases 2 and 4) | writing | 240 |
 | 2026-08-23 | promote capture script to scripts/ | write, smoke-test, regenerate fixtures | 420 |
 | 2026-08-23 | promote capture script to scripts/ | make lint + make test | 7 |
+| 2026-08-23 | M3 phase 1 | pytest tests/integration/test_analysis.py | 4 |
+| 2026-08-23 | M3 phase 1 | make lint | 12 |
+| 2026-08-23 | M3 phase 1 | make test (315 passed) | 10 |

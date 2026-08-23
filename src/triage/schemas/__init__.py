@@ -29,6 +29,7 @@ from triage.schemas.common import (
 from triage.schemas.diagnosis import (
     AcceptanceCriterion,
     Diagnosis,
+    DiagnosisDraft,
     Evidence,
     EvidenceKind,
     Impact,
@@ -80,6 +81,7 @@ __all__ = [
     "DedupDecision",
     "DependencyKind",
     "Diagnosis",
+    "DiagnosisDraft",
     "Endpoint",
     "EntryPoint",
     "EntryPointKind",
