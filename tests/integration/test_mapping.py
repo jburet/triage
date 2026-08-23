@@ -8,11 +8,17 @@ rows, and the line it wrote about every service it could not map.
 
 import pytest
 
-from tests.conftest import build_deps, declaring, fake_datadog_over_days, run_config
+from tests.conftest import (
+    TENANT,
+    build_deps,
+    datadog_running,
+    declaring,
+    fake_datadog_over_days,
+    run_config,
+)
 from triage.graphs.mapping import graph
 from triage.schemas.system_map import MappingOutcome, MappingSource, Tenancy
 
-TENANT = "plt-hcl-software-uat"
 PLATFORM = "github.com/zeenea/platform"
 PLATFORM_INFRA = "github.com/zeenea/platform-infra"
 DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
@@ -98,3 +104,15 @@ async def test_one_query_per_service_and_nothing_else(zeenea):
 
     assert deps.datadog.queries_for("events") == [f"service:{TENANT}"]
     assert deps.llm.calls == []
+
+
+async def test_an_image_no_repository_is_named_after_writes_nothing_and_says_so(zeenea):
+    deps = build_deps(zeenea, datadog=datadog_running("ghcr.io/other/thing:2.0"))
+
+    state = await run(deps)
+
+    (derivation,) = state["derivations"]
+    assert derivation.outcome is MappingOutcome.UNRESOLVED_IMAGE
+    assert "ghcr.io/other/thing:2.0" in derivation.reason
+    assert deps.repo.workloads == {}
+    assert state["entries_written"] == 0

@@ -1,6 +1,7 @@
 """Shared builders. Everything here is offline: no database, no network, no spend."""
 
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -45,6 +46,7 @@ from triage.schemas.postmortem import Postmortem
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
 CAPTURE = "hcl_software_uat_20260822"
+TENANT = "plt-hcl-software-uat"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARCHITECTURE_DOC = REPO_ROOT / "docs" / "reference-aws-architecture-2026-04-20.md"
 
@@ -412,6 +414,31 @@ def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
     }
     responses.update(overrides)  # type: ignore[arg-type]
     return FakeDatadogClient(responses=responses)
+
+
+def statefulset_change_event(slug: str = CAPTURE) -> dict:
+    """The captured change-tracking event, the one carrying the workload's own image."""
+    return next(
+        event
+        for event in captured("events_service", slug)["data"]
+        if (event["attributes"]["attributes"].get("changed_resource") or {}).get("type")
+        == "kube_stateful_set"
+    )
+
+
+def running_image(reference: str, slug: str = CAPTURE) -> dict:
+    """That event, with the workload running some other image."""
+    event = deepcopy(statefulset_change_event(slug))
+    event["attributes"]["attributes"]["new_value"]["containers"] = [
+        {"image": reference, "name": "workload"}
+    ]
+    return event
+
+
+def datadog_running(reference: str, service: str = TENANT) -> FakeDatadogClient:
+    """A client whose only answer is this service running this image."""
+    replay = {"events": {f"service:{service}": {"data": [running_image(reference)]}}}
+    return FakeDatadogClient(responses=replay, wide=replay)
 
 
 def fake_datadog_over_days(slug: str = CAPTURE) -> FakeDatadogClient:

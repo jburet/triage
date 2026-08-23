@@ -95,7 +95,7 @@ ECR under the repository's own name. So:
 - [x] 2.1 A container-start or StatefulSet change event carrying an image resolves the
       application repository by image name, and the resulting `WorkloadEntry` records
       `source = image` and the digest it saw.
-- [ ] 2.2 An image name that matches no repository in the seed is a stated failure naming the
+- [x] 2.2 An image name that matches no repository in the seed is a stated failure naming the
       image, never a fuzzy match onto the nearest repository name.
 - [ ] 2.3 The deployed commit is resolved from the image (tag or ECR image metadata) and
       recorded as `Filled`; when it cannot be, `deployed_commit` is an `Unknown` whose reason
