@@ -76,3 +76,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M6 phase 2.4 | make lint + make test (467 passed) | 5 |
 | 2026-08-23 | M6 phase 2.5 | make lint + make test (469 passed) | 5 |
 | 2026-08-23 | M6 deployed_repo order | make lint + make test (476 passed) | 4 |
+| 2026-08-23 | M6 public interface | make lint + make test (476 passed) | 4 |
+| 2026-08-23 | M6 one-shot | run_mapping on plt-hcl-software-uat, live Datadog (1 call) | 2 |
