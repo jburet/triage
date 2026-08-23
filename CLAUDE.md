@@ -24,6 +24,8 @@ Python 3.12, `uv`-managed. CI (`.github/workflows/ci.yml`) runs exactly `make li
 
 ```bash
 make dev                 # uv sync --all-extras, create .env, start Postgres (docker compose), alembic upgrade head
+make proxy               # local LiteLLM on :4000 from docker/litellm.yaml — the three tier
+                         # aliases and the daily cap; needs TRIAGE_LLM_PROVIDER=litellm to be used
 make lint                # ruff check + ruff format --check (src tests evals scripts) + mypy --strict
 make test                # uv run pytest -q  — offline: no DB, no network, no model spend
 uv run pytest tests/integration/test_ticket_pipeline.py -k oom      # single file / test
@@ -67,7 +69,10 @@ under `src/`.** Two interchangeable implementations, chosen by `TRIAGE_LLM_PROVI
 enforces the spend caps — this is production — and `AnthropicClient` straight to the API
 with `TRIAGE_ANTHROPIC_API_KEY`, for local runs where standing up a proxy is why the alert
 never gets tried. The direct client reads its three model ids from `TRIAGE_MODEL_*`, so the
-rule holds; it has no spend caps, which is its whole cost. Both return a validated Pydantic
+rule holds; it has no spend caps, which is its whole cost. `make proxy` runs the proxy
+locally (`docker/litellm.yaml`, same aliases, same `TRIAGE_MODEL_*`, own Postgres for the
+spend it counts) — so the two paths differ in guardrails, not in which model answers. Both
+return a validated Pydantic
 model from one forced tool call, never `response_format`. Prose-only output still goes
 through a schema with a prose field.
 

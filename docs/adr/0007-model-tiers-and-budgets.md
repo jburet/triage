@@ -65,6 +65,33 @@ the current models reject outright, and `effort`, which is a per-model capabilit
 the operator's choice of model decides — sending it to a model that does not take
 it fails the run rather than costing a little more.
 
+## Amended 2026-08-23 — the proxy runs locally too
+
+`docker/litellm.yaml` plus the `litellm` service in `docker-compose.yml` are the
+same three aliases on `localhost:4000`, started by `make proxy`. It resolves the
+tiers from the *same* `TRIAGE_MODEL_*` variables the direct client reads, which
+is the point: the two paths must differ in guardrails, not in which model
+answers, or a local run through one says nothing about the other.
+
+Two things this made explicit and are worth keeping written down.
+
+**The daily cap needs a database.** With no `DATABASE_URL`, LiteLLM starts, logs
+one warning, and enforces `max_budget` not at all — a proxy that looks like
+production and silently is not. The compose service therefore gets its own small
+Postgres, deliberately not Triage's: those are LiteLLM's ~150 Prisma migrations
+and they are not Triage data.
+
+**The per-run 500k cap is not in this config.** A run is a graph invocation
+spanning many requests and LiteLLM budgets per key, not per caller, so enforcing
+it would mean minting a virtual key per run. Local development does not need
+that; the deployed proxy does, and this file is not it.
+
+The `auto` rule is unchanged and now has a sharper edge: it prefers the direct
+client as soon as a key is set, so `make proxy` alone does not route through the
+proxy — `TRIAGE_LLM_PROVIDER=litellm` does. Left as an explicit choice rather
+than a liveness probe on port 4000, because a provider that changes under you
+depending on what happens to be running is worse than one you have to name.
+
 ## Revisit when
 
 Someone runs production through the direct client because it was easier, which

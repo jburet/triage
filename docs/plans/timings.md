@@ -56,3 +56,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 one-shot | run_incident on the pod-down alert (9 Datadog calls) | 1 |
 | 2026-08-23 | M3 scope fixes | make test (379 passed) | 2 |
 | 2026-08-23 | direct Anthropic client | make lint + make test (389 passed) | 6 |
+| 2026-08-23 | local LiteLLM | docker compose pull + first start (image ~1 GB) | 16 |
+| 2026-08-23 | local LiteLLM | make proxy, cold: db + 151 prisma migrations + health | 20 |
+| 2026-08-23 | local LiteLLM | make lint + make test (389 passed) | 8 |

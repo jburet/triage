@@ -28,6 +28,7 @@ not built yet; see the milestone table in `docs/architecture.md`.
 
 ```bash
 make dev            # uv sync, start Postgres, apply migrations
+make proxy          # start the local LiteLLM proxy (optional, see Models)
 make test           # full suite — no network, no model spend
 make run-fixture    # run the pipeline on a fixture diagnosis, in dry-run mode
 ```
@@ -61,6 +62,22 @@ Pick a different fixture with `make run-fixture FIXTURE=tests/fixtures/diagnoses
 Graph code asks for a **tier** — `triage`, `analysis` or `diagnosis` — never for a
 model. The tier-to-model mapping and the budget guardrails live in the LiteLLM
 proxy configuration (ADR-0007). No model name appears anywhere under `src/`.
+
+There are two ways to reach a model, chosen by `TRIAGE_LLM_PROVIDER`:
+
+| | `litellm` | `anthropic` |
+|---|---|---|
+| Resolves the tier | the proxy, from `docker/litellm.yaml` | `TRIAGE_MODEL_*` in `.env` |
+| Daily $50 cap | enforced | not enforced |
+| Needs | `make proxy` | an API key |
+
+`make proxy` runs LiteLLM and its own small Postgres from `docker-compose.yml` on
+`localhost:4000`, with the same three aliases production uses. It reads the same
+`TRIAGE_MODEL_*` and the same key as the direct client, so switching provider does
+not change which model answers — that is what makes a local run through one path
+evidence about the other. `auto`, the default, prefers the *direct* client
+whenever a key is set, so a proxy you deliberately started needs
+`TRIAGE_LLM_PROVIDER=litellm`.
 
 ## Running the graph in LangGraph Studio
 

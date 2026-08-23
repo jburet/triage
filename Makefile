@@ -1,4 +1,4 @@
-.PHONY: help install env dev db migrate lint test run-fixture run-cartography run-incident evals evals-cartography evals-incident clean
+.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-incident evals evals-cartography evals-incident clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -15,6 +15,14 @@ db: ## Start Postgres and wait for it
 	docker compose up -d postgres
 	@until docker compose exec -T postgres pg_isready -U triage >/dev/null 2>&1; do sleep 1; done
 	@echo "postgres ready"
+
+proxy: env ## Start the local LiteLLM proxy (tier aliases + the daily cap)
+	docker compose up -d litellm
+	@until curl -fsS http://localhost:4000/health/liveliness >/dev/null 2>&1; do sleep 1; done
+	@echo "litellm ready on http://localhost:4000 — aliases: triage analysis diagnosis"
+
+proxy-down: ## Stop the local LiteLLM proxy
+	docker compose stop litellm
 
 migrate: ## Apply Alembic migrations
 	uv run alembic upgrade head
