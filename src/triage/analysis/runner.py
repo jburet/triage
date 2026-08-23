@@ -14,22 +14,32 @@ import json
 import os
 import shutil
 import tempfile
-from collections.abc import Callable, Mapping, Sequence
+import time
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
 import structlog
 
-from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult
+from triage.analysis.jobs import (
+    JOB_TIMEOUT_SECONDS,
+    REQUEST_ENV,
+    JobApi,
+    JobApiError,
+    job_manifest,
+    job_name,
+)
+from triage.config import AnalysisJobConfig
+from triage.db.repo import AnalysisResultRecord, TriageRepository
+from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult, AnalysisStatus
 
 log = structlog.get_logger(__name__)
 
 CLONE_DEPTH = 1
 """ADR-0009: the analyses read a tree at a commit, not a history."""
 
-REQUEST_ENV = "TRIAGE_ANALYSIS_REQUEST"
-JOB_NAME_ENV = "TRIAGE_ANALYSIS_JOB_NAME"
+DEFAULT_POLL_SECONDS = 5.0
 
 _STDERR_TAIL = 500
 
@@ -159,7 +169,7 @@ class LocalAnalysisRunner:
         *,
         command: CommandRunner = run_command,
         workdir: Path | None = None,
-        timeout: float = 900.0,
+        timeout: float = JOB_TIMEOUT_SECONDS,
         git: str = "git",
     ) -> None:
         self._entrypoint = tuple(entrypoint)
@@ -223,3 +233,95 @@ class LocalAnalysisRunner:
                 request.kind, f"analysis entrypoint did not emit JSON: {exc}"
             )
         return AnalysisResult.from_payload(request.kind, raw)
+
+
+class KubernetesJobRunner:
+    """Submits one sandboxed Job per analysis and reads the row it writes (ADR-0009).
+
+    The Job has no path back to the graph, so the result channel is a single row
+    in ``triage.analysis_results`` keyed by Job name, which this runner polls
+    through the repository. Nothing here raises: a wedged Job, a Job that errored
+    and a payload that does not validate are all *failed results*, because a
+    failed analysis is a fact the diagnosis has to record — losing the whole run
+    over one hypothesis is the worse outcome.
+
+    The Job is deleted whatever happened, and a delete that fails is logged
+    rather than allowed to discard a good result.
+    """
+
+    def __init__(
+        self,
+        jobs: JobApi,
+        repo: TriageRepository,
+        spec: AnalysisJobConfig,
+        *,
+        timeout: float = JOB_TIMEOUT_SECONDS,
+        poll_interval: float = DEFAULT_POLL_SECONDS,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self._jobs = jobs
+        self._repo = repo
+        self._spec = spec
+        self._timeout = timeout
+        self._poll_interval = poll_interval
+        self._sleep = sleep
+        self._clock = clock
+
+    async def run(self, request: AnalysisRequest) -> AnalysisResult:
+        name = job_name(request)
+        manifest = job_manifest(request, name=name, spec=self._spec)
+        try:
+            await self._jobs.create(manifest)
+        except JobApiError as exc:
+            return AnalysisResult.failed(request.kind, f"could not submit Job {name}: {exc}")
+        try:
+            return await self._await_result(request, name)
+        finally:
+            await self._delete(name)
+
+    async def _await_result(self, request: AnalysisRequest, name: str) -> AnalysisResult:
+        started = self._clock()
+        while True:
+            row = await self._repo.analysis_result(name)
+            if row is not None and row.status.is_terminal:
+                return self._admit(request, name, row)
+
+            status = await self._jobs.status(name)
+            if status.failed:
+                return AnalysisResult.failed(
+                    request.kind,
+                    f"Job {name} failed: {status.reason or 'no reason reported'}",
+                )
+            if status.succeeded:
+                # The Job writes its row before exiting, so one that finished
+                # without writing never will; waiting out the deadline for it
+                # only delays the diagnosis.
+                return AnalysisResult.failed(
+                    request.kind, f"Job {name} finished but wrote no result row"
+                )
+            if self._clock() - started >= self._timeout:
+                return AnalysisResult.failed(
+                    request.kind,
+                    f"Job {name} reported no result within {self._timeout:.0f}s",
+                )
+            await self._sleep(self._poll_interval)
+
+    def _admit(
+        self, request: AnalysisRequest, name: str, row: AnalysisResultRecord
+    ) -> AnalysisResult:
+        if row.kind is not request.kind:
+            return AnalysisResult.failed(
+                request.kind, f"Job {name} wrote a {row.kind.value} result"
+            )
+        if row.status is AnalysisStatus.FAILED:
+            return AnalysisResult.failed(
+                request.kind, row.error or "the analysis reported a failure with no message"
+            )
+        return AnalysisResult.from_payload(request.kind, row.result)
+
+    async def _delete(self, name: str) -> None:
+        try:
+            await self._jobs.delete(name)
+        except JobApiError as exc:
+            log.warning("analysis_job_not_deleted", job=name, error=str(exc))

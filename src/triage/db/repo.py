@@ -9,13 +9,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from triage.db.models import DiagnosisRow, EvaluationRow, TicketRow
+from triage.db.models import AnalysisResultRow, DiagnosisRow, EvaluationRow, TicketRow
+from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.common import Feature
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.ticket import PipelineOutcome
@@ -35,6 +36,22 @@ class TicketRecord:
     state: str
     occurrence_count: int
     last_alerted_occurrence: int
+
+
+@dataclass(frozen=True)
+class AnalysisResultRecord:
+    """The row an analysis Job writes, as the runner reads it (ADR-0009).
+
+    The Job reaches this table with its own narrow role; Triage only ever reads
+    what arrives, which is why the payload stays a plain mapping until the
+    per-kind schema admits it.
+    """
+
+    job_name: str
+    kind: AnalysisKind
+    status: AnalysisStatus
+    result: dict[str, Any] | None = None
+    error: str | None = None
 
 
 class TriageRepository(Protocol):
@@ -70,6 +87,18 @@ class TriageRepository(Protocol):
         compose_attempts: int,
         time_to_ticket_seconds: float | None,
     ) -> None: ...
+
+    async def analysis_result(self, job_name: str) -> AnalysisResultRecord | None: ...
+
+    async def save_analysis_result(
+        self,
+        *,
+        job_name: str,
+        kind: AnalysisKind,
+        status: AnalysisStatus,
+        result: dict[str, Any] | None = None,
+        error: str | None = None,
+    ) -> AnalysisResultRecord: ...
 
 
 def _to_record(row: TicketRow) -> TicketRecord:
@@ -186,6 +215,46 @@ class SqlRepository:
         async with self._sessionmaker() as session, session.begin():
             session.add(row)
 
+    async def analysis_result(self, job_name: str) -> AnalysisResultRecord | None:
+        async with self._sessionmaker() as session:
+            row = await session.scalar(
+                select(AnalysisResultRow).where(AnalysisResultRow.job_name == job_name)
+            )
+        return _to_analysis_record(row) if row else None
+
+    async def save_analysis_result(
+        self,
+        *,
+        job_name: str,
+        kind: AnalysisKind,
+        status: AnalysisStatus,
+        result: dict[str, Any] | None = None,
+        error: str | None = None,
+    ) -> AnalysisResultRecord:
+        async with self._sessionmaker() as session, session.begin():
+            row = await session.scalar(
+                select(AnalysisResultRow).where(AnalysisResultRow.job_name == job_name)
+            )
+            if row is None:
+                row = AnalysisResultRow(job_name=job_name, kind=kind.value, status=status.value)
+                session.add(row)
+            row.kind = kind.value
+            row.status = status.value
+            row.result = result
+            row.error = error
+            await session.flush()
+            return _to_analysis_record(row)
+
+
+def _to_analysis_record(row: AnalysisResultRow) -> AnalysisResultRecord:
+    return AnalysisResultRecord(
+        job_name=row.job_name,
+        kind=AnalysisKind(row.kind),
+        status=AnalysisStatus(row.status),
+        result=row.result,
+        error=row.error,
+    )
+
 
 @dataclass(frozen=True)
 class EvaluationRecord:
@@ -205,6 +274,7 @@ class InMemoryRepository:
     tickets: dict[str, TicketRecord] = field(default_factory=dict)
     diagnoses: dict[UUID, Diagnosis] = field(default_factory=dict)
     evaluations: list[EvaluationRecord] = field(default_factory=list)
+    analysis_results: dict[str, AnalysisResultRecord] = field(default_factory=dict)
 
     async def open_tickets_for_service(self, service: str) -> list[TicketRecord]:
         return [
@@ -283,3 +353,21 @@ class InMemoryRepository:
                 recorded_at=datetime.now(UTC),
             )
         )
+
+    async def analysis_result(self, job_name: str) -> AnalysisResultRecord | None:
+        return self.analysis_results.get(job_name)
+
+    async def save_analysis_result(
+        self,
+        *,
+        job_name: str,
+        kind: AnalysisKind,
+        status: AnalysisStatus,
+        result: dict[str, Any] | None = None,
+        error: str | None = None,
+    ) -> AnalysisResultRecord:
+        record = AnalysisResultRecord(
+            job_name=job_name, kind=kind, status=status, result=result, error=error
+        )
+        self.analysis_results[job_name] = record
+        return record

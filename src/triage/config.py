@@ -46,11 +46,26 @@ class Thresholds(BaseModel):
     max_compose_attempts: int = Field(default=3, ge=1)
 
 
+class AnalysisJobConfig(BaseModel):
+    """Where one analysis runs (ADR-0009).
+
+    The cluster objects these name — the runtime class, the Secret, the
+    NetworkPolicy, the narrow database role — belong to the infra track. Triage
+    only names them when it submits a Job.
+    """
+
+    namespace: str = "triage"
+    image: str = ""
+    runtime_class: str = "gvisor"
+    secret_ref: str = "triage-analysis"
+
+
 class AnalysisConfig(BaseModel):
     """Secondary-cause fan-out in the Analysis sub-graph. See ADR-0005."""
 
     min_rank_score: float = Field(default=0.3, ge=0.0, le=1.0)
     max_hypotheses: int = Field(default=3, ge=1)
+    job: AnalysisJobConfig = Field(default_factory=AnalysisJobConfig)
 
 
 class Config(BaseModel):
@@ -94,6 +109,12 @@ class Settings(BaseSettings):
     jira_base_url: str = ""
     jira_user_email: str = ""
     jira_api_token: str = ""
+
+    # Datadog: read-only collection for F1. ``datadog_site`` is the API host;
+    # the application key is scoped and belongs to a service account, not a person.
+    datadog_site: str = "api.datadoghq.eu"
+    datadog_api_key: str = ""
+    datadog_app_key: str = ""
 
     config_path: Path = DEFAULT_CONFIG_PATH
 

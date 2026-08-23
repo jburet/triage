@@ -13,7 +13,12 @@ from dataclasses import dataclass
 import structlog
 from langchain_core.runnables import RunnableConfig
 
-from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner, dry_run_result
+from triage.analysis.runner import (
+    AnalysisRunner,
+    FakeAnalysisRunner,
+    KubernetesJobRunner,
+    dry_run_result,
+)
 from triage.config import Config, Settings, get_config, get_settings
 from triage.db.repo import InMemoryRepository, SqlRepository, TriageRepository
 from triage.integrations.base import (
@@ -42,7 +47,11 @@ class Deps:
 def _build_runner(settings: Settings, config: Config, repo: TriageRepository) -> AnalysisRunner:
     if settings.dry_run:
         return FakeAnalysisRunner(default=dry_run_result)
-    raise NotImplementedError("the Kubernetes analysis runner lands with M2 phase 1.3")
+
+    from triage.analysis.jobs import KubernetesJobApi
+
+    job = config.analysis.job
+    return KubernetesJobRunner(KubernetesJobApi(job.namespace), repo, job)
 
 
 def build_deps(settings: Settings | None = None, config: Config | None = None) -> Deps:

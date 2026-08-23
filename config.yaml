@@ -44,3 +44,12 @@ analysis:
   # Secondary-cause fan-out in the Analysis sub-graph (ADR-0005).
   min_rank_score: 0.3
   max_hypotheses: 3
+
+  # Where one analysis runs (ADR-0009). The runtime class, the Secret, the
+  # NetworkPolicy and the narrow database role are created by the infra track;
+  # Triage only names them when it submits the Job.
+  job:
+    namespace: triage
+    image: ""
+    runtime_class: gvisor
+    secret_ref: triage-analysis
