@@ -1,0 +1,46 @@
+# Static configuration, versioned. Discovered data (the system map) lives in
+# PostgreSQL and is never hand-edited here.
+
+teams:
+  - name: payments
+    slack_channel: "#payments-alerts"
+    jira_project: PAY
+  - name: platform
+    slack_channel: "#platform-alerts"
+    jira_project: PLAT
+
+repos:
+  - url: github.com/org/payments-api
+    team: payments
+    kind: application
+  - url: github.com/org/infra
+    team: platform
+    kind: terraform
+
+# Target databases for F3. Credentials are never inlined: `secret_ref` names a
+# Kubernetes Secret exposing a read-only role (see ADR-0008).
+databases: []
+#  - name: payments-primary
+#    team: payments
+#    secret_ref: triage-db-payments-primary
+
+thresholds:
+  # Minimum diagnosis confidence for a signal to become a Jira ticket (ADR-0002).
+  # F3 is proactive and noisier than F1, so it earns a higher bar.
+  ticket_confidence:
+    F1: medium
+    F3: high
+
+  # Re-alert Slack on an updated (deduplicated) ticket at this occurrence count,
+  # then every `dedup_recurrence_interval` occurrences after it (ADR-0003).
+  dedup_recurrence_alert: 3
+  dedup_recurrence_interval: 5
+
+  # compose -> self_review retry budget. On exhaustion: Slack notice with the
+  # draft attached, no Jira ticket.
+  max_compose_attempts: 3
+
+analysis:
+  # Secondary-cause fan-out in the Analysis sub-graph (ADR-0005).
+  min_rank_score: 0.3
+  max_hypotheses: 3

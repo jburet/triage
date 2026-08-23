@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "ticket_pipeline": "./src/triage/graphs/ticket_pipeline.py:graph"
+  },
+  "env": ".env"
+}

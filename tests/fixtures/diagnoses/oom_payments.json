@@ -1,0 +1,45 @@
+{
+  "diagnosis_id": "6f1a2b3c-4d5e-4f60-8a91-0b2c3d4e5f60",
+  "feature": "F1",
+  "service": "payments-api",
+  "team": "payments",
+  "symptom": {
+    "description": "payments-api pods OOM-killed 11 times between 02:10 and 02:55 UTC; container memory climbed from a 480 MB baseline to the 1 Gi limit within roughly 7 minutes of each pod start.",
+    "window": {"start": "2026-08-22T02:10:00Z", "end": "2026-08-22T02:55:00Z"}
+  },
+  "impact": {
+    "users": "All checkout traffic; 4.1% of POST /payments requests returned 502 during the window (2 840 requests).",
+    "services": ["payments-api", "checkout-web"],
+    "slos": "Checkout availability SLO consumed 38% of its 30-day error budget in 45 minutes."
+  },
+  "probable_cause": "The idempotency-key cache introduced in 9f2c1ab is an unbounded dict keyed by request id with no eviction; under the nightly settlement batch the key space grows fast enough to exhaust the 1 Gi container limit in minutes.",
+  "confidence": "high",
+  "confidence_rationale": "The heap growth rate matches the settlement batch request rate exactly, the cache has no eviction path in the code, and the symptom first appeared in the deploy that introduced it. Not certain only because no heap dump was captured during the window.",
+  "evidence": [
+    {"kind": "metric", "description": "container_memory_working_set_bytes for payments-api rises 480 MB to 1.02 GB over 7 minutes, sawtooth on each restart.", "url": "https://app.datadoghq.example/metric/payments-api-memory"},
+    {"kind": "k8s_event", "description": "11 x OOMKilled events on payments-api pods in namespace prod between 02:10 and 02:55 UTC.", "url": "https://app.datadoghq.example/events/oom-payments"},
+    {"kind": "commit", "description": "9f2c1ab 'add idempotency key cache' deployed 2026-08-21T18:40Z; first OOM 7h later at the start of the settlement window.", "url": "https://github.example/org/payments-api/commit/9f2c1ab"},
+    {"kind": "trace", "description": "Settlement batch drives 18 400 unique idempotency keys per hour, each retained for the process lifetime.", "url": "https://app.datadoghq.example/traces/settlement-batch"}
+  ],
+  "location": {
+    "repo": "github.com/org/payments-api",
+    "commit": "9f2c1ab7e4d3c2b1a0987654321fedcba0123456",
+    "paths": ["src/payments/idempotency.py:IdempotencyCache", "src/payments/handlers/charge.py:handle_charge"],
+    "terraform_resource": null
+  },
+  "expected_change": {
+    "statement": "payments-api container working set stays under 700 MB across a full settlement window, with zero OOMKilled events over 24 hours.",
+    "how_to_verify": "The payments-api memory dashboard in Datadog, over the 02:00-04:00 UTC settlement window the night after deploy."
+  },
+  "out_of_scope": [
+    "The 1 Gi container memory limit itself; raising it postpones the symptom without addressing the unbounded cache.",
+    "The settlement batch schedule and its request rate."
+  ],
+  "ruled_out": [
+    {"hypothesis": "A memory leak in the postgres connection pool.", "why": "Pool size and open connection count were flat at 20 throughout the window, and the growth predates any pool churn."},
+    {"hypothesis": "Increased traffic volume.", "why": "Request rate was within 3% of the previous four nights; only memory per pod changed."}
+  ],
+  "unknowns": [
+    {"question": "Peak per-entry size of a cached idempotency record.", "why_unresolved": "No heap dump was captured during the window and the pods have since been replaced."}
+  ]
+}

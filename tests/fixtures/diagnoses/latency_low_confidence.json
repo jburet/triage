@@ -1,0 +1,41 @@
+{
+  "diagnosis_id": "7a2b3c4d-5e6f-4071-9b02-1c2d3e4f5061",
+  "feature": "F1",
+  "service": "payments-api",
+  "team": "payments",
+  "symptom": {
+    "description": "p95 latency on GET /payments/{id} rose from 140 ms to 610 ms between 09:00 and 09:40 UTC, then recovered without intervention.",
+    "window": {"start": "2026-08-22T09:00:00Z", "end": "2026-08-22T09:40:00Z"}
+  },
+  "impact": {
+    "users": {"unknown": true, "reason": "No user-facing error rate moved; the endpoint stayed within its 2 s timeout throughout, so degradation may not have been perceptible."},
+    "services": ["payments-api"],
+    "slos": "Latency SLO (p95 under 400 ms) breached for 40 minutes, consuming 6% of the monthly budget."
+  },
+  "probable_cause": {"unknown": true, "reason": "Latency rose across every handler at once with no deploy, no traffic change and no database contention; nothing in the collected telemetry distinguishes a cause, and the node-level metrics for the window were not retained."},
+  "confidence": "low",
+  "confidence_rationale": "No candidate cause survived the available evidence. Reported as low rather than medium because the leading hypothesis, noisy-neighbour contention, could not be checked at all.",
+  "evidence": [
+    {"kind": "metric", "description": "p95 on GET /payments/{id} 140 ms to 610 ms, recovering at 09:40 with no deploy in the window.", "url": "https://app.datadoghq.example/metric/payments-latency"},
+    {"kind": "db_stat", "description": "pg_stat_statements shows no change in mean execution time for the endpoint's three queries during the window.", "url": "https://app.datadoghq.example/db/payments-primary"}
+  ],
+  "location": {
+    "repo": "github.com/org/payments-api",
+    "commit": {"unknown": true, "reason": "No deploy occurred within 36 hours of the window, so no commit is implicated."},
+    "paths": [],
+    "terraform_resource": null
+  },
+  "expected_change": {
+    "statement": "p95 on GET /payments/{id} stays under 400 ms across a full business day.",
+    "how_to_verify": "The payments-api latency dashboard in Datadog, over one full weekday."
+  },
+  "out_of_scope": [],
+  "ruled_out": [
+    {"hypothesis": "A slow database query.", "why": "Mean and p99 execution times in pg_stat_statements were flat for every query the endpoint issues."},
+    {"hypothesis": "A deployment.", "why": "The last deploy to payments-api was 36 hours before the window."}
+  ],
+  "unknowns": [
+    {"question": "Whether the node hosting the pods was contended by another workload.", "why_unresolved": "Node-level CPU steal metrics are retained for 6 hours and the window had already aged out when the alert was investigated."},
+    {"question": "Whether an upstream dependency slowed down.", "why_unresolved": "The payment processor's status API reports current state only and has no historical endpoint."}
+  ]
+}

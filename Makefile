@@ -1,0 +1,37 @@
+.PHONY: help install env dev db migrate lint test run-fixture evals clean
+
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
+
+install: ## Sync the virtualenv
+	uv sync --all-extras
+
+env: ## Create .env from the example if it does not exist
+	@test -f .env || (cp .env.example .env && echo "created .env from .env.example")
+
+dev: install env db migrate ## Full local setup: deps, .env, Postgres, migrations
+
+db: ## Start Postgres and wait for it
+	docker compose up -d postgres
+	@until docker compose exec -T postgres pg_isready -U triage >/dev/null 2>&1; do sleep 1; done
+	@echo "postgres ready"
+
+migrate: ## Apply Alembic migrations
+	uv run alembic upgrade head
+
+lint: ## ruff + mypy
+	uv run ruff check src tests evals scripts
+	uv run ruff format --check src tests evals scripts
+	uv run mypy
+
+test: ## Run the test suite (no network, no spend)
+	uv run pytest -q
+
+run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mode
+	uv run python -m scripts.run_fixture $(FIXTURE)
+
+evals: ## Score the fixture suite against the real models (spends money)
+	uv run python -m evals.run
+
+clean:
+	rm -rf .mypy_cache .ruff_cache .pytest_cache
