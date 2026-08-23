@@ -12,11 +12,18 @@ collection that still has the other six, because an incident where the log
 endpoint was throttled is still an incident with events, metrics and a diff.
 
 Emptiness is not a result. A query that returns nothing in the incident window is
-re-run namespace-wide over seven days before it is written down: empty in both
-means the workload is not instrumented, empty only in the window means the
-absence is itself evidence. The reference incident returned no spans either way —
-the tenant has no APM at all — and only the wider query separates that from "the
-service was down".
+re-run — *the same query*, over seven days — before it is written down: empty in
+both means this signal is not collected for this scope at all, empty only in the
+window means the absence is itself evidence. The reference incident returned no
+spans either way (the tenant has no APM), and only the wider query separates that
+from "the service was down".
+
+The widening is in time and not in scope, which is a correction the first live
+run forced. Widening to the namespace answers a different question — "is anything
+collected in this namespace" — and on a real alert it labelled a `service:` tag
+that does not exist as "the absence is about this incident", because the
+namespace around it was busy. The same query over more time cannot make that
+mistake.
 """
 
 from __future__ import annotations
@@ -55,7 +62,7 @@ class Call:
     query: str
     fetch: Fetch
     reduce: Reducer
-    widen_query: str | None = None
+    widenable: bool = True
     note: str | None = None
 
 
@@ -99,10 +106,6 @@ class Collectors:
         namespace = self._alert.scope.namespace
         return f"kube_namespace:{namespace}" if namespace else None
 
-    @property
-    def _widest_scope(self) -> str | None:
-        return self._namespace_scope or self._service_scope
-
     def _reduce_events(self, payload: dict[str, Any]) -> dict[str, Any]:
         return reducers.reduce_events(payload, self._config.max_events)
 
@@ -118,27 +121,22 @@ class Collectors:
 
     def call_for(self, collector: Collector, query: str) -> Call:
         """One collector, run with an arbitrary query — the follow-up loop's entry point."""
-        widen = self._widest_scope
-        if collector in (Collector.EVENTS_SERVICE, Collector.EVENTS_NAMESPACE):
-            return Call(collector, query, self._events, self._reduce_events, widen)
         if collector is Collector.LOGS_SAMPLE:
-            return Call(collector, query, self._logs, self._reduce_logs, widen)
+            return Call(collector, query, self._logs, self._reduce_logs)
         if collector is Collector.LOGS_AGGREGATE:
-            return Call(
-                collector, query, self._logs_aggregate, reducers.reduce_log_aggregate, widen
-            )
+            return Call(collector, query, self._logs_aggregate, reducers.reduce_log_aggregate)
         if collector is Collector.METRICS:
             return Call(collector, query, self._timeseries, self._reduce_timeseries)
         if collector is Collector.SPANS:
-            return Call(collector, query, self._spans, reducers.reduce_spans, widen)
+            return Call(collector, query, self._spans, reducers.reduce_spans)
         if collector is Collector.MONITOR_DEFINITION:
-            return Call(collector, query, self._monitor, reducers.reduce_monitor)
-        return Call(collector, query, self._events, self._reduce_events, widen)
+            return Call(collector, query, self._monitor, reducers.reduce_monitor, widenable=False)
+        return Call(collector, query, self._events, self._reduce_events)
 
     # -- the sweep ---------------------------------------------------------------
 
     def _monitor_query_call(self) -> Call:
-        plan = monitor_query_plan(self._alert.monitor_query)
+        plan = monitor_query_plan(self._alert.monitor_query, self._alert.scope)
         if plan is None:
             return Call(
                 Collector.MONITOR_QUERY,
@@ -224,7 +222,7 @@ class Collectors:
         self, call: Call, window: TimeWindow, payload: dict[str, Any]
     ) -> CollectorResult:
         """Nothing came back. Widen before deciding what that means (ADR-0016)."""
-        if call.widen_query is None:
+        if not call.widenable:
             return CollectorResult(
                 collector=call.collector,
                 query=call.query,
@@ -237,7 +235,7 @@ class Collectors:
             start=window.end - timedelta(days=self._config.widen_days), end=window.end
         )
         try:
-            raw = await call.fetch(call.widen_query, wider)
+            raw = await call.fetch(call.query, wider)
         except Exception as exc:
             return CollectorResult(
                 collector=call.collector,
@@ -251,17 +249,17 @@ class Collectors:
                 collector=call.collector,
                 query=call.query,
                 status=CollectorStatus.NOT_INSTRUMENTED,
-                detail=f"nothing in the incident window and nothing for "
-                f"`{call.widen_query}` over {self._config.widen_days} days: this signal "
-                f"is not collected for this workload at all",
+                detail=f"nothing in the incident window and nothing for the same query "
+                f"over {self._config.widen_days} days: this signal is not collected for "
+                f"this scope at all",
                 payload=payload,
             )
         return CollectorResult(
             collector=call.collector,
             query=call.query,
             status=CollectorStatus.EMPTY,
-            detail=f"nothing in the incident window, although `{call.widen_query}` returns "
-            f"data over {self._config.widen_days} days: the absence is about this incident",
+            detail=f"nothing in the incident window, although the same query returns data "
+            f"over {self._config.widen_days} days: the absence is about this incident",
             payload=payload,
         )
 

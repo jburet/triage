@@ -77,13 +77,18 @@ def collection_window(
     return TimeWindow(start=alert.fired_at - span, end=min(moment, alert.fired_at + span))
 
 
-def monitor_query_plan(query: str | None) -> MonitorQueryPlan | None:
+def monitor_query_plan(
+    query: str | None, scope: AlertScope | None = None
+) -> MonitorQueryPlan | None:
     """The re-runnable form of the monitor's query, in the idiom it was written in."""
     if not query:
         return None
     metric = METRIC_QUERY.match(query)
     if metric:
-        return MonitorQueryPlan("timeseries", metric.group("expr").strip())
+        expression = metric.group("expr").strip()
+        return MonitorQueryPlan(
+            "timeseries", scope_expression(expression, scope) if scope else expression
+        )
     event = EVENT_QUERY.match(query)
     if event:
         # The monitor embeds its event query as a quoted string, so the inner
@@ -100,7 +105,7 @@ class Recipe:
     """The sweep for one alert class: which collectors, and which metrics."""
 
     collectors: tuple[Collector, ...]
-    metrics: tuple[str, ...] = ()
+    metrics: tuple[MetricSpec, ...] = ()
 
 
 SWEEP = (
@@ -114,60 +119,89 @@ SWEEP = (
 )
 """Every class sweeps the same shape; the classes differ in which metrics they ask for."""
 
-WORKLOAD_METRICS = (
-    "sum:kubernetes.containers.restarts{{kube_namespace:{namespace}}}",
-    "sum:kubernetes_state.statefulset.replicas_ready{{kube_stateful_set:{stateful_set}}}",
-    "sum:kubernetes_state.statefulset.replicas_desired{{kube_stateful_set:{stateful_set}}}",
-)
-
-RECIPES: dict[AlertClass, Recipe] = {
-    AlertClass.CRASH_RESTART: Recipe(
-        SWEEP,
-        (*WORKLOAD_METRICS, "avg:kubernetes.memory.usage_pct{{kube_namespace:{namespace}}}"),
-    ),
-    AlertClass.AVAILABILITY: Recipe(SWEEP, WORKLOAD_METRICS),
-    AlertClass.SATURATION: Recipe(
-        SWEEP,
-        (
-            "avg:kubernetes.memory.usage_pct{{kube_namespace:{namespace}}}",
-            "avg:kubernetes.cpu.usage.total{{kube_namespace:{namespace}}}",
-            *WORKLOAD_METRICS[:1],
-        ),
-    ),
-    AlertClass.LATENCY: Recipe(
-        SWEEP,
-        (
-            "avg:trace.http.request.duration{{service:{service}}}",
-            "avg:kubernetes.cpu.usage.total{{kube_namespace:{namespace}}}",
-        ),
-    ),
-    AlertClass.ERROR_RATE: Recipe(
-        SWEEP,
-        (
-            "sum:trace.http.request.errors{{service:{service}}}",
-            *WORKLOAD_METRICS[:1],
-        ),
-    ),
-    AlertClass.GENERIC: Recipe(SWEEP, WORKLOAD_METRICS[:1]),
+TAG_FOR = {
+    "cluster": "kube_cluster_name",
+    "namespace": "kube_namespace",
+    "stateful_set": "kube_stateful_set",
+    "service": "service",
 }
 
 
-def metric_queries(alert_class: AlertClass, scope: AlertScope) -> list[str]:
-    """The recipe's metrics, rendered for this scope.
+@dataclass(frozen=True)
+class MetricSpec:
+    """One metric, and the identifiers it must be narrowed by.
 
-    A metric whose scope the alert never carried is dropped rather than rendered
-    with an empty tag value: ``{kube_stateful_set:}`` matches everything, which
-    would answer a question about one workload with the whole cluster's numbers.
+    Scoping is the whole content of this type. Measured on a live alert
+    (2026-08-23, `grafana-observability-metrics` in `preprod-euw3`): asked for
+    without the cluster, `sum:kubernetes_state.statefulset.replicas_ready` summed
+    every cluster running a StatefulSet of that name and answered 7 ready of 8
+    desired — 87% healthy — for a workload that was at 0 of 1. Scoped to the
+    firing group it answers 1 → 0, which is the incident. A metric that is not
+    narrowed to what alerted does not merely lack precision; it says the opposite
+    of the truth, confidently.
     """
-    values = {
+
+    query: str
+    scope: tuple[str, ...]
+
+    def render(self, values: dict[str, str | None]) -> str | None:
+        tags = [f"{TAG_FOR[name]}:{values[name]}" for name in self.scope if values.get(name)]
+        return f"{self.query}{{{','.join(tags)}}}" if tags else None
+
+
+WORKLOAD = ("cluster", "namespace", "stateful_set")
+NAMESPACE = ("cluster", "namespace")
+
+RESTARTS = MetricSpec("sum:kubernetes.containers.restarts", NAMESPACE)
+REPLICAS = (
+    MetricSpec("sum:kubernetes_state.statefulset.replicas_ready", WORKLOAD),
+    MetricSpec("sum:kubernetes_state.statefulset.replicas_desired", WORKLOAD),
+)
+MEMORY = MetricSpec("avg:kubernetes.memory.usage_pct", NAMESPACE)
+CPU = MetricSpec("avg:kubernetes.cpu.usage.total", NAMESPACE)
+
+RECIPES: dict[AlertClass, Recipe] = {
+    AlertClass.CRASH_RESTART: Recipe(SWEEP, (RESTARTS, *REPLICAS, MEMORY)),
+    AlertClass.AVAILABILITY: Recipe(SWEEP, (RESTARTS, *REPLICAS)),
+    AlertClass.SATURATION: Recipe(SWEEP, (MEMORY, CPU, RESTARTS)),
+    AlertClass.LATENCY: Recipe(
+        SWEEP, (MetricSpec("avg:trace.http.request.duration", ("service",)), CPU)
+    ),
+    AlertClass.ERROR_RATE: Recipe(
+        SWEEP, (MetricSpec("sum:trace.http.request.errors", ("service",)), RESTARTS)
+    ),
+    AlertClass.GENERIC: Recipe(SWEEP, (RESTARTS,)),
+}
+
+
+def scope_values(scope: AlertScope) -> dict[str, str | None]:
+    return {
+        "cluster": scope.cluster,
         "namespace": scope.namespace,
         "service": scope.service,
         "stateful_set": scope.stateful_set or scope.service,
     }
-    rendered = []
-    for template in RECIPES[alert_class].metrics:
-        needed = re.findall(r"\{(\w+)\}", template)
-        if any(not values.get(name) for name in needed):
-            continue
-        rendered.append(template.format(**{name: values[name] for name in needed}))
-    return rendered
+
+
+def metric_queries(alert_class: AlertClass, scope: AlertScope) -> list[str]:
+    """The recipe's metrics, narrowed to the identifiers this alert actually carried.
+
+    A metric none of whose identifiers the alert carried is dropped rather than
+    asked unscoped: an unscoped query answers a question about the whole org.
+    """
+    values = scope_values(scope)
+    rendered = (spec.render(values) for spec in RECIPES[alert_class].metrics)
+    return [query for query in rendered if query]
+
+
+def scope_expression(expression: str, scope: AlertScope) -> str:
+    """Narrow a monitor's own metric expression to the group that fired.
+
+    A monitor is written across every group — ``{*} by {kube_cluster_name,…}`` —
+    so re-running it verbatim answers for the whole org and the reduction then
+    keeps whichever six series came first. Substituting the firing group's tags
+    for ``{*}`` is what makes the re-run a fact about this incident.
+    """
+    values = scope_values(scope)
+    tags = [f"{TAG_FOR[name]}:{values[name]}" for name in WORKLOAD if values.get(name)]
+    return expression.replace("{*}", f"{{{','.join(tags)}}}") if tags else expression

@@ -39,13 +39,15 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from triage.collect.recipes import collection_window
 from triage.config import get_config, get_settings
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.graphs.incident import build_graph
 from triage.integrations.datadog import DatadogClient, DatadogRestClient
+from triage.nodes.collect import classify_alert, collect
 from triage.runtime import DEPS_KEY, Deps, build_deps
 from triage.schemas.alert import Alert, AlertStatus
-from triage.schemas.collection import Collection
+from triage.schemas.collection import AlertClass, AlertClassification, Collection
 from triage.schemas.common import render as render_field
 from triage.schemas.system_map import RepoSummary, ServiceEntry, SystemMapKind
 from triage.scope import resolve
@@ -433,6 +435,38 @@ def show_side_effects(deps: Deps, recorder: Recorder) -> None:
         print(indent(f"SLACK {message.channel}{thread}: {clip(message.text, 120)}"))
 
 
+async def run_collection_only(deps: Deps, state: dict[str, Any], forced: str | None) -> None:
+    """The sweep on its own, for when there is no model proxy to reach.
+
+    Everything except the class is a rule, so forcing the class costs the run
+    nothing but honesty about which part a human supplied.
+    """
+    run = {"configurable": {DEPS_KEY: deps}}
+    if forced:
+        rule("node: classify_alert (forced)")
+        classification = AlertClassification(
+            alert_class=AlertClass(forced),
+            reason=f"forced with --class {forced}: the triage tier was not called",
+        )
+        window = collection_window(state["alert"], deps.config.collection)
+        print(indent(f"class  {classification.alert_class.value}  ({classification.reason})"))
+        print(indent(f"window {window}"))
+        state |= {"classification": classification, "window": window}
+    else:
+        update = await classify_alert(state, run)  # type: ignore[arg-type]
+        show_update("classify_alert", update)
+        state |= update
+
+    started = time.monotonic()
+    update = await collect(state, run)  # type: ignore[arg-type]
+    show_update("collect", update)
+    rule("stopped after the sweep")
+    print(indent(f"{time.monotonic() - started:.1f}s wall clock"))
+    print(
+        indent(f"{DIM}--collect-only: qualify, analysis, ticket and post-mortem need models{RESET}")
+    )
+
+
 def parse_time(value: str | None) -> datetime | None:
     return datetime.fromisoformat(value.replace("Z", "+00:00")) if value else None
 
@@ -453,6 +487,17 @@ async def main(argv: list[str]) -> int:
         help="service=repo_url[@commit], repeatable: seed the system map for this run",
     )
     parser.add_argument("--db", action="store_true", help="read the real system map from Postgres")
+    parser.add_argument(
+        "--collect-only",
+        action="store_true",
+        help="stop after the sweep: the collection half needs no model beyond the class",
+    )
+    parser.add_argument(
+        "--class",
+        dest="alert_class",
+        choices=[item.value for item in AlertClass],
+        help="force the class instead of asking the triage tier (needs --collect-only)",
+    )
     parser.add_argument("--json", dest="json_out", help="write the final state to this file")
     args = parser.parse_args(argv[1:])
 
@@ -515,6 +560,12 @@ async def main(argv: list[str]) -> int:
         "team": args.team or routing.team or "platform",
         "service": alert.scope.workload or "unknown",
     }
+
+    if args.collect_only:
+        await run_collection_only(deps, state, args.alert_class)
+        show_side_effects(deps, recorder)
+        await client.aclose()
+        return 0
 
     started = time.monotonic()
     final: dict[str, Any] = {}

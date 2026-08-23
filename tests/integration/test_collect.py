@@ -167,16 +167,22 @@ async def test_a_signal_absent_everywhere_is_recorded_as_not_instrumented(config
 
 
 async def test_a_signal_absent_only_in_the_window_is_evidence_not_a_gap(config: Config):
-    """The same empty response, the opposite meaning — decided by the widened query."""
+    """The same empty response, the opposite meaning — decided by widening the *time*."""
     datadog = fake_datadog()
-    responses = dict(datadog.responses)
-    # Nothing for the incident scope, but the namespace has spans over seven days.
-    responses["spans"] = {
-        "kube_namespace:hcl-software-uat": {
-            "data": [{"attributes": {"by": {"service": "other"}, "computes": {"c0": 42}}}]
-        }
-    }
-    deps = build_deps(config, datadog=FakeDatadogClient(responses=responses))
+    # Nothing during the incident, but this workload does emit spans over seven days.
+    deps = build_deps(
+        config,
+        datadog=FakeDatadogClient(
+            responses=datadog.responses,
+            wide={
+                "spans": {
+                    "plt-hcl-software-uat": {
+                        "data": [{"attributes": {"by": {"service": "plt"}, "computes": {"c0": 42}}}]
+                    }
+                }
+            },
+        ),
+    )
 
     collection = await swept(deps)
 

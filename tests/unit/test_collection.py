@@ -20,6 +20,7 @@ from triage.collect.recipes import (
     monitor_query_plan,
 )
 from triage.config import CollectionConfig
+from triage.schemas.alert import AlertScope
 from triage.schemas.collection import (
     AlertClass,
     Collection,
@@ -70,15 +71,45 @@ def test_a_monitor_query_is_replanned_in_the_idiom_it_was_written_in():
     assert monitor_query_plan("composite: 123 && 456") is None
 
 
-def test_a_metric_the_alerts_scope_cannot_fill_is_dropped_rather_than_left_open():
+def test_every_metric_is_narrowed_to_the_group_that_fired():
+    """Measured on a live alert: unscoped, the replica count answered for every cluster."""
     scope = captured_alert().scope
 
     queries = metric_queries(AlertClass.CRASH_RESTART, scope)
 
-    assert any("kube_namespace:hcl-software-uat" in query for query in queries)
-    assert any("kube_stateful_set:plt-hcl-software-uat" in query for query in queries)
-    assert all("{}" not in query and "kube_stateful_set:}" not in query for query in queries)
-    assert metric_queries(AlertClass.LATENCY, scope.model_copy(update={"namespace": None})) == []
+    replicas = next(query for query in queries if "replicas_ready" in query)
+    assert replicas == (
+        "sum:kubernetes_state.statefulset.replicas_ready{"
+        "kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,"
+        "kube_stateful_set:plt-hcl-software-uat}"
+    )
+    assert all("kube_cluster_name:prod-use1" in query for query in queries)
+
+
+def test_a_metric_none_of_whose_identifiers_the_alert_carried_is_dropped():
+    nothing = AlertScope()
+
+    assert metric_queries(AlertClass.CRASH_RESTART, nothing) == []
+    assert metric_queries(AlertClass.LATENCY, AlertScope(service="payments-api")) == [
+        "avg:trace.http.request.duration{service:payments-api}"
+    ]
+
+
+def test_the_monitors_own_expression_is_narrowed_to_the_group_that_fired():
+    """`{*} by {…}` re-run verbatim answers for the whole org, not for this incident."""
+    alert = captured_alert()
+
+    plan = monitor_query_plan(alert.monitor_query, alert.scope)
+
+    assert plan is not None
+    assert "{*}" not in plan.query
+    assert (
+        plan.query.count(
+            "kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,"
+            "kube_stateful_set:plt-hcl-software-uat"
+        )
+        == 2
+    )
 
 
 def test_namespace_scope_carries_the_exit_code_the_service_scope_never_saw():

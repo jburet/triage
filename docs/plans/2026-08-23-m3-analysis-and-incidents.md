@@ -112,6 +112,22 @@ Scored in `evals/`, not here, because it depends on model output: fed the captur
   is a roadmap decision, not this plan's.
 - Change correlation beyond deployments (feature flags, vendor incidents).
 
+## What the first live run changed (2026-08-23)
+
+`make run-incident` against a real alert — `grafana-observability-metrics` in
+`preprod-euw3`, 06:21 UTC — found three defects the captured fixture could not, because
+its tenant name was globally unique and its monitor was an event monitor:
+
+- **Metrics were not narrowed to the firing group.** `sum:…replicas_ready{kube_stateful_set:X}`
+  summed every cluster running a StatefulSet of that name and answered *7 ready of 8
+  desired* for a workload that was at *0 of 1*. Scoped to the group it answers 1 → 0.
+- **The monitor's own query was re-run unscoped.** `{*} by {cluster,namespace,statefulset}`
+  returns every group in the org; the reduction then kept whichever six series came first,
+  all reading 100%. Scoped, it shows the group falling 100 → 0.
+- **Emptiness was widened by scope instead of by time.** A `service:` tag that does not
+  exist was reported as "the absence is about this incident" because the *namespace* around
+  it was busy. The same query over seven days says what it should: not collected at all.
+
 ## Open risks
 
 - **One incident, one class.** The recipes for latency, error-rate and saturation classes are

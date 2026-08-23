@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Protocol
 
 import structlog
@@ -212,6 +212,9 @@ class RecordedQuery:
     query: str
 
 
+WIDE_SPAN = timedelta(days=1)
+"""Anything longer than this is the widened check, not the incident window."""
+
 EMPTY_EVENTS: dict[str, Any] = {"data": []}
 EMPTY_LOGS: dict[str, Any] = {"data": []}
 EMPTY_SERIES: dict[str, Any] = {"series": []}
@@ -231,14 +234,28 @@ class FakeDatadogClient:
     """
 
     responses: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    wide: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    """Answers for the widened check only — the same query over a much longer span.
+
+    Without this a fake cannot express the one distinction the emptiness rule is
+    built on: a query that is empty during an incident and alive over a week is
+    evidence, and one that is empty over both is a signal nobody collects.
+    """
     fail: Mapping[str, str] = field(default_factory=dict)
     calls: list[RecordedQuery] = field(default_factory=list)
 
-    def _answer(self, endpoint: str, query: str, empty: dict[str, Any]) -> dict[str, Any]:
+    def _answer(
+        self,
+        endpoint: str,
+        query: str,
+        empty: dict[str, Any],
+        span: timedelta = timedelta(0),
+    ) -> dict[str, Any]:
         self.calls.append(RecordedQuery(endpoint=endpoint, query=query))
         if endpoint in self.fail:
             raise DatadogError(self.fail[endpoint])
-        for marker, payload in self.responses.get(endpoint, {}).items():
+        table = self.wide if span > WIDE_SPAN else self.responses
+        for marker, payload in table.get(endpoint, {}).items():
             if marker in query:
                 return dict(payload)
         return empty
@@ -249,23 +266,23 @@ class FakeDatadogClient:
     async def search_events(
         self, *, query: str, frm: datetime, to: datetime, limit: int = 200
     ) -> dict[str, Any]:
-        return self._answer("events", query, EMPTY_EVENTS)
+        return self._answer("events", query, EMPTY_EVENTS, to - frm)
 
     async def get_monitor(self, monitor_id: int) -> dict[str, Any]:
         return self._answer("monitor", str(monitor_id), {})
 
     async def query_timeseries(self, *, query: str, frm: datetime, to: datetime) -> dict[str, Any]:
-        return self._answer("metrics", query, EMPTY_SERIES)
+        return self._answer("metrics", query, EMPTY_SERIES, to - frm)
 
     async def aggregate_logs(
         self, *, query: str, frm: datetime, to: datetime, group_by: Sequence[str] = ("status",)
     ) -> dict[str, Any]:
-        return self._answer("logs_aggregate", query, {"data": {"buckets": []}})
+        return self._answer("logs_aggregate", query, {"data": {"buckets": []}}, to - frm)
 
     async def search_logs(
         self, *, query: str, frm: datetime, to: datetime, limit: int = 60
     ) -> dict[str, Any]:
-        return self._answer("logs", query, EMPTY_LOGS)
+        return self._answer("logs", query, EMPTY_LOGS, to - frm)
 
     async def aggregate_spans(self, *, query: str, frm: datetime, to: datetime) -> dict[str, Any]:
-        return self._answer("spans", query, EMPTY_AGGREGATE)
+        return self._answer("spans", query, EMPTY_AGGREGATE, to - frm)

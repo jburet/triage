@@ -51,3 +51,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 phase 4 | make lint | 2 |
 | 2026-08-23 | M3 phase 4 | make test (374 passed) | 2 |
 | 2026-08-23 | M3 one-shot harness | scripts/run_incident against captured fixtures (offline smoke) | 2 |
+| 2026-08-23 | M3 one-shot | run_incident --collect-only on a live alert (12 Datadog calls) | 2 |
+| 2026-08-23 | M3 scoping fixes | make test (376 passed) | 2 |
