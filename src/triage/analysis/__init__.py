@@ -8,6 +8,7 @@ from triage.analysis.runner import (
     LocalAnalysisRunner,
     dry_run_result,
 )
+from triage.analysis.summaries import summarize_repo, summarize_terraform
 
 __all__ = [
     "AnalysisRunner",
@@ -18,4 +19,6 @@ __all__ = [
     "KubernetesJobRunner",
     "LocalAnalysisRunner",
     "dry_run_result",
+    "summarize_repo",
+    "summarize_terraform",
 ]

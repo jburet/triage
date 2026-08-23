@@ -69,6 +69,9 @@ class ContextBudget:
     max_file_bytes: int = 40_000
 
 
+DEFAULT_BUDGET = ContextBudget()
+
+
 @dataclass(frozen=True)
 class SelectionProfile:
     """Priority-ordered globs. Earlier patterns are read first when the budget runs short.
@@ -240,7 +243,7 @@ def _read_text(path: Path, limit: int) -> tuple[str, bool] | None:
 
 
 def gather(
-    root: Path, profile: SelectionProfile, budget: ContextBudget = ContextBudget()
+    root: Path, profile: SelectionProfile, budget: ContextBudget = DEFAULT_BUDGET
 ) -> RepoContext:
     """Read what the profile asks for, up to the budget, and record the rest."""
     everything = _walk(root)

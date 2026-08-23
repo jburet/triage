@@ -1,0 +1,187 @@
+"""Summarising a repository, offline (plan M2 phase 2.1, 2.2).
+
+The entrypoint is the only part of Triage that runs inside the sandbox, so it is
+also the only part no integration test can reach. What these tests pin is the
+contract on either side of it: what the model is shown, and what shape comes
+back out — including the failures, which must be stated results rather than
+tracebacks nobody sees.
+"""
+
+import json
+from pathlib import Path
+
+import pytest
+
+from tests.conftest import a_repo_summary, a_terraform_summary, an_analysis_request
+from triage.analysis.context import ContextBudget
+from triage.analysis.entrypoint import analyse, report
+from triage.llm import FakeLLM, StructuredOutputError
+from triage.schemas.analysis import AnalysisKind, AnalysisResult
+from triage.schemas.common import Unknown
+from triage.schemas.system_map import RepoSummary, TerraformSummary
+
+
+class FailingLLM:
+    """A tier that answered with nothing the schema admits."""
+
+    async def call(self, tier, prompt, schema):
+        raise StructuredOutputError(tier, schema)
+
+
+def write(root: Path, path: str, text: str) -> None:
+    target = root / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+
+
+@pytest.fixture
+def application_repo(tmp_path):
+    write(tmp_path, "pyproject.toml", "[project]\nname = 'payments-api'\n")
+    write(tmp_path, "src/payments/main.py", "app = FastAPI()\n")
+    write(tmp_path, "src/payments/models.py", "class Payment: ...\n")
+    return tmp_path
+
+
+@pytest.fixture
+def terraform_repo(tmp_path):
+    write(
+        tmp_path,
+        "main.tf",
+        'resource "aws_db_instance" "primary" {\n  instance_class = "db.r6g.large"\n}\n',
+    )
+    write(tmp_path, "terraform.tfstate", '{"resources": [{"instance": "db-abc123"}]}\n')
+    return tmp_path
+
+
+def tagged(prompt: str, tag: str) -> dict:
+    return json.loads(prompt.split(f"<{tag}>", 1)[1].split(f"</{tag}>", 1)[0])
+
+
+async def test_an_application_repo_is_summarised_into_every_area(application_repo):
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+
+    result = await analyse(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), application_repo, llm)
+
+    assert result.succeeded
+    summary = result.result
+    assert isinstance(summary, RepoSummary)
+    for area in (
+        "languages",
+        "frameworks",
+        "entry_points",
+        "endpoints",
+        "depends_on",
+        "database_access",
+        "observability",
+    ):
+        value = getattr(summary, area)
+        assert isinstance(value, Unknown) or value, f"{area} is neither filled nor an Unknown"
+
+
+async def test_a_terraform_repo_is_summarised_from_code_alone(terraform_repo):
+    llm = FakeLLM(responses={TerraformSummary: [a_terraform_summary()]})
+
+    result = await analyse(
+        an_analysis_request(AnalysisKind.SUMMARIZE_TERRAFORM), terraform_repo, llm
+    )
+
+    assert result.succeeded
+    assert isinstance(result.result, TerraformSummary)
+    prompt = llm.calls_for(TerraformSummary)[0].prompt
+    assert "db-abc123" not in prompt
+    assert [f["path"] for f in tagged(prompt, "repository")["files"]] == ["main.tf"]
+
+
+async def test_the_model_is_shown_the_tree_and_the_files_that_decide_the_answer(application_repo):
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+
+    await analyse(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), application_repo, llm)
+
+    repository = tagged(llm.calls_for(RepoSummary)[0].prompt, "repository")
+    assert "src/payments/main.py" in repository["tree"]
+    assert "pyproject.toml" in [item["path"] for item in repository["files"]]
+
+
+async def test_what_was_not_read_reaches_the_model(application_repo):
+    """A gap the model is not told about is a gap it fills in with something plausible."""
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+
+    await analyse(
+        an_analysis_request(AnalysisKind.SUMMARIZE_REPO),
+        application_repo,
+        llm,
+        budget=ContextBudget(max_files=1),
+    )
+
+    assert tagged(llm.calls_for(RepoSummary)[0].prompt, "repository")["not_examined"]
+
+
+async def test_the_summary_is_produced_by_the_analysis_tier(application_repo):
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+
+    await analyse(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), application_repo, llm)
+
+    assert [call.tier for call in llm.calls] == ["analysis"]
+
+
+async def test_instructions_precede_the_repository(application_repo):
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+
+    await analyse(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), application_repo, llm)
+
+    prompt = llm.calls_for(RepoSummary)[0].prompt
+    assert prompt.index("Never invent") < prompt.index("<repository>")
+    assert tagged(prompt, "request")["kind"] == "summarize_repo"
+
+
+async def test_an_area_the_model_could_not_determine_stays_unknown(application_repo):
+    partial = a_repo_summary(
+        endpoints=Unknown(reason="No router or route table appears in the files read.")
+    )
+    llm = FakeLLM(responses={RepoSummary: [partial]})
+
+    result = await analyse(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), application_repo, llm)
+
+    assert isinstance(result.result, RepoSummary)
+    assert isinstance(result.result.endpoints, Unknown)
+
+
+async def test_a_kind_with_no_summariser_is_a_stated_failure(application_repo):
+    llm = FakeLLM(responses={})
+
+    result = await analyse(an_analysis_request(AnalysisKind.CODE_ANALYSIS), application_repo, llm)
+
+    assert not result.succeeded
+    assert "code_analysis" in (result.error or "")
+
+
+async def test_a_tier_that_returns_nothing_parsable_is_a_stated_failure(application_repo):
+    result = await analyse(
+        an_analysis_request(AnalysisKind.SUMMARIZE_REPO),
+        application_repo,
+        FailingLLM(),  # type: ignore[arg-type]
+    )
+
+    assert not result.succeeded
+    assert "summarize_repo" in (result.error or "")
+
+
+def test_the_entrypoint_emits_what_the_local_runner_reads_back(capsys):
+    """stdout is the payload, and a failure is an exit code — the runner's contract."""
+    summary = a_repo_summary()
+    kind = AnalysisKind.SUMMARIZE_REPO
+
+    code = report(AnalysisResult(kind=kind, status="succeeded", result=summary))
+    out = capsys.readouterr().out
+
+    assert code == 0
+    assert AnalysisResult.from_payload(kind, json.loads(out)).result == summary
+
+
+def test_a_failed_analysis_exits_non_zero_and_says_why(capsys):
+    code = report(AnalysisResult.failed(AnalysisKind.SUMMARIZE_REPO, "clone was empty"))
+    captured = capsys.readouterr()
+
+    assert code == 1
+    assert "clone was empty" in captured.err
+    assert not captured.out.strip()

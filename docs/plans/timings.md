@@ -13,3 +13,8 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M2 phase 1.2 | make lint + make test | 3 |
 | 2026-08-23 | M2 phase 1.3 | pytest tests/unit/test_kubernetes_job_runner.py | 1 |
 | 2026-08-23 | M2 phase 1.3 | make lint + make test | 3 |
+| 2026-08-23 | M2 phase 2.1-2.2 | pytest tests/unit/test_analysis_context.py | 1 |
+| 2026-08-23 | M2 phase 2.1-2.2 | pytest tests/unit/test_analysis_entrypoint.py | 1 |
+| 2026-08-23 | M2 phase 2.1-2.2 | pytest tests/unit/test_summaries.py | 1 |
+| 2026-08-23 | M2 phase 2.1-2.2 | make lint | 1 |
+| 2026-08-23 | M2 phase 2.1-2.2 | make test (247 passed) | 2 |
