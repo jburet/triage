@@ -1,14 +1,11 @@
-# Plan: M3 — Analysis sub-graph, F1 incident graph, Datadog ingress (2026-08-23)
+# Plan: M3 — Analysis sub-graph, F1 incident graph, Datadog collection (2026-08-23)
 
-> **Stale as of 2026-08-23.** Phase 2 and Phase 4 below predate
-> [ADR-0016](../adr/0016-datadog-collected-by-triage.md),
-> [ADR-0017](../adr/0017-alert-ingestion-by-polling.md) and
-> [ADR-0018](../adr/0018-alert-persistence-gate.md): there is no Bits AI input, no Datadog
-> webhook endpoint, and no analysis before the persistence gate. Phases 1 and 3 stand.
-> Rewrite before executing.
+Architecture §2.1, §2.3, §8; ADR-0005, ADR-0010, ADR-0011, ADR-0016, ADR-0017, ADR-0018.
+Depends on M2 Phases 1 and 3 (`AnalysisRunner`, `system_map_for_service`).
 
-Architecture §2.1, §2.3, §8; ADR-0005, ADR-0010, ADR-0011, ADR-0016, ADR-0017, ADR-0018. Depends on M2
-Phases 1 and 3 (`AnalysisRunner`, `system_map_for_service`).
+Phases 2 and 4 were rewritten on 2026-08-23 after collecting one real alert by hand
+(`tests/fixtures/datadog/hcl_software_uat_20260822/`). The numbers in the caps below come
+from that capture, not from estimation.
 
 ## Public interface
 
@@ -16,18 +13,43 @@ Phases 1 and 3 (`AnalysisRunner`, `system_map_for_service`).
   `system_map` context. Output: `diagnosis: Diagnosis`.
 - `triage.graphs.incident`: graph `incident`, registered in `langgraph.json`. Input: a `Signal`
   with `feature = F1`. Composes `analysis` then `ticket_pipeline`, then drafts a post-mortem.
-- `triage.integrations.datadog.DatadogClient` (protocol) — `bits_ai_investigation(alert_id)`,
-  `query_metrics(...)`, `search_logs(...)`, `search_traces(...)`; `FakeDatadogClient` with
-  canned fixtures; real client over the Datadog MCP server.
-- `triage.integrations.kubernetes.KubernetesReader` (protocol) — `events_for(service, window)`,
-  `pods_for(service)`; read-only; fake + real.
-- `Deps` gains `datadog` and `k8s`.
-- `triage.ingress`: FastAPI app with `POST /webhooks/datadog`. Validates the signature, persists a
-  `Signal`, creates a run on the Platform (or invokes in-process under the ADR-0011 fallback),
-  returns 202. No business logic.
-- Prompts: `classify_alert.md`, `qualify.md`, `diagnose.md`, `postmortem.md`.
-- Fixtures: `tests/fixtures/alerts/*.json` (Datadog payloads), `tests/fixtures/bits_ai/*.json`,
-  `tests/fixtures/analysis_results/*.json`.
+- `triage.integrations.datadog.DatadogClient` (protocol) — `search_events(query, frm, to, limit)`,
+  `get_monitor(id)`, `query_timeseries(query, frm, to)`, `aggregate_logs(...)`, `search_logs(...)`,
+  `aggregate_spans(...)`. Real client over REST v1/v2 with `httpx`: host from
+  `TRIAGE_DATADOG_SITE`, `DD-API-KEY` and `DD-APPLICATION-KEY` headers.
+  `FakeDatadogClient` replays `tests/fixtures/datadog/` keyed by (collector, query).
+- `triage.collect`: the alert-class recipes, the sweep, the reduction, the follow-up budget.
+  Pure functions over collector results — no graph knowledge.
+- `triage.nodes.poll_alerts`: one poller tick. Registered as a 60-second Platform cron in
+  `langgraph.json`. There is no Datadog endpoint on the ingress.
+- `Deps` gains `datadog`.
+- Prompts: `classify_alert.md`, `qualify.md`, `diagnose.md`, `postmortem.md`, `follow_up.md`.
+- `config.yaml` gains, per team, `service_patterns`, `namespace_patterns` and `environments`;
+  a top-level `clusters:` map of cluster name → environment; and:
+
+  ```yaml
+  collection:
+    window_multiplier: 4          # of the monitor's own evaluation window
+    window_min_minutes: 15
+    window_max_hours: 6
+    max_followup_calls: 6
+    max_log_templates: 15
+    max_log_lines: 25
+    max_events: 40
+    max_timeseries_series: 6
+    max_timeseries_points: 60
+    max_prompt_bytes: 60000
+  thresholds:
+    alert_persistence_minutes: 15
+    flap_count: 5
+    flap_window_hours: 24
+  ```
+
+- `signals` gains: Datadog event id (as `external_id`), monitor id, firing group, cycle
+  duration, recovery time; statuses `out_of_scope` and `self_recovered`. One row holds the
+  poller watermark.
+- Fixtures: `tests/fixtures/datadog/hcl_software_uat_20260822/` (captured from the live org),
+  and `tests/fixtures/alert_events/*.json` (poller pages, hand-built for the routing cases).
 
 ## Phase 1: Analysis sub-graph (ADR-0005)
 
@@ -38,37 +60,67 @@ Phases 1 and 3 (`AnalysisRunner`, `system_map_for_service`).
 - [ ] 1.5 A failed analysis for one hypothesis does not fail the run: the diagnosis records an `unknowns` entry naming the hypothesis and the failure, and confidence for a cause that relied on it is capped at `medium`.
 - [ ] 1.6 The synthesised `Diagnosis` always passes its own validator (`_confidence_is_earned`); a synthesis that would not is retried once with the validation error fed back, then degraded to `low`.
 
-## Phase 2: F1 collection and qualification
+## Phase 2: F1 collection and qualification (ADR-0016)
 
-- [ ] 2.1 A Datadog alert fixture is classified by the `triage` tier into an alert type, a collection window and a collector list; the window is bounded by the alert's own timestamps.
-- [ ] 2.2 When Bits AI returns an investigation, it is the primary input to `qualify` and its findings appear as `evidence` with URLs.
-- [ ] 2.3 When Bits AI is unavailable, the graph retries once after 60 s, then proceeds without it, adds an `unknowns` entry saying so, and the final diagnosis confidence is at most `medium` (ADR-0004).
-- [ ] 2.4 `collect_gaps` only calls collectors the classification named and Bits AI did not cover; Kubernetes events for the service over the window are attached as `k8s_event` evidence.
-- [ ] 2.5 `qualify` produces a ranked `Hypothesis` list where every `app`/`deployment` hypothesis carries the deployed commit resolved from the system map, and an unresolvable commit yields a `dependency` or `infra` hypothesis instead of an invented commit.
+- [ ] 2.1 `classify_alert` asks the `triage` tier for an alert class from a closed enum and nothing else. The window is a rule — the monitor's own evaluation window × `window_multiplier`, clamped to `[window_min_minutes, window_max_hours]` — and the collectors come from the class recipe, so a class the model cannot decide degrades to the `generic` recipe instead of failing the run.
+- [ ] 2.2 The monitor's query, thresholds, options, priority and firing groups are read from the alert event itself; `get_monitor` is only called when the event lacks them, and never in the sweep.
+- [ ] 2.3 The sweep runs its recipe's collectors concurrently and returns a `Collection` in which every collector records whether it ran and whether it returned data; one collector raising does not fail the sweep, it is recorded as failed.
+- [ ] 2.4 Events are collected at **both** `service:` and `kube_namespace:` scope. Against the captured fixture, the liveness-probe failures and the container exit code — present only at namespace scope — appear as `k8s_event` evidence.
+- [ ] 2.5 A Kubernetes change event is diffed, not read by title: given `events_deploy.json`, where `prev_value` and `new_value` differ only in `ready_replicas`, the collection reports no spec change and no `deployment` hypothesis is raised from that event.
+- [ ] 2.6 Logs are deduplicated by message template before sampling. The captured window's 60 entries (176 KB, 25 of them the same `platform api authentication failed`) reduce to at most `max_log_templates` templates with counts plus at most `max_log_lines` verbatim lines.
+- [ ] 2.7 The rendered collection handed to `qualify` stays under `collection.max_prompt_bytes`; when a collector's share would exceed it, that collector is truncated and the truncation is stated in the rendered text rather than being silent.
+- [ ] 2.8 A collector returning nothing is re-run namespace-wide over 7 days before it is recorded. Empty in both yields an `unknowns` entry naming the collector (the captured tenant has no APM in either); empty only in the incident window is passed to `qualify` as evidence, not as a gap.
+- [ ] 2.9 `follow_up` lets the `analysis` tier request up to `collection.max_followup_calls` further calls from the same collector set. A request beyond the budget is refused and recorded; a request naming a collector outside the set is discarded, with the discarded request preserved in state.
+- [ ] 2.10 `qualify` produces a ranked `Hypothesis` list where every `app`/`deployment` hypothesis carries the deployed commit resolved from the system map, and an unresolvable commit yields a `dependency` or `infra` hypothesis instead of an invented commit.
+
+Scored in `evals/`, not here, because it depends on model output: fed the captured fixture,
+`qualify` should rank an `infra` hypothesis naming the liveness probe first, and the
+`StatefulSet … deployed` event should not produce a `deployment` hypothesis.
 
 ## Phase 3: F1 end to end and post-mortem
 
 - [ ] 3.1 The `incident` graph, fed an alert fixture with all fakes, ends in a Jira ticket (the `oom_payments` path) and the Slack channel of the owning team has both the immediate notice and the ticket notice.
-- [ ] 3.2 An immediate Slack notice is posted before any analysis starts, naming the service, alert and that Triage is investigating; it is the thread the later notices reply to.
+- [ ] 3.2 A Slack notice is posted when the persistence gate opens and analysis starts, naming the service, alert, how long it has been firing, and that Triage is investigating; it is the thread the later notices reply to.
 - [ ] 3.3 After a ticket is created, a post-mortem draft (timeline + diagnosis) is added as a Jira comment on that ticket and the Slack thread receives a link, not the text (ADR-0010).
 - [ ] 3.4 No post-mortem is drafted when the pipeline ends without a ticket.
-- [ ] 3.5 `Signal.status` moves `received → analysing → diagnosed → ticketed|discarded`, and `failed` on an unhandled error, observable through the repository.
+- [ ] 3.5 `Signal.status` moves `received → waiting → analysing → diagnosed → ticketed|discarded`, terminates at `out_of_scope` or `self_recovered` without ever reaching `analysing`, and reaches `failed` on an unhandled error — all observable through the repository.
 
-## Phase 4: ingress (ADR-0011)
+## Phase 4: alert poller (ADR-0017, ADR-0018, ADR-0011)
 
-- [ ] 4.1 `POST /webhooks/datadog` with a valid signature persists a `Signal` and returns 202 with the signal id; an invalid signature returns 401 and persists nothing.
-- [ ] 4.2 A replayed webhook (same `external_id`) returns 202 and does not create a second signal or run.
-- [ ] 4.3 With `TRIAGE_PLATFORM_URL` set, a run is created on the Platform for the `incident` graph; without it, the graph is invoked in-process with the Postgres checkpointer. Same graph, same thread id either way.
-- [ ] 4.4 A Datadog alert for a service not in the system map is accepted, routed to the platform team's channel as a Slack notice, and discarded — never analysed.
+- [ ] 4.1 One tick against a fixture page of monitor-alert events persists one `Signal` per (monitor id, firing group) in `error`, with the Datadog event id as `external_id`, and advances the watermark. A second tick over the same page persists nothing new and creates no run.
+- [ ] 4.2 Each tick queries from `watermark − 2 min`; an event inside that overlap which was already stored is deduplicated on `external_id`, and a re-notification of an open cycle does not create a second signal.
+- [ ] 4.3 An alert whose service matches a team's `service_patterns` resolves to that team; one matching no team is persisted `out_of_scope` and posts nothing to Slack; one that resolves to a team but names a service unknown to the system map posts the notice to that team's channel and is never analysed.
+- [ ] 4.4 An alert with no `service:` tag resolves through `kube_namespace` / `kube_stateful_set` against `namespace_patterns`, which is how the captured StatefulSet alert reaches a team at all.
+- [ ] 4.5 Environment comes from `clusters:` mapping `kube_cluster_name`, never from an `env:` tag. A cluster mapping to an environment outside the team's `environments` is `out_of_scope`; an unmapped cluster is `out_of_scope` with that reason, never assumed to be production.
+- [ ] 4.6 A cycle that recovers before `thresholds.alert_persistence_minutes` is stored `self_recovered` with its duration and never analysed; a cycle still in `error` when the gate is reached creates a run for the `incident` graph.
+- [ ] 4.7 `thresholds.flap_count` self-recovered cycles for the same monitor and group inside `thresholds.flap_window_hours` produce one flapping `Diagnosis` through the ticket pipeline, after which the counter for that pair resets.
+- [ ] 4.8 After a gap longer than the catch-up bound the poller replays at most 30 minutes, posts one Slack line naming the skipped span and how many events it contained, and does not silently advance the watermark past them.
+- [ ] 4.9 With `TRIAGE_PLATFORM_URL` set a run is created on the Platform for the `incident` graph; without it the graph is invoked in-process with the Postgres checkpointer. Same graph, same thread id either way.
 
 ## Out of scope
 
-- Real Datadog MCP and Kubernetes clients beyond the protocol and a smoke test — they need cluster credentials and are verified during the infra track.
-- GitHub merge webhook (`POST /webhooks/github`) — small, but belongs with M2's incremental refresh; add it to the ingress when M2 Phase 4 is green.
+- **`KubernetesReader`, dropped rather than deferred.** Every Kubernetes fact the captured
+  incident needed — probe failures, kill reason, exit code, restart counts, replica counts,
+  the full before/after StatefulSet spec — came from Datadog. Add a cluster credential when
+  an incident proves it is needed, not before.
+- Replying inside the Datadog message's own Slack thread. `SlackClient` takes `thread_ts`
+  now (ADR-0017) so this stays a small change; it needs a bot with `channels:history`.
+- GitHub merge webhook (`POST /webhooks/github`) — belongs with M2's incremental refresh.
 - Jira closure-feedback webhook — M5.
-- Change correlation beyond deployments (feature flags, vendor incidents) — roadmap cross-cutting, unplanned.
+- Alert coverage audit. The measurements in the roadmap argue it should come before F1; that
+  is a roadmap decision, not this plan's.
+- Change correlation beyond deployments (feature flags, vendor incidents).
 
 ## Open risks
 
-- Bits AI output shape is unknown until it is enabled (roadmap "Before starting"). Phase 2 fixtures are assumptions; replace them with real captures before calling 2.2 done.
-- The Datadog MCP server's tool surface may not expose Bits AI at all. If so, `bits_ai_investigation` becomes a REST call and the protocol stays the same.
+- **One incident, one class.** The recipes for latency, error-rate and saturation classes are
+  written from the shape of the crash/restart one. Capture a real alert per class before
+  calling 2.1 done; the exploration script that produced the existing capture is the tool for it.
+- **Fixtures age out of the source.** Datadog retains logs and spans around 15 days, so the
+  captured JSON is the only permanent record of these responses — it cannot be regenerated
+  from the same incident after that.
+- **The tenant pattern is an assumption.** `plt-<customer>[-<env>]` held across every group
+  observed, but it is a naming convention, not a contract; 4.3 fails loudly (out of scope
+  with a reason) rather than guessing when it does not match.
+- Datadog does not publish per-endpoint rate limits. The client should read the
+  `X-RateLimit-*` headers and record them, so the first time we are throttled we know it.
