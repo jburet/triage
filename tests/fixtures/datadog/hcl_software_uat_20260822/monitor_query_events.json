@@ -1,0 +1,193 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7qAABTU7mB_dt6WQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359434000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f deleted with exit code 137",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:54Z"
+      },
+      "id": "AwAAAaAm7JUQJqQuywAAABhBYUFtN0pVUUFBRFpZNVB1QWxNc0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAjQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyLQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2 deleted with exit code 1",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lAAAABhBYUFtN1A2SUFBQ3VraTg4TVRtMkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiA",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776108898279354257",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm8PEGAAAZ8M5XoDKfxAAA"
+          },
+          "hostname": "ip-10-34-82-58.eu-west-3.compute.internal",
+          "service": "plt-generali",
+          "status": "info",
+          "timestamp": 1787359713000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 7398e9d9705219ba2e997e326f5eb11984acbc3ff02fab400e1788ed904cfbea deleted with exit code 1",
+        "tags": [
+          "cluster_name:prod-euw3",
+          "container_id:7398e9d9705219ba2e997e326f5eb11984acbc3ff02fab400e1788ed904cfbea",
+          "container_name:platform",
+          "display_container_name:platform_plt-generali-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.eu-west-3.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.eu-west-3.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-euw3",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:generali",
+          "kube_node:ip-10-34-82-58.eu-west-3.compute.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-generali",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-generali",
+          "orch_cluster_id:0a2a3801-ee9f-47dc-9d5e-c5fd7a618235",
+          "persistentvolumeclaim:generali-plt-generali-0",
+          "pod_name:plt-generali-0",
+          "pod_phase:running",
+          "service:plt-generali",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:48:33Z"
+      },
+      "id": "AwAAAaAm8Nbow_K7lAAAABhBYUFtOE5ib0FBRF9LT2F4bjdDS0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAhQ",
+      "type": "event"
+    }
+  ],
+  "meta": {
+    "elapsed": 43,
+    "request_id": "pddv1ChYtc2QtRmgwdlNHSzZyRVRUUmNGSnJnIi0KHUzPNP6Npmu9AQGMgbG3ZhffuwS5sr0a9lF4sn6nEgwEs060OR2mJAmMStI",
+    "status": "done"
+  }
+}

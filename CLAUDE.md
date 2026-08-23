@@ -27,6 +27,9 @@ make test                # uv run pytest -q  — offline: no DB, no network, no 
 uv run pytest tests/integration/test_ticket_pipeline.py -k oom      # single file / test
 uv run ruff format src tests evals scripts                          # apply formatting
 make run-fixture [FIXTURE=tests/fixtures/diagnoses/<name>.json]     # run pipeline on a fixture; calls real model tiers via LiteLLM, Jira/Slack faked
+make capture-datadog ARGS="find 'pod down'"   # then `triggers <id>`, then
+                         # `capture <id> <iso-time> --slug <name> --scope service:<x>`; read-only,
+                         # writes tests/fixtures/datadog/<slug>/, needs a Datadog key
 make evals               # scored fixture suite against real models — spends money, not in CI
 langgraph dev            # LangGraph Studio; langgraph.json registers `ticket_pipeline`
 make migrate             # alembic upgrade head

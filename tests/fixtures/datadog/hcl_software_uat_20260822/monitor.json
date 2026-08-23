@@ -1,0 +1,75 @@
+{
+  "created": "2025-08-13T07:01:59.687653+00:00",
+  "created_at": 1755068519000,
+  "creator": {
+    "email": "tfleurant@zeenea.com",
+    "handle": "tfleurant@zeenea.com",
+    "id": 1001095427,
+    "name": "Tom Fleurant"
+  },
+  "deleted": null,
+  "draft_status": "published",
+  "id": 76154596,
+  "message": "{{#is_alert}}\n@slack-Actian-zeenea-alerting-critical \n{{/is_alert}}",
+  "modified": "2025-12-03T09:52:34.904118+00:00",
+  "multi": true,
+  "name": "Zeenea service or platform pod down in prod",
+  "options": {
+    "enable_logs_sample": false,
+    "escalation_message": "Zeenea service or platform is still down for pod down for {{service.name}} in prod",
+    "groupby_simple_monitor": false,
+    "include_tags": true,
+    "new_group_delay": 60,
+    "notification_preset_name": "hide_query",
+    "notify_audit": false,
+    "on_missing_data": "default",
+    "renotify_interval": 30,
+    "renotify_statuses": [
+      "alert"
+    ],
+    "silenced": {},
+    "thresholds": {
+      "critical": 0.0
+    }
+  },
+  "org_id": 1000133217,
+  "overall_state": "OK",
+  "overall_state_modified": "2026-08-23T02:49:47+00:00",
+  "priority": null,
+  "query": "events(\"(service:plt-* OR namespace:zeenea) env:prod container_name:platform event_type:destroy @event_object:\\\"containerd:/tasks/delete\\\" pod_name:plt-*\").rollup(\"count\").by(\"service\").last(\"5m\") > 0",
+  "restricted_roles": null,
+  "state": {
+    "groups": {
+      "service:plt-generali": {
+        "last_nodata_ts": null,
+        "last_notified_ts": 1787446336,
+        "last_resolved_ts": 1787446336,
+        "last_triggered_ts": 1787446036,
+        "name": "service:plt-generali",
+        "status": "OK"
+      },
+      "service:plt-hcl-software-uat": {
+        "last_nodata_ts": null,
+        "last_notified_ts": 1787453296,
+        "last_resolved_ts": 1787453296,
+        "last_triggered_ts": 1787453056,
+        "name": "service:plt-hcl-software-uat",
+        "status": "OK"
+      },
+      "service:plt-sko-ignite": {
+        "last_nodata_ts": null,
+        "last_notified_ts": 1787436976,
+        "last_resolved_ts": 1787436976,
+        "last_triggered_ts": 1787436676,
+        "name": "service:plt-sko-ignite",
+        "status": "OK"
+      }
+    }
+  },
+  "tags": [
+    "env:prod",
+    "owner:zeenea",
+    "service:plt"
+  ],
+  "type": "event-v2 alert"
+}

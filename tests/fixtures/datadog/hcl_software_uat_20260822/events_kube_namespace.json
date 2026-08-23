@@ -1,0 +1,1832 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776103526328998662",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7A-GAACdPKNySG8rEwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359384000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n9 **Unhealthy**: Liveness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n 15 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:04 +0000 UTC since 2026-08-20 00:42:54 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:04Z"
+      },
+      "id": "AwAAAaAm69HAuYu7lAAAABhBYUFtNjlIQUFBQUJfSWtacUk3YUFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO_A",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776103778172914104",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7EtcAACdPKNySGKwZQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359394000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n10 **Unhealthy**: Liveness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n 16 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:14 +0000 UTC since 2026-08-20 00:42:54 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:14Z"
+      },
+      "id": "AwAAAaAm6_jQJ5TcdQAAABhBYUFtNl9qUUFBQU5DT0EzRXByTEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO-Q",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "info",
+            "id": "8776104031058468922",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7IRKAAAZ8M5XoDDmgwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "service": "undefined",
+          "status": "info",
+          "timestamp": 1787359403000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n3 **Killing**: Container platform failed liveness probe, will be restarted\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:23 +0000 UTC since 2026-08-20 00:43:43 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:23Z"
+      },
+      "id": "AwAAAaAm7Bv4jmwYjAAAABhBYUFtN0J2NEFBRHV3NkhuUVpaQkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO-A",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776104031058468922",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7IRKAAAZ8M5XoDDmggAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359414000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n3 **FailedPreStopHook**: PreStopHook failed\n 11 **Unhealthy**: Liveness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n 35 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:34 +0000 UTC since 2026-08-20 00:43:54 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:34Z"
+      },
+      "id": "AwAAAaAm7EbwjmwYiwAAABhBYUFtN0Vid0FBQUt2VVRIZmw1MEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO9w",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "preserved_tags": [
+              "cluster_name:prod-use1",
+              "namespace:hcl-software-uat",
+              "statefulset_name:plt-hcl-software-uat",
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501",
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat",
+              "identified_changes:1"
+            ],
+            "preserved_timestamps": {
+              "ingestion_timestamp": 1787359424333
+            },
+            "source_type_name": "Change Tracking",
+            "source_type_name_tag": "change_tracking",
+            "version": "2"
+          },
+          "action": "update",
+          "aggregation_key": "change-tracking-kube_stateful_set",
+          "change_metadata": {
+            "action": "update",
+            "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
+          },
+          "changed_resource": {
+            "name": "plt-hcl-software-uat",
+            "type": "kube_stateful_set"
+          },
+          "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "evt": {
+            "category": "change",
+            "id": "8776103948061584187",
+            "integration_id": "change-tracking",
+            "source_id": 374,
+            "type": "kube_stateful_set",
+            "uid": "AaAm7G9QAAC7ca9WyyjLOwAA"
+          },
+          "impacted_resources": [
+            {
+              "name": "plt-hcl-software-uat",
+              "type": "service"
+            }
+          ],
+          "new_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 0,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "prev_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 1,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "sub_category": "kubernetes",
+          "timestamp": 1787359418000,
+          "title": "kubernetes StatefulSet plt-hcl-software-uat updated"
+        },
+        "message": "StatefulSet plt-hcl-software-uat deployed in cluster: prod-use1 namespace: hcl-software-uat",
+        "tags": [
+          "app.kubernetes.io/managed-by:helm",
+          "app:plt",
+          "env:prod",
+          "identified_changes:1",
+          "kube_api_version:apps/v1",
+          "kube_cluster:prod-use1",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "service:plt-hcl-software-uat",
+          "source:change_tracking",
+          "tags.datadoghq.com/env:prod",
+          "tags.datadoghq.com/service:plt-hcl-software-uat",
+          "tags.datadoghq.com/version:501",
+          "tenant:hcl-software-uat",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:38Z"
+      },
+      "id": "AwAAAaAm7FaQaW0YiwAAABhBYUFtN0c5UUFBQzdjYTlXeXlqTE93QUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAD4g",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776104282179587618",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7L2nAAAZ8M5XoPQlwAAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359424000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n19 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:44 +0000 UTC since 2026-08-20 00:42:54 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:44Z"
+      },
+      "id": "AwAAAaAm7G4AFX5CywAAABhBYUFtN0c0QUFBQms0S29RUEhHZ0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO9g",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7qAABTU7mB_dt6WQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359434000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f deleted with exit code 137",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:54Z"
+      },
+      "id": "AwAAAaAm7JUQJqQuywAAABhBYUFtN0pVUUFBRFpZNVB1QWxNc0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAjQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "info",
+            "id": "8776104532883600405",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7PoOAABTU7mB_fSMwwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "service": "undefined",
+          "status": "info",
+          "timestamp": 1787359435000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n4 **Created**: Container created\n 1 **Pulled**: Successfully pulled image \"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b\" in 142ms (142ms including waiting). Image size: 807902625 bytes.\n 4 **Pulling**: Pulling image \"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b\"\n 4 **Started**: Container started\n \n _Events emitted by the kubelet seen at 2026-08-22 00:43:55 +0000 UTC since 2026-08-20 00:11:50 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:43:55Z"
+      },
+      "id": "AwAAAaAm7Jj45PDXigAAABhBYUFtN0pqNEFBQjUwYjhQdF9GZ0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO9A",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/create",
+          "event_object": "containerd:/containers/create",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7rAABTU7mB_dt6WwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359435000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2 started, running the image 097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:create",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:55Z"
+      },
+      "id": "AwAAAaAm7Jj4JqQuzQAAABhBYUFtN0pqNEFBQk16SDlEOEtHckFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiw",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776104532883600405",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7PoOAABTU7mB_fSMwgAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359446000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n4 **Unhealthy**: Liveness probe failed: Get \"http://10.33.14.232:8080/health\": dial tcp 10.33.14.232:8080: connect: connection refused\n 20 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)\n 24 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": dial tcp 10.33.14.232:8080: connect: connection refused\n \n _Events emitted by the kubelet seen at 2026-08-22 00:44:06 +0000 UTC since 2026-08-20 00:44:16 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:44:06Z"
+      },
+      "id": "AwAAAaAm7MPw5PDXiQAAABhBYUFtN01Qd0FBRFdtSWlLQzRVWUFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO7g",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "alert",
+            "id": "8776104784269786775",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7TUAAACdPKNySDX-fwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "priority": "4",
+          "service": "undefined",
+          "status": "warn",
+          "timestamp": 1787359458000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n11 **Unhealthy**: Liveness probe failed: Get \"http://10.33.14.232:8080/health\": dial tcp 10.33.14.232:8080: connect: connection refused\n 10 **Unhealthy**: Readiness probe failed: Get \"http://10.33.14.232:8080/health\": dial tcp 10.33.14.232:8080: connect: connection refused\n \n _Events emitted by the kubelet seen at 2026-08-22 00:44:18 +0000 UTC since 2026-08-20 00:44:18 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:44:18Z"
+      },
+      "id": "AwAAAaAm7PLQEZbX7gAAABhBYUFtN1BMUUFBQmJaVjVVMUJIbkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO6A",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyLQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2 deleted with exit code 1",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lAAAABhBYUFtN1A2SUFBQ3VraTg4TVRtMkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiA",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/create",
+          "event_object": "containerd:/containers/create",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyLwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a started, running the image 097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:create",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lgAAABhBYUFtN1A2SUFBQURGNkppWm0yOEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/delete",
+          "event_object": "containerd:/containers/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyMAAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f deleted",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lwAAABhBYUFtN1A2SUFBQkNxYzlPbXZ2QkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAig",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Kubernetes",
+            "source_type_name_tag": "kubernetes",
+            "version": "2"
+          },
+          "aggregation_key": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "event_object": "kubernetes_apiserver:e369ce14-e0b6-44af-a595-cd79e6240f1d",
+          "evt": {
+            "category": "info",
+            "id": "8776104784269786775",
+            "integration_id": "kubernetes",
+            "source_id": 128,
+            "type": "kubernetes_apiserver",
+            "uid": "AaAm7TUAAACdPKNySDX-gAAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal-prod-use1",
+          "service": "undefined",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Events from the Pod hcl-software-uat/plt-hcl-software-uat-0"
+        },
+        "message": "%%% \n5 **Created**: Container created\n 4 **Killing**: Container platform failed liveness probe, will be restarted\n 1 **Pulled**: Successfully pulled image \"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b\" in 122ms (122ms including waiting). Image size: 807902625 bytes.\n 5 **Pulling**: Pulling image \"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b\"\n 5 **Started**: Container started\n \n _Events emitted by the kubelet seen at 2026-08-22 00:44:21 +0000 UTC since 2026-08-20 00:11:50 +0000 UTC_ \n\n %%%",
+        "tags": [
+          "cluster_name:prod-use1",
+          "host_provider_id:i-0dc9e448e94fbd8f7",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_kind:pod",
+          "kube_name:plt-hcl-software-uat-0",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kubernetes_kind:pod",
+          "name:plt-hcl-software-uat-0",
+          "namespace:hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "orchestrator:kubernetes",
+          "pod_name:plt-hcl-software-uat-0",
+          "reporting_controller:kubelet",
+          "source:kubernetes",
+          "source_component:kubelet"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IEZbX7wAAABhBYUFtN1A2SUFBQjZrYUwtamZzdEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAO5g",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "preserved_tags": [
+              "cluster_name:prod-use1",
+              "namespace:hcl-software-uat",
+              "statefulset_name:plt-hcl-software-uat",
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501",
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat",
+              "identified_changes:1"
+            ],
+            "preserved_timestamps": {
+              "ingestion_timestamp": 1787359632005
+            },
+            "source_type_name": "Change Tracking",
+            "source_type_name_tag": "change_tracking",
+            "version": "2"
+          },
+          "action": "update",
+          "aggregation_key": "change-tracking-kube_stateful_set",
+          "change_metadata": {
+            "action": "update",
+            "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
+          },
+          "changed_resource": {
+            "name": "plt-hcl-software-uat",
+            "type": "kube_stateful_set"
+          },
+          "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "evt": {
+            "category": "change",
+            "id": "8776107432211201254",
+            "integration_id": "change-tracking",
+            "source_id": 374,
+            "type": "kube_stateful_set",
+            "uid": "AaAm75qHAABDWpqAc9785gAA"
+          },
+          "impacted_resources": [
+            {
+              "name": "plt-hcl-software-uat",
+              "type": "service"
+            }
+          ],
+          "new_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 1,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "prev_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 0,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "sub_category": "kubernetes",
+          "timestamp": 1787359627000,
+          "title": "kubernetes StatefulSet plt-hcl-software-uat updated"
+        },
+        "message": "StatefulSet plt-hcl-software-uat deployed in cluster: prod-use1 namespace: hcl-software-uat",
+        "tags": [
+          "app.kubernetes.io/managed-by:helm",
+          "app:plt",
+          "env:prod",
+          "identified_changes:1",
+          "kube_api_version:apps/v1",
+          "kube_cluster:prod-use1",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "service:plt-hcl-software-uat",
+          "source:change_tracking",
+          "tags.datadoghq.com/env:prod",
+          "tags.datadoghq.com/service:plt-hcl-software-uat",
+          "tags.datadoghq.com/version:501",
+          "tenant:hcl-software-uat",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:47:07Z"
+      },
+      "id": "AwAAAaAm74b4mWe2pQAAABhBYUFtNzVxSEFBQkRXcHFBYzk3ODVnQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAD4Q",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": true,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Monitor Alert",
+            "source_type_name_tag": "monitor_alert",
+            "version": "2"
+          },
+          "aggregation_key": "c9777594d83ee0ec0b8b1a7ad8bb9058",
+          "event_object": "b5f3429930b3add307cef637be521479",
+          "evt": {
+            "category": "alert",
+            "id": "8776108459754470659",
+            "integration_id": "monitor-alert-event",
+            "source_id": 36,
+            "type": "query_alert_monitor",
+            "uid": "AaAm8IuwAACdPKNySBUTzgAA"
+          },
+          "monitor": {
+            "alert_cycle_key_txt": "8776108442614864094",
+            "created_at": 1722523876000,
+            "draft_status": "published",
+            "group_status": 1,
+            "groups": [
+              "kube_cluster_name:prod-use1",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat"
+            ],
+            "id": 18369851,
+            "message": "More than one Statefulset Replica's pods are down in Statefulset {{kube_namespace.name}}/{{kube_stateful_set.name}}. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n{{^is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-warning \n{{/is_match}}\n\n{{#is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-critical \n{{/is_match}}",
+            "modified": 1758189908000,
+            "name": "[kubernetes] Monitor Kubernetes Statefulset Replicas",
+            "notifications": [
+              "slack-Actian-zeenea-alerting-critical"
+            ],
+            "options": {
+              "escalation_message": "",
+              "include_tags": true,
+              "new_group_delay": 60,
+              "notify_audit": false,
+              "on_missing_data": "default",
+              "renotify_interval": 0,
+              "require_full_window": false,
+              "thresholds": {
+                "critical": 30
+              }
+            },
+            "priority": 2,
+            "query": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+            "result": {
+              "alert_url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358731000&to_ts=1787359931000&event_id=8776108459754470659&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631",
+              "group_key": "kube_cluster_name,kube_namespace,kube_stateful_set",
+              "logs_url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359331000&to_ts=1787359631000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631",
+              "result_id": 8776108440189108679,
+              "result_id_txt": "8776108440189108679",
+              "result_ts": 1787359631,
+              "snap_url": "https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359693251-4443ad03-99db-44b5-86a0-004295482db8.png"
+            },
+            "tags": [
+              "integration:kubernetes",
+              "owner:zeenea"
+            ],
+            "templated_name": "[kubernetes] Monitor Kubernetes Statefulset Replicas on kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+            "transition": {
+              "destination_state": "Alert",
+              "source_state": "OK",
+              "transition_type": "alert"
+            },
+            "type": "query alert"
+          },
+          "monitor-alert-event": {
+            "alert_cycle_key": "8776108442614864094",
+            "alert_type": "error",
+            "date_happened": 1787359631000,
+            "dest_state": "Alert",
+            "event_object": "b5f3429930b3add307cef637be521479",
+            "event_type": "query_alert_monitor",
+            "group_transition_type": "no_grouping",
+            "id": "8776108459754470659",
+            "message_parts": {
+              "last_triggered_ts": "2026-08-22T00:47:11Z",
+              "links": [
+                {
+                  "key": "status",
+                  "text": "Monitor Status",
+                  "url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358731000&to_ts=1787359931000&event_id=8776108459754470659&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631"
+                },
+                {
+                  "key": "edit",
+                  "text": "Edit Monitor",
+                  "url": "/monitors/18369851/edit?link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631"
+                },
+                {
+                  "key": "logs",
+                  "text": "Related Logs",
+                  "url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359331000&to_ts=1787359631000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631"
+                }
+              ],
+              "message": "%%%\nMore than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n\n\n@slack-Actian-zeenea-alerting-critical \n\n%%%",
+              "message_prefix": "",
+              "message_suffix": "",
+              "query_plain": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+              "query_summary": "%%%\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n%%%"
+            },
+            "monitor": {
+              "alert_cycle_key": 8776108442614864000,
+              "alert_cycle_key_txt": "8776108442614864094",
+              "created_at": 1722523876000,
+              "draft_status": "published",
+              "group_status": 1,
+              "groups": [
+                "kube_cluster_name:prod-use1",
+                "kube_namespace:hcl-software-uat",
+                "kube_stateful_set:plt-hcl-software-uat"
+              ],
+              "id": 18369851,
+              "message": "More than one Statefulset Replica's pods are down in Statefulset {{kube_namespace.name}}/{{kube_stateful_set.name}}. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n{{^is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-warning \n{{/is_match}}\n\n{{#is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-critical \n{{/is_match}}",
+              "modified": 1758189908000,
+              "name": "[kubernetes] Monitor Kubernetes Statefulset Replicas",
+              "notifications": [
+                "slack-Actian-zeenea-alerting-critical"
+              ],
+              "options": {
+                "escalation_message": "",
+                "include_tags": true,
+                "new_group_delay": 60,
+                "notify_audit": false,
+                "on_missing_data": "default",
+                "renotify_interval": 0,
+                "require_full_window": false,
+                "thresholds": {
+                  "critical": 30
+                }
+              },
+              "org_id": 1000133217,
+              "priority": 2,
+              "query": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+              "result": {
+                "alert_url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358731000&to_ts=1787359931000&event_id=8776108459754470659&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631",
+                "avalanche": false,
+                "evaluation_ts": 1787359631,
+                "group_key": "kube_cluster_name,kube_namespace,kube_stateful_set",
+                "groups": "{\"kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat\": {\"status\": 1}}",
+                "logs_url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359331000&to_ts=1787359631000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631",
+                "metadata": {
+                  "from_js_ts": 1787359331000,
+                  "metric": "kubernetes_state.statefulset.replicas_desired,kubernetes_state.statefulset.replicas_ready",
+                  "monitor_id": 18369851,
+                  "priority_list": {
+                    "original_priority": 2
+                  },
+                  "to_js_ts": 1787359631000
+                },
+                "num_groups": 1,
+                "result_id": 8776108440189108000,
+                "result_id_txt": "8776108440189108679",
+                "result_ts": 1787359631,
+                "scheduled_ts": 1787359691,
+                "snap_url": "https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359693251-4443ad03-99db-44b5-86a0-004295482db8.png",
+                "state_counts": {
+                  "0": 313,
+                  "1": 5,
+                  "2": 0,
+                  "3": 0,
+                  "5": 0,
+                  "6": 0
+                },
+                "state_id": 1
+              },
+              "tags": [
+                "integration:kubernetes",
+                "owner:zeenea"
+              ],
+              "templated_name": "[kubernetes] Monitor Kubernetes Statefulset Replicas on kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+              "transition": {
+                "destination_state": "Alert",
+                "source_state": "OK",
+                "transition_name": "Triggered",
+                "transition_type": "alert"
+              },
+              "type": "query alert"
+            },
+            "monitor_group": "kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+            "monitor_group_status": 1,
+            "monitor_groups": [
+              "kube_cluster_name:prod-use1",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat"
+            ],
+            "monitor_id": 18369851,
+            "monitor_notifications": [
+              "slack-Actian-zeenea-alerting-critical"
+            ],
+            "org_id": 1000133217,
+            "reduced_message_text": "More than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nMetric value: 30.0",
+            "service_name": "alerting-state-notifications",
+            "source_state": "OK",
+            "source_type_id": 36,
+            "source_type_name": "monitor alert",
+            "sourcecategory": "monitor_alert",
+            "text_only_message": "More than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nMetric value: 30.0",
+            "trans_type": "alert"
+          },
+          "monitor_groups": [
+            "kube_cluster_name:prod-use1",
+            "kube_namespace:hcl-software-uat",
+            "kube_stateful_set:plt-hcl-software-uat"
+          ],
+          "monitor_id": 18369851,
+          "monitor_notifications": [
+            "slack-Actian-zeenea-alerting-critical"
+          ],
+          "priority": "2",
+          "service": "undefined",
+          "sourcecategory": "monitor_alert",
+          "status": "error",
+          "timestamp": 1787359631000,
+          "title": "[P2] [Triggered on {kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat}] [kubernetes] Monitor Kubernetes Statefulset Replicas"
+        },
+        "message": "%%%\nMore than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n[![Metric Graph](https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359693251-4443ad03-99db-44b5-86a0-004295482db8.png)](/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358731000&to_ts=1787359931000&event_id=8776108459754470659&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631)\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nThe monitor was last triggered at Sat Aug 22 2026 00:47:11 UTC.\n\n- - -\n\n[[Monitor Status](/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358731000&to_ts=1787359931000&event_id=8776108459754470659&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631)] \u00b7 [[Edit Monitor](/monitors/18369851/edit?link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631)] \u00b7 [[Related Logs](/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359331000&to_ts=1787359631000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776108459754470659&link_event_ts=1787359631)]\n%%%",
+        "tags": [
+          "integration:kubernetes",
+          "kube_cluster_name:prod-use1",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "monitor",
+          "owner:zeenea",
+          "priority:p2",
+          "source:alert"
+        ],
+        "timestamp": "2026-08-22T00:47:11Z"
+      },
+      "id": "AwAAAaAm75aYxZXcdQAAABhBYUFtNzVhWUFBQTlqM0xQOXlQdEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAARzQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": true,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Monitor Alert",
+            "source_type_name_tag": "monitor_alert",
+            "version": "2"
+          },
+          "aggregation_key": "c9777594d83ee0ec0b8b1a7ad8bb9058",
+          "duration": 120000000000,
+          "event_object": "b5f3429930b3add307cef637be521479",
+          "evt": {
+            "category": "alert",
+            "id": "8776110456156005167",
+            "integration_id": "monitor-alert-event",
+            "source_id": 36,
+            "type": "query_alert_monitor",
+            "uid": "AaAm8l83AABTU7mB_TeY2AAA"
+          },
+          "monitor": {
+            "alert_cycle_key_txt": "8776108442614864094",
+            "created_at": 1722523876000,
+            "draft_status": "published",
+            "group_status": 0,
+            "groups": [
+              "kube_cluster_name:prod-use1",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat"
+            ],
+            "id": 18369851,
+            "message": "More than one Statefulset Replica's pods are down in Statefulset {{kube_namespace.name}}/{{kube_stateful_set.name}}. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n{{^is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-warning \n{{/is_match}}\n\n{{#is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-critical \n{{/is_match}}",
+            "modified": 1758189908000,
+            "name": "[kubernetes] Monitor Kubernetes Statefulset Replicas",
+            "notifications": [
+              "slack-Actian-zeenea-alerting-critical"
+            ],
+            "options": {
+              "escalation_message": "",
+              "include_tags": true,
+              "new_group_delay": 60,
+              "notify_audit": false,
+              "on_missing_data": "default",
+              "renotify_interval": 0,
+              "require_full_window": false,
+              "thresholds": {
+                "critical": 30
+              }
+            },
+            "priority": 2,
+            "query": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+            "result": {
+              "alert_url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358851000&to_ts=1787360051000&event_id=8776110456156005167&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751",
+              "group_key": "kube_cluster_name,kube_namespace,kube_stateful_set",
+              "logs_url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359451000&to_ts=1787359751000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751",
+              "result_id": 8776110447550798155,
+              "result_id_txt": "8776110447550798155",
+              "result_ts": 1787359751,
+              "snap_url": "https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359812247-a4243bfa-fecd-4ccc-b4e4-d550404438c2.png"
+            },
+            "tags": [
+              "integration:kubernetes",
+              "owner:zeenea"
+            ],
+            "templated_name": "[kubernetes] Monitor Kubernetes Statefulset Replicas on kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+            "transition": {
+              "destination_state": "OK",
+              "source_state": "Alert",
+              "transition_type": "alert recovery"
+            },
+            "type": "query alert"
+          },
+          "monitor-alert-event": {
+            "alert_cycle_key": "8776108442614864094",
+            "alert_type": "success",
+            "date_happened": 1787359751000,
+            "dest_state": "OK",
+            "duration": 120000000000,
+            "event_object": "b5f3429930b3add307cef637be521479",
+            "event_type": "query_alert_monitor",
+            "group_transition_type": "no_grouping",
+            "id": "8776110456156005167",
+            "message_parts": {
+              "last_triggered_ts": "2026-08-22T00:47:11Z",
+              "links": [
+                {
+                  "key": "status",
+                  "text": "Monitor Status",
+                  "url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358851000&to_ts=1787360051000&event_id=8776110456156005167&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751"
+                },
+                {
+                  "key": "edit",
+                  "text": "Edit Monitor",
+                  "url": "/monitors/18369851/edit?link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751"
+                },
+                {
+                  "key": "logs",
+                  "text": "Related Logs",
+                  "url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359451000&to_ts=1787359751000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751"
+                }
+              ],
+              "message": "%%%\nMore than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n\n\n@slack-Actian-zeenea-alerting-critical \n\n%%%",
+              "message_prefix": "",
+              "message_suffix": "",
+              "query_plain": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+              "query_summary": "%%%\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n%%%"
+            },
+            "monitor": {
+              "alert_cycle_key": 8776108442614864000,
+              "alert_cycle_key_txt": "8776108442614864094",
+              "created_at": 1722523876000,
+              "draft_status": "published",
+              "group_status": 0,
+              "groups": [
+                "kube_cluster_name:prod-use1",
+                "kube_namespace:hcl-software-uat",
+                "kube_stateful_set:plt-hcl-software-uat"
+              ],
+              "id": 18369851,
+              "message": "More than one Statefulset Replica's pods are down in Statefulset {{kube_namespace.name}}/{{kube_stateful_set.name}}. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n{{^is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-warning \n{{/is_match}}\n\n{{#is_match \"kube_cluster_name.name\" \"prod-\"}}\n@slack-Actian-zeenea-alerting-critical \n{{/is_match}}",
+              "modified": 1758189908000,
+              "name": "[kubernetes] Monitor Kubernetes Statefulset Replicas",
+              "notifications": [
+                "slack-Actian-zeenea-alerting-critical"
+              ],
+              "options": {
+                "escalation_message": "",
+                "include_tags": true,
+                "new_group_delay": 60,
+                "notify_audit": false,
+                "on_missing_data": "default",
+                "renotify_interval": 0,
+                "require_full_window": false,
+                "thresholds": {
+                  "critical": 30
+                }
+              },
+              "org_id": 1000133217,
+              "priority": 2,
+              "query": "avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30",
+              "result": {
+                "alert_url": "/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358851000&to_ts=1787360051000&event_id=8776110456156005167&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751",
+                "avalanche": false,
+                "evaluation_ts": 1787359751,
+                "group_key": "kube_cluster_name,kube_namespace,kube_stateful_set",
+                "groups": "{\"kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat\": {\"status\": 0}}",
+                "logs_url": "/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359451000&to_ts=1787359751000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751",
+                "metadata": {
+                  "from_js_ts": 1787359451000,
+                  "metric": "kubernetes_state.statefulset.replicas_desired,kubernetes_state.statefulset.replicas_ready",
+                  "monitor_id": 18369851,
+                  "priority_list": {
+                    "original_priority": 2
+                  },
+                  "to_js_ts": 1787359751000
+                },
+                "num_groups": 1,
+                "result_id": 8776110447550798000,
+                "result_id_txt": "8776110447550798155",
+                "result_ts": 1787359751,
+                "scheduled_ts": 1787359811,
+                "snap_url": "https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359812247-a4243bfa-fecd-4ccc-b4e4-d550404438c2.png",
+                "state_counts": {
+                  "0": 314,
+                  "1": 4,
+                  "2": 0,
+                  "3": 0,
+                  "5": 0,
+                  "6": 0
+                },
+                "state_id": 0
+              },
+              "tags": [
+                "integration:kubernetes",
+                "owner:zeenea"
+              ],
+              "templated_name": "[kubernetes] Monitor Kubernetes Statefulset Replicas on kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+              "transition": {
+                "destination_state": "OK",
+                "source_state": "Alert",
+                "transition_name": "Recovered",
+                "transition_type": "alert recovery"
+              },
+              "type": "query alert"
+            },
+            "monitor_group": "kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat",
+            "monitor_group_status": 0,
+            "monitor_groups": [
+              "kube_cluster_name:prod-use1",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat"
+            ],
+            "monitor_id": 18369851,
+            "monitor_notifications": [
+              "slack-Actian-zeenea-alerting-critical"
+            ],
+            "org_id": 1000133217,
+            "reduced_message_text": "More than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nMetric value: 46.607",
+            "service_name": "alerting-state-notifications",
+            "source_state": "Alert",
+            "source_type_id": 36,
+            "source_type_name": "monitor alert",
+            "sourcecategory": "monitor_alert",
+            "text_only_message": "More than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nMetric value: 46.607",
+            "trans_type": "alert recovery"
+          },
+          "monitor_groups": [
+            "kube_cluster_name:prod-use1",
+            "kube_namespace:hcl-software-uat",
+            "kube_stateful_set:plt-hcl-software-uat"
+          ],
+          "monitor_id": 18369851,
+          "monitor_notifications": [
+            "slack-Actian-zeenea-alerting-critical"
+          ],
+          "priority": "2",
+          "service": "undefined",
+          "sourcecategory": "monitor_alert",
+          "status": "ok",
+          "timestamp": 1787359751000,
+          "title": "[P2] [Recovered on {kube_cluster_name:prod-use1,kube_namespace:hcl-software-uat,kube_stateful_set:plt-hcl-software-uat}] [kubernetes] Monitor Kubernetes Statefulset Replicas"
+        },
+        "message": "%%%\nMore than one Statefulset Replica's pods are down in Statefulset hcl-software-uat/plt-hcl-software-uat. This might present an unsafe situation for any further manual operations, such as killing other pods.\n\n@slack-Actian-zeenea-alerting-critical \n\n\n[![Metric Graph](https://snapshot.datadoghq.eu/api/v2/snapshot/view/public/2y/9751515e-8786-11ee-8bbe-da7ad0900005/1787359812247-a4243bfa-fecd-4ccc-b4e4-d550404438c2.png)](/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358851000&to_ts=1787360051000&event_id=8776110456156005167&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751)\n\n`avg(last_5m):sum:kubernetes_state.statefulset.replicas_ready{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} / sum:kubernetes_state.statefulset.replicas_desired{*} by {kube_cluster_name,kube_namespace,kube_stateful_set} * 100 <= 30`\n\nThe monitor was last triggered at Sat Aug 22 2026 00:47:11 UTC.\n\n- - -\n\n[[Monitor Status](/monitors/18369851?group=kube_cluster_name%3Aprod-use1%2Ckube_namespace%3Ahcl-software-uat%2Ckube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787358851000&to_ts=1787360051000&event_id=8776110456156005167&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751)] \u00b7 [[Edit Monitor](/monitors/18369851/edit?link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751)] \u00b7 [[Related Logs](/logs?query=kube_cluster_name%3Aprod-use1+AND+kube_namespace%3Ahcl-software-uat+AND+kube_stateful_set%3Aplt-hcl-software-uat&from_ts=1787359451000&to_ts=1787359751000&live=false&link_source=monitor_notif&link_monitor_id=18369851&link_event_id=8776110456156005167&link_event_ts=1787359751)]\n%%%",
+        "tags": [
+          "integration:kubernetes",
+          "kube_cluster_name:prod-use1",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "monitor",
+          "owner:zeenea",
+          "priority:p2",
+          "source:alert"
+        ],
+        "timestamp": "2026-08-22T00:49:11Z"
+      },
+      "id": "AwAAAaAm8WtYcyy7lAAAABhBYUFtOFd0WUFBRHp1TFFsb0k1ZEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAARzA",
+      "type": "event"
+    }
+  ],
+  "meta": {
+    "elapsed": 53,
+    "request_id": "pddv1ChYyUmVHV2VkUlNPR05LWGJqOTVpLS1RIi0KHdVadzWUBvZUPUxV7xIVpnG1sbl7ZNUA0ztYSAv_Egxav2wZdKX2EIORPNA",
+    "status": "done"
+  }
+}

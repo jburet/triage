@@ -17,9 +17,10 @@ application keys are user-scoped and die with the user who owns them. Scopes:
 deterministic and their volume bounded, because their output is spent as prompt tokens.
 
 **Shape: a fixed sweep, then a bounded follow-up loop.** The sweep is deterministic and
-parallel — the monitor's own metric over a widened window, events at *both* service and
-namespace scope, logs aggregated then sampled newest-first anchored at the alert, and a
-span-presence check. The follow-up loop lets the `analysis` tier request up to
+parallel — the monitor's own query re-run **in the idiom it was written in** (timeseries for
+a metric monitor, event search for an event monitor, log search for a log monitor) over a
+widened window, events at *both* service and namespace scope, logs aggregated then sampled
+newest-first anchored at the alert, and a span-presence check. The follow-up loop lets the `analysis` tier request up to
 `collection.max_followup_calls` (default 6) further calls, chosen from the same collector
 set. Sweep for breadth, loop for depth.
 
@@ -70,10 +71,12 @@ diff was worth making only *because* the sweep surfaced the event.
 visible at `kube_namespace:` scope and absent at `service:` scope. Both are in the sweep for
 that reason.
 
-**Raw payloads do not fit.** Sixty log entries came back as 176 KB — roughly 45k tokens for
-one collector, against a 500k per-run budget ([ADR-0007](0007-model-tiers-and-budgets.md))
-that also has to cover analysis and composition. Twenty-five of those sixty lines were the
-same `platform api authentication failed`. Reduction is the design, not an optimisation.
+**Raw payloads do not fit.** Sixty log entries came back as 133 KB on the wire — roughly
+35k tokens for one collector, against a 500k per-run budget
+([ADR-0007](0007-model-tiers-and-budgets.md)) that also has to cover analysis and
+composition. Forty-five of those sixty lines were the same
+`platform api authentication failed`, and the whole window holds 11 distinct message
+templates. Reduction is the design, not an optimisation.
 
 **Emptiness is genuinely ambiguous.** The span search returned nothing for the incident
 window, which during an outage reads as "the service is down". Re-run namespace-wide over
@@ -90,6 +93,10 @@ being unavailable during an incident is no longer an outage in Triage.
   replays the captured fixtures.
 - The F1 graph loses `fetch_bits_ai` and its retry edge; `collect_gaps` becomes `collect`.
 - `config.yaml` gains a `collection:` block for the caps and the follow-up budget.
+- Datadog's undocumented per-endpoint limits bind the sweep: measured 2026-08-23,
+  `spans_public_api` 5 per 60 s, `logs_public_search_api` 3 per 10 s,
+  `logs_public_analytics_aggregate` 2 per 10 s. "Parallel" therefore means parallel within
+  those limits, honouring `x-ratelimit-reset`, and serialised across concurrent runs.
 - The roadmap's "Before starting" item *enable Datadog Bits AI SRE* is dropped.
 
 ## Revisit when

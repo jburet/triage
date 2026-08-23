@@ -64,14 +64,15 @@ from that capture, not from estimation.
 
 - [ ] 2.1 `classify_alert` asks the `triage` tier for an alert class from a closed enum and nothing else. The window is a rule — the monitor's own evaluation window × `window_multiplier`, clamped to `[window_min_minutes, window_max_hours]` — and the collectors come from the class recipe, so a class the model cannot decide degrades to the `generic` recipe instead of failing the run.
 - [ ] 2.2 The monitor's query, thresholds, options, priority and firing groups are read from the alert event itself; `get_monitor` is only called when the event lacks them, and never in the sweep.
-- [ ] 2.3 The sweep runs its recipe's collectors concurrently and returns a `Collection` in which every collector records whether it ran and whether it returned data; one collector raising does not fail the sweep, it is recorded as failed.
-- [ ] 2.4 Events are collected at **both** `service:` and `kube_namespace:` scope. Against the captured fixture, the liveness-probe failures and the container exit code — present only at namespace scope — appear as `k8s_event` evidence.
-- [ ] 2.5 A Kubernetes change event is diffed, not read by title: given `events_deploy.json`, where `prev_value` and `new_value` differ only in `ready_replicas`, the collection reports no spec change and no `deployment` hypothesis is raised from that event.
-- [ ] 2.6 Logs are deduplicated by message template before sampling. The captured window's 60 entries (176 KB, 25 of them the same `platform api authentication failed`) reduce to at most `max_log_templates` templates with counts plus at most `max_log_lines` verbatim lines.
-- [ ] 2.7 The rendered collection handed to `qualify` stays under `collection.max_prompt_bytes`; when a collector's share would exceed it, that collector is truncated and the truncation is stated in the rendered text rather than being silent.
-- [ ] 2.8 A collector returning nothing is re-run namespace-wide over 7 days before it is recorded. Empty in both yields an `unknowns` entry naming the collector (the captured tenant has no APM in either); empty only in the incident window is passed to `qualify` as evidence, not as a gap.
-- [ ] 2.9 `follow_up` lets the `analysis` tier request up to `collection.max_followup_calls` further calls from the same collector set. A request beyond the budget is refused and recorded; a request naming a collector outside the set is discarded, with the discarded request preserved in state.
-- [ ] 2.10 `qualify` produces a ranked `Hypothesis` list where every `app`/`deployment` hypothesis carries the deployed commit resolved from the system map, and an unresolvable commit yields a `dependency` or `infra` hypothesis instead of an invented commit.
+- [ ] 2.3 The sweep re-runs the monitor's own query **in the idiom it was written in** — timeseries for a metric monitor, event search for an `event-v2 alert`, log search for a log monitor — and records that it could not when the type has no re-runnable form. The reference monitor is an event monitor whose query returns the three container kills and their exit codes; sent to the timeseries API instead it returns a 400, which reads as *no data*.
+- [ ] 2.4 The sweep runs its recipe's collectors concurrently within Datadog's per-endpoint limits — measured 2026-08-23: spans 5 per 60 s, logs search 3 per 10 s, logs aggregate 2 per 10 s — honouring `x-ratelimit-reset` on a 429. It returns a `Collection` in which every collector records whether it ran and whether it returned data; one collector raising does not fail the sweep, it is recorded as failed.
+- [ ] 2.5 Events are collected at **both** `service:` and `kube_namespace:` scope. Against the captured fixture, the liveness-probe failures and the container exit code — present only at namespace scope — appear as `k8s_event` evidence.
+- [ ] 2.6 A Kubernetes change event is diffed, not read by title: of the 18 namespace events captured, the two carrying `change_metadata` have `prev_value` and `new_value` differing only in `ready_replicas`, so the collection reports no spec change and raises no `deployment` hypothesis from them.
+- [ ] 2.7 Logs are deduplicated by message template before sampling. The captured window's 60 entries — 133 KB on the wire, 45 of them the same `platform api authentication failed`, 11 distinct templates in all — reduce to at most `max_log_templates` templates with counts plus at most `max_log_lines` verbatim lines.
+- [ ] 2.8 The rendered collection handed to `qualify` stays under `collection.max_prompt_bytes`; when a collector's share would exceed it, that collector is truncated and the truncation is stated in the rendered text rather than being silent.
+- [ ] 2.9 A collector returning nothing is re-run namespace-wide over 7 days before it is recorded. Empty in both yields an `unknowns` entry naming the collector (the captured tenant has no APM in either); empty only in the incident window is passed to `qualify` as evidence, not as a gap.
+- [ ] 2.10 `follow_up` lets the `analysis` tier request up to `collection.max_followup_calls` further calls from the same collector set. A request beyond the budget is refused and recorded; a request naming a collector outside the set is discarded, with the discarded request preserved in state.
+- [ ] 2.11 `qualify` produces a ranked `Hypothesis` list where every `app`/`deployment` hypothesis carries the deployed commit resolved from the system map, and an unresolvable commit yields a `dependency` or `infra` hypothesis instead of an invented commit.
 
 Scored in `evals/`, not here, because it depends on model output: fed the captured fixture,
 `qualify` should rank an `infra` hypothesis naming the liveness probe first, and the
@@ -122,5 +123,11 @@ Scored in `evals/`, not here, because it depends on model output: fed the captur
 - **The tenant pattern is an assumption.** `plt-<customer>[-<env>]` held across every group
   observed, but it is a naming convention, not a contract; 4.3 fails loudly (out of scope
   with a reason) rather than guessing when it does not match.
-- Datadog does not publish per-endpoint rate limits. The client should read the
-  `X-RateLimit-*` headers and record them, so the first time we are throttled we know it.
+- **Rate limits are tight where it hurts and undocumented.** Measured from response headers
+  on 2026-08-23: `spans_public_api` **5 per 60 s**, `logs_public_search_api` 3 per 10 s,
+  `logs_public_analytics_aggregate` 2 per 10 s; events search and monitor reads are
+  effectively unlimited (12,000/60 s and 3,000/10 s). A single sweep already spends two of
+  the five span calls, so concurrent incidents will throttle each other and the follow-up
+  loop can exhaust the budget alone. The client must serialise span and log calls across
+  concurrent runs, not merely retry — and the limits are org-scoped and can be raised on
+  request, which may be the cheaper fix.

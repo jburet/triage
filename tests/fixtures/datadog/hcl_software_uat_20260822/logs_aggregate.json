@@ -1,10 +1,35 @@
 {
   "data": {
-    "buckets": []
+    "buckets": [
+      {
+        "by": {
+          "status": "error"
+        },
+        "computes": {
+          "c0": 71
+        }
+      },
+      {
+        "by": {
+          "status": "info"
+        },
+        "computes": {
+          "c0": 1506
+        }
+      },
+      {
+        "by": {
+          "status": "warn"
+        },
+        "computes": {
+          "c0": 396
+        }
+      }
+    ]
   },
   "meta": {
-    "elapsed": 121,
-    "request_id": "pddv1ChZuNnR1OTFac1RheXRXTEh3UXYwWHRnIi0KHYRYo6R2GojGiyHpd42aaS3yNfG66xpsL8teuEdkEgydqDq0xMDN28VlSeg",
+    "elapsed": 35,
+    "request_id": "pddv1ChZ6ODl3ekt6M1E0R1p5MmtvS3diNlZnIisKGwfSx9f8pNDgoVD5egPaYPaxtR-khIz-59d53RIM9FhbQpY6MMRaInZ0",
     "status": "done"
   }
 }

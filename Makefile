@@ -33,6 +33,9 @@ run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mo
 run-cartography: env ## Run the cartography graph over config.yaml in dry-run mode
 	uv run python -m scripts.run_cartography $(REPOS) $(if $(LOCAL),--local)
 
+capture-datadog: ## Capture a real alert's telemetry as fixtures (read-only, needs a Datadog key)
+	uv run python -m scripts.capture_datadog $(ARGS)
+
 evals: ## Score the fixture suite against the real models (spends money)
 	uv run python -m evals.run
 

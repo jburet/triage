@@ -1,6 +1,52 @@
 [
   {
-    "bytes": 45373,
+    "bytes": 1857,
+    "json": null,
+    "method": "GET",
+    "name": "monitor.get",
+    "params": {
+      "group_states": "all"
+    },
+    "path": "/api/v1/monitor/76154596",
+    "ratelimit": {
+      "x-ratelimit-limit": "3000",
+      "x-ratelimit-name": "get_monitors",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "2999",
+      "x-ratelimit-reset": "2"
+    },
+    "seconds": 0.133,
+    "status": 200
+  },
+  {
+    "bytes": 5958,
+    "json": {
+      "filter": {
+        "from": 1787356740000,
+        "query": "(service:plt-* OR namespace:zeenea) env:prod container_name:platform event_type:destroy @event_object:\"containerd:/tasks/delete\" pod_name:plt-*",
+        "to": 1787361240000
+      },
+      "page": {
+        "limit": 200
+      },
+      "sort": "timestamp"
+    },
+    "method": "POST",
+    "name": "events.monitor_query",
+    "params": null,
+    "path": "/api/v2/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "12000",
+      "x-ratelimit-name": "event_management_api_event_search",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "11999",
+      "x-ratelimit-reset": "32"
+    },
+    "seconds": 0.1,
+    "status": 200
+  },
+  {
+    "bytes": 45372,
     "json": {
       "filter": {
         "from": 1787356740000,
@@ -13,21 +59,21 @@
       "sort": "timestamp"
     },
     "method": "POST",
-    "name": "events.window",
+    "name": "events.service",
     "params": null,
     "path": "/api/v2/events/search",
     "ratelimit": {
       "x-ratelimit-limit": "12000",
       "x-ratelimit-name": "event_management_api_event_search",
       "x-ratelimit-period": "60",
-      "x-ratelimit-remaining": "11997",
-      "x-ratelimit-reset": "17"
+      "x-ratelimit-remaining": "11998",
+      "x-ratelimit-reset": "32"
     },
-    "seconds": 0.261,
+    "seconds": 0.099,
     "status": 200
   },
   {
-    "bytes": 179,
+    "bytes": 316,
     "json": {
       "compute": [
         {
@@ -44,10 +90,6 @@
         {
           "facet": "status",
           "limit": 10
-        },
-        {
-          "facet": "@kube_container_name",
-          "limit": 15
         }
       ]
     },
@@ -60,26 +102,26 @@
       "x-ratelimit-name": "logs_public_analytics_aggregate",
       "x-ratelimit-period": "10",
       "x-ratelimit-remaining": "1",
-      "x-ratelimit-reset": "7"
+      "x-ratelimit-reset": "2"
     },
-    "seconds": 0.227,
+    "seconds": 0.119,
     "status": 200
   },
   {
-    "bytes": 115962,
+    "bytes": 133587,
     "json": {
       "filter": {
         "from": 1787356740000,
-        "query": "service:plt-hcl-software-uat status:(error OR warn)",
+        "query": "service:plt-hcl-software-uat",
         "to": 1787361240000
       },
       "page": {
-        "limit": 50
+        "limit": 60
       },
-      "sort": "timestamp"
+      "sort": "-timestamp"
     },
     "method": "POST",
-    "name": "logs.search",
+    "name": "logs.at_alert",
     "params": null,
     "path": "/api/v2/logs/events/search",
     "ratelimit": {
@@ -87,13 +129,124 @@
       "x-ratelimit-name": "logs_public_search_api",
       "x-ratelimit-period": "10",
       "x-ratelimit-remaining": "2",
-      "x-ratelimit-reset": "7"
+      "x-ratelimit-reset": "1"
     },
-    "seconds": 0.654,
+    "seconds": 0.159,
     "status": 200
   },
   {
-    "bytes": 192,
+    "bytes": 65959,
+    "json": {
+      "filter": {
+        "from": 1787356740000,
+        "query": "kube_namespace:hcl-software-uat",
+        "to": 1787361240000
+      },
+      "page": {
+        "limit": 200
+      },
+      "sort": "timestamp"
+    },
+    "method": "POST",
+    "name": "events.kube_namespace",
+    "params": null,
+    "path": "/api/v2/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "12000",
+      "x-ratelimit-name": "event_management_api_event_search",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "11997",
+      "x-ratelimit-reset": "31"
+    },
+    "seconds": 0.105,
+    "status": 200
+  },
+  {
+    "bytes": 3990,
+    "json": null,
+    "method": "GET",
+    "name": "metrics.extra",
+    "params": {
+      "from": 1787356740,
+      "query": "sum:kubernetes_state.statefulset.replicas_ready{kube_stateful_set:plt-hcl-software-uat}",
+      "to": 1787361240
+    },
+    "path": "/api/v1/query",
+    "ratelimit": {
+      "x-ratelimit-limit": "600",
+      "x-ratelimit-name": "batch_query",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "599",
+      "x-ratelimit-reset": "1"
+    },
+    "seconds": 0.256,
+    "status": 200
+  },
+  {
+    "bytes": 3998,
+    "json": null,
+    "method": "GET",
+    "name": "metrics.extra",
+    "params": {
+      "from": 1787356740,
+      "query": "sum:kubernetes_state.statefulset.replicas_desired{kube_stateful_set:plt-hcl-software-uat}",
+      "to": 1787361240
+    },
+    "path": "/api/v1/query",
+    "ratelimit": {
+      "x-ratelimit-limit": "600",
+      "x-ratelimit-name": "batch_query",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "598",
+      "x-ratelimit-reset": "1"
+    },
+    "seconds": 0.209,
+    "status": 200
+  },
+  {
+    "bytes": 3973,
+    "json": null,
+    "method": "GET",
+    "name": "metrics.extra",
+    "params": {
+      "from": 1787356740,
+      "query": "sum:kubernetes.containers.restarts{kube_namespace:hcl-software-uat}",
+      "to": 1787361240
+    },
+    "path": "/api/v1/query",
+    "ratelimit": {
+      "x-ratelimit-limit": "600",
+      "x-ratelimit-name": "batch_query",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "597",
+      "x-ratelimit-reset": "1"
+    },
+    "seconds": 0.198,
+    "status": 200
+  },
+  {
+    "bytes": 6221,
+    "json": null,
+    "method": "GET",
+    "name": "metrics.extra",
+    "params": {
+      "from": 1787356740,
+      "query": "avg:kubernetes.memory.usage_pct{kube_namespace:hcl-software-uat}",
+      "to": 1787361240
+    },
+    "path": "/api/v1/query",
+    "ratelimit": {
+      "x-ratelimit-limit": "600",
+      "x-ratelimit-name": "batch_query",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "596",
+      "x-ratelimit-reset": "1"
+    },
+    "seconds": 0.218,
+    "status": 200
+  },
+  {
+    "bytes": 188,
     "json": {
       "data": {
         "attributes": {
@@ -110,7 +263,7 @@
           },
           "group_by": [
             {
-              "facet": "resource_name",
+              "facet": "service",
               "limit": 10
             }
           ]
@@ -119,7 +272,7 @@
       }
     },
     "method": "POST",
-    "name": "spans.aggregate",
+    "name": "spans.spans_window",
     "params": null,
     "path": "/api/v2/spans/analytics/aggregate",
     "ratelimit": {
@@ -127,9 +280,49 @@
       "x-ratelimit-name": "spans_public_api",
       "x-ratelimit-period": "60",
       "x-ratelimit-remaining": "4",
-      "x-ratelimit-reset": "16"
+      "x-ratelimit-reset": "30"
     },
-    "seconds": 0.708,
+    "seconds": 0.081,
+    "status": 200
+  },
+  {
+    "bytes": 192,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-15T00:44:00+00:00",
+            "query": "kube_namespace:hcl-software-uat",
+            "to": "2026-08-22T01:14:00+00:00"
+          },
+          "group_by": [
+            {
+              "facet": "service",
+              "limit": 10
+            }
+          ]
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.spans_wide",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "3",
+      "x-ratelimit-reset": "30"
+    },
+    "seconds": 0.6,
     "status": 200
   }
 ]
