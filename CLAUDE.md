@@ -91,8 +91,19 @@ offline; anything that spends money belongs in `evals/`.
 
 - **Comments: as few as possible.** Module docstrings stating *why* a module exists are the
   one exception; no inline narration, no restating what the code does.
-- **Until the first official release, push straight to `main`.** No feature branches or PRs;
-  commit after each plan behaviour and push.
+- **A milestone plan is developed in its own git worktree, on its own branch, and lands as a
+  PR into `main`.** Several Claude sessions work this repo at once; one shared working tree
+  means one session stages another's half-finished edits, which is how M2's commits swept up
+  in-progress Datadog changes to `config.py` and `timings.md`.
+
+      git worktree add -b m3-analysis ../triage-worktrees/m3 main
+      cp .env ../triage-worktrees/m3/.env    # gitignored, so a new worktree has none
+      cd ../triage-worktrees/m3 && uv sync --all-extras
+
+  Commit after each plan behaviour and push the branch; open the PR when the plan's phases are
+  green. Anything smaller than a plan — a doc fix, a one-line correction — still goes straight
+  to `main` in the primary tree. Remove the worktree once the PR is merged
+  (`git worktree remove`).
 - **Measure and minimise time.** For every plan phase and every tool run (`make lint`,
   `make test`, `make run-fixture`, `make evals`, …) record wall-clock duration in
   `docs/plans/timings.md` (one line: date, plan/phase, command, seconds). Treat a rising number
