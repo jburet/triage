@@ -1,6 +1,13 @@
 # Plan: M3 — Analysis sub-graph, F1 incident graph, Datadog ingress (2026-08-23)
 
-Architecture §2.1, §2.3, §8; ADR-0004, ADR-0005, ADR-0010, ADR-0011. Depends on M2
+> **Stale as of 2026-08-23.** Phase 2 and Phase 4 below predate
+> [ADR-0016](../adr/0016-datadog-collected-by-triage.md),
+> [ADR-0017](../adr/0017-alert-ingestion-by-polling.md) and
+> [ADR-0018](../adr/0018-alert-persistence-gate.md): there is no Bits AI input, no Datadog
+> webhook endpoint, and no analysis before the persistence gate. Phases 1 and 3 stand.
+> Rewrite before executing.
+
+Architecture §2.1, §2.3, §8; ADR-0005, ADR-0010, ADR-0011, ADR-0016, ADR-0017, ADR-0018. Depends on M2
 Phases 1 and 3 (`AnalysisRunner`, `system_map_for_service`).
 
 ## Public interface

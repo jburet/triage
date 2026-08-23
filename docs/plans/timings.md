@@ -33,3 +33,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M2 phase 4 | run_cartography --merge (dry run, no spend) | 2 |
 | 2026-08-23 | M2 phase 4 | make lint | 1 |
 | 2026-08-23 | M2 phase 4 | make test (304 passed) | 2 |
+| 2026-08-23 | ADR 0016-0018 + doc consistency | writing and cross-linking | 300 |

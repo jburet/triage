@@ -1,0 +1,3965 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-21T23:59:35.402Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "e39a57ff5d4762f3"
+          },
+          "span_id": "e39a57ff5d4762f3",
+          "trace": {
+            "id": "92a529c1c883b9b57b982a5d69f138ba"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-21T23:59:35.402Z"
+      },
+      "id": "AwAAAaAmxAPqikrLtAAAABhBYUFteEJYdkFBREQ0RXQ0UTNkM1B3QUEAAAAkMTFhMDI2YzQtNjNlOS00NTZkLWFkYWYtNTk0OWVmOTA1Y2Q0AAI0SQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-21T23:59:49.753Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "3a30c09b6e09c073"
+          },
+          "span_id": "3a30c09b6e09c073",
+          "trace": {
+            "id": "b41d1555ca32bf5c4f25ae39b672244d"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-21T23:59:49.753Z"
+      },
+      "id": "AwAAAaAmxDv5e8jFfQAAABhBYUFteEZDSkFBQjN4V2VZNVVISTFBQUEAAAAkMTFhMDI2YzQtNjNlOS00NTZkLWFkYWYtNTk0OWVmOTA1Y2Q0AAI0SA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:13.108Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "74d272847bcab675"
+          },
+          "span_id": "74d272847bcab675",
+          "trace": {
+            "id": "e1d79d26dfb4b1ebec178bbc1bf2a6d5"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:13.108Z"
+      },
+      "id": "AwAAAaAmxJc0qyscxQAAABhBYUFteEo2b0FBQ2pRal9FdlhNek13QUMAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4KA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:15.621Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5c826fac097f382b"
+          },
+          "span_id": "5c826fac097f382b",
+          "trace": {
+            "id": "a88393b4cc2b94aa64a7211b869c6015"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:15.621Z"
+      },
+      "id": "AwAAAaAmxKEFTfVehAAAABhBYUFteExJeEFBQzBja3ZidGpJOWx3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Jw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:23.148Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "e47aa503cbce5c16"
+          },
+          "span_id": "e47aa503cbce5c16",
+          "trace": {
+            "id": "f7325b4ce4f74918394b80379efbc77a"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:23.148Z"
+      },
+      "id": "AwAAAaAmxL5szVqEFgAAABhBYUFteE1XNEFBQm9aUlhPc2FtQzFnQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Jg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:25.633Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "8308096b18c5e1ff"
+          },
+          "span_id": "8308096b18c5e1ff",
+          "trace": {
+            "id": "95496fc7f314bdc59d4da0f44404c406"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:25.633Z"
+      },
+      "id": "AwAAAaAmxMghppFehAAAABhBYUFteE5sREFBQzBja3ZidGpLV013QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4JQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:33.188Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "f2453acff2c4e68b"
+          },
+          "span_id": "f2453acff2c4e68b",
+          "trace": {
+            "id": "081d729c1e0c81eac816d36de60a6604"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:33.188Z"
+      },
+      "id": "AwAAAaAmxOWkfwMFqgAAABhBYUFteE96R0FBQWRyS3VvNUhEQ0NRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4JA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:35.429Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "90a130a591e6ead9"
+          },
+          "span_id": "90a130a591e6ead9",
+          "trace": {
+            "id": "c7899d1e9e5558da4485f6703d2151cb"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:35.429Z"
+      },
+      "id": "AwAAAaAmxO5lDt3FfQAAABhBYUFteFFCUEFBQjN4V2VZNVVOYjZRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Iw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:35.644Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "15d239adbae110be"
+          },
+          "span_id": "15d239adbae110be",
+          "trace": {
+            "id": "dae40feb5eddadc2fd0d97d9953e3ade"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:35.644Z"
+      },
+      "id": "AwAAAaAmxO88Dt3FfgAAABhBYUFteFFCUEFBQjN4V2VZNVVOYjZRQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Ig",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:43.182Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.server.maintenance.index.IndexStatusBatch"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9a073ff660b1f422"
+          },
+          "span_id": "9a073ff660b1f422",
+          "trace": {
+            "id": "f109cb9648b55d5ba5687e6d15987614"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error when preparing batch: waitForIdle timed out after 30 seconds (pendingRequests=0, inFlightBatches=1)",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:43.182Z"
+      },
+      "id": "AwAAAaAmxQyuelmEFgAAABhBYUFteFJQYUFBQm9aUlhPc2FvdjFRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4IQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:43.228Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "c0c4916f2a7fe629"
+          },
+          "span_id": "c0c4916f2a7fe629",
+          "trace": {
+            "id": "e5176ecdb60d76f10457d3058522b33b"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:43.228Z"
+      },
+      "id": "AwAAAaAmxQzcelmEFwAAABhBYUFteFJQYUFBQm9aUlhPc2FvdjFRQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4IA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:45.656Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "dce180d43b6f53de"
+          },
+          "span_id": "dce180d43b6f53de",
+          "trace": {
+            "id": "503431aa04be11aee93d7192c82d396a"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:45.656Z"
+      },
+      "id": "AwAAAaAmxRZYUgXq5wAAABhBYUFteFNkZUFBQ3VFV2xMRzNDaUF3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Hw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:50.788Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "8d7631cfabdaa7f2"
+          },
+          "span_id": "8d7631cfabdaa7f2",
+          "trace": {
+            "id": "ab9dace8284744b6589d0cd3ee97b058"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:50.788Z"
+      },
+      "id": "AwAAAaAmxSpkfOfq5wAAABhBYUFteFRyb0FBQ3VFV2xMRzNETTVRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Hg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:53.268Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "d2a31a640bea4d97"
+          },
+          "span_id": "d2a31a640bea4d97",
+          "trace": {
+            "id": "0a0ee20697de1eb5bae40e71ff414cef"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:53.268Z"
+      },
+      "id": "AwAAAaAmxTQUfOfq6AAAABhBYUFteFRyb0FBQ3VFV2xMRzNETTVRQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4HQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:00:55.674Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "81eca405e412b393"
+          },
+          "span_id": "81eca405e412b393",
+          "trace": {
+            "id": "35fd7ccef88ab91485b559abc2df0905"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:00:55.674Z"
+      },
+      "id": "AwAAAaAmxT16ptjq5wAAABhBYUFteFU1dkFBQ3VFV2xMRzNEMjFnQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4HA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:03.319Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "1f3d8699f23e2c66"
+          },
+          "span_id": "1f3d8699f23e2c66",
+          "trace": {
+            "id": "b232cfaac6584812f3f0f3abae22297f"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:03.319Z"
+      },
+      "id": "AwAAAaAmxVtXhXkFqgAAABhBYUFteFdIMkFBQWRyS3VvNUhISWZ3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Gw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:05.685Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5ca6429819dea870"
+          },
+          "span_id": "5ca6429819dea870",
+          "trace": {
+            "id": "e62dded92789e75cd200e0cafc700324"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:05.685Z"
+      },
+      "id": "AwAAAaAmxWSVxPauVAAAABhBYUFteFhXQkFBRDAzMi1HMXhZUU9RQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Gg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:13.377Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "0060c80c360f80bb"
+          },
+          "span_id": "0060c80c360f80bb",
+          "trace": {
+            "id": "a7429e1089a12f738a142d9b5f0aae8f"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:13.377Z"
+      },
+      "id": "AwAAAaAmxYKhKMrq5wAAABhBYUFteFlrR0FBQ3VFV2xMRzNGNHlBQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4GQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:15.697Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "049ec50867511c5c"
+          },
+          "span_id": "049ec50867511c5c",
+          "trace": {
+            "id": "bcdfb620667e79c10a533a749f43cfda"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:15.697Z"
+      },
+      "id": "AwAAAaAmxYuxUpTq5wAAABhBYUFteFp5T0FBQ3VFV2xMRzNHaWtnQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4GA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:23.423Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5d87def70a859329"
+          },
+          "span_id": "5d87def70a859329",
+          "trace": {
+            "id": "32c5eb43d0b4b3d601cdbfc86703ffa1"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:23.423Z"
+      },
+      "id": "AwAAAaAmxanfL1MFqgAAABhBYUFteGJBVkFBQWRyS3VvNUhKeVdRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Fw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:25.708Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "543e30f315d4671b"
+          },
+          "span_id": "543e30f315d4671b",
+          "trace": {
+            "id": "ee899576d90410bd8a6dc072bd75d2c1"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:25.708Z"
+      },
+      "id": "AwAAAaAmxbLMpABehAAAABhBYUFteGNPZ0FBQzBja3ZidGpTVG9nQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Fg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:33.468Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "b7577cdde05a7012"
+          },
+          "span_id": "b7577cdde05a7012",
+          "trace": {
+            "id": "bb47d7279c01988fa43946d2cfd1965e"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:33.468Z"
+      },
+      "id": "AwAAAaAmxdEcziPq5wAAABhBYUFteGRjb0FBQ3VFV2xMRzNJZUlRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4FQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:35.458Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "db125bbb7214084a"
+          },
+          "span_id": "db125bbb7214084a",
+          "trace": {
+            "id": "1e50d9891ac05e280f2c2bd77efcb2bb"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:35.458Z"
+      },
+      "id": "AwAAAaAmxdjiSjOEFgAAABhBYUFteGVxdkFBQm9aUlhPc2F2X3J3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4FA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:35.720Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "abfee3f82bcae573"
+          },
+          "span_id": "abfee3f82bcae573",
+          "trace": {
+            "id": "afc36f77df205c33cf090f91872a2d91"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:35.720Z"
+      },
+      "id": "AwAAAaAmxdnoSjOEFwAAABhBYUFteGVxdkFBQm9aUlhPc2F2X3J3QUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Ew",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:43.518Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "6cb169357e20bd27"
+          },
+          "span_id": "6cb169357e20bd27",
+          "trace": {
+            "id": "4d4b6d447835b6a5d5f725aaa1f03d31"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:43.518Z"
+      },
+      "id": "AwAAAaAmxfhevkUcwwAAABhBYUFteGY0M0FBQ2pRal9FdlhaR1RRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Eg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:45.731Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "33d0f364fa5bf2c9"
+          },
+          "span_id": "33d0f364fa5bf2c9",
+          "trace": {
+            "id": "c83ca609df1abe7e7a93bf2f89c3d9cc"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:45.731Z"
+      },
+      "id": "AwAAAaAmxgEDD--uWQAAABhBYUFteGhHLUFBRDAzMi1HMXhkYk1nQUYAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4EQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:51.014Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "e74aad39f361ea08"
+          },
+          "span_id": "e74aad39f361ea08",
+          "trace": {
+            "id": "9a536e80f13d4ccab311fde3b6ffe84a"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:51.014Z"
+      },
+      "id": "AwAAAaAmxhWmDlocwwAAABhBYUFteGlWR0FBQ2pRal9FdlhhV1lnQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4EA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:53.564Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "22aef91366ee740a"
+          },
+          "span_id": "22aef91366ee740a",
+          "trace": {
+            "id": "821f06db8b6d0e291a04f287ddbbf597"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:53.564Z"
+      },
+      "id": "AwAAAaAmxh-cDlocxAAAABhBYUFteGlWR0FBQ2pRal9FdlhhV1lnQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Dw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:01:55.752Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "213d0948af21f0d3"
+          },
+          "span_id": "213d0948af21f0d3",
+          "trace": {
+            "id": "56bb8f35bfbf6073359e0fd53b5ebb36"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:01:55.752Z"
+      },
+      "id": "AwAAAaAmxigoEVLLtAAAABhBYUFteGpqUEFBREQ0RXQ0UTN2LVJ3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Dg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:03.610Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "39101ca4f921d0c8"
+          },
+          "span_id": "39101ca4f921d0c8",
+          "trace": {
+            "id": "298b880295c679661528d857e5163520"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:03.610Z"
+      },
+      "id": "AwAAAaAmxkbaOxDLtQAAABhBYUFteGt4V0FBREQ0RXQ0UTN3b0JRQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4DQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:05.768Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "ef339eccd9401ea3"
+          },
+          "span_id": "ef339eccd9401ea3",
+          "trace": {
+            "id": "73791770e681d8400aca569e678fefb9"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:05.768Z"
+      },
+      "id": "AwAAAaAmxk9I63VehAAAABhBYUFteGxfZUFBQzBja3ZidGpYYkZ3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4DA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:13.656Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "59b306d1647cc072"
+          },
+          "span_id": "59b306d1647cc072",
+          "trace": {
+            "id": "60439759c92710d8b8a4600a4ea75383"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:13.656Z"
+      },
+      "id": "AwAAAaAmxm4Y3DKuVAAAABhBYUFteG5Ob0FBRDAzMi1HMXhnbmRRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Cw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:15.780Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "8ed86afde13ee8fb"
+          },
+          "span_id": "8ed86afde13ee8fb",
+          "trace": {
+            "id": "44dc00b3074d7ff0a6883f012f8ff1a9"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:15.780Z"
+      },
+      "id": "AwAAAaAmxnZkjtuEFgAAABhBYUFteG9idkFBQm9aUlhPc2ExRVZ3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Cg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:23.703Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "2ad10e4201a0279b"
+          },
+          "span_id": "2ad10e4201a0279b",
+          "trace": {
+            "id": "8f9d11fcf114e4f6f7a45e047168367b"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:23.703Z"
+      },
+      "id": "AwAAAaAmxpVXGQMFqgAAABhBYUFteHBwMkFBQWRyS3VvNUhSY0NRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4CQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:25.796Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5b38a226c58a8dc3"
+          },
+          "span_id": "5b38a226c58a8dc3",
+          "trace": {
+            "id": "c321679e1e3f17b3e3a36fccec0640eb"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:25.796Z"
+      },
+      "id": "AwAAAaAmxp2EKzMcwwAAABhBYUFteHE0Q0FBQ2pRal9Fdlhlek93QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4CA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:33.749Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "026dfe6d5eb1e83e"
+          },
+          "span_id": "026dfe6d5eb1e83e",
+          "trace": {
+            "id": "9027209fbcf0c0b640425dce5eff26bc"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:33.749Z"
+      },
+      "id": "AwAAAaAmxryVw0LFfQAAABhBYUFteHNHR0FBQjN4V2VZNVVjUVRnQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Bw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:35.492Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "be24d6c7eb33fa99"
+          },
+          "span_id": "be24d6c7eb33fa99",
+          "trace": {
+            "id": "eb21338573810f5cf1e819bf49709828"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:35.492Z"
+      },
+      "id": "AwAAAaAmxsNk7ZXFfQAAABhBYUFteHRVT0FBQjN4V2VZNVVjNm9RQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Bg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:35.819Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "3bb3231db05dc803"
+          },
+          "span_id": "3bb3231db05dc803",
+          "trace": {
+            "id": "f2ec790df81978ed6d1506d5905c0ec4"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:35.819Z"
+      },
+      "id": "AwAAAaAmxsSr7ZXFfgAAABhBYUFteHRVT0FBQjN4V2VZNVVjNm9RQUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4BQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:43.795Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "dce9f180b6075a11"
+          },
+          "span_id": "dce9f180b6075a11",
+          "trace": {
+            "id": "95a43e015d01f079607eefd355c9df5f"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:43.795Z"
+      },
+      "id": "AwAAAaAmxuPTvl4FqgAAABhBYUFteHVpWUFBQWRyS3VvNUhVQlpBQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4BA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:45.835Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "98a9319207ff251a"
+          },
+          "span_id": "98a9319207ff251a",
+          "trace": {
+            "id": "a07f1189eb9f023c7900dbce461f4bcd"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:45.835Z"
+      },
+      "id": "AwAAAaAmxuvL0TMcwwAAABhBYUFteHZ3Z0FBQ2pRal9FdlhoWk93QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Aw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:51.606Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "54113bf818c34bea"
+          },
+          "span_id": "54113bf818c34bea",
+          "trace": {
+            "id": "eff6f9fb82201d6de54058892574c1f1"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:51.606Z"
+      },
+      "id": "AwAAAaAmxwJWbN_FfQAAABhBYUFteHctbUFBQjN4V2VZNVVlNTZ3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4Ag",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:53.842Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "3b4a1005022a5ea6"
+          },
+          "span_id": "3b4a1005022a5ea6",
+          "trace": {
+            "id": "0c0e9b725b9ee29e6a158fedba4ab7e9"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:53.842Z"
+      },
+      "id": "AwAAAaAmxwsSbN_FfgAAABhBYUFteHctbUFBQjN4V2VZNVVlNTZ3QUIAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4AQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:02:55.852Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9c34d245aa3fb406"
+          },
+          "span_id": "9c34d245aa3fb406",
+          "trace": {
+            "id": "7379addf7c4794bc0530c91090628b36"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:02:55.852Z"
+      },
+      "id": "AwAAAaAmxxLsUg6uVAAAABhBYUFteHlNdkFBRDAzMi1HMXhtZFVRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa4AA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:03.888Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5b6c32916425e7d8"
+          },
+          "span_id": "5b6c32916425e7d8",
+          "trace": {
+            "id": "98d741230a15cfd5997ab53a9cdce32a"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:03.888Z"
+      },
+      "id": "AwAAAaAmxzJQwpDFfQAAABhBYUFteHphMkFBQjN4V2VZNVVnUG5BQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3_w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:05.873Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "da2c2b275844fa7e"
+          },
+          "span_id": "da2c2b275844fa7e",
+          "trace": {
+            "id": "e205645fcadb0a06cc289e76b76c8447"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:05.873Z"
+      },
+      "id": "AwAAAaAmxzoRlH8FqgAAABhBYUFteDBvLUFBQWRyS3VvNUhYWGhRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3_g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:13.934Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "0cbf7d8b7fe5d97e"
+          },
+          "span_id": "0cbf7d8b7fe5d97e",
+          "trace": {
+            "id": "ba3a2737b72706a63d6aa6cc4c4ed6a3"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:13.934Z"
+      },
+      "id": "AwAAAaAmx1mOCUFehAAAABhBYUFteDEzR0FBQzBja3ZidGpmNDR3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3_Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:15.893Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "1d68237d6abfb07f"
+          },
+          "span_id": "1d68237d6abfb07f",
+          "trace": {
+            "id": "db14098653ec3a3d0f3b6319e3a43659"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:15.893Z"
+      },
+      "id": "AwAAAaAmx2E16D8FqgAAABhBYUFteDNGT0FBQWRyS3VvNUhZclJRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3_A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:23.979Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "4b225667aca696ae"
+          },
+          "span_id": "4b225667aca696ae",
+          "trace": {
+            "id": "2368bfbea42a9a5597419e36e7df717a"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:23.979Z"
+      },
+      "id": "AwAAAaAmx4DLXkPq5wAAABhBYUFteDRUV0FBQ3VFV2xMRzNXdVFRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3-w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:25.909Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "7b6ebba9cfd10934"
+          },
+          "span_id": "7b6ebba9cfd10934",
+          "trace": {
+            "id": "5c0c05220509fee9ccb61c6c2e44acb0"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(US-Deliver-1-scanner). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:25.909Z"
+      },
+      "id": "AwAAAaAmx4hVIIccwwAAABhBYUFteDVoZkFBQ2pRal9Fdlhtb2p3QUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3-g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:03:34.026Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.scanner.ScannerPlatformApiServer"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-62"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9333305e98458569"
+          },
+          "span_id": "9333305e98458569",
+          "trace": {
+            "id": "9939c780c034a9cf9ee5635518dbe5ea"
+          },
+          "trace_flags": "00",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Error on heartbeat for scanner ScannerIdentifier(hclsw-arch-k8s). Error: zeenea.commons.exceptions.DatabaseUnavailableException: scanner_cannot_heartbeat_during_backup.Skipping.",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:2.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:03:34.026Z"
+      },
+      "id": "AwAAAaAmx6gKdIKuVAAAABhBYUFteDZ2bkFBRDAzMi1HMXhxX3hRQUEAAABdMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0LXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDAwNzUwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAa3-Q",
+      "type": "log"
+    }
+  ],
+  "links": {
+    "next": "https://api.datadoghq.eu/api/v2/logs/events?filter%5Bfrom%5D=1787356740000&filter%5Bindexes%5D=&filter%5Bquery%5D=service%3Aplt-hcl-software-uat+status%3A%28error+OR+warn%29&filter%5Bto%5D=1787361240000&page%5Bcursor%5D=eyJhZnRlciI6IkF3QUFBYUFteDZnS2RJS3VWQUFBQUJoQllVRnRlRFoyYmtGQlJEQXpNaTFITVhoeFgzaFJRVUVBQUFCZE1URmhNREkzTkRRdFlUa3laQzAwTnpZekxUZzFNekV0TjJKbU9Ua3pNakF3Tm1FMExYTjViblJvWlhScFl5MTBhVzFsTFRFM09EY3pOVFk0TURBd056VXdNREF3TURCakxURTNPRGN6TmpRd01EQXdNREF3TURBd01EQnZBQWEzLVEiLCJ2YWx1ZXMiOlsiMjAyNi0wOC0yMlQwMDowMzozNC4wMjZaIiwxOTU0NzIxMzY0XX0&page%5Blimit%5D=50&sort=timestamp"
+  },
+  "meta": {
+    "elapsed": 567,
+    "page": {
+      "after": "eyJhZnRlciI6IkF3QUFBYUFteDZnS2RJS3VWQUFBQUJoQllVRnRlRFoyYmtGQlJEQXpNaTFITVhoeFgzaFJRVUVBQUFCZE1URmhNREkzTkRRdFlUa3laQzAwTnpZekxUZzFNekV0TjJKbU9Ua3pNakF3Tm1FMExYTjViblJvWlhScFl5MTBhVzFsTFRFM09EY3pOVFk0TURBd056VXdNREF3TURCakxURTNPRGN6TmpRd01EQXdNREF3TURBd01EQnZBQWEzLVEiLCJ2YWx1ZXMiOlsiMjAyNi0wOC0yMlQwMDowMzozNC4wMjZaIiwxOTU0NzIxMzY0XX0"
+    },
+    "request_id": "pddv1ChZ4SFVfN28yX1FFbWNYZmxiOHUtNzh3Ii0KHSaBry-pWwOv0roY_1r-nlsxrs65NegBzQMtSFx7Egy5qI34Yf1bK2u1MTo",
+    "status": "done"
+  }
+}

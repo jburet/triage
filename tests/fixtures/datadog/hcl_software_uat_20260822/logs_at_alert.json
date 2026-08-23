@@ -1,0 +1,4315 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:58:55.674Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "c0a4102446d2b784"
+          },
+          "span_id": "c0a4102446d2b784",
+          "trace": {
+            "id": "25249f239662cb6253df03be0a9f1e85"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:58:55.674Z"
+      },
+      "id": "AwAAAaAm-lc6J-Fu6gAAABhBYUFtLW1ndkFBRHVGaFRDaTBfbW9RQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2vQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:58:14.756Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "1d9ac68600dce2bc"
+          },
+          "span_id": "1d9ac68600dce2bc",
+          "trace": {
+            "id": "e48513b6f0a3ff70aee81088e0aeca0f"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:58:14.756Z"
+      },
+      "id": "AwAAAaAm-bdkDuXtzgAAABhBYUFtLWN2dkFBQXNmS1ZpM0U0N0VRQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2vg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:55.643Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "2223a8c789c135b0"
+          },
+          "span_id": "2223a8c789c135b0",
+          "trace": {
+            "id": "4e3014f41cef51bf617bc7294cf83217"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:55.643Z"
+      },
+      "id": "AwAAAaAm-Wy7AH5u6gAAABhBYUFtLVgzUEFBRHVGaFRDaTAyX1BnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2vw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:14.561Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "076afc93cc9e881f"
+          },
+          "span_id": "076afc93cc9e881f",
+          "trace": {
+            "id": "46a83e981880dd1358cf13f42f2f042d"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:14.561Z"
+      },
+      "id": "AwAAAaAm-MxBe9xGxAAAABhBYUFtLU9HUEFBREd0eVdCOEhwRHl3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2wA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:13.956Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ConnectorConfigurationService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "a525868410c82718"
+          },
+          "span_id": "a525868410c82718",
+          "trace": {
+            "id": "a614fd451bcf0cda7bc5ef4cee7cd160"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_connector SourceConnectorConfiguration(Mysql,List(SourceConnectionConfigurationProperty(42f3b3df-c9de-4c22-a30f-b1c8cf19205d,Connection URL), SourceConnectionConfigurationProperty(0ddc8140-e60b-448a-b1d1-09885df294f5,Username), SourceConnectionConfigurationProperty(e66c42fb-5547-4e05-97d4-5b8694f18c1a,Lineage View Enabled)),List(TagsSourceProperty(610b8e06-7fcb-4de6-b1a6-594b05901463,Catalog,Some(Common Property Catalog),false,false), TagsSourceProperty(7055eb42-329e-11ee-a1c1-af9eec72241a,Schema,Some(Common Property Schema),false,false), StringSourceProperty(6eb568ec-7006-3a06-ad01-fcbd2b4a09ce,Table,None,false,false), StringSourceProperty(047afd70-04a9-3609-8fc0-0692d917f8f4,Last Alter Time,None,false,false), TagsSourceProperty(cbfe45a3-986f-4b7b-bfc2-23a022a31012,Type,Some(Common Property Type),false,false), LongTextSourceProperty(18c61716-e110-40c1-8ca2-3a1468842a4a,SQL Query,None,false,false), TagsSourceProperty(b94ab627-9b06-4866-b304-47028baf5608,SQL Query dialect,None,false,false)),DatasetType,List(Dataset),Set(Inventory, DataSample),Some(1.5.1))",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:13.956Z"
+      },
+      "id": "AwAAAaAm-MnkdgRu6wAAABhBYUFtLU00SEFBRHVGaFRDaTB3MHhBQUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqrg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:13.956Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ScannerService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "a525868410c82718"
+          },
+          "span_id": "a525868410c82718",
+          "trace": {
+            "id": "a614fd451bcf0cda7bc5ef4cee7cd160"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_scanner - protocol=REST scannerIdentifier=US-Deliver-1-scanner scannerVersion=100 hostnameSha256=50dcebf6fe277473e7e678e4e13709df6b54cec9d6e0597c9ce93893de761905 nbConnectors=1operatingSystem=Some(Linux 5.15.0-1022-aws amd64) jvmVersion=Some(11.0.31)",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:13.956Z"
+      },
+      "id": "AwAAAaAm-MnkdgRu6gAAABhBYUFtLU00SEFBRHVGaFRDaTB3MHhBQUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqrQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:00.174Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ConnectorConfigurationService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "73fa9748ebd41b8e"
+          },
+          "span_id": "73fa9748ebd41b8e",
+          "trace": {
+            "id": "b75d3bf9ac49c058523e5e7069117b98"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_connector SourceConnectorConfiguration(zdf-dataset,List(SourceConnectionConfigurationProperty(f6d3eb3c-4c0a-486a-b120-08e5d2aeee5e,Folder path), SourceConnectionConfigurationProperty(3f6815e4-88b1-4c3e-a345-45612310b1e5,Git repository URL), SourceConnectionConfigurationProperty(0f97d71a-edaa-4e52-b646-c411c499495b,Git branch), SourceConnectionConfigurationProperty(01e3d0b2-d4a2-40ea-9ba1-ecbf28145bec,Git username), SourceConnectionConfigurationProperty(c975be2c-18ec-4eb2-88ea-5c4bbe303e57,Git clone working directory), SourceConnectionConfigurationProperty(05936dff-9f51-4a86-a142-b3a3028d8fed,Git clone clean working directory)),List(TagsSourceProperty(cbfe45a3-986f-4b7b-bfc2-23a022a31012,Type,Some(Common Property Type),false,false), StringSourceProperty(ec8a18a9-b24d-49e7-8aeb-bf85892d210a,Format,None,false,false), StringSourceProperty(80faf92c-e672-4386-9d9d-950c9d9fa7b0,Number of Rows,None,false,false), StringSourceProperty(2729732d-85bb-44d3-bc3b-5a702abb4824,Disk Usage,None,false,false), StringSourceProperty(7827ceb1-e97e-47c4-bbbd-7045e4b80642,Location,None,false,false), StringSourceProperty(2b2069d6-205b-476e-97f1-c3bf266d5ffe,Tags,None,false,false), StringSourceProperty(479e9ed6-9adb-408e-8ce0-8f9d2780710e,Project,None,false,false), TagsSourceProperty(610b8e06-7fcb-4de6-b1a6-594b05901463,Catalog,Some(Common Property Catalog),false,false), TagsSourceProperty(7055eb42-329e-11ee-a1c1-af9eec72241a,Schema,Some(Common Property Schema),false,false), TagsSourceProperty(2e3ac846-79b5-4953-8b76-a0cbe794453b,Database,Some(Common Property Database),false,false), StringSourceProperty(659595f3-3a82-47bf-abc3-1c27d00ea04b,Replication Factor,None,false,false), StringSourceProperty(3791713b-f3db-4ef3-a27a-7ddad2b9af23,Source System,None,false,false), StringSourceProperty(6b2bd18f-592b-41cc-86f8-bfc962d66a06,Origin,None,false,false), StringSourceProperty(e99b1347-7737-455a-a0c3-413c89584e18,Created By,None,false,false), StringSourceProperty(dddb8b7b-4e45-4318-8c27-16f1f1c3b7bc,Updated By,None,false,false), StringSourceProperty(6a39cc34-6004-42c5-ae78-0707df66c77d,Creation Date,None,false,false), StringSourceProperty(2d5f73cb-68db-46d9-ac78-33d8dce4f6ae,Update Date,None,false,false), StringSourceProperty(6e73bfbe-c541-4632-a839-af1a44052484,Comments,None,false,false), StringSourceProperty(06e91f5f-f9c8-4e68-8ed6-b2aa73b80fcf,Length,None,false,false), StringSourceProperty(2918c423-262d-4713-8c1d-0f80577d3afb,Encoding,None,false,false), StringSourceProperty(ce703456-469c-4857-a07d-c2e8ba527783,ZDF File path,None,false,false)),DatasetType,List(),Set(Inventory),Some(2.0.0))",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:00.174Z"
+      },
+      "id": "AwAAAaAm-JQOF-VFxwAAABhBYUFtLUtiNUFBQ2hRS3dsOVJXZ09nQUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqrw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:57:00.173Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ScannerService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "73fa9748ebd41b8e"
+          },
+          "span_id": "73fa9748ebd41b8e",
+          "trace": {
+            "id": "b75d3bf9ac49c058523e5e7069117b98"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_scanner - protocol=REST scannerIdentifier=scanner-333-688 scannerVersion=84 hostnameSha256=f1c56dfd302dc2555a806c93f23d0c1b563bd5c8d700a1b0627630e5f565fd84 nbConnectors=1operatingSystem=Some(Mac OS X 26.5.2 aarch64) jvmVersion=Some(21.0.11)",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:57:00.173Z"
+      },
+      "id": "AwAAAaAm-JQNF-VFxgAAABhBYUFtLUtiNUFBQ2hRS3dsOVJXZ09nQUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqsA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:58.194Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ConnectorConfigurationService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9796e69813628145"
+          },
+          "span_id": "9796e69813628145",
+          "trace": {
+            "id": "a7af030b3951e6f2f90741feace86997"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_connector SourceConnectorConfiguration(salesforce,List(),List(LongTextSourceProperty(223bb8ae-d14c-3e43-b0d5-5903f84d94d4,References,None,false,false), StringSourceProperty(a474a64f-3f30-384e-a9bb-f6572fec33c3,Key Prefix,None,false,false), StringSourceProperty(caf57fbb-6e38-371b-b77b-0cb30328658c,Label,None,false,false), StringSourceProperty(3fa64f92-5ada-3c61-8ec8-4b44a27b2fc4,API Name,None,false,false), LongTextSourceProperty(f24a9f75-3bdd-31ca-aa5f-137b24f03fcb,Formula,None,false,false), StringSourceProperty(fa79b33e-c771-319e-8a0e-d90e182d4ac6,Plural,None,false,false)),DatasetType,List(),Set(Inventory),Some(1.0.0))",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:58.194Z"
+      },
+      "id": "AwAAAaAm-IxS7-Fu7QAAABhBYUFtLUpOd0FBRHVGaFRDaTB1dW9RQUQAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqsQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:58.068Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ConnectorConfigurationService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9796e69813628145"
+          },
+          "span_id": "9796e69813628145",
+          "trace": {
+            "id": "a7af030b3951e6f2f90741feace86997"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_connector SourceConnectorConfiguration(kafka,List(SourceConnectionConfigurationProperty(6feaaf24-a9a7-40f3-8fc9-5d78c07fa659,Space separated list of Kafka servers urls), SourceConnectionConfigurationProperty(3af37323-0d0d-4951-ad2d-f694c1fbc8e0,Kafka schema registry url), SourceConnectionConfigurationProperty(ef59b457-8767-4301-8aa6-05e50ec93530,Inventory Strategy), SourceConnectionConfigurationProperty(620c9f2e-c9dd-4709-b49a-062323af6ef1,Number of messages sampled by topic), SourceConnectionConfigurationProperty(7ca1e407-61ec-40fe-9502-0e8fe1f0c4ba,Topic max listening period in milliseconds), SourceConnectionConfigurationProperty(8326557c-1f4e-4a26-a09c-0ea2462c16c3,Topic max listening duration), SourceConnectionConfigurationProperty(3765eeae-2c88-40b0-a630-be45f5a9cf32,Space separated list of excluded topic name patterns), SourceConnectionConfigurationProperty(72dabb7e-a02b-44f2-abca-b717995a4608,Kafka security protocol), SourceConnectionConfigurationProperty(69f61e3e-8489-47d3-9e1d-69b0e5b18929,Kafka Username), SourceConnectionConfigurationProperty(944f091b-a5ed-4ad4-bc80-1db0066bdbec,API Key), SourceConnectionConfigurationProperty(2b31cbbb-60af-4fcb-b9e4-3e724bdac9ca,TLS/SSL Truststore Path), SourceConnectionConfigurationProperty(48158775-b77f-4f75-a001-aafe78872546,TLS/SSL Truststore Type), SourceConnectionConfigurationProperty(ae514bc3-934d-4515-97c2-21b777805a1b,TLS/SSL Keystore Path), SourceConnectionConfigurationProperty(e4dcab04-d65f-4c62-9e2e-044846bea3fa,TLS/SSL Keystore Type)),List(StringSourceProperty(8f89d8e9-f4a4-42b9-9537-5f16e576c462,Topic Format,None,false,false), TagsSourceProperty(7055eb42-329e-11ee-a1c1-af9eec72241a,Schema,Some(Common Property Schema),false,false), StringSourceProperty(cc3a4d5d-c0e2-4be4-ba9d-b57de8904219,Schema Key Type,None,false,false), StringSourceProperty(d2b64a07-04ce-4acc-bb47-47e5b899b2a7,Schema Key Version,None,false,false), StringSourceProperty(65daeaf3-390c-47ca-8b8d-efc782f32778,Schema Value Type,None,false,false), StringSourceProperty(bf524ede-455d-494e-a728-bcc5c4e15afa,Schema Value Version,None,false,false)),DatasetType,List(dataset),Set(Inventory),Some(1.6.2))",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:58.068Z"
+      },
+      "id": "AwAAAaAm-IvU7-Fu7AAAABhBYUFtLUpOd0FBRHVGaFRDaTB1dW9RQUMAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqsg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:58.055Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.service.api.ScannerService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "9796e69813628145"
+          },
+          "span_id": "9796e69813628145",
+          "trace": {
+            "id": "a7af030b3951e6f2f90741feace86997"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "register_scanner - protocol=REST scannerIdentifier=hclsw-arch-k8s scannerVersion=95 hostnameSha256=419d7f422f1ab952310ce2e49f9e059f6db02a26e4d91057a8096c4502f96222 nbConnectors=2operatingSystem=Some(Linux 6.12.85+ amd64) jvmVersion=Some(11.0.30)",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:58.055Z"
+      },
+      "id": "AwAAAaAm-IvH7-Fu6wAAABhBYUFtLUpOd0FBRHVGaFRDaTB1dW9RQUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqsw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:55.611Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "d9e3caf95e1c3105"
+          },
+          "span_id": "d9e3caf95e1c3105",
+          "trace": {
+            "id": "90aacad6a384828ebc45bad3fb9a6a88"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:55.611Z"
+      },
+      "id": "AwAAAaAm-II77-Fu6gAAABhBYUFtLUpOd0FBRHVGaFRDaTB1dW9RQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2wQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:18.052Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.backup.service.RuntimeBackupService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "End backup of type startup",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:18.052Z"
+      },
+      "id": "AwAAAaAm9--Eocf4XQAAABhBYUFtOV9jdUFBQ2dWM0VuUlM2WEhRQUMAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqtA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:18.051Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.backup.service.aws.SnapshotService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "snapshot TriggerSnapshotResult(snap-0d501200f4c9989ba) completed",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:18.051Z"
+      },
+      "id": "AwAAAaAm9--Docf4XAAAABhBYUFtOV9jdUFBQ2dWM0VuUlM2WEhRQUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqtQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:56:14.187Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "b3cff431aee0d7c1"
+          },
+          "span_id": "b3cff431aee0d7c1",
+          "trace": {
+            "id": "dd38b706d1995b95d628895948b2cd2d"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:56:14.187Z"
+      },
+      "id": "AwAAAaAm9-Brocf4WwAAABhBYUFtOV9jdUFBQ2dWM0VuUlM2WEhRQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2wg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:55:55.581Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "7a48e33a0a041495"
+          },
+          "span_id": "7a48e33a0a041495",
+          "trace": {
+            "id": "b404dc926fd9def5a3d5f08794a92833"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:55:55.581Z"
+      },
+      "id": "AwAAAaAm95e9g4aC2gAAABhBYUFtOTZrT0FBQmE4S0x4bGcwTVVRQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2ww",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:55:13.966Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5ec7460ca6eec428"
+          },
+          "span_id": "5ec7460ca6eec428",
+          "trace": {
+            "id": "2c5b69fdd3a4d0e3ee01f1bb913785bd"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:55:13.966Z"
+      },
+      "id": "AwAAAaAm9vUuToy0SQAAABhBYUFtOXZsSEFBQTJqTDFleVFSLVhnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2xA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:54:55.551Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "bd789bfcfc5c79f8"
+          },
+          "span_id": "bd789bfcfc5c79f8",
+          "trace": {
+            "id": "35ad364249bc358ef21196b504d45371"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:54:55.551Z"
+      },
+      "id": "AwAAAaAm9q0_7wr4WwAAABhBYUFtOXI2dUFBQ2dWM0VuUlN2a1lBQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2xQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:54:13.768Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "eceeeee32e81ac71"
+          },
+          "span_id": "eceeeee32e81ac71",
+          "trace": {
+            "id": "7212eb77ccf179394124fb4a4bf8c9b3"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:54:13.768Z"
+      },
+      "id": "AwAAAaAm9goIFKIIuwAAABhBYUFtOWc3bUFBRE16QkMwTW9DTEhBQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2xg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:53:55.518Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "dfe00e48a25bd1dc"
+          },
+          "span_id": "dfe00e48a25bd1dc",
+          "trace": {
+            "id": "e63cdf9cdfa3e5e8ed2e2855c17ec93a"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:53:55.518Z"
+      },
+      "id": "AwAAAaAm9cK-m8YIuwAAABhBYUFtOWRST0FBRE16QkMwTW9BU1FBQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2xw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:53:13.608Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "90e1bc004a7c4cb8"
+          },
+          "span_id": "90e1bc004a7c4cb8",
+          "trace": {
+            "id": "36e9a923268c07ccf451eeb86aa25c4e"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:53:13.608Z"
+      },
+      "id": "AwAAAaAm9R8ITOwIuwAAABhBYUFtOVNTR0FBRE16QkMwTW43RFpnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2yA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:55.488Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "a0521bd07eb55810"
+          },
+          "span_id": "a0521bd07eb55810",
+          "trace": {
+            "id": "02ffc17a1daf67852a6398ec67170083"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:55.488Z"
+      },
+      "id": "AwAAAaAm9NhAJXy0SQAAABhBYUFtOU9udkFBQTJqTDFleVFCVlRnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2yQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:25.923Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.datacatalog.orientdb.db.BackupOdbManager"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "DB Released",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:25.923Z"
+      },
+      "id": "AwAAAaAm9GTDeCin4AAAABhBYUFtOUhTLUFBRFZ0c2xtaGlJSm53QUUAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqtg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:25.919Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.datacatalog.orientdb.db.BackupOdbManager"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Release db",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:25.919Z"
+      },
+      "id": "AwAAAaAm9GS_eCin3wAAABhBYUFtOUhTLUFBRFZ0c2xtaGlJSm53QUQAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqtw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:25.300Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.backup.service.aws.AwsEbsSnapshotService"
+          },
+          "process": {
+            "thread": {
+              "name": "monix-io-199"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "trigger EBS Snapshot",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:25.300Z"
+      },
+      "id": "AwAAAaAm9GJUeCin3gAAABhBYUFtOUhTLUFBRFZ0c2xtaGlJSm53QUMAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANquA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:24.919Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.backup.service.aws.AwsEbsSnapshotService"
+          },
+          "process": {
+            "thread": {
+              "name": "monix-io-87"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Find Tenant Volume for tenant: hcl-software-uat",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:24.919Z"
+      },
+      "id": "AwAAAaAm9GDXeCin3QAAABhBYUFtOUhTLUFBRFZ0c2xtaGlJSm53QUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANquQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:24.417Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.backup.service.RuntimeBackupService"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Start backup of type startup",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:24.417Z"
+      },
+      "id": "AwAAAaAm9F7httMqqwAAABhBYUFtOUdFM0FBQnZsLVVpaDBOaWhBQUIAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqug",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:24.315Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.datacatalog.orientdb.db.BackupOdbManager"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Clean and Freeze db",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:24.315Z"
+      },
+      "id": "AwAAAaAm9F57ttMqqgAAABhBYUFtOUdFM0FBQnZsLVVpaDBOaWhBQUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANquw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:52:13.398Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "4aec43ddc36ca76d"
+          },
+          "span_id": "4aec43ddc36ca76d",
+          "trace": {
+            "id": "3f148c31a5e80648121e4ee25d441b46"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:52:13.398Z"
+      },
+      "id": "AwAAAaAm9DPWbuAqqgAAABhBYUFtOURvbUFBQnZsLVVpaDBNYWtRQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2yg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:51:55.448Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "d03a01b9d529aec2"
+          },
+          "span_id": "d03a01b9d529aec2",
+          "trace": {
+            "id": "4ab8e42cdcb49dee7af64653b36927e4"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:51:55.448Z"
+      },
+      "id": "AwAAAaAm8-24JskIuwAAABhBYUFtOF8tUUFBRE16QkMwTW55ZFF3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2yw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:51:13.189Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "a7a7393b5b2c630f"
+          },
+          "span_id": "a7a7393b5b2c630f",
+          "trace": {
+            "id": "c94c45c6dbc0d64f0a91446ef1b6e610"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:51:13.189Z"
+      },
+      "id": "AwAAAaAm80ilVsSn3AAAABhBYUFtODBfSEFBRFZ0c2xtaGhfb093QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2zA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:50:55.421Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "0e08e6f35aa3f4e1"
+          },
+          "span_id": "0e08e6f35aa3f4e1",
+          "trace": {
+            "id": "e8de593e8f5947f887905a6a50c3ab61"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:50:55.421Z"
+      },
+      "id": "AwAAAaAm8wM9u6G0SQAAABhBYUFtOHhVdUFBQTJqTDFleWZ6cmN3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2zQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:50:13.019Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "3b3fdb685c1a687a"
+          },
+          "span_id": "3b3fdb685c1a687a",
+          "trace": {
+            "id": "9ed62854f3ad722d44fec145005f16d9"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:50:13.019Z"
+      },
+      "id": "AwAAAaAm8l2bmer4WwAAABhBYUFtOG1Wb0FBQ2dWM0VuUlNPUFFBQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2zg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:49:55.372Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "7dfadb175e2c504f"
+          },
+          "span_id": "7dfadb175e2c504f",
+          "trace": {
+            "id": "e781f23560d49db005bb2ebd6485d220"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:49:55.372Z"
+      },
+      "id": "AwAAAaAm8hisJrin3AAAABhBYUFtOGlyT0FBRFZ0c2xtaGgyNEx3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa2zw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:49:12.826Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "db8124f428761869"
+          },
+          "span_id": "db8124f428761869",
+          "trace": {
+            "id": "03fce320d6788b9674b4b9ef864b6dd8"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:49:12.826Z"
+      },
+      "id": "AwAAAaAm8XJ6t6W0SQAAABhBYUFtOFhzR0FBQTJqTDFleWZubmR3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa20A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:48:55.337Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "295e582e87c5e11e"
+          },
+          "span_id": "295e582e87c5e11e",
+          "trace": {
+            "id": "32571d72643ef3e2998fce59d817f7fe"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:48:55.337Z"
+      },
+      "id": "AwAAAaAm8S4pFDyC2gAAABhBYUFtOFVCdkFBQmE4S0x4bGdDZEJ3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa20Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:48:12.547Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "7edcc1488eaf761e"
+          },
+          "span_id": "7edcc1488eaf761e",
+          "trace": {
+            "id": "3ee42bcc1e39647064740c60c2d7c8a5"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:48:12.547Z"
+      },
+      "id": "AwAAAaAm8IcDMoSn3AAAABhBYUFtOEpDbkFBRFZ0c2xtaGhyRC13QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa20g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:47:55.306Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "c8f041c78522aa1d"
+          },
+          "span_id": "c8f041c78522aa1d",
+          "trace": {
+            "id": "f20b1d51976489aa0a421d6a973f6f6a"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:47:55.306Z"
+      },
+      "id": "AwAAAaAm8EOqwY6n3AAAABhBYUFtOEZZUUFBRFZ0c2xtaGhwVEJRQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa20w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:47:12.344Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "32adb320f3cf7855"
+          },
+          "span_id": "32adb320f3cf7855",
+          "trace": {
+            "id": "40a9e2fed8104920e82a2c8fa21e67f5"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:47:12.344Z"
+      },
+      "id": "AwAAAaAm75vY0cSJpAAAABhBYUFtNzZaSEFBQVlHVFRFZzZZaEx3QUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa21A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:46:55.210Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "WARN",
+            "logger": "zeenea.platform.endpoint.SecurePlatformAuthenticator"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "047ac20bbf5b2859"
+          },
+          "span_id": "047ac20bbf5b2859",
+          "trace": {
+            "id": "cd83c42b594d6001e71bf301b9849d3e"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "platform api authentication failed",
+        "service": "plt-hcl-software-uat",
+        "status": "warn",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_service:plt",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:46:55.210Z"
+      },
+      "id": "AwAAAaAm71jq25SYtAAAABhBYUFtNzJ1eEFBQ1R0QWF0UVNyUnRBQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAa21Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:46:45.194Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "ERROR",
+            "logger": "zeenea.server.App"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Server at http://plt.hcl-software-uat:80/health not reachable, skipping embedding regeneration.",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:46:45.194Z"
+      },
+      "id": "AwAAAaAm7zHKl_C0SQAAABhBYUFtNzBTZkFBQTJqTDFleWZYSHdnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw2g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:46:15.186Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.EmbeddingReadinessChecker$"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Readiness check failed on attempt 4/5 (Exception when sending request: GET http://plt.hcl-software-uat:80/health); retrying in 30s",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:46:15.186Z"
+      },
+      "id": "AwAAAaAm7ryS7cyn3AAAABhBYUFtN3M5dkFBRFZ0c2xtaGhkX1F3QUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqvA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:45:45.179Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.EmbeddingReadinessChecker$"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Readiness check failed on attempt 3/5 (Exception when sending request: GET http://plt.hcl-software-uat:80/health); retrying in 30s",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:45.179Z"
+      },
+      "id": "AwAAAaAm7kdb4HS0SQAAABhBYUFtN2xvLUFBQTJqTDFleWZRUVJnQUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqvQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:520 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created UpDownCounter for solr.cache.size",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:25.598Z"
+      },
+      "id": "AwAAAaAm7freQ36YtAAAABhBYUFtN2d3Z0FBQ1R0QWF0UVNnNW5nQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw2w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:519 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.cache.lookup.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4ZAAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUoAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw5Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:518 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.cache.insert.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4YwAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUkAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw5A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:517 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.cache.hit.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4YgAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUgAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw4w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:515 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.cache.eviction.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4YQAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUcAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw4g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:513 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.request.timeout.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4YAAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUYAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw4Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:510 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.request.error.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4XwAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUUAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw4A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:507 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.request.time.average",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4XgAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUQAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw3w",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:500 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created Gauge for solr.request.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4XQAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUMAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw3g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:496 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created UpDownCounter for solr.index.size",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4XAAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUIAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw3Q",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "[otel.javaagent 2026-08-22 00:45:24:490 +0000] [pool-5-thread-1] INFO io.opentelemetry.javaagent.shaded.instrumentation.jmx.engine.MetricRegistrar - Created UpDownCounter for solr.document.count",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:24.597Z"
+      },
+      "id": "AwAAAaAm7fb1UXz4WwAAABhBYUFtN2ZpV0FBQ2dWM0VuUlJ0RzBnQUEAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw3A",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:45:15.172Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.EmbeddingReadinessChecker$"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Readiness check failed on attempt 2/5 (Exception when sending request: GET http://plt.hcl-software-uat:80/health); retrying in 30s",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:45:15.172Z"
+      },
+      "id": "AwAAAaAm7dIkYNPFfQAAABhBYUFtN2VVUEFBQjN4V2VZNVpHdDN3QUEAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqvg",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "2026-08-22 00:44:45.325 [INFO] Profiling started",
+        "service": "plt-hcl-software-uat",
+        "status": "error",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.pipelines:false",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:46.574Z"
+      },
+      "id": "AwAAAaAm7WJu4_aC4gAAABhBYUFtN1dfZUFBQmE4S0x4bHZsc3dRQUkAAAAkMTFhMDI3NDQtYTkyZC00NzYzLTg1MzEtN2JmOTkzMjAwNmE0AAaw5g",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:44:45.161Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.EmbeddingReadinessChecker$"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-45"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Readiness check failed on attempt 1/5 (Exception when sending request: GET http://plt.hcl-software-uat:80/health); retrying in 30s",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:45.161Z"
+      },
+      "id": "AwAAAaAm7Vzp4_aC4QAAABhBYUFtN1dfZUFBQmE4S0x4bHZsc3dRQUgAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqvw",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:44:44.961Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.App"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Starting post server start tasks",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:44.961Z"
+      },
+      "id": "AwAAAaAm7Vwh4_aC4AAAABhBYUFtN1dfZUFBQmE4S0x4bHZsc3dRQUcAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqwQ",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:44:44.961Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.App"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Starting up complete.",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:44.961Z"
+      },
+      "id": "AwAAAaAm7Vwh4_aC3wAAABhBYUFtN1dfZUFBQmE4S0x4bHZsc3dRQUYAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqwA",
+      "type": "log"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "@timestamp": "2026-08-22T00:44:44.960Z",
+          "class": "",
+          "ecs": {
+            "version": "1.2.0"
+          },
+          "line": "",
+          "log": {
+            "level": "INFO",
+            "logger": "zeenea.server.App"
+          },
+          "process": {
+            "thread": {
+              "name": "scala-execution-context-global-20"
+            }
+          },
+          "requestId": "",
+          "service": "plt-hcl-software-uat",
+          "source": "java",
+          "span": {
+            "id": "5e298fe7acdbeb5e"
+          },
+          "span_id": "5e298fe7acdbeb5e",
+          "trace": {
+            "id": "3f44462c200544f5030e43235cc69a20"
+          },
+          "trace_flags": "01",
+          "transaction": {
+            "id": ""
+          },
+          "zeenea": {
+            "application": "platform",
+            "environment": "prod",
+            "tenant": "hcl-software-uat"
+          }
+        },
+        "host": "i-0dc9e448e94fbd8f7",
+        "message": "Pekko server online at http://0:0:0:0:0:0:0:0:8080/",
+        "service": "plt-hcl-software-uat",
+        "status": "info",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "datadog.api_key_uuid:6615da0b-a9ed-4a4d-ab7b-1d507be67a60",
+          "datadog.submission_auth:api_key",
+          "dirname:/var/log/pods/hcl-software-uat_plt-hcl-software-uat-0_e369ce14-e0b6-44af-a595-cd79e6240f1d/platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "filename:4.log",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:platform",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:44.960Z"
+      },
+      "id": "AwAAAaAm7Vwg4_aC3gAAABhBYUFtN1dfZUFBQmE4S0x4bHZsc3dRQUUAAAAkMTFhMDI3YTAtMWQ5Yy00MDhiLWFmNjAtMTAwYWZlMmU3MDEyAANqwg",
+      "type": "log"
+    }
+  ],
+  "links": {
+    "next": "https://api.datadoghq.eu/api/v2/logs/events?filter%5Bfrom%5D=1787358840000&filter%5Bindexes%5D=&filter%5Bquery%5D=service%3Aplt-hcl-software-uat&filter%5Bto%5D=1787360340000&page%5Bcursor%5D=eyJhZnRlciI6IkF3QUFBYUFtN1Z3ZzRfYUMzZ0FBQUJoQllVRnROMWRmWlVGQlFtRTRTMHg0Ykhac2MzZFJRVVVBQUFBa01URmhNREkzWVRBdE1XUTVZeTAwTURoaUxXRm1OakF0TVRBd1lXWmxNbVUzTURFeUFBTnF3ZyIsInZhbHVlcyI6WyIyMDI2LTA4LTIyVDAwOjQ0OjQ0Ljk2MFoiLC00NzAzODM5MDZdfQ&page%5Blimit%5D=60&sort=-timestamp"
+  },
+  "meta": {
+    "elapsed": 624,
+    "page": {
+      "after": "eyJhZnRlciI6IkF3QUFBYUFtN1Z3ZzRfYUMzZ0FBQUJoQllVRnROMWRmWlVGQlFtRTRTMHg0Ykhac2MzZFJRVVVBQUFBa01URmhNREkzWVRBdE1XUTVZeTAwTURoaUxXRm1OakF0TVRBd1lXWmxNbVUzTURFeUFBTnF3ZyIsInZhbHVlcyI6WyIyMDI2LTA4LTIyVDAwOjQ0OjQ0Ljk2MFoiLC00NzAzODM5MDZdfQ"
+    },
+    "request_id": "pddv1ChZyaVZ1X3pnZlI5LUNuLU01eTZIV19BIisKG5yqy6KJWH6OcwW-UqgWW8HFUV7QnDr44Aw6XBIMnGNbXLkwqWY5_ZNn",
+    "status": "done"
+  }
+}

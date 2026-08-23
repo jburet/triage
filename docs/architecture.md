@@ -15,8 +15,8 @@ For what is actually built today, see [§10 Implementation status](#10-implement
 | Model tiers | Haiku = triage/routing, Sonnet = analysis, Opus = diagnosis |
 | Execution | Graphs run on self-hosted LangGraph Platform (in the prod cluster); Triage ingress = thin FastAPI service for webhooks, invoking graphs via the Platform API |
 | State | LangGraph Platform's PostgreSQL for everything: checkpoints (managed by the Platform) and Triage tables |
-| Signal ingestion | Webhooks (Datadog, GitHub) via the ingress; DB review and F0 refresh as Platform crons |
-| External systems | MCP servers when they exist, Python tools otherwise; Jira has no MCP server, so REST v3 ([ADR-0013](adr/0013-jira-over-rest.md)) |
+| Signal ingestion | Datadog alerts polled from the event stream by a Platform cron ([ADR-0017](adr/0017-alert-ingestion-by-polling.md)); GitHub webhook via the ingress; DB review and F0 refresh as Platform crons |
+| External systems | MCP servers when they exist, Python tools otherwise; Jira and Datadog are REST ([ADR-0013](adr/0013-jira-over-rest.md), [ADR-0016](adr/0016-datadog-collected-by-triage.md)) |
 | Code / Terraform analysis | A gVisor Kubernetes Job per analysis; F0 summaries are a bounded context gather plus one structured call ([ADR-0014](adr/0014-analysis-entrypoint-context-gather.md)) |
 | Git access | No shared cache: each analysis Job clones the repo at the required commit |
 | Configuration | YAML for static config; PostgreSQL for what F0 discovers |
@@ -32,7 +32,7 @@ For what is actually built today, see [§10 Implementation status](#10-implement
 ```mermaid
 flowchart LR
     subgraph Inputs
-        DD[Datadog alert webhook]
+        DD[(Datadog event stream)]
         GH_WH[GitHub merge to main webhook]
     end
 
@@ -56,7 +56,7 @@ flowchart LR
     end
 
     subgraph Tools
-        MCP_DD[MCP Datadog]
+        PY_DD[Python: Datadog REST v1/v2]
         MCP_GH[MCP GitHub - read only]
         PY_JIRA[Python: Jira REST v3]
         PY_K8S[Python: k8s read-only]
@@ -65,7 +65,8 @@ flowchart LR
         LLM[LiteLLM proxy -> Anthropic]
     end
 
-    DD --> API --> G1
+    CRON --> POLL[F1 alert poller] --> DD
+    POLL --> G1
     GH_WH --> API --> G0
     CRON --> G3
     CRON --> G0
@@ -75,12 +76,12 @@ flowchart LR
     G0 --> PG
     GT --> PY_JIRA
     GA --> SBX --> MCP_GH
-    G1 & G3 --> MCP_DD & PY_K8S & PY_PG
+    G1 & G3 --> PY_DD & PY_K8S & PY_PG
     LGP --> LLM
     LS[LangSmith self-hosted] -.traces.- LGP
 ```
 
-Execution: the ingress only validates webhooks and creates runs on the Platform (one thread per signal). Concurrency is the Platform's task queue; 2 workers, queue concurrency 4 ([ADR-0001](adr/0001-platform-worker-count.md)). Scheduling: Platform crons create runs for the F3 daily tick and F0 periodic refresh. The Platform also handles retries and run history; LangSmith self-hosted receives all traces.
+Execution: the ingress only validates webhooks and creates runs on the Platform (one thread per signal). Concurrency is the Platform's task queue; 2 workers, queue concurrency 4 ([ADR-0001](adr/0001-platform-worker-count.md)). Scheduling: Platform crons create runs for the F3 daily tick, the F0 periodic refresh, and the 60-second F1 alert poll ([ADR-0017](adr/0017-alert-ingestion-by-polling.md)) — an alert becomes a run only once it has persisted ([ADR-0018](adr/0018-alert-persistence-gate.md)). The Platform also handles retries and run history; LangSmith self-hosted receives all traces.
 
 ---
 
@@ -127,19 +128,21 @@ counter, and post to Slack. The notice escalates at the 3rd occurrence, then eve
 ### 2.3 F1 — Incident graph
 
 ```
-alert_in
-  → classify_alert     (Haiku: alert type → collection window + which collectors)
-  → fetch_bits_ai      (Datadog Bits AI investigation — always available, primary input)
-  → collect_gaps       (only what Bits AI did not cover: k8s events, extra traces)
+alert_in             (from the poller, once the alert has persisted — ADR-0018)
+  → classify_alert     (Haiku: alert class only; the window is a rule, the collectors a recipe)
+  → collect            (fixed sweep: monitor metric, events at service + namespace scope,
+                        logs aggregated then sampled, span presence)
+  → follow_up          (bounded loop: up to `collection.max_followup_calls` further calls)
   → qualify            (Sonnet: ranked Hypothesis list)
   → [Analysis sub-graph]
   → [Ticket pipeline]
   → postmortem_draft   (Sonnet)
 ```
 
-Bits AI is the primary telemetry input; Triage adds code/IaC reasoning on top. If it is
-unavailable: one retry, then collect alone, record the gap in `unknowns` and cap confidence at
-`medium` ([ADR-0004](adr/0004-bits-ai-unavailable.md)).
+Triage collects the telemetry itself over Datadog's REST API and does the correlation in
+`qualify` ([ADR-0016](adr/0016-datadog-collected-by-triage.md)). Kubernetes change events are
+diffed (`prev_value` vs `new_value`), never read by title; an empty collector is disambiguated
+by re-querying namespace-wide over seven days before it is recorded as an unknown.
 
 ### 2.4 F3 — DB review graph
 
@@ -220,7 +223,7 @@ Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $5
 
 | System | Access | Read/Write |
 |---|---|---|
-| Datadog | MCP | read |
+| Datadog | Python (REST v1/v2, `httpx`, scoped app key) | read |
 | Kubernetes | Python (read-only ServiceAccount) | read |
 | PostgreSQL (target DBs) | Python (read-only role) | read |
 | GitHub | MCP for repository reads; Python (REST, `httpx`) for the one commit comparison F0's incremental refresh needs ([ADR-0015](adr/0015-incremental-refresh-unit.md)) | read |
@@ -278,7 +281,7 @@ Components:
 - `langgraph-platform` — self-hosted (API server, workers, its PostgreSQL and Redis). Hosts all graphs and crons. Needs an Enterprise licence, treated as a
   procurement dependency with a documented in-process fallback
   ([ADR-0011](adr/0011-langgraph-platform-licence.md)). Worker count per ADR-0001.
-- `triage-ingress` — thin FastAPI deployment: Datadog, GitHub and Jira (closure feedback) webhook validation, run creation on the Platform. No business logic.
+- `triage-ingress` — thin FastAPI deployment: GitHub and Jira (closure feedback) webhook validation, run creation on the Platform. No business logic. Datadog does not reach it: F1 polls ([ADR-0017](adr/0017-alert-ingestion-by-polling.md)).
 - `litellm-proxy` — holds the Anthropic key, enforces budgets, centralises logs; aliases `triage` / `analysis` / `diagnosis`.
 - `analysis-job` template — gVisor runtime class, Claude Agent SDK image; one Job per analysis, created by graph nodes through the Kubernetes API (the Platform's ServiceAccount needs create/get/delete on Jobs in the `triage` namespace only).
 - `langsmith` — self-hosted, receives traces from the Platform.
@@ -297,7 +300,7 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 1 | 2 Platform workers, queue concurrency 4 | [0001](adr/0001-platform-worker-count.md) |
 | 2 | Confidence is `low`/`medium`/`high`; F1 ≥ medium, F3 ≥ high | [0002](adr/0002-confidence-thresholds.md) |
 | 3 | Every dedup match is announced; escalate at the 3rd occurrence, then every 5th | [0003](adr/0003-recurrence-alerting.md) |
-| 4 | Bits AI down → degrade, never wait; cap confidence at medium | [0004](adr/0004-bits-ai-unavailable.md) |
+| 4 | ~~Bits AI down → degrade, never wait~~ — superseded by 16 | [0004](adr/0004-bits-ai-unavailable.md) |
 | 5 | Analyse the top 3 hypotheses with rank_score ≥ 0.3, always at least 1 | [0005](adr/0005-secondary-cause-fanout.md) |
 | 6 | F0 incremental per merge, full re-summarise weekly | [0006](adr/0006-f0-refresh-strategy.md) |
 | 7 | Tier aliases only; 500 k tokens per run and $50/day, both | [0007](adr/0007-model-tiers-and-budgets.md) |
@@ -306,6 +309,9 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 10 | Post-mortem draft as a Jira comment, linked from Slack | [0010](adr/0010-postmortem-destination.md) |
 | 11 | Platform Enterprise licence, with an in-process fallback | [0011](adr/0011-langgraph-platform-licence.md) |
 | 12 | Nightly full dump, 30 d; payloads 90 d; product memory kept | [0012](adr/0012-backup-and-retention.md) |
+| 16 | Triage collects Datadog telemetry itself: fixed sweep, then a bounded follow-up loop | [0016](adr/0016-datadog-collected-by-triage.md) |
+| 17 | Alerts polled from the Datadog event stream every 60 s; scope matched by pattern | [0017](adr/0017-alert-ingestion-by-polling.md) |
+| 18 | Analyse only after 15 minutes of continuous firing; count the flapping instead | [0018](adr/0018-alert-persistence-gate.md) |
 | 14 | F0 summaries are a bounded context gather plus one structured call | [0014](adr/0014-analysis-entrypoint-context-gather.md) |
 | 15 | Incremental refresh invalidates a whole repository summary, or none of it | [0015](adr/0015-incremental-refresh-unit.md) |
 

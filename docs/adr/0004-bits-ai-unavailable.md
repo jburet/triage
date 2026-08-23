@@ -1,6 +1,9 @@
 # 0004 — Behaviour when Datadog Bits AI is unavailable
 
-Status: Proposed. Resolves architecture open item 4.
+Status: **Superseded by [ADR-0016](0016-datadog-collected-by-triage.md)**, which drops
+Bits AI as an input entirely: Triage collects the telemetry itself, so there is no
+vendor investigation to degrade from. Kept for the reasoning, which still applies to
+any collector that fails mid-incident. Resolved architecture open item 4.
 
 ## Decision
 

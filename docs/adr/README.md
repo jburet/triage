@@ -9,14 +9,14 @@ proposed rather than agreed: the alternative was leaving twelve blockers in plac
 and every value that could be made configurable is in `config.yaml` so the SRE team
 can override it without touching code.
 
-0013 and 0014 record later changes to decisions that draft had already taken.
+0013 onwards record later changes to decisions that draft had already taken.
 
 | # | Decision | Status |
 |---|---|---|
 | [0001](0001-platform-worker-count.md) | Platform worker count | Proposed |
 | [0002](0002-confidence-thresholds.md) | Confidence levels and per-feature thresholds | Accepted, implemented |
 | [0003](0003-recurrence-alerting.md) | Recurrence alerting on deduplicated tickets | Accepted, implemented |
-| [0004](0004-bits-ai-unavailable.md) | Behaviour when Datadog Bits AI is unavailable | Proposed |
+| [0004](0004-bits-ai-unavailable.md) | Behaviour when Datadog Bits AI is unavailable | Superseded by 0016 |
 | [0005](0005-secondary-cause-fanout.md) | Which hypotheses get analysed | Proposed |
 | [0006](0006-f0-refresh-strategy.md) | F0 full vs incremental refresh | Proposed |
 | [0007](0007-model-tiers-and-budgets.md) | Model tiers and spend guardrails | Accepted, implemented |
@@ -28,6 +28,9 @@ can override it without touching code.
 | [0013](0013-jira-over-rest.md) | Jira over REST v3, not MCP | Accepted, implemented |
 | [0014](0014-analysis-entrypoint-context-gather.md) | The analysis entrypoint gathers context, it does not agent | Accepted, implemented |
 | [0015](0015-incremental-refresh-unit.md) | The unit of incremental refresh is the whole repository summary | Accepted, implemented |
+| [0016](0016-datadog-collected-by-triage.md) | Triage collects Datadog telemetry itself, over REST | Proposed |
+| [0017](0017-alert-ingestion-by-polling.md) | Alerts arrive by polling the Datadog event stream | Proposed |
+| [0018](0018-alert-persistence-gate.md) | An alert is analysed only once it has persisted | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

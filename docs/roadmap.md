@@ -20,7 +20,7 @@ The product is not "an AI SRE". It is the layer between observability (Datadog) 
 - **Production scope only.**
 - **Analysis only**: Triage diagnoses and specifies; it never produces code or PRs. Fixing is the developer's job.
 - **Never invent**: any field that cannot be filled with confidence is explicitly marked "unknown".
-- **Buy what observability vendors do well** (detection, telemetry correlation — Datadog Bits AI). **Build what they cannot**: code, Terraform and database understanding.
+- **Buy what observability vendors do well** (detection, instrumentation, retention). **Build what they cannot**: correlation across a specific system, and code, Terraform and database understanding ([ADR-0016](adr/0016-datadog-collected-by-triage.md)).
 
 ---
 
@@ -64,8 +64,8 @@ A ticket is complete only if a developer could start working on it without askin
 
 ## F1 — Incident to ticket
 
-- Trigger: alert (unavailability, crash/restart, OOM, latency…).
-- Takes Datadog Bits AI's investigation as primary input, then collects over an adaptive window only what it did not cover: Kubernetes events, extra traces, dependency state.
+- Trigger: alert (unavailability, crash/restart, OOM, latency…), once it has been firing for 15 minutes ([ADR-0018](adr/0018-alert-persistence-gate.md)).
+- Collects from Datadog itself over an adaptive window — the monitor's own metric, events at service and namespace scope, aggregated logs, traces where the service is instrumented — as a fixed sweep followed by a bounded follow-up loop.
 - Adds what Datadog cannot: analysis of the code at the deployed commit, Terraform analysis, diff vs previous version.
 - Outputs: immediate Slack notice, then a ticket via the core pipeline.
 - Generates the post-mortem draft from the ticket and timeline.
@@ -81,7 +81,7 @@ A ticket is complete only if a developer could start working on it without askin
 
 ## Cross-cutting features
 
-- **Alert coverage audit**: detect missing, noisy or obsolete alerts and SLOs; an agent cannot convert an alert that was never configured.
+- **Alert coverage audit**: detect missing, noisy or obsolete alerts and SLOs; an agent cannot convert an alert that was never configured. *Measured 2026-08-23: 6,489 monitor-alert events in 7 days, 4,232 of them `error`, from 19 monitors — of which the production pod-down signal is 28. Three Synthetics monitors fired 1,344 times with zero recoveries. On these numbers F1 would spend most of its budget on monitors that are themselves the defect, which argues for moving this ahead of F1 rather than after it.*
 - **Change correlation beyond deployments**: feature flags, cloud config changes, DB migrations, vendor incidents.
 - **Incident memory**: link new tickets to past similar ones.
 - **Deduplication**: update existing tickets rather than creating duplicates.
@@ -94,7 +94,7 @@ A ticket is complete only if a developer could start working on it without askin
 
 1. **Ticket specification + Jira workflow** — the product definition; cheap, unblocks everything.
 2. **F0** — foundation.
-3. **F1** — on top of Datadog Bits AI, focused on the code/IaC layer.
+3. **F1** — self-collected telemetry plus the code/IaC layer.
 4. **F3** — independent daily job.
 5. Cross-cutting: alert coverage audit, self-evaluation.
 
@@ -102,7 +102,6 @@ Removed from scope: weak-signal detection (delegated to Datadog anomaly detectio
 
 ## Before starting
 
-- Enable Datadog Bits AI SRE to establish a baseline of what is already covered.
 - Measure today's average developer time per escalation. This is the metric the agent must move.
 - Make the SRE team the owner of the agent: F0 configuration, ticket validation, infra tickets, F3 reports.
 
@@ -114,6 +113,6 @@ Removed from scope: weak-signal detection (delegated to Datadog anomaly detectio
 | Retention of incident memory | `diagnoses`, `tickets` and `evaluations` kept indefinitely; raw payloads 90 d — [ADR-0012](adr/0012-backup-and-retention.md) |
 | Where the post-mortem draft is published | Jira comment on the incident ticket, linked from Slack — [ADR-0010](adr/0010-postmortem-destination.md) |
 
-The three items under **Before starting** remain open, and are not decisions Triage
-can take for itself: enabling Bits AI, measuring today's developer time per
-escalation, and making the SRE team the agent's owner.
+The two items under **Before starting** remain open, and are not decisions Triage
+can take for itself: measuring today's developer time per escalation, and making
+the SRE team the agent's owner.

@@ -1,0 +1,1452 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "preserved_tags": [
+              "cluster_name:prod-use1",
+              "namespace:hcl-software-uat",
+              "statefulset_name:plt-hcl-software-uat",
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501",
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat",
+              "identified_changes:1"
+            ],
+            "preserved_timestamps": {
+              "ingestion_timestamp": 1787359424333
+            },
+            "source_type_name": "Change Tracking",
+            "source_type_name_tag": "change_tracking",
+            "version": "2"
+          },
+          "action": "update",
+          "aggregation_key": "change-tracking-kube_stateful_set",
+          "change_metadata": {
+            "action": "update",
+            "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
+          },
+          "changed_resource": {
+            "name": "plt-hcl-software-uat",
+            "type": "kube_stateful_set"
+          },
+          "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "evt": {
+            "category": "change",
+            "id": "8776103948061584187",
+            "integration_id": "change-tracking",
+            "source_id": 374,
+            "type": "kube_stateful_set",
+            "uid": "AaAm7G9QAAC7ca9WyyjLOwAA"
+          },
+          "impacted_resources": [
+            {
+              "name": "plt-hcl-software-uat",
+              "type": "service"
+            }
+          ],
+          "new_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 0,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "prev_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 1,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "sub_category": "kubernetes",
+          "timestamp": 1787359418000,
+          "title": "kubernetes StatefulSet plt-hcl-software-uat updated"
+        },
+        "message": "StatefulSet plt-hcl-software-uat deployed in cluster: prod-use1 namespace: hcl-software-uat",
+        "tags": [
+          "app.kubernetes.io/managed-by:helm",
+          "app:plt",
+          "env:prod",
+          "identified_changes:1",
+          "kube_api_version:apps/v1",
+          "kube_cluster:prod-use1",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "service:plt-hcl-software-uat",
+          "source:change_tracking",
+          "tags.datadoghq.com/env:prod",
+          "tags.datadoghq.com/service:plt-hcl-software-uat",
+          "tags.datadoghq.com/version:501",
+          "tenant:hcl-software-uat",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:38Z"
+      },
+      "id": "AwAAAaAm7FaQaW0YiwAAABhBYUFtN0c5UUFBQzdjYTlXeXlqTE93QUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAD4g",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7qAABTU7mB_dt6WQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359434000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f deleted with exit code 137",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:54Z"
+      },
+      "id": "AwAAAaAm7JUQJqQuywAAABhBYUFtN0pVUUFBRFpZNVB1QWxNc0FBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAjQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/create",
+          "event_object": "containerd:/containers/create",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7rAABTU7mB_dt6WwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359435000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2 started, running the image 097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:create",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:55Z"
+      },
+      "id": "AwAAAaAm7Jj4JqQuzQAAABhBYUFtN0pqNEFBQk16SDlEOEtHckFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiw",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/delete",
+          "event_object": "containerd:/containers/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104288891837539",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7L7rAABTU7mB_dt6XAAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359435000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container d2420fe30181796ffe7ce79cd6e7f60b799d57445cc8d7ba7a1c0e4f37283f41 deleted",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:d2420fe30181796ffe7ce79cd6e7f60b799d57445cc8d7ba7a1c0e4f37283f41",
+          "container_name:platform",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_distribution:eks",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:43:55Z"
+      },
+      "id": "AwAAAaAm7Jj4JqQuzgAAABhBYUFtN0pqNEFBRDZUTjhqZmtTUEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAjA",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/tasks/delete",
+          "event_object": "containerd:/tasks/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyLQAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on tasks from Containerd"
+        },
+        "message": "Task 9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2 deleted with exit code 1",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:9058116776cd2615c61afb58c74d5b127bb1d2483f650fe79b4b84712bf609b2",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lAAAABhBYUFtN1A2SUFBQ3VraTg4TVRtMkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiA",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/create",
+          "event_object": "containerd:/containers/create",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyLwAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a started, running the image 097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:593d74e5458060bf17e4e4261cc9454fcf140848618b780146019fac5a8e242a",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:create",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lgAAABhBYUFtN1A2SUFBQURGNkppWm0yOEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAiQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Containerd",
+            "source_type_name_tag": "containerd",
+            "version": "2"
+          },
+          "aggregation_key": "containerd:/containers/delete",
+          "event_object": "containerd:/containers/delete",
+          "evt": {
+            "category": "info",
+            "id": "8776104792675749332",
+            "integration_id": "containerd",
+            "source_id": 10082,
+            "type": "containerd",
+            "uid": "AaAm7TY4AACdPKNySMiyMAAA"
+          },
+          "hostname": "ip-10-33-27-60.ec2.internal",
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "timestamp": 1787359461000,
+          "title": "Event on containers from Containerd"
+        },
+        "message": "Container 57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f deleted",
+        "tags": [
+          "cluster_name:prod-use1",
+          "container_id:57304cf3626bbfe377b6ac2e2529204235b67218143daa3a560444b3ecd6631f",
+          "container_name:platform",
+          "display_container_name:platform_plt-hcl-software-uat-0",
+          "env:prod",
+          "event_type:destroy",
+          "image_id:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform_sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "image_name:097607883991.dkr.ecr.us-east-1.amazonaws.com/platform",
+          "image_tag:501",
+          "kube_cluster_name:prod-use1",
+          "kube_container_name:platform",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_node:ip-10-33-27-60.ec2.internal",
+          "kube_ownerref_kind:statefulset",
+          "kube_ownerref_name:plt-hcl-software-uat",
+          "kube_qos:burstable",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "orch_cluster_id:baee6ab3-a8c7-4a3e-98df-11a24170787a",
+          "persistentvolumeclaim:hcl-software-uat-plt-hcl-software-uat-0",
+          "pod_name:plt-hcl-software-uat-0",
+          "pod_phase:running",
+          "service:plt-hcl-software-uat",
+          "short_image:platform",
+          "source:containerd",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:44:21Z"
+      },
+      "id": "AwAAAaAm7P6IqA67lwAAABhBYUFtN1A2SUFBQkNxYzlPbXZ2QkFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAAig",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": true,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Monitor Alert",
+            "source_type_name_tag": "monitor_alert",
+            "version": "2"
+          },
+          "aggregation_key": "7db66500f19c2698fb282d6221794127",
+          "event_object": "083a7344f0e3773b295573ff8bf3a9f0",
+          "evt": {
+            "category": "alert",
+            "id": "8776106177671659819",
+            "integration_id": "monitor-alert-event",
+            "source_id": 36,
+            "type": "log_alert",
+            "uid": "AaAm7nhdAACdPKNySGN_vgAA"
+          },
+          "monitor": {
+            "alert_cycle_key_txt": "8776106172429695973",
+            "created_at": 1753945690000,
+            "draft_status": "published",
+            "group_status": 1,
+            "groups": [
+              "service:plt-hcl-software-uat"
+            ],
+            "id": 70284056,
+            "message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n{{/is_alert}}",
+            "modified": 1759130712000,
+            "name": "New error logs for {{log.service}} for prod",
+            "notifications": [
+              "slack-Actian-zeenea-alerting-error",
+              "slack-alerting-critical"
+            ],
+            "options": {
+              "enable_logs_sample": true,
+              "escalation_message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-poc \n{{/is_alert}}",
+              "groupby_simple_monitor": false,
+              "include_tags": true,
+              "new_group_delay": 60,
+              "notify_audit": false,
+              "on_missing_data": "default",
+              "renotify_interval": 0,
+              "thresholds": {
+                "critical": 1
+              }
+            },
+            "priority": 2,
+            "query": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+            "result": {
+              "alert_url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787358596000&to_ts=1787359796000&event_id=8776106177671659819&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496",
+              "group_key": "service",
+              "logs_url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787358896000&to_ts=1787359496000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496",
+              "result_id": 8776106169888107626,
+              "result_id_txt": "8776106169888107626",
+              "result_ts": 1787359496
+            },
+            "tags": [
+              "owner:zeenea"
+            ],
+            "templated_name": "New error logs for plt-hcl-software-uat for prod",
+            "transition": {
+              "destination_state": "Alert",
+              "source_state": "OK",
+              "transition_type": "alert"
+            },
+            "type": "log alert"
+          },
+          "monitor-alert-event": {
+            "alert_cycle_key": "8776106172429695973",
+            "alert_type": "error",
+            "date_happened": 1787359496000,
+            "dest_state": "Alert",
+            "event_object": "083a7344f0e3773b295573ff8bf3a9f0",
+            "event_type": "log_alert",
+            "group_transition_type": "no_grouping",
+            "id": "8776106177671659819",
+            "message_parts": {
+              "last_triggered_ts": "2026-08-22T00:44:56Z",
+              "links": [
+                {
+                  "key": "status",
+                  "text": "Monitor Status",
+                  "url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787358596000&to_ts=1787359796000&event_id=8776106177671659819&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496"
+                },
+                {
+                  "key": "edit",
+                  "text": "Edit Monitor",
+                  "url": "/monitors/70284056/edit?link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496"
+                },
+                {
+                  "key": "logs",
+                  "text": "Related Logs",
+                  "url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787358896000&to_ts=1787359496000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496"
+                }
+              ],
+              "message": "%%%\nplt-hcl-software-uat - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n\n%%%",
+              "message_prefix": "",
+              "message_suffix": "",
+              "query_plain": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+              "query_summary": "%%%\nMore than **1** log events matched in the last **10m** against the monitored query: **[`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A)** by **service**\n%%%"
+            },
+            "monitor": {
+              "alert_cycle_key": 8776106172429696000,
+              "alert_cycle_key_txt": "8776106172429695973",
+              "created_at": 1753945690000,
+              "draft_status": "published",
+              "group_status": 1,
+              "groups": [
+                "service:plt-hcl-software-uat"
+              ],
+              "id": 70284056,
+              "message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n{{/is_alert}}",
+              "modified": 1759130712000,
+              "name": "New error logs for {{log.service}} for prod",
+              "notifications": [
+                "slack-Actian-zeenea-alerting-error",
+                "slack-alerting-critical"
+              ],
+              "options": {
+                "enable_logs_sample": true,
+                "escalation_message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-poc \n{{/is_alert}}",
+                "groupby_simple_monitor": false,
+                "include_tags": true,
+                "new_group_delay": 60,
+                "notify_audit": false,
+                "on_missing_data": "default",
+                "renotify_interval": 0,
+                "thresholds": {
+                  "critical": 1
+                }
+              },
+              "org_id": 1000133217,
+              "priority": 2,
+              "query": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+              "result": {
+                "alert_url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787358596000&to_ts=1787359796000&event_id=8776106177671659819&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496",
+                "avalanche": false,
+                "display_logs_sample": {
+                  "columns": [
+                    "Time",
+                    "Service"
+                  ],
+                  "label": "Sample Logs",
+                  "rows": [
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:1e28e726-b0bf-477b-9ae5-ff84eba84efb for ReCreateAll 1e28e726-b0bf-477b-9ae5-ff84eba84efb from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:2b0b1e90-7433-493a-bccb-ab52e75e6544 for ReCreateAll 2b0b1e90-7433-493a-bccb-ab52e75e6544 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:e371361d-915d-4623-a798-a1abee065dbd for ReCreateAll e371361d-915d-4623-a798-a1abee065dbd from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:df0d56e1-966d-4827-9d7a-94a497a51a6c for ReCreateAll df0d56e1-966d-4827-9d7a-94a497a51a6c from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:b43998ab-9bea-4045-94d6-302cb5d8fd26 for ReCreateAll b43998ab-9bea-4045-94d6-302cb5d8fd26 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:71f49323-ccca-4f5e-9882-779769b09736 for ReCreateAll 71f49323-ccca-4f5e-9882-779769b09736 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:7b33b0ed-483d-480e-9190-8121006fd683 for ReCreateAll 7b33b0ed-483d-480e-9190-8121006fd683 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:8f7a23ce-a850-4b23-a89b-583d2ed28bc2 for ReCreateAll 8f7a23ce-a850-4b23-a89b-583d2ed28bc2 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:6f4d33fe-b715-46bc-99c6-1481d9c5e421 for ReCreateAll 6f4d33fe-b715-46bc-99c6-1481d9c5e421 from ReindexAllBatchService.scala:115"
+                    },
+                    {
+                      "items": [
+                        "00:44:19 UTC",
+                        "plt-hcl-software-uat"
+                      ],
+                      "message": "async_update_failed, field:79698181-ab09-41c4-a465-03a46c2775d7 for ReCreateAll 79698181-ab09-41c4-a465-03a46c2775d7 from ReindexAllBatchService.scala:115"
+                    }
+                  ]
+                },
+                "evaluation_ts": 1787359496,
+                "group_key": "service",
+                "groups": "{\"service:plt-hcl-software-uat\": {\"status\": 1}}",
+                "logs_url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787358896000&to_ts=1787359496000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496",
+                "metadata": {
+                  "from_js_ts": 1787358896000,
+                  "monitor_id": 70284056,
+                  "priority_list": {
+                    "original_priority": 2
+                  },
+                  "to_js_ts": 1787359496000
+                },
+                "num_groups": 1,
+                "result_id": 8776106169888108000,
+                "result_id_txt": "8776106169888107626",
+                "result_ts": 1787359496,
+                "scheduled_ts": 1787359556,
+                "state_counts": {
+                  "0": 36,
+                  "1": 4,
+                  "2": 0,
+                  "3": 0,
+                  "5": 0,
+                  "6": 0
+                },
+                "state_id": 1
+              },
+              "tags": [
+                "owner:zeenea"
+              ],
+              "templated_name": "New error logs for plt-hcl-software-uat for prod",
+              "transition": {
+                "destination_state": "Alert",
+                "source_state": "OK",
+                "transition_name": "Triggered",
+                "transition_type": "alert"
+              },
+              "type": "log alert"
+            },
+            "monitor_group": "service:plt-hcl-software-uat",
+            "monitor_group_status": 1,
+            "monitor_groups": [
+              "service:plt-hcl-software-uat"
+            ],
+            "monitor_id": 70284056,
+            "monitor_notifications": [
+              "slack-Actian-zeenea-alerting-error",
+              "slack-alerting-critical"
+            ],
+            "org_id": 1000133217,
+            "reduced_message_text": "plt-hcl-software-uat - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n\n\nMore than 1 log events matched in the last 10m against the monitored query: [`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A) by service",
+            "service_name": "alerting-state-notifications",
+            "source_state": "OK",
+            "source_type_id": 36,
+            "source_type_name": "monitor alert",
+            "sourcecategory": "monitor_alert",
+            "text_only_message": "plt-hcl-software-uat - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n\n\nMore than 1 log events matched in the last 10m against the monitored query: `@log.level:ERROR env:prod` by service",
+            "trans_type": "alert"
+          },
+          "monitor_groups": [
+            "service:plt-hcl-software-uat"
+          ],
+          "monitor_id": 70284056,
+          "monitor_notifications": [
+            "slack-Actian-zeenea-alerting-error",
+            "slack-alerting-critical"
+          ],
+          "priority": "2",
+          "service": "plt-hcl-software-uat",
+          "sourcecategory": "monitor_alert",
+          "status": "error",
+          "timestamp": 1787359496000,
+          "title": "[P2] [Triggered on {service:plt-hcl-software-uat}] New error logs for plt-hcl-software-uat for prod"
+        },
+        "message": "%%%\nplt-hcl-software-uat - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n\n\nMore than **1** log events matched in the last **10m** against the monitored query: **[`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A)** by **service**\n\nThe monitor was last triggered at Sat Aug 22 2026 00:44:56 UTC.\n\n- - -\n\n[[Monitor Status](/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787358596000&to_ts=1787359796000&event_id=8776106177671659819&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496)] \u00b7 [[Edit Monitor](/monitors/70284056/edit?link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496)] \u00b7 [[Related Logs](/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787358896000&to_ts=1787359496000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776106177671659819&link_event_ts=1787359496)]\n%%%",
+        "tags": [
+          "monitor",
+          "owner:zeenea",
+          "priority:p2",
+          "service:plt-hcl-software-uat",
+          "source:alert"
+        ],
+        "timestamp": "2026-08-22T00:44:56Z"
+      },
+      "id": "AwAAAaAm7YdAKTvXiQAAABhBYUFtN1lkQUFBQlFJS2tmeFk0QUFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAARuQ",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "preserved_tags": [
+              "cluster_name:prod-use1",
+              "namespace:hcl-software-uat",
+              "statefulset_name:plt-hcl-software-uat",
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501",
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat",
+              "identified_changes:1"
+            ],
+            "preserved_timestamps": {
+              "ingestion_timestamp": 1787359632005
+            },
+            "source_type_name": "Change Tracking",
+            "source_type_name_tag": "change_tracking",
+            "version": "2"
+          },
+          "action": "update",
+          "aggregation_key": "change-tracking-kube_stateful_set",
+          "change_metadata": {
+            "action": "update",
+            "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
+          },
+          "changed_resource": {
+            "name": "plt-hcl-software-uat",
+            "type": "kube_stateful_set"
+          },
+          "container_images_key": "platform|097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+          "evt": {
+            "category": "change",
+            "id": "8776107432211201254",
+            "integration_id": "change-tracking",
+            "source_id": 374,
+            "type": "kube_stateful_set",
+            "uid": "AaAm75qHAABDWpqAc9785gAA"
+          },
+          "impacted_resources": [
+            {
+              "name": "plt-hcl-software-uat",
+              "type": "service"
+            }
+          ],
+          "new_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 1,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "prev_value": {
+            "annotations": [
+              "meta.helm.sh/release-name:hcl-software-uat",
+              "meta.helm.sh/release-namespace:default"
+            ],
+            "cluster_id": "baee6ab3-a8c7-4a3e-98df-11a24170787a",
+            "cluster_name": "prod-use1",
+            "containers": [
+              {
+                "image": "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b",
+                "name": "platform"
+              }
+            ],
+            "creation_timestamp": 1732783966000,
+            "current_replicas": 1,
+            "desired_replicas": 1,
+            "init_containers": [
+              {
+                "image": "alpine/openssl",
+                "name": "generate-keystore"
+              }
+            ],
+            "k8s_cluster_key": {
+              "id": "0acbd4dc6df56152d5be35cbdbaab45f",
+              "name": "baee6ab3-a8c7-4a3e-98df-11a24170787a"
+            },
+            "labels": [
+              "app.kubernetes.io/managed-by:Helm",
+              "app:plt",
+              "tags.datadoghq.com/env:prod",
+              "tags.datadoghq.com/service:plt-hcl-software-uat",
+              "tags.datadoghq.com/version:501",
+              "tenant:hcl-software-uat"
+            ],
+            "name": "plt-hcl-software-uat",
+            "namespace": "hcl-software-uat",
+            "partition": 0,
+            "pod_management_policy": "OrderedReady",
+            "ready_replicas": 0,
+            "replicas": 1,
+            "resource_requirements": [
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": "2684354560"
+                },
+                "name": "platform",
+                "requests": {
+                  "cpu": "1536",
+                  "memory": "2147483648"
+                },
+                "type": "container"
+              },
+              {
+                "limits": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "name": "generate-keystore",
+                "requests": {
+                  "cpu": "",
+                  "memory": ""
+                },
+                "type": "initContainer"
+              }
+            ],
+            "selectors": [
+              {
+                "key": "app",
+                "operator": "In",
+                "values": [
+                  "plt"
+                ]
+              },
+              {
+                "key": "tenant",
+                "operator": "In",
+                "values": [
+                  "hcl-software-uat"
+                ]
+              }
+            ],
+            "service_name": "plt",
+            "tags": [
+              "env:prod",
+              "kube_api_version:apps/v1",
+              "kube_cluster_name:prod-use1",
+              "kube_distribution:eks",
+              "kube_namespace:hcl-software-uat",
+              "kube_stateful_set:plt-hcl-software-uat",
+              "service:plt-hcl-software-uat",
+              "version:501"
+            ],
+            "uid": "80b309db-1918-48e9-8c39-70da2fbadc65",
+            "update_strategy": "RollingUpdate",
+            "updated_replicas": 1
+          },
+          "service": "plt-hcl-software-uat",
+          "status": "info",
+          "sub_category": "kubernetes",
+          "timestamp": 1787359627000,
+          "title": "kubernetes StatefulSet plt-hcl-software-uat updated"
+        },
+        "message": "StatefulSet plt-hcl-software-uat deployed in cluster: prod-use1 namespace: hcl-software-uat",
+        "tags": [
+          "app.kubernetes.io/managed-by:helm",
+          "app:plt",
+          "env:prod",
+          "identified_changes:1",
+          "kube_api_version:apps/v1",
+          "kube_cluster:prod-use1",
+          "kube_distribution:eks",
+          "kube_namespace:hcl-software-uat",
+          "kube_stateful_set:plt-hcl-software-uat",
+          "service:plt-hcl-software-uat",
+          "source:change_tracking",
+          "tags.datadoghq.com/env:prod",
+          "tags.datadoghq.com/service:plt-hcl-software-uat",
+          "tags.datadoghq.com/version:501",
+          "tenant:hcl-software-uat",
+          "version:501"
+        ],
+        "timestamp": "2026-08-22T00:47:07Z"
+      },
+      "id": "AwAAAaAm74b4mWe2pQAAABhBYUFtNzVxSEFBQkRXcHFBYzk3ODVnQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAAD4Q",
+      "type": "event"
+    },
+    {
+      "attributes": {
+        "attributes": {
+          "_dd": {
+            "has_notification": false,
+            "internal": "1",
+            "is_shadow": false,
+            "source_type_name": "Monitor Alert",
+            "source_type_name_tag": "monitor_alert",
+            "version": "2"
+          },
+          "aggregation_key": "7db66500f19c2698fb282d6221794127",
+          "duration": 600000000000,
+          "event_object": "083a7344f0e3773b295573ff8bf3a9f0",
+          "evt": {
+            "category": "alert",
+            "id": "8776116243805872268",
+            "integration_id": "monitor-alert-event",
+            "source_id": 36,
+            "type": "log_alert",
+            "uid": "AaAm96IiAABTU7mB_d-n3gAA"
+          },
+          "monitor": {
+            "alert_cycle_key_txt": "8776106172429695973",
+            "created_at": 1753945690000,
+            "draft_status": "published",
+            "group_status": 0,
+            "groups": [
+              "service:plt-hcl-software-uat"
+            ],
+            "id": 70284056,
+            "message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n{{/is_alert}}",
+            "modified": 1759130712000,
+            "name": "New error logs for {{log.service}} for prod",
+            "options": {
+              "enable_logs_sample": true,
+              "escalation_message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-poc \n{{/is_alert}}",
+              "groupby_simple_monitor": false,
+              "include_tags": true,
+              "new_group_delay": 60,
+              "notify_audit": false,
+              "on_missing_data": "default",
+              "renotify_interval": 0,
+              "thresholds": {
+                "critical": 1
+              }
+            },
+            "priority": 2,
+            "query": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+            "result": {
+              "alert_url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787359196000&to_ts=1787360396000&event_id=8776116243805872268&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096",
+              "group_key": "service",
+              "logs_url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787359496000&to_ts=1787360096000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096",
+              "result_id": 8776116234915137677,
+              "result_id_txt": "8776116234915137677",
+              "result_ts": 1787360096
+            },
+            "tags": [
+              "owner:zeenea"
+            ],
+            "templated_name": "New error logs for plt-hcl-software-uat for prod",
+            "transition": {
+              "destination_state": "OK",
+              "source_state": "Alert",
+              "transition_type": "alert recovery"
+            },
+            "type": "log alert"
+          },
+          "monitor-alert-event": {
+            "alert_cycle_key": "8776106172429695973",
+            "alert_type": "success",
+            "date_happened": 1787360096000,
+            "dest_state": "OK",
+            "duration": 600000000000,
+            "event_object": "083a7344f0e3773b295573ff8bf3a9f0",
+            "event_type": "log_alert",
+            "group_transition_type": "no_grouping",
+            "id": "8776116243805872268",
+            "message_parts": {
+              "last_triggered_ts": "2026-08-22T00:44:56Z",
+              "links": [
+                {
+                  "key": "status",
+                  "text": "Monitor Status",
+                  "url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787359196000&to_ts=1787360396000&event_id=8776116243805872268&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096"
+                },
+                {
+                  "key": "edit",
+                  "text": "Edit Monitor",
+                  "url": "/monitors/70284056/edit?link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096"
+                },
+                {
+                  "key": "logs",
+                  "text": "Related Logs",
+                  "url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787359496000&to_ts=1787360096000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096"
+                }
+              ],
+              "message": "",
+              "message_prefix": "",
+              "message_suffix": "",
+              "query_plain": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+              "query_summary": "%%%\nLess than or exactly **1** log events matched in the last **10m** against the monitored query: **[`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A)** by **service**\n%%%"
+            },
+            "monitor": {
+              "alert_cycle_key": 8776106172429696000,
+              "alert_cycle_key_txt": "8776106172429695973",
+              "created_at": 1753945690000,
+              "draft_status": "published",
+              "group_status": 0,
+              "groups": [
+                "service:plt-hcl-software-uat"
+              ],
+              "id": 70284056,
+              "message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-critical \n@slack-Actian-zeenea-alerting-error \n{{/is_alert}}",
+              "modified": 1759130712000,
+              "name": "New error logs for {{log.service}} for prod",
+              "options": {
+                "enable_logs_sample": true,
+                "escalation_message": "{{#is_alert}}\n{{log.service}} - new log entries have matched the following conditions: environment equals prod and log.level equals ERROR\n\n@slack-alerting-poc \n{{/is_alert}}",
+                "groupby_simple_monitor": false,
+                "include_tags": true,
+                "new_group_delay": 60,
+                "notify_audit": false,
+                "on_missing_data": "default",
+                "renotify_interval": 0,
+                "thresholds": {
+                  "critical": 1
+                }
+              },
+              "org_id": 1000133217,
+              "priority": 2,
+              "query": "logs(\"@log.level:ERROR env:prod\").index(\"*\").rollup(\"count\").by(\"service\").last(\"10m\") > 1",
+              "result": {
+                "alert_url": "/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787359196000&to_ts=1787360396000&event_id=8776116243805872268&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096",
+                "avalanche": false,
+                "evaluation_ts": 1787360096,
+                "group_key": "service",
+                "groups": "{\"service:plt-hcl-software-uat\": {\"status\": 0}}",
+                "logs_url": "/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787359496000&to_ts=1787360096000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096",
+                "metadata": {
+                  "from_js_ts": 1787359496000,
+                  "monitor_id": 70284056,
+                  "priority_list": {
+                    "original_priority": 2
+                  },
+                  "to_js_ts": 1787360096000
+                },
+                "num_groups": 1,
+                "result_id": 8776116234915138000,
+                "result_id_txt": "8776116234915137677",
+                "result_ts": 1787360096,
+                "scheduled_ts": 1787360156,
+                "state_counts": {
+                  "0": 32,
+                  "1": 7,
+                  "2": 0,
+                  "3": 0,
+                  "5": 0,
+                  "6": 0
+                },
+                "state_id": 0
+              },
+              "tags": [
+                "owner:zeenea"
+              ],
+              "templated_name": "New error logs for plt-hcl-software-uat for prod",
+              "transition": {
+                "destination_state": "OK",
+                "source_state": "Alert",
+                "transition_name": "Recovered",
+                "transition_type": "alert recovery"
+              },
+              "type": "log alert"
+            },
+            "monitor_group": "service:plt-hcl-software-uat",
+            "monitor_group_status": 0,
+            "monitor_groups": [
+              "service:plt-hcl-software-uat"
+            ],
+            "monitor_id": 70284056,
+            "org_id": 1000133217,
+            "reduced_message_text": "Less than or exactly 1 log events matched in the last 10m against the monitored query: [`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A) by service",
+            "service_name": "alerting-state-notifications",
+            "source_state": "Alert",
+            "source_type_id": 36,
+            "source_type_name": "monitor alert",
+            "sourcecategory": "monitor_alert",
+            "text_only_message": "Less than or exactly 1 log events matched in the last 10m against the monitored query: `@log.level:ERROR env:prod` by service",
+            "trans_type": "alert recovery"
+          },
+          "monitor_groups": [
+            "service:plt-hcl-software-uat"
+          ],
+          "monitor_id": 70284056,
+          "priority": "2",
+          "service": "plt-hcl-software-uat",
+          "sourcecategory": "monitor_alert",
+          "status": "ok",
+          "timestamp": 1787360096000,
+          "title": "[P2] [Recovered on {service:plt-hcl-software-uat}] New error logs for plt-hcl-software-uat for prod"
+        },
+        "message": "%%%\nLess than or exactly **1** log events matched in the last **10m** against the monitored query: **[`@log.level:ERROR env:prod`](https://app.datadoghq.eu/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&agg_m=count&agg_t=count&agg_q=service&index=%2A)** by **service**\n\nThe monitor was last triggered at Sat Aug 22 2026 00:44:56 UTC.\n\n- - -\n\n[[Monitor Status](/monitors/70284056?group=service%3Aplt-hcl-software-uat&from_ts=1787359196000&to_ts=1787360396000&event_id=8776116243805872268&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096)] \u00b7 [[Edit Monitor](/monitors/70284056/edit?link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096)] \u00b7 [[Related Logs](/logs/analytics?query=%40log.level%3AERROR+env%3Aprod&from_ts=1787359496000&to_ts=1787360096000&live=false&agg_m=count&agg_t=count&agg_q=service&index=%2A&link_source=monitor_notif&link_monitor_id=70284056&link_event_id=8776116243805872268&link_event_ts=1787360096)]\n%%%",
+        "tags": [
+          "monitor",
+          "owner:zeenea",
+          "priority:p2",
+          "service:plt-hcl-software-uat",
+          "source:alert"
+        ],
+        "timestamp": "2026-08-22T00:54:56Z"
+      },
+      "id": "AwAAAaAm9q8AVk8uywAAABhBYUFtOXE4QUFBREo1WlRlUnFpWEFBQUEAAABdMTFhMDI3YTAtMTYzMC00NGFhLTkwN2UtZTAzYjBjOGVhZDZlLXN5bnRoZXRpYy10aW1lLTE3ODczNTY4MDMwMDAwMDAwMDBjLTE3ODczNjQwMDAwMDAwMDAwMDBvAAARsw",
+      "type": "event"
+    }
+  ],
+  "meta": {
+    "elapsed": 146,
+    "request_id": "pddv1ChZXcy1Ed2lBalRLLWhQdmhISkNnTC13Ii0KHdMdsL3VLCqJ906hNxFBnF4E1XeP8_uY5mpLnlxmEgyhssNaxkXdO-sbN7U",
+    "status": "done"
+  }
+}

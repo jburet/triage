@@ -1,0 +1,135 @@
+[
+  {
+    "bytes": 45373,
+    "json": {
+      "filter": {
+        "from": 1787356740000,
+        "query": "service:plt-hcl-software-uat",
+        "to": 1787361240000
+      },
+      "page": {
+        "limit": 200
+      },
+      "sort": "timestamp"
+    },
+    "method": "POST",
+    "name": "events.window",
+    "params": null,
+    "path": "/api/v2/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "12000",
+      "x-ratelimit-name": "event_management_api_event_search",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "11997",
+      "x-ratelimit-reset": "17"
+    },
+    "seconds": 0.261,
+    "status": 200
+  },
+  {
+    "bytes": 179,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787356740000,
+        "query": "service:plt-hcl-software-uat",
+        "to": 1787361240000
+      },
+      "group_by": [
+        {
+          "facet": "status",
+          "limit": 10
+        },
+        {
+          "facet": "@kube_container_name",
+          "limit": 15
+        }
+      ]
+    },
+    "method": "POST",
+    "name": "logs.aggregate",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "7"
+    },
+    "seconds": 0.227,
+    "status": 200
+  },
+  {
+    "bytes": 115962,
+    "json": {
+      "filter": {
+        "from": 1787356740000,
+        "query": "service:plt-hcl-software-uat status:(error OR warn)",
+        "to": 1787361240000
+      },
+      "page": {
+        "limit": 50
+      },
+      "sort": "timestamp"
+    },
+    "method": "POST",
+    "name": "logs.search",
+    "params": null,
+    "path": "/api/v2/logs/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "3",
+      "x-ratelimit-name": "logs_public_search_api",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "2",
+      "x-ratelimit-reset": "7"
+    },
+    "seconds": 0.654,
+    "status": 200
+  },
+  {
+    "bytes": 192,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-21T23:59:00+00:00",
+            "query": "service:plt-hcl-software-uat",
+            "to": "2026-08-22T01:14:00+00:00"
+          },
+          "group_by": [
+            {
+              "facet": "resource_name",
+              "limit": 10
+            }
+          ]
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.aggregate",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "4",
+      "x-ratelimit-reset": "16"
+    },
+    "seconds": 0.708,
+    "status": 200
+  }
+]
