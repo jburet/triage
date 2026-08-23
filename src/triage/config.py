@@ -24,6 +24,14 @@ PLATFORM_TEAM = "platform"
 """The team that owns Triage itself, and hears about the system it cannot attribute."""
 
 
+class LLMProvider(StrEnum):
+    """Which implementation of :class:`~triage.llm.StructuredLLM` serves a run."""
+
+    AUTO = "auto"
+    LITELLM = "litellm"
+    ANTHROPIC = "anthropic"
+
+
 class RepoKind(StrEnum):
     """What kind of summary a repository earns. An undeclared kind fails config load."""
 
@@ -184,8 +192,22 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="TRIAGE_", env_file=".env", extra="ignore")
 
+    # How model calls are made. ``auto`` prefers the proxy and falls back to the
+    # direct Anthropic client when an API key is set and no proxy is configured —
+    # which is the local-development case, and the only reason this second path
+    # exists (ADR-0007, amended).
+    llm_provider: LLMProvider = LLMProvider.AUTO
+
     litellm_url: str = "http://localhost:4000/v1"
     litellm_api_key: str = "sk-local-dev"
+
+    # Direct Anthropic access. The three model ids are configuration and not code,
+    # so that "graph code asks for a tier, never a model" still holds: an unset one
+    # is an error naming the variable, never a default compiled in here.
+    anthropic_api_key: str = ""
+    model_triage: str = ""
+    model_analysis: str = ""
+    model_diagnosis: str = ""
     database_url: str = "postgresql+psycopg://triage:triage@localhost:5432/triage"
 
     # When true, every write-capable integration is swapped for a recording fake.

@@ -8,7 +8,9 @@ settings, and tests construct one directly.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
+from typing import cast
 
 import structlog
 from langchain_core.runnables import RunnableConfig
@@ -19,7 +21,7 @@ from triage.analysis.runner import (
     KubernetesJobRunner,
     dry_run_result,
 )
-from triage.config import Config, Settings, get_config, get_settings
+from triage.config import Config, LLMProvider, Settings, get_config, get_settings
 from triage.db.repo import InMemoryRepository, SqlRepository, TriageRepository
 from triage.integrations.base import (
     FakeJiraClient,
@@ -30,7 +32,7 @@ from triage.integrations.base import (
 from triage.integrations.datadog import DatadogClient, FakeDatadogClient
 from triage.integrations.github import GitHubClient, dry_run_github
 from triage.integrations.platform import PlatformClient
-from triage.llm import LiteLLMClient, StructuredLLM
+from triage.llm import AnthropicClient, LiteLLMClient, StructuredLLM, Tier
 
 log = structlog.get_logger(__name__)
 
@@ -48,6 +50,54 @@ class Deps:
     datadog: DatadogClient
     platform: PlatformClient | None
     config: Config
+
+
+MODEL_SETTING = {
+    "triage": "model_triage",
+    "analysis": "model_analysis",
+    "diagnosis": "model_diagnosis",
+}
+
+
+def build_llm(settings: Settings) -> StructuredLLM:
+    """The proxy, or the API directly — the same one method either way (ADR-0007).
+
+    ``auto`` is what makes the local shortcut usable without being a footgun: it
+    takes the direct client only when there is an Anthropic key and the LiteLLM
+    URL is still the default, so a deployment that configures a proxy keeps its
+    guardrails even if a key happens to be in the environment.
+    """
+    provider = settings.llm_provider
+    key = settings.anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY", "")
+    if provider is LLMProvider.AUTO:
+        # Compared against the field default rather than a fresh Settings(), which
+        # would re-read the environment and call a configured proxy "untouched".
+        untouched_proxy = settings.litellm_url == type(settings).model_fields["litellm_url"].default
+        provider = LLMProvider.ANTHROPIC if key and untouched_proxy else LLMProvider.LITELLM
+    if provider is LLMProvider.LITELLM:
+        return LiteLLMClient(settings.litellm_url, settings.litellm_api_key)
+
+    models: dict[Tier, str] = {}
+    missing: list[str] = []
+    for tier, attribute in MODEL_SETTING.items():
+        value = getattr(settings, attribute)
+        if value:
+            models[cast(Tier, tier)] = value
+        else:
+            missing.append(f"TRIAGE_{attribute.upper()}")
+    if missing:
+        raise ValueError(
+            f"calling Anthropic directly needs a model per tier; unset: {', '.join(missing)}. "
+            f"See .env.example for the current ids."
+        )
+    if not key:
+        log.warning(
+            "anthropic_key_unset",
+            detail="no TRIAGE_ANTHROPIC_API_KEY and no ANTHROPIC_API_KEY; the SDK will "
+            "resolve its own credentials (environment, or an `ant auth login` profile)",
+        )
+    log.info("llm_direct", detail="calling Anthropic directly: the proxy's spend caps do not apply")
+    return AnthropicClient(settings.anthropic_api_key, models)
 
 
 def _build_runner(settings: Settings, config: Config, repo: TriageRepository) -> AnalysisRunner:
@@ -71,7 +121,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
             detail="Jira and Slack writes are recorded, not sent; state is in-memory",
         )
         return Deps(
-            llm=LiteLLMClient(settings.litellm_url, settings.litellm_api_key),
+            llm=build_llm(settings),
             jira=FakeJiraClient(),
             slack=FakeSlackClient(),
             repo=InMemoryRepository(),
@@ -93,7 +143,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
     engine = create_async_engine(settings.database_url, pool_pre_ping=True)
     repo = SqlRepository(async_sessionmaker(engine, expire_on_commit=False))
     return Deps(
-        llm=LiteLLMClient(settings.litellm_url, settings.litellm_api_key),
+        llm=build_llm(settings),
         jira=JiraRestClient(
             settings.jira_base_url, settings.jira_user_email, settings.jira_api_token
         ),

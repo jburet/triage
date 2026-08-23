@@ -61,10 +61,15 @@ routing functions in the graph module. `langgraph.json` registers five:
 the fallback when nothing injects deps (Studio). Never reach for module-level clients.
 
 **LLM access by tier only** — `llm.py` exposes `StructuredLLM.call(tier, prompt, schema)`
-with `tier ∈ {"triage", "analysis", "diagnosis"}` (Haiku/Sonnet/Opus, mapped in the LiteLLM
-proxy, ADR-0007). **No model name may appear under `src/`.** Every call returns a validated
-Pydantic model via `function_calling` (tool use), never `response_format`. Prose-only output
-still goes through a schema with a prose field.
+with `tier ∈ {"triage", "analysis", "diagnosis"}` (ADR-0007). **No model name may appear
+under `src/`.** Two interchangeable implementations, chosen by `TRIAGE_LLM_PROVIDER`
+(`auto` by default): `LiteLLMClient` through the proxy, which resolves the aliases and
+enforces the spend caps — this is production — and `AnthropicClient` straight to the API
+with `TRIAGE_ANTHROPIC_API_KEY`, for local runs where standing up a proxy is why the alert
+never gets tried. The direct client reads its three model ids from `TRIAGE_MODEL_*`, so the
+rule holds; it has no spend caps, which is its whole cost. Both return a validated Pydantic
+model from one forced tool call, never `response_format`. Prose-only output still goes
+through a schema with a prose field.
 
 **Prompts as files** — `src/triage/prompts/*.md`, loaded with `prompts.render(name, **sections)`:
 instructions first, then each input as a `<tag>…</tag>` JSON block (never string

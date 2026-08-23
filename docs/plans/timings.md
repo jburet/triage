@@ -55,3 +55,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 scoping fixes | make test (376 passed) | 2 |
 | 2026-08-23 | M3 one-shot | run_incident on the pod-down alert (9 Datadog calls) | 1 |
 | 2026-08-23 | M3 scope fixes | make test (379 passed) | 2 |
+| 2026-08-23 | direct Anthropic client | make lint + make test (389 passed) | 6 |

@@ -5,6 +5,7 @@ description = "Turns a production signal into a ticket a developer can act on wi
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=1.0",
     "langgraph>=0.2.60",
     "langgraph-checkpoint-postgres>=2.0.0",
     "langchain-core>=0.3.29",
