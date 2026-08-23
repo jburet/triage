@@ -87,6 +87,18 @@ Fixture diagnoses live in `tests/fixtures/diagnoses/*.json` (`oom_payments` = ti
 against them, `tests/unit/` covers schemas, rules, ADF and LLM plumbing. Tests must stay
 offline; anything that spends money belongs in `evals/`.
 
+## Working conventions
+
+- **Comments: as few as possible.** Module docstrings stating *why* a module exists are the
+  one exception; no inline narration, no restating what the code does.
+- **Until the first official release, push straight to `main`.** No feature branches or PRs;
+  commit after each plan behaviour and push.
+- **Measure and minimise time.** For every plan phase and every tool run (`make lint`,
+  `make test`, `make run-fixture`, `make evals`, …) record wall-clock duration in
+  `docs/plans/timings.md` (one line: date, plan/phase, command, seconds). Treat a rising number
+  as a defect: prefer targeted `pytest <file>` over the full suite while iterating, run the full
+  `make lint && make test` once per behaviour, and never run `make evals` from a test loop.
+
 ## Style
 
 Ruff (line length 100, rules E/F/I/UP/B/SIM/RUF/ANN/PT; annotations required in `src/`),
