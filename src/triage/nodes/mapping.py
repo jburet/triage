@@ -60,6 +60,32 @@ async def _events(deps: Deps, service: str, days: int) -> list[dict[str, object]
     return [event for event in data if isinstance(event, dict)]
 
 
+async def _against_what_is_on_record(deps: Deps, derivation: Derivation) -> Derivation:
+    """Nothing moved, so nothing is rewritten — ADR-0015's reasoning, one level down.
+
+    The digest is what makes a derivation *an observation*: while it is the same,
+    the workload is running the same build and the row on record already says so.
+    A pattern mapping has no digest and therefore no such claim, so it is left to
+    be written; and a row that differs in anything else is rewritten, because
+    config.yaml can move under a digest that did not.
+    """
+    entry = derivation.entry
+    if entry is None or not derivation.mapped or entry.image_digest is None:
+        return derivation
+    previous = await deps.repo.workload_for_service(derivation.service)
+    if previous != entry:
+        return derivation
+    return derivation.model_copy(
+        update={
+            "outcome": MappingOutcome.UNCHANGED,
+            "reason": (
+                f"{derivation.service} is still running {entry.image_digest}, which is what "
+                f"the mapping on record already says, so nothing was rewritten"
+            ),
+        }
+    )
+
+
 async def derive_workloads(
     state: MappingState, config: RunnableConfig | None = None
 ) -> MappingState:
@@ -81,7 +107,8 @@ async def derive_workloads(
                 )
             )
             continue
-        derivations.append(derive_workload(deps.config, seed, service, events))
+        derived = derive_workload(deps.config, seed, service, events)
+        derivations.append(await _against_what_is_on_record(deps, derived))
     return {"derivations": derivations}
 
 

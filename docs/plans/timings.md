@@ -74,3 +74,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M6 phase 2.2 | make lint + make test (451 passed) | 4 |
 | 2026-08-23 | M6 phase 2.3 | make lint + make test (462 passed) | 5 |
 | 2026-08-23 | M6 phase 2.4 | make lint + make test (467 passed) | 5 |
+| 2026-08-23 | M6 phase 2.5 | make lint + make test (469 passed) | 5 |

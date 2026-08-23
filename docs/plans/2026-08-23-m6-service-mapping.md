@@ -104,7 +104,7 @@ ECR under the repository's own name. So:
 - [x] 2.4 A service with no image event inside the collection window falls back to the seed's
       tenancy plus `config.yaml` patterns, recording `source = pattern`; with neither, the
       mapping is absent and the caller says "not mapped", as it does today.
-- [ ] 2.5 Re-running the derivation for a service whose image digest is unchanged rewrites
+- [x] 2.5 Re-running the derivation for a service whose image digest is unchanged rewrites
       nothing and says so, on the same reasoning as ADR-0015.
 
 ## Phase 3: where the workload is defined

@@ -116,3 +116,35 @@ async def test_an_image_no_repository_is_named_after_writes_nothing_and_says_so(
     assert "ghcr.io/other/thing:2.0" in derivation.reason
     assert deps.repo.workloads == {}
     assert state["entries_written"] == 0
+
+
+async def test_a_second_pass_over_an_unchanged_digest_rewrites_nothing(zeenea):
+    deps = deps_for(zeenea)
+    await run(deps)
+
+    state = await run(deps)
+
+    (derivation,) = state["derivations"]
+    assert derivation.outcome is MappingOutcome.UNCHANGED
+    assert DIGEST in derivation.reason
+    assert state["entries_written"] == 0
+    assert deps.repo.workloads[TENANT].image_digest == DIGEST
+
+
+async def test_a_digest_that_moved_is_written_over_the_old_one(zeenea):
+    moved = "sha256:" + "a" * 64
+    deps = deps_for(zeenea)
+    await run(deps)
+
+    deps = build_deps(
+        zeenea,
+        repo=deps.repo,
+        datadog=datadog_running(
+            f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:502@{moved}"
+        ),
+    )
+    state = await run(deps)
+
+    assert state["derivations"][0].outcome is MappingOutcome.MAPPED
+    assert state["entries_written"] == 1
+    assert deps.repo.workloads[TENANT].image_digest == moved
