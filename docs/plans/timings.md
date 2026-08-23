@@ -20,3 +20,9 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M2 phase 2.1-2.2 | make test (247 passed) | 2 |
 | 2026-08-23 | M2 phase 2.3 | make lint | 1 |
 | 2026-08-23 | M2 phase 2.3 | make test (247 passed) | 1 |
+| 2026-08-23 | datadog collection experiment | explore_datadog: 8 collection calls | 4 |
+| 2026-08-23 | datadog collection experiment | full exploration session (org scan + 1 incident) | ~600 |
+| 2026-08-23 | M2 phase 3.1-3.4 | pytest tests/unit/test_system_map_repo.py | 3 |
+| 2026-08-23 | M2 phase 3.1-3.4 | pytest tests/integration/test_cartography.py | 1 |
+| 2026-08-23 | M2 phase 3 | make lint | 1 |
+| 2026-08-23 | M2 phase 3 | make test (276 passed) | 2 |

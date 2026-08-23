@@ -162,12 +162,19 @@ Target databases are declared in `config.yaml`, each naming a Kubernetes Secret;
 repo_list (YAML) or merge_webhook
   → summarize_repo       (analysis Job: clone main → structured summary per repo)
   → summarize_terraform  (analysis Job: clone → resources, modules ↔ services)
-  → build_system_map     (Sonnet: merge summaries + YAML ownership)
+  → build_system_map     (rule: merge summaries + YAML ownership)
   → persist_map          (PostgreSQL)
 ```
 
 Incremental on every merge, with a weekly full re-summarise by cron
 ([ADR-0006](adr/0006-f0-refresh-strategy.md)).
+
+`build_system_map` is a rule, not a model call as first sketched: a summary names the
+service it deploys as, a module names the services it provisions for, and `config.yaml`
+names the owner, so the merge is a join over structured data. The one fuzzy part — a
+resource's free-text `serves` — is matched by service name and left empty when it does
+not match. A service whose team is undeclared is persisted with no owner and reported to
+the platform channel, alongside any repository that failed to summarise.
 
 
 ---

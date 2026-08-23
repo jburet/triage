@@ -37,10 +37,11 @@ Phase 1 and Phase 3 of this one.
 
 ## Phase 3: system map
 
-- [ ] 3.1 Running `cartography` over the `config.yaml` repo list persists one `system_map` row per service and per Terraform module, keyed by `(kind, name)`, carrying the owning team from `config.yaml` and the summarised commit.
-- [ ] 3.2 Re-running over the same commits is idempotent: rows are updated in place, never duplicated.
-- [ ] 3.3 `system_map_for_service("payments-api")` returns the repo, team, entry points and Terraform resources a later feature needs to build a `Location`.
-- [ ] 3.4 A service whose team is not declared in `config.yaml` is persisted with `team = None` and produces a Slack notice to the platform channel, rather than failing the run.
+- [x] 3.1 Running `cartography` over the `config.yaml` repo list persists one `system_map` row per service and per Terraform module, keyed by `(kind, name)`, carrying the owning team from `config.yaml` and the summarised commit.
+- [x] 3.2 Re-running over the same commits is idempotent: rows are updated in place, never duplicated.
+- [x] 3.3 `system_map_for_service("payments-api")` returns the repo, team, entry points and Terraform resources a later feature needs to build a `Location`.
+- [x] 3.4 A service whose team is not declared in `config.yaml` is persisted with `team = None` and produces a Slack notice to the platform channel, rather than failing the run.
+      A repo that fails to summarise is reported in the same notice, for the same reason.
 
 ## Phase 4: incremental refresh (ADR-0006)
 
