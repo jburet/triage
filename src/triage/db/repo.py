@@ -24,12 +24,13 @@ from triage.db.models import (
     SignalRow,
     SystemMapRow,
     TicketRow,
+    WorkloadRow,
 )
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.common import Feature
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.signal import Signal, SignalStatus
-from triage.schemas.system_map import ServiceEntry, SystemMapKind
+from triage.schemas.system_map import ServiceEntry, SystemMapKind, WorkloadEntry
 from triage.schemas.ticket import PipelineOutcome
 
 OPEN_TICKET_STATES = ("Proposed by agent", "Validated", "In progress")
@@ -159,6 +160,12 @@ class TriageRepository(Protocol):
     async def last_summarised_commit(self, repo_url: str) -> str | None: ...
 
     async def advance_source_commit(self, repo_url: str, commit: str) -> int: ...
+
+    async def upsert_workload(self, entry: WorkloadEntry) -> None: ...
+
+    async def workload_for_service(self, service: str) -> WorkloadEntry | None: ...
+
+    async def services_seen_since(self, since: datetime) -> list[str]: ...
 
 
 def _to_record(row: TicketRow) -> TicketRecord:
@@ -438,6 +445,40 @@ class SqlRepository:
             await session.flush()
         return len(rows)
 
+    async def upsert_workload(self, entry: WorkloadEntry) -> None:
+        async with self._sessionmaker() as session, session.begin():
+            row = await session.scalar(
+                select(WorkloadRow).where(WorkloadRow.service == entry.service)
+            )
+            if row is None:
+                row = WorkloadRow(service=entry.service, **_workload_columns(entry))
+                session.add(row)
+            else:
+                for column, value in _workload_columns(entry).items():
+                    setattr(row, column, value)
+            await session.flush()
+
+    async def workload_for_service(self, service: str) -> WorkloadEntry | None:
+        async with self._sessionmaker() as session:
+            row = await session.scalar(select(WorkloadRow).where(WorkloadRow.service == service))
+        return WorkloadEntry.model_validate(row.payload) if row else None
+
+    async def services_seen_since(self, since: datetime) -> list[str]:
+        stmt = select(SignalRow.service).where(SignalRow.created_at >= since).distinct()
+        async with self._sessionmaker() as session:
+            return sorted((await session.scalars(stmt)).all())
+
+
+def _workload_columns(entry: WorkloadEntry) -> dict[str, Any]:
+    return {
+        "repository": entry.repository,
+        "repo_url": entry.repo_url,
+        "image": entry.image,
+        "image_digest": entry.image_digest,
+        "source": entry.source.value,
+        "payload": entry.model_dump(mode="json"),
+    }
+
 
 def _to_analysis_record(row: AnalysisResultRow) -> AnalysisResultRecord:
     return AnalysisResultRecord(
@@ -471,6 +512,7 @@ class InMemoryRepository:
     evaluations: list[EvaluationRecord] = field(default_factory=list)
     analysis_results: dict[str, AnalysisResultRecord] = field(default_factory=dict)
     system_map: dict[tuple[SystemMapKind, str], SystemMapEntry] = field(default_factory=dict)
+    workloads: dict[str, WorkloadEntry] = field(default_factory=dict)
 
     async def save_signal(self, signal: Signal) -> Signal:
         self.signals[signal.signal_id] = signal
@@ -611,6 +653,17 @@ class InMemoryRepository:
             if entry.payload.get("repo_url") == repo_url and entry.source_commit:
                 return entry.source_commit
         return None
+
+    async def upsert_workload(self, entry: WorkloadEntry) -> None:
+        self.workloads[entry.service] = entry
+
+    async def workload_for_service(self, service: str) -> WorkloadEntry | None:
+        return self.workloads.get(service)
+
+    async def services_seen_since(self, since: datetime) -> list[str]:
+        return sorted(
+            {signal.service for signal in self.signals.values() if signal.received_at >= since}
+        )
 
     async def advance_source_commit(self, repo_url: str, commit: str) -> int:
         moved = 0

@@ -252,6 +252,34 @@ class WorkloadEntry(BaseModel):
     source: MappingSource
 
 
+class MappingOutcome(StrEnum):
+    """What one service's derivation produced. The report is a count per value."""
+
+    MAPPED = "mapped"
+    UNCHANGED = "unchanged"
+    CONFLICT = "conflict"
+    UNRESOLVED_IMAGE = "unresolved_image"
+    NOT_MAPPED = "not_mapped"
+
+
+class Derivation(BaseModel):
+    """One service, after the derivation ran: what it produced and why.
+
+    A service that produced no entry still produces a line — the reason it did
+    not — because an unmapped production workload is Triage's own gap and a
+    silent one is invisible.
+    """
+
+    service: str
+    outcome: MappingOutcome
+    reason: Filled
+    entry: WorkloadEntry | None = None
+
+    @property
+    def mapped(self) -> bool:
+        return self.outcome is MappingOutcome.MAPPED
+
+
 class SystemMapKind(StrEnum):
     """The two kinds of row the map holds; with the name, it is the key of a row."""
 

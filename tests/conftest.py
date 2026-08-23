@@ -414,6 +414,16 @@ def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
     return FakeDatadogClient(responses=responses)
 
 
+def fake_datadog_over_days(slug: str = CAPTURE) -> FakeDatadogClient:
+    """The same capture, answered for a query spanning days rather than an incident.
+
+    A mapping pass asks about a week, which the fake would otherwise treat as the
+    widened emptiness check and answer empty (ADR-0016).
+    """
+    replay = fake_datadog(slug)
+    return FakeDatadogClient(responses=replay.responses, wide=replay.responses)
+
+
 def a_classification(alert_class: AlertClass = AlertClass.CRASH_RESTART) -> AlertClassification:
     return AlertClassification(
         alert_class=alert_class,

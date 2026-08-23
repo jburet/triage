@@ -92,7 +92,7 @@ ECR under the repository's own name. So:
 
 ## Phase 2: derivation from the cluster
 
-- [ ] 2.1 A container-start or StatefulSet change event carrying an image resolves the
+- [x] 2.1 A container-start or StatefulSet change event carrying an image resolves the
       application repository by image name, and the resulting `WorkloadEntry` records
       `source = image` and the digest it saw.
 - [ ] 2.2 An image name that matches no repository in the seed is a stated failure naming the

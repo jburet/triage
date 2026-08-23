@@ -16,7 +16,13 @@ from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
-from triage.schemas.system_map import RepoSummary, SystemMap, TerraformSummary
+from triage.schemas.system_map import (
+    Derivation,
+    RepoSummary,
+    SeedEntry,
+    SystemMap,
+    TerraformSummary,
+)
 from triage.schemas.ticket import DedupDecision, PipelineOutcome, ReviewVerdict, TicketDraft
 
 
@@ -119,6 +125,25 @@ class CartographyState(TypedDict, total=False):
     system_map: SystemMap
     failures: list[SummaryFailure]
     unowned: list[str]
+    entries_written: int
+
+
+class MappingState(TypedDict, total=False):
+    """One pass of the service mapping (M6).
+
+    Input is ``services``; an empty list is a full pass over every service that
+    has alerted inside ``lookback_days``. Everything else is what the pass found,
+    reported back rather than only logged, because an unmapped production
+    workload is Triage's own gap.
+    """
+
+    services: list[str]
+    lookback_days: int
+
+    seed: list[SeedEntry]
+    targets: list[str]
+    unclaimed: list[str]
+    derivations: list[Derivation]
     entries_written: int
 
 
