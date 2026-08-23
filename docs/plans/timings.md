@@ -50,3 +50,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 phase 4 | pytest tests/integration/test_poller.py | 1 |
 | 2026-08-23 | M3 phase 4 | make lint | 2 |
 | 2026-08-23 | M3 phase 4 | make test (374 passed) | 2 |
+| 2026-08-23 | M3 one-shot harness | scripts/run_incident against captured fixtures (offline smoke) | 2 |

@@ -381,7 +381,7 @@ def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
             ),
             "kubernetes.memory.usage_pct": captured("metric_kubernetes_memory_usage_pct", slug),
             "statefulset.replicas_ready": captured(
-                "metric_kubernetes_state_statefulset_replicas_desired", slug
+                "metric_kubernetes_state_statefulset_replicas_ready", slug
             ),
             "statefulset.replicas_desired": captured(
                 "metric_kubernetes_state_statefulset_replicas_desired", slug
