@@ -40,3 +40,7 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | M3 phase 1 | pytest tests/integration/test_analysis.py | 4 |
 | 2026-08-23 | M3 phase 1 | make lint | 12 |
 | 2026-08-23 | M3 phase 1 | make test (315 passed) | 10 |
+| 2026-08-23 | M3 phase 2 | pytest tests/unit/test_collection.py | 1 |
+| 2026-08-23 | M3 phase 2 | pytest tests/integration/test_collect.py | 1 |
+| 2026-08-23 | M3 phase 2 | make lint | 2 |
+| 2026-08-23 | M3 phase 2 | make test (341 passed) | 2 |

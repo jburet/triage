@@ -27,6 +27,7 @@ from triage.integrations.base import (
     JiraClient,
     SlackClient,
 )
+from triage.integrations.datadog import DatadogClient, FakeDatadogClient
 from triage.integrations.github import GitHubClient, dry_run_github
 from triage.llm import LiteLLMClient, StructuredLLM
 
@@ -43,6 +44,7 @@ class Deps:
     repo: TriageRepository
     runner: AnalysisRunner
     github: GitHubClient
+    datadog: DatadogClient
     config: Config
 
 
@@ -73,11 +75,13 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
             repo=InMemoryRepository(),
             runner=FakeAnalysisRunner(default=dry_run_result),
             github=dry_run_github(),
+            datadog=FakeDatadogClient(),
             config=config,
         )
 
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+    from triage.integrations.datadog import DatadogRestClient
     from triage.integrations.github import GitHubRestClient
     from triage.integrations.jira import JiraRestClient
     from triage.integrations.slack import SlackWebClient
@@ -93,6 +97,9 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
         repo=repo,
         runner=_build_runner(settings, config, repo),
         github=GitHubRestClient(settings.github_token),
+        datadog=DatadogRestClient(
+            settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
+        ),
         config=config,
     )
 

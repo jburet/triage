@@ -1,13 +1,32 @@
 # Static configuration, versioned. Discovered data (the system map) lives in
 # PostgreSQL and is never hand-edited here.
 
+# An alert is matched to a team by pattern, never by enumeration: the firing
+# groups are per-customer tenants and a list here would be obsolete the day a
+# customer is provisioned (ADR-0017).
 teams:
   - name: payments
     slack_channel: "#payments-alerts"
     jira_project: PAY
+    service_patterns: ["payments-*"]
+    namespace_patterns: ["payments*"]
+    environments: [prod]
   - name: platform
     slack_channel: "#platform-alerts"
     jira_project: PLAT
+    service_patterns: ["plt-*"]
+    namespace_patterns: ["*"]
+    environments: [prod]
+
+# Datadog kube_cluster_name -> environment. No alert carries a usable env: tag —
+# for Kubernetes monitors the environment is inside the cluster name, and for the
+# others it is inside the monitor's own name — so this map is not a convenience,
+# it is the only thing that works (ADR-0017). An unmapped cluster is out of
+# scope with that reason, never assumed to be production.
+clusters:
+  prod-use1: prod
+  prod-euw3: prod
+  preprod-euw3: preprod
 
 repos:
   - url: github.com/org/payments-api
@@ -40,6 +59,16 @@ thresholds:
   # draft attached, no Jira ticket.
   max_compose_attempts: 3
 
+  # An alert is analysed only once it has been firing this long (ADR-0018).
+  # Across 961 measured pod-down cycles the longest was nine minutes; the gate
+  # discards precisely what a human would not have ticketed either. Flapping is
+  # counted rather than discarded, because the reference incident — a liveness
+  # probe shorter than the pod's own startup — has exactly that signature.
+  alert_persistence_minutes: 15
+  p1_alert_persistence_minutes: 5
+  flap_count: 5
+  flap_window_hours: 24
+
 analysis:
   # Secondary-cause fan-out in the Analysis sub-graph (ADR-0005).
   min_rank_score: 0.3
@@ -53,3 +82,19 @@ analysis:
     image: ""
     runtime_class: gvisor
     secret_ref: triage-analysis
+
+# Caps on one F1 collection (ADR-0016). Reduction happens before the model, not
+# in the prompt: the reference incident's sixty log entries were 176 KB on the
+# wire, of which 45 lines were the same message.
+collection:
+  window_multiplier: 4          # of the monitor's own evaluation window
+  window_min_minutes: 15
+  window_max_hours: 6
+  widen_days: 7                 # how far back an empty collector is re-checked
+  max_followup_calls: 6
+  max_log_templates: 15
+  max_log_lines: 25
+  max_events: 40
+  max_timeseries_series: 6
+  max_timeseries_points: 60
+  max_prompt_bytes: 60000

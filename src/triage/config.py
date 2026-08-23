@@ -32,9 +32,23 @@ class RepoKind(StrEnum):
 
 
 class Team(BaseModel):
+    """One owning team, and how an alert is matched to it (ADR-0017).
+
+    Scope is matched by pattern and never by enumeration: one StatefulSet monitor
+    fired for 66 distinct groups in 40 days and the groups are per-customer
+    tenants, so a list of services here would be obsolete the day a customer is
+    provisioned.
+    """
+
     name: str
     slack_channel: str
     jira_project: str
+    service_patterns: list[str] = Field(default_factory=list)
+    namespace_patterns: list[str] = Field(default_factory=list)
+    environments: list[str] = Field(default_factory=list)
+    alert_persistence_minutes: int | None = Field(
+        default=None, ge=0, description="Overrides the global gate for this team (ADR-0018)."
+    )
 
 
 class Repo(BaseModel):
@@ -50,12 +64,41 @@ class Database(BaseModel):
 
 
 class Thresholds(BaseModel):
-    """Tunables the SRE team owns. See ADR-0002, ADR-0003."""
+    """Tunables the SRE team owns. See ADR-0002, ADR-0003, ADR-0018."""
 
     ticket_confidence: dict[Feature, Confidence]
     dedup_recurrence_alert: int = Field(default=3, ge=1)
     dedup_recurrence_interval: int = Field(default=5, ge=1)
     max_compose_attempts: int = Field(default=3, ge=1)
+
+    # An alert is analysed only once it has persisted this long (ADR-0018): across
+    # 961 measured pod-down cycles the longest was nine minutes, so a 15-minute
+    # gate discards exactly what a human would not have ticketed either.
+    alert_persistence_minutes: int = Field(default=15, ge=0)
+    p1_alert_persistence_minutes: int = Field(default=5, ge=0)
+    flap_count: int = Field(default=5, ge=2)
+    flap_window_hours: int = Field(default=24, ge=1)
+
+
+class CollectionConfig(BaseModel):
+    """Caps on what one collection may spend (ADR-0016).
+
+    Reduction is the design, not an optimisation: sixty log entries came back as
+    176 KB from the reference incident — roughly 45k tokens for one collector,
+    against a 500k per-run budget that also has to cover analysis and composition.
+    """
+
+    window_multiplier: int = Field(default=4, ge=1)
+    window_min_minutes: int = Field(default=15, ge=1)
+    window_max_hours: int = Field(default=6, ge=1)
+    widen_days: int = Field(default=7, ge=1)
+    max_followup_calls: int = Field(default=6, ge=0)
+    max_log_templates: int = Field(default=15, ge=1)
+    max_log_lines: int = Field(default=25, ge=1)
+    max_events: int = Field(default=40, ge=1)
+    max_timeseries_series: int = Field(default=6, ge=1)
+    max_timeseries_points: int = Field(default=60, ge=2)
+    max_prompt_bytes: int = Field(default=60_000, ge=1_000)
 
 
 class AnalysisJobConfig(BaseModel):
@@ -84,8 +127,29 @@ class Config(BaseModel):
     teams: list[Team] = Field(default_factory=list)
     repos: list[Repo] = Field(default_factory=list)
     databases: list[Database] = Field(default_factory=list)
+    clusters: dict[str, str] = Field(
+        default_factory=dict,
+        description="Datadog kube_cluster_name → environment. No alert carries a usable "
+        "env: tag, so this map is the only thing that separates production (ADR-0017).",
+    )
     thresholds: Thresholds
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
+    collection: CollectionConfig = Field(default_factory=CollectionConfig)
+
+    def environment_of(self, cluster: str | None) -> str | None:
+        """The environment a cluster runs, or None — never a guess (ADR-0017)."""
+        return self.clusters.get(cluster) if cluster else None
+
+    def persistence_minutes(self, team: str | None, priority: int | None) -> int:
+        """How long an alert must have persisted before it is analysed (ADR-0018)."""
+        thresholds = self.thresholds
+        if priority == 1:
+            return thresholds.p1_alert_persistence_minutes
+        if team is not None and self.declares_team(team):
+            override = self.team(team).alert_persistence_minutes
+            if override is not None:
+                return override
+        return thresholds.alert_persistence_minutes
 
     def team(self, name: str) -> Team:
         for team in self.teams:

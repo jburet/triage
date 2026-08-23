@@ -8,10 +8,13 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.schemas.alert import Alert
 from triage.schemas.analysis import AnalysisFindings, AnalysisResult
-from triage.schemas.common import Feature, Filled
+from triage.schemas.collection import AlertClassification, Collection, Qualification
+from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.hypothesis import Hypothesis
+from triage.schemas.signal import Signal
 from triage.schemas.system_map import RepoSummary, SystemMap, TerraformSummary
 from triage.schemas.ticket import DedupDecision, PipelineOutcome, ReviewVerdict, TicketDraft
 
@@ -172,3 +175,32 @@ class AnalysisState(TypedDict, total=False):
     investigated: list[Investigated]
     diagnosis: Diagnosis
     synthesis_attempts: int
+
+
+class IncidentState(TypedDict, total=False):
+    """F1, from a persisted alert to a ticket and a post-mortem (architecture §2.3).
+
+    The input is a ``Signal`` the poller already stored, never a raw webhook body:
+    by the time this graph runs, the alert has been in ``error`` for the
+    persistence gate (ADR-0018) and somebody owns it.
+    """
+
+    signal: Signal
+    alert: Alert
+    team: str
+    service: str
+
+    classification: AlertClassification
+    window: TimeWindow
+    collection: Collection
+    followup_done: bool
+
+    qualification: Qualification
+    hypotheses: list[Hypothesis]
+    diagnosis: Diagnosis
+
+    thread_ts: str | None
+    outcome: PipelineOutcome
+    ticket_key: str | None
+    ticket_url: str | None
+    postmortem: str

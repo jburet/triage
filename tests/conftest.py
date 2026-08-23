@@ -9,6 +9,7 @@ from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
 from triage.config import Config, load_config
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
+from triage.integrations.datadog import FakeDatadogClient
 from triage.integrations.github import FakeGitHubClient
 from triage.llm import FakeLLM
 from triage.runtime import DEPS_KEY, Deps
@@ -31,8 +32,17 @@ from triage.schemas import (
     TerraformSummary,
     TicketDraft,
 )
+from triage.schemas.alert import Alert
+from triage.schemas.collection import (
+    AlertClass,
+    AlertClassification,
+    FollowUpPlan,
+    Qualification,
+)
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
+DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
+CAPTURE = "hcl_software_uat_20260822"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -313,6 +323,103 @@ def a_synthesis(**overrides: object) -> DiagnosisDraft:
     return DiagnosisDraft.model_validate(base)
 
 
+def captured(name: str, slug: str = CAPTURE) -> dict:
+    """One response from the Datadog capture, verbatim as the API returned it."""
+    return json.loads((DATADOG_DIR / slug / f"{name}.json").read_text())
+
+
+def captured_alert(slug: str = CAPTURE) -> Alert:
+    """The StatefulSet-replicas alert, parsed from the event the poller would have read."""
+    events = captured("events_kube_namespace", slug)["data"]
+    firing = next(
+        event
+        for event in events
+        if Alert.is_monitor_alert(event)
+        and event["attributes"]["attributes"].get("monitor-alert-event", {}).get("alert_type")
+        == "error"
+    )
+    return Alert.from_event(firing)
+
+
+def pod_down_alert(slug: str = CAPTURE) -> Alert:
+    """The same incident seen through the event monitor whose query *is* re-runnable.
+
+    Its query counts container deletion events, so re-running it returns the three
+    kills and their exit codes — which is the case behaviour 2.3 is about.
+    """
+    monitor = captured("monitor", slug)
+    return captured_alert(slug).model_copy(
+        update={
+            "monitor_id": monitor["id"],
+            "monitor_name": monitor["name"],
+            "monitor_query": monitor["query"],
+            "monitor_options": monitor["options"],
+        }
+    )
+
+
+def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
+    """A client that replays the capture, keyed by what the query is about.
+
+    Spans are deliberately absent from both the window and the widened check: the
+    captured tenant has no APM at all, which is the case that separates "not
+    instrumented" from "nothing happened" (ADR-0016).
+    """
+    responses: dict[str, dict[str, object]] = {
+        "events": {
+            "container_name:platform": captured("monitor_query_events", slug),
+            "service:plt-hcl-software-uat": captured("events_service", slug),
+            "kube_namespace:hcl-software-uat": captured("events_kube_namespace", slug),
+        },
+        "logs": {"plt-hcl-software-uat": captured("logs_at_alert", slug)},
+        "logs_aggregate": {"plt-hcl-software-uat": captured("logs_aggregate", slug)},
+        "metrics": {
+            "kubernetes.containers.restarts": captured(
+                "metric_kubernetes_containers_restarts", slug
+            ),
+            "kubernetes.memory.usage_pct": captured("metric_kubernetes_memory_usage_pct", slug),
+            "statefulset.replicas_ready": captured(
+                "metric_kubernetes_state_statefulset_replicas_desired", slug
+            ),
+            "statefulset.replicas_desired": captured(
+                "metric_kubernetes_state_statefulset_replicas_desired", slug
+            ),
+        },
+        "monitor": {str(captured("monitor", slug)["id"]): captured("monitor", slug)},
+    }
+    responses.update(overrides)  # type: ignore[arg-type]
+    return FakeDatadogClient(responses=responses)
+
+
+def a_classification(alert_class: AlertClass = AlertClass.CRASH_RESTART) -> AlertClassification:
+    return AlertClassification(
+        alert_class=alert_class,
+        reason="The monitor counts container deletion events over five minutes.",
+    )
+
+
+def a_qualification(*causes: dict[str, object], **overrides: object) -> Qualification:
+    base: dict[str, object] = {
+        "summary": "The pod was killed three times with exit code 137 after failing "
+        "its liveness probe during startup.",
+        "causes": list(causes)
+        or [
+            {
+                "cause_type": "infra",
+                "service": "plt-hcl-software-uat",
+                "description": "The liveness probe is shorter than the pod's own startup.",
+                "rank_score": 0.9,
+            }
+        ],
+    }
+    base.update(overrides)
+    return Qualification.model_validate(base)
+
+
+def a_follow_up(*requests: dict[str, object], done: bool = False) -> FollowUpPlan:
+    return FollowUpPlan.model_validate({"done": done, "requests": list(requests)})
+
+
 def build_deps(
     config: Config,
     *,
@@ -320,9 +427,13 @@ def build_deps(
     drafts: object = None,
     verdicts: object = None,
     syntheses: object = None,
+    classifications: object = None,
+    qualifications: object = None,
+    follow_ups: object = None,
     repo: InMemoryRepository | None = None,
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
+    datadog: FakeDatadogClient | None = None,
 ) -> Deps:
     """Assemble fakes. Anything not supplied gets a sensible passing default."""
     responses: dict[type, object] = {
@@ -330,6 +441,11 @@ def build_deps(
         TicketDraft: drafts if drafts is not None else [a_draft()],
         ReviewVerdict: verdicts if verdicts is not None else [a_verdict()],
         DiagnosisDraft: syntheses if syntheses is not None else [a_synthesis()],
+        AlertClassification: classifications
+        if classifications is not None
+        else [a_classification()],
+        Qualification: qualifications if qualifications is not None else [a_qualification()],
+        FollowUpPlan: follow_ups if follow_ups is not None else [a_follow_up(done=True)],
     }
     return Deps(
         llm=FakeLLM(responses=responses),  # type: ignore[arg-type]
@@ -338,6 +454,7 @@ def build_deps(
         repo=repo or InMemoryRepository(),
         runner=runner or canned_runner(),
         github=FakeGitHubClient(changed=changed or {}),
+        datadog=datadog or FakeDatadogClient(),
         config=config,
     )
 
