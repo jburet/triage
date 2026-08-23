@@ -59,6 +59,19 @@ MODEL_SETTING = {
 }
 
 
+def _configured_models(settings: Settings) -> tuple[dict[Tier, str], list[str]]:
+    """The tier-to-model mapping from `TRIAGE_MODEL_*`, and which are unset."""
+    models: dict[Tier, str] = {}
+    missing: list[str] = []
+    for tier, attribute in MODEL_SETTING.items():
+        value = getattr(settings, attribute)
+        if value:
+            models[cast(Tier, tier)] = value
+        else:
+            missing.append(f"TRIAGE_{attribute.upper()}")
+    return models, missing
+
+
 def build_llm(settings: Settings) -> StructuredLLM:
     """The proxy, or the API directly — the same one method either way (ADR-0007).
 
@@ -74,17 +87,28 @@ def build_llm(settings: Settings) -> StructuredLLM:
         # would re-read the environment and call a configured proxy "untouched".
         untouched_proxy = settings.litellm_url == type(settings).model_fields["litellm_url"].default
         provider = LLMProvider.ANTHROPIC if key and untouched_proxy else LLMProvider.LITELLM
-    if provider is LLMProvider.LITELLM:
-        return LiteLLMClient(settings.litellm_url, settings.litellm_api_key)
+    models, missing = _configured_models(settings)
 
-    models: dict[Tier, str] = {}
-    missing: list[str] = []
-    for tier, attribute in MODEL_SETTING.items():
-        value = getattr(settings, attribute)
-        if value:
-            models[cast(Tier, tier)] = value
-        else:
-            missing.append(f"TRIAGE_{attribute.upper()}")
+    if provider is LLMProvider.LITELLM:
+        # Unset, the tier is the model name — what a proxy configured for Triage
+        # publishes. Set, they are what a proxy nobody will re-configure for us
+        # calls those models. Half-set is neither, and would fail on one tier at
+        # whatever hour that node first runs.
+        if models and missing:
+            raise ValueError(
+                f"a proxy addressed by model name needs all three tiers; unset: "
+                f"{', '.join(missing)}. Leave all three empty to address the proxy "
+                f"by the aliases triage / analysis / diagnosis instead."
+            )
+        # Logged because "model not found" from a proxy is otherwise a guess about
+        # which of the two addressings is in force.
+        log.info(
+            "llm_proxy",
+            url=settings.litellm_url,
+            addressed_by="model name" if models else "tier alias",
+        )
+        return LiteLLMClient(settings.litellm_url, settings.litellm_api_key, models=models)
+
     if missing:
         raise ValueError(
             f"calling Anthropic directly needs a model per tier; unset: {', '.join(missing)}. "

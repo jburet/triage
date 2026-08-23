@@ -56,20 +56,39 @@ class StructuredLLM(Protocol):
 
 
 class LiteLLMClient:
-    """Real client. LiteLLM speaks the OpenAI protocol, so `model` is the alias."""
+    """Real client. LiteLLM speaks the OpenAI protocol, so `model` is the alias.
 
-    def __init__(self, base_url: str, api_key: str, *, timeout: float = 120.0) -> None:
+    The tier *is* the model name by default, which is what a proxy configured for
+    Triage publishes. A shared proxy nobody will re-configure for us publishes its
+    own names instead, so ``models`` maps tier to whatever that proxy calls it —
+    from ``TRIAGE_MODEL_*``, the same variables the direct client reads. Graph code
+    still asks for a tier and no model name appears under ``src/``: which model
+    serves a tier stays configuration (ADR-0007).
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        models: Mapping[Tier, str] | None = None,
+        timeout: float = 120.0,
+    ) -> None:
         self._base_url = base_url
         self._api_key = api_key
+        self._models = dict(models or {})
         self._timeout = timeout
         self._cache: dict[Tier, Any] = {}
+
+    def model_for(self, tier: Tier) -> str:
+        return self._models.get(tier, tier)
 
     def _chat(self, tier: Tier) -> Any:
         if tier not in self._cache:
             from langchain_openai import ChatOpenAI
 
             self._cache[tier] = ChatOpenAI(
-                model=tier,
+                model=self.model_for(tier),
                 base_url=self._base_url,
                 api_key=self._api_key,
                 timeout=self._timeout,

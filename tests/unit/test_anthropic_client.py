@@ -164,3 +164,33 @@ def test_no_key_is_left_to_the_sdk_rather_than_refused():
     )
 
     assert isinstance(build_llm(settings), AnthropicClient)
+
+
+def test_a_proxy_is_addressed_by_the_tier_unless_it_is_told_otherwise():
+    """A proxy configured for Triage publishes the aliases; a shared one does not."""
+    aliases = build_llm(a_settings(litellm_url="https://shared.example/v1"))
+    assert isinstance(aliases, LiteLLMClient)
+    assert aliases.model_for("analysis") == "analysis"
+
+    named = build_llm(
+        a_settings(
+            litellm_url="https://shared.example/v1",
+            model_triage="small",
+            model_analysis="mid",
+            model_diagnosis="big",
+        )
+    )
+    assert isinstance(named, LiteLLMClient)
+    assert named.model_for("analysis") == "mid"
+
+
+def test_naming_only_some_tiers_for_a_proxy_is_refused():
+    """Half-mapped fails on one tier at whatever hour that node first runs."""
+    settings = a_settings(
+        llm_provider=LLMProvider.LITELLM,
+        litellm_url="https://shared.example/v1",
+        model_triage="small",
+    )
+
+    with pytest.raises(ValueError, match="TRIAGE_MODEL_ANALYSIS, TRIAGE_MODEL_DIAGNOSIS"):
+        build_llm(settings)

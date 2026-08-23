@@ -71,7 +71,9 @@ with `TRIAGE_ANTHROPIC_API_KEY`, for local runs where standing up a proxy is why
 never gets tried. The direct client reads its three model ids from `TRIAGE_MODEL_*`, so the
 rule holds; it has no spend caps, which is its whole cost. `make proxy` runs the proxy
 locally (`docker/litellm.yaml`, same aliases, same `TRIAGE_MODEL_*`, own Postgres for the
-spend it counts) — so the two paths differ in guardrails, not in which model answers. Both
+spend it counts) — so the two paths differ in guardrails, not in which model answers. Through
+a proxy the tier is sent as the model name; a shared proxy that publishes its own names is
+reached by filling all three `TRIAGE_MODEL_*` (all or none — half is refused at startup). Both
 return a validated Pydantic
 model from one forced tool call, never `response_format`. Prose-only output still goes
 through a schema with a prose field.

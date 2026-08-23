@@ -86,6 +86,25 @@ spanning many requests and LiteLLM budgets per key, not per caller, so enforcing
 it would mean minting a virtual key per run. Local development does not need
 that; the deployed proxy does, and this file is not it.
 
+## Amended 2026-08-23 — a proxy that is not ours
+
+Sending the tier as the model name assumes the proxy was configured for Triage.
+An existing shared proxy publishes its own model names and will answer
+`model not found` to every tier, and "have the aliases added" is a request to
+someone else's backlog. So `LiteLLMClient` takes an optional tier-to-model map,
+read from the same `TRIAGE_MODEL_*` the direct client uses: unset, the tier is
+the model name as before; set, they are what that proxy calls those models.
+
+Filling only some is an error rather than a partial map, because the missing tier
+would fail at whatever hour its node first runs rather than at startup. Which
+addressing is in force is logged on every build, since `model not found` from a
+proxy is otherwise a guess between the two.
+
+This does not weaken the decision: graph code still asks for a tier, no model
+name appears under `src/`, and which model serves a tier is still configuration.
+It only stops the rule from requiring administrative rights on someone else's
+proxy.
+
 The `auto` rule is unchanged and now has a sharper edge: it prefers the direct
 client as soon as a key is set, so `make proxy` alone does not route through the
 proxy — `TRIAGE_LLM_PROVIDER=litellm` does. Left as an explicit choice rather

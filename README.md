@@ -67,9 +67,17 @@ There are two ways to reach a model, chosen by `TRIAGE_LLM_PROVIDER`:
 
 | | `litellm` | `anthropic` |
 |---|---|---|
-| Resolves the tier | the proxy, from `docker/litellm.yaml` | `TRIAGE_MODEL_*` in `.env` |
+| Resolves the tier | the proxy | `TRIAGE_MODEL_*` in `.env` |
 | Daily $50 cap | enforced | not enforced |
-| Needs | `make proxy` | an API key |
+| Needs | `TRIAGE_LITELLM_URL` + `TRIAGE_LITELLM_API_KEY` | an API key |
+
+Through a proxy, the tier is sent *as* the model name — `triage`, `analysis`,
+`diagnosis` — which is what a proxy configured for Triage publishes. A shared
+proxy nobody will re-configure publishes its own names instead: fill all three
+`TRIAGE_MODEL_*` with what that proxy calls those models and they are used as the
+model name. Filling only some is refused, since it would fail on one tier at
+whatever hour that node first runs. Either way graph code asks for a tier and no
+model name appears under `src/`.
 
 `make proxy` runs LiteLLM and its own small Postgres from `docker-compose.yml` on
 `localhost:4000`, with the same three aliases production uses. It reads the same
