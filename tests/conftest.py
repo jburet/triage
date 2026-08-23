@@ -33,6 +33,7 @@ from triage.schemas import (
     TerraformModuleEntry,
     TerraformSummary,
     TicketDraft,
+    WorkloadEntry,
 )
 from triage.schemas.alert import Alert
 from triage.schemas.collection import (
@@ -47,6 +48,7 @@ FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
 CAPTURE = "hcl_software_uat_20260822"
 TENANT = "plt-hcl-software-uat"
+CAPTURED_DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARCHITECTURE_DOC = REPO_ROOT / "docs" / "reference-aws-architecture-2026-04-20.md"
 
@@ -414,6 +416,26 @@ def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
     }
     responses.update(overrides)  # type: ignore[arg-type]
     return FakeDatadogClient(responses=responses)
+
+
+def a_workload(service: str = TENANT, **overrides: object) -> WorkloadEntry:
+    """A workload as the derivation records it: the captured tenant, on its own image."""
+    base: dict[str, object] = {
+        "service": service,
+        "repository": "platform",
+        "repo_url": "github.com/zeenea/platform",
+        "image": f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@{CAPTURED_DIGEST}",
+        "image_digest": CAPTURED_DIGEST,
+        "deployed_commit": {
+            "unknown": True,
+            "reason": "the image was found, but its tag '501' is not a commit",
+        },
+        "iac_repo": "platform-infra",
+        "tenancy": "mono_tenant",
+        "source": "image",
+    }
+    base.update(overrides)
+    return WorkloadEntry.model_validate(base)
 
 
 def statefulset_change_event(slug: str = CAPTURE) -> dict:

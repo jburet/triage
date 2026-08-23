@@ -123,14 +123,25 @@ async def deployed_repo(
 ) -> tuple[str | None, str | None]:
     """The repository and commit to read this service in, and where they came from.
 
-    F0's map first: it is keyed on the name a repository says it deploys as, and
-    when the service *is* that name the commit is the one actually summarised.
-    Otherwise config.yaml's ``serves`` patterns, because a per-customer instance of
-    a multi-tenant platform — the majority of what this monitor fires for — is not
-    its own repository and will never be in the map. The commit is then the last
-    one F0 summarised for that repository: a fact about the repository, not a claim
-    about which build this tenant runs, and the diagnosis says so.
+    The derived workload first (M6): it is keyed on the name the cluster uses, so
+    it is the only one of the three that can answer for a customer's instance of
+    the mono-tenant platform, and its commit is what that instance was actually
+    running. Then F0's map, which is keyed on the name a repository says it
+    deploys as. Then config.yaml's ``serves`` patterns.
+
+    Where the commit is unknown — a workload whose image tag carried none, a
+    pattern match, a map entry — it falls back to the last commit F0 summarised
+    for that repository: a fact about the repository, not a claim about which
+    build this tenant runs, and the diagnosis says so.
     """
+    if kind is RepoKind.APPLICATION:
+        workload = await repository.workload_for_service(service)
+        if workload is not None and workload.repo_url is not None:
+            commit = workload.deployed_commit if isinstance(workload.deployed_commit, str) else None
+            return workload.repo_url, commit or await repository.last_summarised_commit(
+                workload.repo_url
+            )
+
     entry = await repository.system_map_for_service(service)
     if entry is not None:
         return entry.repo_url, entry.source_commit
