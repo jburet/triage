@@ -1,4 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-incident evals evals-cartography evals-incident clean
+.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-incident repository-map evals evals-cartography evals-incident clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -43,6 +43,9 @@ run-cartography: env ## Run the cartography graph over config.yaml in dry-run mo
 
 run-incident: env ## Run F1 end to end on one real alert: read-only Datadog, real models, fake Jira/Slack
 	uv run python -m scripts.run_incident $(ARGS)
+
+repository-map: ## Regenerate config/repository-map.yaml from the architecture document
+	uv run python -m scripts.generate_repository_map
 
 capture-datadog: ## Capture a real alert's telemetry as fixtures (read-only, needs a Datadog key)
 	uv run python -m scripts.capture_datadog $(ARGS)

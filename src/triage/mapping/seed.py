@@ -13,8 +13,15 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 from triage.schemas.system_map import Deployer, SeedEntry, Tenancy
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DOCUMENT_PATH = REPO_ROOT / "docs" / "reference-aws-architecture-2026-04-20.md"
+SEED_PATH = REPO_ROOT / "config" / "repository-map.yaml"
 
 HEADING = "### 1.1 Repository Map"
 
@@ -107,5 +114,42 @@ def parse_document(text: str) -> list[SeedEntry]:
     return entries
 
 
-def parse_file(path: Path) -> list[SeedEntry]:
+def parse_file(path: Path = DOCUMENT_PATH) -> list[SeedEntry]:
     return parse_document(path.read_text(encoding="utf-8"))
+
+
+BANNER = """\
+# The seed of the service map: which repositories exist, which of them is
+# mono-tenant, and which IaC repository deploys each.
+#
+# Generated from {source} by
+# scripts/generate_repository_map.py. Do not hand-edit: regenerate and review the
+# diff, which is the only place the document's drift becomes visible.
+"""
+
+
+def dump_seed(entries: list[SeedEntry], source: Path = DOCUMENT_PATH) -> str:
+    """The seed as the versioned YAML file, banner included."""
+    body = yaml.safe_dump(
+        {
+            "source": str(source.relative_to(REPO_ROOT)),
+            "repositories": [entry.model_dump(mode="json") for entry in entries],
+        },
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    return BANNER.format(source=source.relative_to(REPO_ROOT)) + body
+
+
+def load_seed(path: Path = SEED_PATH) -> list[SeedEntry]:
+    """The committed seed. Read from the generated file, never from the document.
+
+    The document is prose that a person edits; this is data that a script writes
+    and a reviewer approves, and only the second is safe to load at run time.
+    """
+    raw: Any = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return [SeedEntry.model_validate(row) for row in raw["repositories"]]
+
+
+def seed_for(entries: list[SeedEntry], repository: str) -> SeedEntry | None:
+    return next((entry for entry in entries if entry.repository == repository), None)

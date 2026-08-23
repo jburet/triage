@@ -81,7 +81,7 @@ ECR under the repository's own name. So:
 - [x] 1.1 The architecture document parses into one `SeedEntry` per repository row, carrying
       tenancy and deployment method; a row whose tenancy or deployment cell is unrecognised is
       reported by name rather than defaulted.
-- [ ] 1.2 The seed is versioned in the repository as data (`config/repository-map.yaml`),
+- [x] 1.2 The seed is versioned in the repository as data (`config/repository-map.yaml`),
       generated from the document by a script and reviewed as a diff — the document is
       someone's Markdown and will be edited without telling us.
 - [ ] 1.3 A repository in the seed that is not declared in `config.yaml` is listed in the

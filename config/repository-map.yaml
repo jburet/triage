@@ -1,0 +1,88 @@
+# The seed of the service map: which repositories exist, which of them is
+# mono-tenant, and which IaC repository deploys each.
+#
+# Generated from docs/reference-aws-architecture-2026-04-20.md by
+# scripts/generate_repository_map.py. Do not hand-edit: regenerate and review the
+# diff, which is the only place the document's drift becomes visible.
+source: docs/reference-aws-architecture-2026-04-20.md
+repositories:
+- repository: zeenea-api-gateway
+  role: Internet-facing reverse proxy
+  tenancy: not_applicable
+  deployment: application_deployer
+- repository: studio
+  role: Data catalog UI (BFF + frontend)
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: socialdataexplorer
+  role: Social data exploration
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: graphql-api
+  role: Public GraphQL API
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: platform
+  role: Core catalog engine
+  tenancy: mono_tenant
+  deployment: platform_infra
+- repository: description-api
+  role: Translation + description service
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: file-backend
+  role: Image storage for rich text editor
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: admin
+  role: Admin UI for tenant management
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: tenant-management-2
+  role: Tenant lifecycle control plane
+  tenancy: not_applicable
+  deployment: application_deployer
+- repository: sql-to-lineage
+  role: SQL lineage inference Lambda
+  tenancy: not_applicable
+  deployment: application_deployer
+- repository: landing-aws-data
+  role: Analytics data pipeline
+  tenancy: not_applicable
+  deployment: application_deployer
+- repository: landing-auth0
+  role: Auth0 IaC configuration
+  tenancy: not_applicable
+  deployment: github_actions
+- repository: zeenea-infra
+  role: Landing zone IaC
+  tenancy: not_applicable
+  deployment: aws_organization
+- repository: platform-infra
+  role: Platform IaC + deploy
+  tenancy: per_tenant_provisioning
+  deployment: github_actions
+- repository: public-api
+  role: Customer-facing REST API
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: scim-api
+  role: SCIM identity provisioning
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: datacatalog-mcp-server-py
+  role: MCP server for AI tools
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: agent-studio-steward
+  role: AI chat agent for Studio
+  tenancy: multi_tenant
+  deployment: application_deployer
+- repository: chrome-plugin-v2
+  role: Chrome extension + NestJS BFF
+  tenancy: not_applicable
+  deployment: application_deployer
+- repository: application-deployer
+  role: Shared deployment tool
+  tenancy: not_applicable
+  deployment: not_deployed

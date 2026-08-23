@@ -8,7 +8,14 @@ provisions it, everything else goes through `application-deployer`.
 import pytest
 
 from tests.conftest import ARCHITECTURE_DOC, seed_document
-from triage.mapping.seed import SeedParseError, parse_document, parse_file
+from triage.mapping.seed import (
+    SEED_PATH,
+    SeedParseError,
+    dump_seed,
+    load_seed,
+    parse_document,
+    parse_file,
+)
 from triage.schemas.system_map import Deployer, Tenancy
 
 
@@ -54,6 +61,16 @@ def test_a_repository_nothing_deploys_has_no_iac_repository(entries):
 def test_markup_is_stripped_from_the_cells(entries):
     gateway = next(entry for entry in entries if entry.repository == "zeenea-api-gateway")
     assert gateway.role == "Internet-facing reverse proxy"
+
+
+def test_the_committed_seed_is_what_the_committed_document_says(entries):
+    """Byte for byte, so an edit to the document that nobody regenerated is a failing
+    test rather than a map that quietly disagrees with its own source."""
+    assert SEED_PATH.read_text(encoding="utf-8") == dump_seed(entries)
+
+
+def test_the_seed_is_loaded_from_the_generated_file_not_from_the_prose(entries):
+    assert load_seed() == entries
 
 
 def test_an_unrecognised_tenancy_is_reported_by_repository_rather_than_defaulted():
