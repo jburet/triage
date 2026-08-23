@@ -18,8 +18,7 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn>=0.34",
     "slack-sdk>=3.34",
-    "mcp>=1.2",
-    "httpx2>=2.12",
+    "httpx>=0.28",
     "structlog>=24.4",
 ]
 

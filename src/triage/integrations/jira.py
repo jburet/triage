@@ -1,86 +1,121 @@
-"""Real Jira client, over MCP.
+"""Jira Cloud client, over the REST v3 API.
 
-Jira is reached through an MCP server rather than its REST API, per the
-architecture's "MCP servers when they exist" rule.
+Jira is one of the two systems Triage may write to. There is no Jira MCP server
+available here, so this is a plain Python client — the architecture's rule is
+"MCP servers when they exist, Python tools otherwise" (ADR-0013).
 
-Tool names are configuration, not constants: Jira MCP servers do not agree on
-them, and hard-coding a guess produces a client that fails at the last step of a
-production run. Set them to match the server you deploy.
+Two things about the v3 API shape the code. Authentication is HTTP basic with an
+Atlassian account email and an API token, not a bearer token. And issue
+descriptions and comments are Atlassian Document Format, a JSON tree, not text —
+so the markdown ticket body is translated by
+:mod:`triage.integrations.adf` on the way out.
 
-Not exercised by the test suite — there is no live Jira in CI, and asserting
-against a mock of an interface we do not control would prove nothing. The tested
-path is :class:`~triage.integrations.base.FakeJiraClient`; this class is the
-boundary where that guarantee stops. Verify it against a staging Jira project
-before turning ``TRIAGE_DRY_RUN`` off.
+The ``client`` parameter exists so tests can supply an ``httpx.MockTransport``.
+Payload shaping and error handling are covered by
+``tests/integration/test_jira_client.py``; what no test here can cover is
+whether a given Jira project accepts the issue type and labels being sent, so
+run ``make run-fixture`` against a staging project before turning
+``TRIAGE_DRY_RUN`` off.
 """
 
 from collections.abc import Sequence
 from typing import Any
 
+import httpx
+
+from triage.integrations.adf import to_adf
 from triage.integrations.base import JiraIssue
 
+API_ROOT = "/rest/api/3"
 
-class McpJiraClient:
+
+class JiraError(RuntimeError):
+    """A Jira request failed. Carries Jira's own explanation, which is the useful part."""
+
+    def __init__(self, status: int, detail: str) -> None:
+        super().__init__(f"Jira returned {status}: {detail}")
+        self.status = status
+        self.detail = detail
+
+
+def _explain(response: httpx.Response) -> str:
+    """Jira reports what was actually wrong in ``errorMessages`` and ``errors``.
+
+    The raw body is a wall of JSON that hides those two fields, and the status
+    line alone never says which field was rejected.
+    """
+    try:
+        payload = response.json()
+    except ValueError:
+        return response.text[:500] or "<empty response>"
+
+    if isinstance(payload, dict):
+        messages = list(payload.get("errorMessages") or [])
+        field_errors = payload.get("errors")
+        if isinstance(field_errors, dict):
+            messages += [f"{field}: {message}" for field, message in field_errors.items()]
+        if messages:
+            return "; ".join(str(message) for message in messages)
+    return response.text[:500]
+
+
+class JiraRestClient:
     def __init__(
         self,
-        url: str,
-        token: str,
+        base_url: str,
+        email: str,
+        api_token: str,
         *,
-        create_tool: str = "jira_create_issue",
-        comment_tool: str = "jira_add_comment",
         issue_type: str = "Task",
         timeout: float = 30.0,
+        client: httpx.AsyncClient | None = None,
     ) -> None:
-        if not url:
-            raise ValueError("a Jira MCP URL is required when dry-run is off")
-        self._url = url
-        self._token = token
-        self._create_tool = create_tool
-        self._comment_tool = comment_tool
+        if not base_url:
+            raise ValueError("a Jira base URL is required when dry-run is off")
+        if not (email and api_token):
+            raise ValueError("a Jira account email and API token are required when dry-run is off")
+
+        self._base_url = base_url.rstrip("/")
         self._issue_type = issue_type
-        self._timeout = timeout
-
-    async def _call(self, tool: str, arguments: dict[str, Any]) -> dict[str, Any]:
-        """One tool call per connection.
-
-        Triage files a handful of tickets a day, so a connection pool would be
-        complexity bought for nothing; a fresh session per call also means a
-        dropped connection cannot wedge the graph.
-        """
-        import httpx2
-        from mcp import Client
-        from mcp.client.streamable_http import streamable_http_client
-
-        headers = {"Authorization": f"Bearer {self._token}"} if self._token else None
-        http_client = httpx2.AsyncClient(headers=headers, timeout=self._timeout)
-        async with Client(streamable_http_client(self._url, http_client=http_client)) as client:
-            result = await client.call_tool(tool, arguments, read_timeout_seconds=self._timeout)
-
-        if result.is_error:
-            raise RuntimeError(f"Jira MCP tool {tool!r} failed: {result.content}")
-        payload = result.structured_content
-        if isinstance(payload, dict):
-            return payload
-        raise RuntimeError(
-            f"Jira MCP tool {tool!r} returned no structured content; the configured "
-            f"server must return the issue as structured output"
+        self._client = client or httpx.AsyncClient(
+            base_url=self._base_url,
+            auth=httpx.BasicAuth(email, api_token),
+            timeout=timeout,
+            headers={"Accept": "application/json"},
         )
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        response = await self._client.post(path, json=payload)
+        if response.is_error:
+            raise JiraError(response.status_code, _explain(response))
+        if not response.content:
+            return {}
+        body = response.json()
+        return body if isinstance(body, dict) else {}
+
+    def browse_url(self, key: str) -> str:
+        return f"{self._base_url}/browse/{key}"
 
     async def create_issue(
         self, *, project: str, summary: str, body: str, labels: Sequence[str]
     ) -> JiraIssue:
-        payload = await self._call(
-            self._create_tool,
-            {
-                "project_key": project,
+        payload = {
+            "fields": {
+                "project": {"key": project},
                 "summary": summary,
-                "description": body,
-                "issue_type": self._issue_type,
+                "description": to_adf(body),
+                "issuetype": {"name": self._issue_type},
                 "labels": list(labels),
-            },
-        )
-        key = str(payload["key"])
-        return JiraIssue(key=key, url=str(payload.get("url", "")))
+            }
+        }
+        created = await self._post(f"{API_ROOT}/issue", payload)
+        key = str(created["key"])
+        # The `self` field is the API URL; a human needs the browse URL, and it
+        # is the one that ends up in Slack and in the tickets table.
+        return JiraIssue(key=key, url=self.browse_url(key))
 
     async def add_comment(self, *, key: str, body: str) -> None:
-        await self._call(self._comment_tool, {"issue_key": key, "comment": body})
+        await self._post(f"{API_ROOT}/issue/{key}/comment", {"body": to_adf(body)})
+
+    async def aclose(self) -> None:
+        await self._client.aclose()

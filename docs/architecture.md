@@ -16,7 +16,7 @@ For what is actually built today, see [§10 Implementation status](#10-implement
 | Execution | Graphs run on self-hosted LangGraph Platform (in the prod cluster); Triage ingress = thin FastAPI service for webhooks, invoking graphs via the Platform API |
 | State | LangGraph Platform's PostgreSQL for everything: checkpoints (managed by the Platform) and Triage tables |
 | Signal ingestion | Webhooks (Datadog, GitHub) via the ingress; DB review and F0 refresh as Platform crons |
-| External systems | MCP servers when they exist, Python tools otherwise |
+| External systems | MCP servers when they exist, Python tools otherwise; Jira has no MCP server, so REST v3 ([ADR-0013](adr/0013-jira-over-rest.md)) |
 | Code / Terraform analysis | Claude Agent SDK in a gVisor Kubernetes Job per analysis |
 | Git access | No shared cache: each analysis Job clones the repo at the required commit |
 | Configuration | YAML for static config; PostgreSQL for what F0 discovers |
@@ -58,7 +58,7 @@ flowchart LR
     subgraph Tools
         MCP_DD[MCP Datadog]
         MCP_GH[MCP GitHub - read only]
-        MCP_JIRA[MCP Jira]
+        PY_JIRA[Python: Jira REST v3]
         PY_K8S[Python: k8s read-only]
         PY_PG[Python: PostgreSQL stats]
         SBX[Analysis Job - gVisor, Claude Agent SDK, shallow clone]
@@ -73,7 +73,7 @@ flowchart LR
     G1 & G3 --> GA --> GT
     G0 --> SBX
     G0 --> PG
-    GT --> MCP_JIRA
+    GT --> PY_JIRA
     GA --> SBX --> MCP_GH
     G1 & G3 --> MCP_DD & PY_K8S & PY_PG
     LGP --> LLM
@@ -212,7 +212,7 @@ Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $5
 | Kubernetes | Python (read-only ServiceAccount) | read |
 | PostgreSQL (target DBs) | Python (read-only role) | read |
 | GitHub | MCP | read |
-| Jira | MCP | read + write |
+| Jira | Python (REST v3, `httpx`) | read + write |
 | Slack | Python SDK (slack_sdk) | write |
 | Code | Claude Agent SDK in analysis Job (shallow clone) | read |
 

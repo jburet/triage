@@ -57,13 +57,15 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
 
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-    from triage.integrations.jira import McpJiraClient
+    from triage.integrations.jira import JiraRestClient
     from triage.integrations.slack import SlackWebClient
 
     engine = create_async_engine(settings.database_url, pool_pre_ping=True)
     return Deps(
         llm=LiteLLMClient(settings.litellm_url, settings.litellm_api_key),
-        jira=McpJiraClient(settings.jira_mcp_url, settings.jira_api_token),
+        jira=JiraRestClient(
+            settings.jira_base_url, settings.jira_user_email, settings.jira_api_token
+        ),
         slack=SlackWebClient(settings.slack_bot_token),
         repo=SqlRepository(async_sessionmaker(engine, expire_on_commit=False)),
         config=config,

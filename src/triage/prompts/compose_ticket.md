@@ -37,5 +37,7 @@ Rules, in order of importance:
 The `summary` is the Jira title: the symptom and the service, under 120 characters,
 no ticket-number prefix.
 
-Markdown is fine inside sections. Do not repeat the section headings inside the
-section bodies.
+Markdown is fine inside sections, limited to: paragraphs, bullet and numbered
+lists, `**bold**`, `*italic*`, `` `code` ``, [links](https://example.com) and
+fenced code blocks. Tables and nested lists do not render in Jira and will appear
+as literal text. Do not repeat the section headings inside the section bodies.

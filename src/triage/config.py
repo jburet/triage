@@ -88,7 +88,11 @@ class Settings(BaseSettings):
     dry_run: bool = True
 
     slack_bot_token: str = ""
-    jira_mcp_url: str = ""
+
+    # Jira Cloud: basic auth with an Atlassian account email and an API token
+    # (ADR-0013), not a bearer token.
+    jira_base_url: str = ""
+    jira_user_email: str = ""
     jira_api_token: str = ""
 
     config_path: Path = DEFAULT_CONFIG_PATH

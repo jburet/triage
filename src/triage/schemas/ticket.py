@@ -56,7 +56,8 @@ class TicketDraft(BaseModel):
     """
 
     summary: Filled = Field(
-        description="Jira summary line: the symptom and the service, under 120 characters."
+        max_length=255,
+        description="Jira summary line: the symptom and the service, under 120 characters.",
     )
     symptom: Filled
     impact: Filled

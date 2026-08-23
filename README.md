@@ -35,7 +35,12 @@ make run-fixture    # run the pipeline on a fixture diagnosis, in dry-run mode
 `make run-fixture` needs neither a database nor credentials. With
 `TRIAGE_DRY_RUN=1` (the default) Jira and Slack are recording fakes and state is
 in-memory, so the script prints the Jira payload and Slack messages that *would*
-have been sent.
+have been sent. It does call the model tiers through LiteLLM — exercising the
+real prompts is the point of it.
+
+Turning `TRIAGE_DRY_RUN` off needs a Slack bot token and, for Jira Cloud, a base
+URL plus an account email and API token ([ADR-0013](docs/adr/0013-jira-over-rest.md));
+see `.env.example`.
 
 Pick a different fixture with `make run-fixture FIXTURE=tests/fixtures/diagnoses/<name>.json`.
 
@@ -47,7 +52,7 @@ Pick a different fixture with `make run-fixture FIXTURE=tests/fixtures/diagnoses
 | `src/triage/prompts/` | Prompt templates, versioned as files so changes are reviewable |
 | `src/triage/nodes/` | One module per graph node |
 | `src/triage/graphs/` | Graph wiring and state |
-| `src/triage/integrations/` | Jira, Slack and the rest — protocol, real client, fake |
+| `src/triage/integrations/` | Jira (REST v3) and Slack — protocol, real client, fake |
 | `src/triage/db/` | Models and the repository the nodes actually depend on |
 | `evals/` | Scored fixture suite; spends money, so it is not in CI |
 

@@ -4,10 +4,12 @@ One file per decision, numbered. Each records the choice, why it was made, and
 what would make it wrong — that last part matters most: a decision recorded
 without its reversal condition cannot be revisited honestly.
 
-These twelve resolve the items marked `[OPEN]` in `../architecture.md`. They were
+0001-0012 resolve the twelve items marked `[OPEN]` in `../architecture.md`. They were
 proposed rather than agreed: the alternative was leaving twelve blockers in place,
-and every value that could be made configurable is in `config.yaml` so the SRE
-team can override it without touching code.
+and every value that could be made configurable is in `config.yaml` so the SRE team
+can override it without touching code.
+
+0013 records a later change to a decision that draft had already taken.
 
 | # | Decision | Status |
 |---|---|---|
@@ -23,6 +25,7 @@ team can override it without touching code.
 | [0010](0010-postmortem-destination.md) | Where the post-mortem draft is published | Proposed |
 | [0011](0011-langgraph-platform-licence.md) | LangGraph Platform tier, and the fallback | Proposed |
 | [0012](0012-backup-and-retention.md) | Backup and retention | Proposed |
+| [0013](0013-jira-over-rest.md) | Jira over REST v3, not MCP | Accepted, implemented |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.
