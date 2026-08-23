@@ -143,10 +143,22 @@ class MetricSpec:
 
     query: str
     scope: tuple[str, ...]
+    fallback: tuple[str, ...] = ("service",)
+    """Used when the alert carried none of the preferred identifiers.
+
+    The pod-down monitor groups ``by service`` and carries no cluster and no
+    namespace, so the restart count — six restarts in the window, the strongest
+    evidence a crash-restart diagnosis has — was being dropped entirely. Datadog
+    tags these metrics with ``service:`` too, which is measurably true in this org
+    and is the difference between a diagnosis and a shrug.
+    """
 
     def render(self, values: dict[str, str | None]) -> str | None:
-        tags = [f"{TAG_FOR[name]}:{values[name]}" for name in self.scope if values.get(name)]
-        return f"{self.query}{{{','.join(tags)}}}" if tags else None
+        for keys in (self.scope, self.fallback):
+            tags = [f"{TAG_FOR[name]}:{values[name]}" for name in keys if values.get(name)]
+            if tags:
+                return f"{self.query}{{{','.join(tags)}}}"
+        return None
 
 
 WORKLOAD = ("cluster", "namespace", "stateful_set")

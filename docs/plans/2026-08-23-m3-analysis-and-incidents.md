@@ -128,7 +128,28 @@ its tenant name was globally unique and its monitor was an event monitor:
   exist was reported as "the absence is about this incident" because the *namespace* around
   it was busy. The same query over seven days says what it should: not collected at all.
 
+A second live run, on `Zeenea service or platform pod down in prod` for
+`plt-hcl-software-uat`, found two more:
+
+- **An alert with only a `service:` tag resolved to no environment**, so the monitor F1
+  exists for would have had every alert dropped. The environment is now read from the
+  monitor's own `env:` filter when there is no cluster ([ADR-0017](../adr/0017-alert-ingestion-by-polling.md),
+  amended).
+- **Metrics scoped only by cluster and namespace were dropped entirely** for that alert,
+  losing the restart count — 4 → 10 in the window, the strongest evidence a crash-restart
+  diagnosis has — and the memory curve. Both are tagged `service:` in this org, so a
+  spec now falls back to it.
+
 ## Open risks
+
+- **The flap thresholds do not fit this monitor.** Measured 2026-08-23 over seven days:
+  56 transitions, 9 tenant groups, **every cycle between 2 and 9 minutes** — so nothing
+  passes the 15-minute gate, exactly as ADR-0018 predicted. But per group the rate is about
+  one cycle a day, so `flap_count: 5` over `flap_window_hours: 24` never fires either, and
+  Triage produces *nothing at all* for the monitor it was built for. Across groups the same
+  monitor shows ~28 cycles in seven days, which is plainly a fleet-wide pattern. Either the
+  flap window becomes days rather than hours, or flapping is counted per monitor as well as
+  per (monitor, group). That is a decision for ADR-0018, not a tuning change.
 
 - **One incident, one class.** The recipes for latency, error-rate and saturation classes are
   written from the shape of the crash/restart one. Capture a real alert per class before

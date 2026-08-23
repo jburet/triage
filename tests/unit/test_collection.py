@@ -19,7 +19,7 @@ from triage.collect.recipes import (
     metric_queries,
     monitor_query_plan,
 )
-from triage.config import CollectionConfig
+from triage.config import CollectionConfig, Config
 from triage.schemas.alert import AlertScope
 from triage.schemas.collection import (
     AlertClass,
@@ -29,6 +29,7 @@ from triage.schemas.collection import (
     CollectorStatus,
 )
 from triage.schemas.common import TimeWindow
+from triage.scope import declared_environment, resolve
 
 CAPS = CollectionConfig()
 
@@ -87,12 +88,15 @@ def test_every_metric_is_narrowed_to_the_group_that_fired():
 
 
 def test_a_metric_none_of_whose_identifiers_the_alert_carried_is_dropped():
-    nothing = AlertScope()
+    assert metric_queries(AlertClass.CRASH_RESTART, AlertScope()) == []
 
-    assert metric_queries(AlertClass.CRASH_RESTART, nothing) == []
-    assert metric_queries(AlertClass.LATENCY, AlertScope(service="payments-api")) == [
-        "avg:trace.http.request.duration{service:payments-api}"
-    ]
+
+def test_an_alert_with_only_a_service_falls_back_to_scoping_by_service():
+    """The pod-down monitor groups by service alone; without this its restarts vanish."""
+    queries = metric_queries(AlertClass.CRASH_RESTART, AlertScope(service="plt-tenant"))
+
+    assert "sum:kubernetes.containers.restarts{service:plt-tenant}" in queries
+    assert "avg:kubernetes.memory.usage_pct{service:plt-tenant}" in queries
 
 
 def test_the_monitors_own_expression_is_narrowed_to_the_group_that_fired():
@@ -196,3 +200,31 @@ def test_an_oversized_collection_is_cut_to_the_budget_and_says_where():
     truncated = [result for result in fitted.results if result.truncated]
     assert truncated
     assert all("truncated to fit the prompt budget" in str(result.detail) for result in truncated)
+
+
+def test_the_environment_can_come_from_the_monitors_own_env_filter(config: Config):
+    """A monitor grouped only `by service` carries no cluster; its query still says prod."""
+    alert = pod_down_alert().model_copy(
+        update={"scope": AlertScope(service="plt-hcl-software-uat")}
+    )
+
+    routing = resolve(config, alert)
+
+    assert declared_environment(alert) == "prod"
+    assert routing.in_scope
+    assert routing.environment == "prod"
+    assert "from the monitor's own env: filter" in routing.reason
+
+
+def test_a_monitor_that_declares_no_environment_stays_out_of_scope(config: Config):
+    alert = pod_down_alert().model_copy(
+        update={
+            "scope": AlertScope(service="plt-hcl-software-uat"),
+            "monitor_query": 'events("service:plt-*").rollup("count").last("5m") > 0',
+        }
+    )
+
+    routing = resolve(config, alert)
+
+    assert not routing.in_scope
+    assert "cannot be determined" in routing.reason

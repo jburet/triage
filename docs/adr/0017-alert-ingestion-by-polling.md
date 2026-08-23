@@ -74,6 +74,21 @@ cluster, and no longer needs a webhook authentication story. F1 becomes a cron l
 - A new table or a single row holds the poller watermark.
 - `config.yaml` gains the patterns, the environment list and the cluster map.
 
+## Amended 2026-08-23, after the first live run
+
+**The environment may also be read from the monitor's own query.** The rule as
+written resolved the environment only from `kube_cluster_name`, and the first
+live run showed what that costs: `Zeenea service or platform pod down in prod`
+groups `by service` alone, carries no cluster tag at all, and therefore resolved
+to no environment — so every alert from the monitor this feature exists for would
+have been recorded `out_of_scope` and dropped. Its query filters `env:prod`, and
+that is a declaration by whoever wrote the monitor, not an inference: it is read
+when there is no cluster, and named as the source in the routing reason.
+
+The monitor's *name* is still not read, though this ADR mentions it. "prod-like
+preprod" contains "prod", and a rule that cannot tell those apart is exactly the
+guess the cluster map exists to avoid.
+
 ## Revisit when
 
 Someone needs Triage to react inside a minute, or the in-scope alert volume grows enough
