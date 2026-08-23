@@ -125,6 +125,48 @@ class Recorder:
         return await self._run("spans", kwargs["query"], self.inner.aggregate_spans(**kwargs))
 
 
+@dataclass
+class ModelCall:
+    tier: str
+    schema: str
+    chars: int
+    seconds: float
+    failed: str | None = None
+
+
+@dataclass
+class PromptSpy:
+    """Prints the exact text sent to each tier, before the answer comes back.
+
+    The prompts are assembled from files plus tagged JSON blocks, so what a node
+    actually asked is not readable from the source alone — and when a run says
+    something surprising, the prompt is the first thing worth seeing.
+    """
+
+    inner: Any
+    show: bool = True
+    limit: int | None = None
+    calls: list[ModelCall] = field(default_factory=list)
+
+    async def call(self, tier: str, prompt: str, schema: type) -> Any:
+        if self.show:
+            rule(f"prompt → {tier} tier · {schema.__name__} ({len(prompt)} chars)")
+            body = prompt if self.limit is None else prompt[: self.limit]
+            print(indent(body))
+            if self.limit is not None and len(prompt) > self.limit:
+                print(indent(f"{DIM}… {len(prompt) - self.limit} more chars{RESET}"))
+        started = time.monotonic()
+        try:
+            answer = await self.inner.call(tier, prompt, schema)
+        except Exception as exc:
+            self.calls.append(
+                ModelCall(tier, schema.__name__, len(prompt), time.monotonic() - started, str(exc))
+            )
+            raise
+        self.calls.append(ModelCall(tier, schema.__name__, len(prompt), time.monotonic() - started))
+        return answer
+
+
 async def find_monitor(settings_site: str, api_key: str, app_key: str, term: str) -> int | None:
     """Monitor id from a name, because what arrives from Slack is a name.
 
@@ -414,7 +456,18 @@ def show_update(node: str, update: dict[str, Any]) -> None:
         print(indent(f"signal {signal.signal_id} → {signal.status.value}"))
 
 
-def show_side_effects(deps: Deps, recorder: Recorder) -> None:
+def show_side_effects(deps: Deps, recorder: Recorder, spy: PromptSpy | None = None) -> None:
+    if spy is not None and spy.calls:
+        rule("model calls")
+        for call in spy.calls:
+            outcome = f"!! {clip(call.failed, 60)}" if call.failed else "ok"
+            print(
+                indent(
+                    f"{call.seconds:5.1f}s {call.chars:>7d} chars  "
+                    f"{call.tier:9s} {call.schema:24s} {outcome}"
+                )
+            )
+
     rule("Datadog calls")
     for call in recorder.calls:
         print(
@@ -499,6 +552,14 @@ async def main(argv: list[str]) -> int:
         help="force the class instead of asking the triage tier (needs --collect-only)",
     )
     parser.add_argument("--json", dest="json_out", help="write the final state to this file")
+    parser.add_argument(
+        "--prompts", action="store_true", help="print the full prompt sent to every tier"
+    )
+    parser.add_argument(
+        "--prompt-chars",
+        type=int,
+        help="truncate each printed prompt to this many characters",
+    )
     args = parser.parse_args(argv[1:])
 
     settings = get_settings()
@@ -540,7 +601,8 @@ async def main(argv: list[str]) -> int:
         assert isinstance(repo, InMemoryRepository)
         seed_map(repo, args.mappings)
 
-    deps = Deps(**{**deps.__dict__, "datadog": recorder, "repo": repo})
+    spy = PromptSpy(deps.llm, show=args.prompts, limit=args.prompt_chars)
+    deps = Deps(**{**deps.__dict__, "datadog": recorder, "repo": repo, "llm": spy})
 
     alert, transitions = await find_alert(
         recorder, monitor_id, parse_time(args.at), args.hours, args.group
@@ -563,7 +625,7 @@ async def main(argv: list[str]) -> int:
 
     if args.collect_only:
         await run_collection_only(deps, state, args.alert_class)
-        show_side_effects(deps, recorder)
+        show_side_effects(deps, recorder, spy)
         await client.aclose()
         return 0
 
@@ -587,7 +649,7 @@ async def main(argv: list[str]) -> int:
 
     rule("done")
     print(indent(f"{time.monotonic() - started:.1f}s wall clock"))
-    show_side_effects(deps, recorder)
+    show_side_effects(deps, recorder, spy)
 
     if args.json_out:
         from pydantic import BaseModel
