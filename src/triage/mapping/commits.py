@@ -20,8 +20,30 @@ from datetime import datetime
 from triage.config import Config
 from triage.integrations.github import GitHubClient, GitHubError
 from triage.mapping.images import split_reference
-from triage.schemas.common import MaybeUnknown, Unknown
+from triage.schemas.common import Confidence, MaybeUnknown, Unknown
 from triage.schemas.system_map import CommitSource, MappingSource, WorkloadEntry
+
+CONFIDENCE_CAP: dict[CommitSource, Confidence] = {CommitSource.DEFAULT_BRANCH: Confidence.MEDIUM}
+"""How sure a diagnosis may be about code read at a commit from this source.
+
+Production runs the default branch in essentially every case, and the case where
+it does not is the one whose incident matters — a customer pinned to an older
+build, a hotfix branch, a rollback. The failure there is quiet: the analysis
+reads real code at a real commit and answers confidently about a tree the tenant
+is not running. So the cap, and :func:`commit_caveat`, are the two things that
+keep that visible in the ticket.
+"""
+
+
+def commit_caveat(source: CommitSource | None, repo_url: str | None) -> str | None:
+    """What a diagnosis reading a commit from this source has to state, if anything."""
+    if source is not CommitSource.DEFAULT_BRANCH:
+        return None
+    return (
+        f"The analysis read the default branch of {repo_url or 'the repository'} as it "
+        f"stood, because no build was identifiable from the image the service is running; "
+        f"that this is the deployed code is not established."
+    )
 
 
 def _undeclared(entry: WorkloadEntry) -> Unknown:

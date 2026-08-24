@@ -98,7 +98,8 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
             result=None,
         )
 
-    repo_url, mapped_commit = await deployed_repo(deps.config, deps.repo, hypothesis.service)
+    deployment = await deployed_repo(deps.config, deps.repo, hypothesis.service)
+    repo_url, mapped_commit = deployment.repo_url, deployment.commit
     if repo_url is None:
         return Investigated(
             hypothesis=hypothesis,
@@ -137,6 +138,7 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
         repo_url=repo_url,
         commit=commit,
         base_commit=base_commit,
+        commit_source=deployment.commit_source,
         result=None,
     )
 

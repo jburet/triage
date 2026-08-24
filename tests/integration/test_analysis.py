@@ -10,6 +10,7 @@ from tests.conftest import (
     a_hypothesis,
     a_service_entry,
     a_synthesis,
+    a_workload,
     build_deps,
     mapped,
     run_config,
@@ -17,6 +18,7 @@ from tests.conftest import (
 )
 from triage.analysis.runner import FakeAnalysisRunner
 from triage.config import Config, Repo, RepoKind
+from triage.db.repo import InMemoryRepository
 from triage.graphs.analysis import build_graph
 from triage.runtime import Deps
 from triage.schemas import (
@@ -256,3 +258,48 @@ async def test_a_tenant_instance_is_analysed_in_the_repository_declared_as_servi
     request = deps.runner.requests[0]
     assert request.repo_url == "github.com/org/platform"
     assert request.commit == "abc1234"
+
+
+async def test_a_commit_read_off_the_default_branch_is_never_presented_as_the_deployed_one(
+    config: Config,
+):
+    """Production runs the default branch in essentially every case, and the case
+    where it does not is the one whose incident matters — a customer pinned to an
+    older build, a hotfix branch, a rollback. The analysis still runs; what it may
+    not do is claim it read the code this tenant is running."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            commit_source="default_branch",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "default branch" in diagnosis.confidence_rationale
+    assert "no build was identifiable" in diagnosis.confidence_rationale
+
+
+async def test_a_commit_the_image_named_carries_no_such_caveat(config: Config):
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            commit_source="image_tag",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.HIGH
+    assert "default branch" not in diagnosis.confidence_rationale

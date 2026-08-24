@@ -20,6 +20,7 @@ from langchain_core.runnables import RunnableConfig
 from pydantic import ValidationError
 
 from triage.graphs.state import AnalysisState, Investigated
+from triage.mapping.commits import CONFIDENCE_CAP, commit_caveat
 from triage.prompts import render
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.analysis import AnalysisKind
@@ -134,14 +135,24 @@ def _failure_unknowns(investigated: list[Investigated]) -> list[OpenQuestion]:
 
 
 def _confidence(draft: DiagnosisDraft, chosen: Investigated | None) -> Confidence:
-    """Capped at ``medium`` when the analysis the cause rests on never ran (ADR-0004's rule).
+    """Capped when the analysis the cause rests on never ran, or read the wrong tree.
 
     A cause the code was never read for can be the best available explanation; it
-    cannot be a confirmed one.
+    cannot be a confirmed one (ADR-0004's rule). Neither can one read at a commit
+    nothing established this service to be running (M6 2.16).
     """
+    caps = [draft.confidence]
     if chosen is not None and chosen.failed:
-        return min(draft.confidence, Confidence.MEDIUM, key=lambda level: level.rank)
-    return draft.confidence
+        caps.append(Confidence.MEDIUM)
+    if chosen is not None and chosen.commit_source in CONFIDENCE_CAP:
+        caps.append(CONFIDENCE_CAP[chosen.commit_source])
+    return min(caps, key=lambda level: level.rank)
+
+
+def _rationale(draft: DiagnosisDraft, chosen: Investigated | None) -> str:
+    """The model's reasoning, plus what the run knows about the tree it read."""
+    caveat = commit_caveat(chosen.commit_source, chosen.repo_url) if chosen else None
+    return f"{draft.confidence_rationale} {caveat}" if caveat else draft.confidence_rationale
 
 
 def _assemble(state: AnalysisState, draft: DiagnosisDraft, *, degraded: bool = False) -> Diagnosis:
@@ -165,7 +176,7 @@ def _assemble(state: AnalysisState, draft: DiagnosisDraft, *, degraded: bool = F
         impact=draft.impact,
         probable_cause=draft.probable_cause,
         confidence=Confidence.LOW if degraded else _confidence(draft, chosen),
-        confidence_rationale=draft.confidence_rationale,
+        confidence_rationale=_rationale(draft, chosen),
         evidence=evidence,
         location=_location(chosen, draft),
         expected_change=draft.expected_change,

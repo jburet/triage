@@ -15,8 +15,8 @@ from pydantic import ValidationError
 from tests.conftest import CAPTURED_DIGEST, TENANT, a_workload, declaring
 from triage.config import Repo, RepoKind
 from triage.integrations.github import FakeGitHubClient, GitHubError
-from triage.mapping.commits import with_deployed_commit
-from triage.schemas.common import Unknown
+from triage.mapping.commits import CONFIDENCE_CAP, commit_caveat, with_deployed_commit
+from triage.schemas.common import Confidence, Unknown
 from triage.schemas.system_map import CommitSource
 
 PLATFORM = "github.com/zeenea/platform"
@@ -223,3 +223,20 @@ async def test_the_unknown_carries_what_github_said_rather_than_a_generic_failur
     assert isinstance(entry.deployed_commit, Unknown)
     assert "rate limit" in entry.deployed_commit.reason
     assert entry.commit_source is None
+
+
+def test_a_default_branch_commit_carries_a_caveat_naming_what_was_read():
+    caveat = commit_caveat(CommitSource.DEFAULT_BRANCH, PLATFORM)
+
+    assert caveat is not None
+    assert PLATFORM in caveat
+    assert "no build was identifiable" in caveat
+
+
+@pytest.mark.parametrize("source", [CommitSource.IMAGE_TAG, CommitSource.GITHUB_TAG, None])
+def test_a_commit_a_tag_named_needs_no_caveat(source):
+    assert commit_caveat(source, PLATFORM) is None
+
+
+def test_only_the_default_branch_caps_what_a_diagnosis_may_claim():
+    assert CONFIDENCE_CAP == {CommitSource.DEFAULT_BRANCH: Confidence.MEDIUM}

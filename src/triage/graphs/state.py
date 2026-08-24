@@ -17,6 +17,7 @@ from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
+    CommitSource,
     Derivation,
     RepoSummary,
     SeedEntry,
@@ -173,6 +174,7 @@ class Investigated(BaseModel):
     repo_url: str | None = None
     commit: str | None = None
     base_commit: str | None = None
+    commit_source: CommitSource | None = None
     result: AnalysisResult | None = None
 
     @property

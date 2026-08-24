@@ -83,7 +83,10 @@ async def main(argv: list[str]) -> int:
             if entry is not None:
                 print(f"    repository {entry.repository} ({entry.repo_url or 'undeclared'})")
                 print(f"    image      {entry.image or 'none observed'}")
+                origin = entry.commit_source.value if entry.commit_source else "nothing"
+                stood = f" as at {entry.commit_read_at.isoformat()}" if entry.commit_read_at else ""
                 print(f"    commit     {render_field(entry.deployed_commit)}")
+                print(f"    from       {origin}{stood}")
                 print(f"    iac        {entry.iac_repo or 'none'} — source {entry.source.value}")
 
     unclaimed = state.get("unclaimed", [])

@@ -147,7 +147,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       fired**, not at the moment the mapping runs, whenever the caller knows that time. A
       diagnosis of Tuesday's outage read against Thursday's `main` is a different repository.
       With no time to work from, `HEAD` is used and the source says so.
-- [ ] 2.16 A `default_branch` commit is never presented as the deployed one: the diagnosis
+- [x] 2.16 A `default_branch` commit is never presented as the deployed one: the diagnosis
       that uses it states that the analysis read the default branch as it stood, because no
       build was identifiable, and cannot reach `high` confidence on that alone (4.2's rule,
       extended to this source).
