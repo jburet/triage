@@ -19,7 +19,7 @@ no real Zeenea repository is declared: declaring them is the prerequisite for M6
 running. F3 (daily DB review), the FastAPI ingress, the analysis Job image for the
 investigative kinds, and the whole infra track are not built.
 Design docs: `docs/roadmap.md` (product), `docs/architecture.md` (system),
-`docs/ticket-spec.md` (what a finished ticket must contain), `docs/adr/` (decisions, each
+`docs/ticket-spec.md` (what a finished report must contain), `docs/adr/` (decisions, each
 with the condition that would make it wrong — add an ADR when changing one).
 
 ## Commands
