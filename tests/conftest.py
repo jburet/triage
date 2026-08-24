@@ -1,6 +1,7 @@
 """Shared builders. Everything here is offline: no database, no network, no spend."""
 
 import json
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 
@@ -589,3 +590,33 @@ def run_config(deps: Deps) -> dict[str, object]:
 
 def loaded_fixture_json(name: str) -> dict[str, object]:
     return json.loads((FIXTURE_DIR / f"{name}.json").read_text())
+
+
+def git(*argv: str, cwd: Path) -> str:
+    return subprocess.run(
+        ["git", *argv], cwd=cwd, check=True, capture_output=True, text=True
+    ).stdout.strip()
+
+
+@pytest.fixture
+def remote(tmp_path):
+    """A local repository with two commits, and the file each of them added.
+
+    Real git, no network: what an analysis reads is decided by git's own ref
+    resolution, and a scripted shell would only prove the argv was written as
+    intended.
+    """
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git("init", "--quiet", "--initial-branch", "main", cwd=origin)
+    git("config", "user.email", "triage@example.com", cwd=origin)
+    git("config", "user.name", "Triage", cwd=origin)
+    (origin / "old.py").write_text("released = True\n", encoding="utf-8")
+    git("add", "-A", cwd=origin)
+    git("commit", "--quiet", "-m", "the deployed build", cwd=origin)
+    older = git("rev-parse", "HEAD", cwd=origin)
+    (origin / "new.py").write_text("released = False\n", encoding="utf-8")
+    git("add", "-A", cwd=origin)
+    git("commit", "--quiet", "-m", "merged since", cwd=origin)
+    newer = git("rev-parse", "HEAD", cwd=origin)
+    return f"file://{origin}", older, newer

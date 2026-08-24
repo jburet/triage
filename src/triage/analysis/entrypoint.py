@@ -23,6 +23,7 @@ from pathlib import Path
 import structlog
 from pydantic import ValidationError
 
+from triage.analysis.clone import clone
 from triage.analysis.context import (
     APPLICATION,
     DEFAULT_BUDGET,
@@ -31,7 +32,7 @@ from triage.analysis.context import (
     SelectionProfile,
     gather,
 )
-from triage.analysis.jobs import JOB_NAME_ENV, REQUEST_ENV
+from triage.analysis.jobs import JOB_NAME_ENV, JOB_TIMEOUT_SECONDS, REQUEST_ENV, WORKSPACE_ENV
 from triage.llm import StructuredLLM, StructuredOutputError, build_llm
 from triage.prompts import render
 from triage.schemas.analysis import (
@@ -116,6 +117,31 @@ async def analyse(
     return AnalysisResult.failed(request.kind, f"{request.kind.value} was not answered: {failure}")
 
 
+async def run(
+    request: AnalysisRequest,
+    llm: StructuredLLM,
+    *,
+    workspace: Path | None,
+    token: str = "",
+    budget: ContextBudget = DEFAULT_BUDGET,
+) -> AnalysisResult:
+    """Get the tree, then answer against it.
+
+    A workspace means the caller has nothing cloned — the image's case, where
+    the container is all there is on the far side of the Job boundary and no
+    step before it ran. No workspace means the host runner, which clones and
+    then starts the entrypoint inside the result; cloning again there would
+    fetch the same tree twice.
+    """
+    if workspace is None:
+        return await analyse(request, Path.cwd(), llm, budget=budget)
+    workspace.mkdir(parents=True, exist_ok=True)
+    failure = await clone(request, workspace, timeout=JOB_TIMEOUT_SECONDS, token=token)
+    if failure is not None:
+        return AnalysisResult.failed(request.kind, failure)
+    return await analyse(request, workspace, llm, budget=budget)
+
+
 def report(result: AnalysisResult) -> int:
     """Hand the result to the local runner: the payload on stdout, or a reason and a code."""
     if result.succeeded and result.result is not None:
@@ -153,10 +179,16 @@ async def main() -> int:
 
     request = AnalysisRequest.model_validate_json(os.environ[REQUEST_ENV])
     settings = get_settings()
+    workspace = os.environ.get(WORKSPACE_ENV)
     try:
         # build_llm, not a LiteLLMClient: the sandbox must reach a model the same
         # way the graph does, or the provider that works outside it fails here.
-        result = await analyse(request, Path.cwd(), build_llm(settings))
+        result = await run(
+            request,
+            build_llm(settings),
+            workspace=Path(workspace) if workspace else None,
+            token=settings.github_token,
+        )
     except Exception as exc:
         result = AnalysisResult.failed(request.kind, f"{type(exc).__name__}: {exc}")
 

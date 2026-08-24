@@ -12,7 +12,8 @@ from pathlib import Path
 import pytest
 
 from tests.conftest import a_repo_summary, an_analysis_request
-from triage.analysis.runner import CompletedCommand, LocalAnalysisRunner
+from triage.analysis.clone import CompletedCommand
+from triage.analysis.runner import LocalAnalysisRunner
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 
 ENTRYPOINT = ("triage-analysis",)
