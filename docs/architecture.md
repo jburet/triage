@@ -409,17 +409,29 @@ confidence caps that keep an unobserved location from reading like an observed o
 
 What M6 does **not** deliver:
 
-- **Only the Datadog half has run live.** `make run-mapping` was run against the real
-  org on 2026-08-24 and mapped `plt-hcl-software-uat` to `platform` at
-  `sha256:2e15f697…` from its StatefulSet change event. Every GitHub call on this path —
-  the tag lookup, the default-branch read, the file listing that finds the chart — has
-  only ever met `FakeGitHubClient`.
-- **Nothing maps until the real repositories are declared.** Against the shipped example
-  `config.yaml` all twenty seed repositories are unclaimed, so the live run resolved no
-  commit and no chart: the image named `platform`, and no declared repository is. This
-  is the prerequisite for the report being worth reading and no plan item covers it.
+- **Both halves have now run live, once.** `make run-mapping ARGS="plt-hcl-software-uat"`
+  against the real org on 2026-08-24 mapped the workload to `platform` at
+  `sha256:2e15f697…` from its StatefulSet change event, and — with
+  `github.com/zeenea/datacatalog` declared — resolved image tag `501` through the git tag
+  of the same name to commit `fcb58d1b`, verified by hand against the GitHub API. The
+  `github_tag` rung, the ladder's most decisive, is the only one observed working; the
+  default-branch fallback and the incremental `UNCHANGED` path have still only met
+  `FakeGitHubClient`.
+- **The workload is named inside the file, and the rule only reads path segments.** The
+  same run resolved `platform-infra` — the right repository, as the seed says — and found
+  no path in it defining the workload. The file it was looking for is
+  `terraform/eks_module/eks.tf`: `resource "kubernetes_stateful_set_v1" "platform"`, with
+  the liveness, readiness and startup probes the captured incident turned on. `_defines`
+  matches a path *segment* equal to the repository name or ending in `-<name>`, and this
+  repository names its module for what it provisions on (`eks_module`) rather than for what
+  runs there. The workload's name is the resource label, one level below any path. So the
+  rule cannot find this file, and cannot find it for any repository that organises by
+  infrastructure rather than by service — which is the majority here.
 - **The seed is a snapshot.** Dated 2026-04-20 and hand-written; a repository added since
-  is missing and a tenancy model changed since is wrong.
+  is missing and a tenancy model changed since is wrong. Its `deployment` field held up on
+  the one workload checked: `platform → platform_infra` is where the StatefulSet is.
+  Eighteen of its twenty repositories are still declared by no team in `config.yaml`, so
+  the report names them as unattributable.
 - **Nothing schedules a pass.** The graph is registered and runs by hand
   (`make run-mapping`) or from Studio; the cron is a Platform object, infra track.
 
