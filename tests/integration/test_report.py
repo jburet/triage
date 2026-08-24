@@ -19,7 +19,13 @@ from tests.conftest import (
 from triage.db.repo import InMemoryRepository
 from triage.graphs.incident import build_graph
 from triage.graphs.ticket_pipeline import graph
-from triage.schemas import PipelineOutcome, ReviewVerdict, TicketDraft, TicketSection
+from triage.schemas import (
+    DedupDecision,
+    PipelineOutcome,
+    ReviewVerdict,
+    TicketDraft,
+    TicketSection,
+)
 from triage.schemas.signal import SignalStatus
 
 
@@ -258,3 +264,62 @@ async def test_an_observed_location_and_a_guessed_one_do_not_read_alike(config, 
     assert "name pattern" in there
     assert "nothing observed which build" in there
     assert "image this service is running" not in there
+
+
+async def test_every_notice_about_one_incident_lands_in_one_thread(config):
+    """The channel is where the team already handles alerts (ADR-0023).
+
+    Which means Triage's several messages about one incident have to read as one
+    conversation, not as three unrelated alerts scattered between everyone
+    else's. The opening notice is the thread; everything after it replies into
+    it, including a report split into parts.
+    """
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry("plt-hcl-software-uat")),
+        datadog=fake_datadog(),
+    )
+    result = await (
+        build_graph()
+        .compile()
+        .ainvoke({"alert": pod_down_alert(), "team": "platform"}, config=run_config(deps))
+    )
+
+    opening, *replies = deps.slack.messages
+    assert opening.thread_ts is None
+    assert "Investigating" in opening.text
+    assert replies
+    assert all(message.thread_ts == result["thread_ts"] for message in replies)
+    assert all(message.channel == "#platform-alerts" for message in deps.slack.messages)
+
+
+async def test_a_recurrence_escalation_replies_into_the_same_thread(jira_config, oom_diagnosis):
+    """ADR-0003's loud notice is still a notice about *this* incident.
+
+    Posted outside the thread it would read as a new problem, which is the one
+    thing an escalation saying "this is not going away" must not do.
+    """
+    repo = InMemoryRepository()
+    await repo.save_ticket(
+        jira_key="PAY-7",
+        jira_url="https://jira.invalid/browse/PAY-7",
+        project="PAY",
+        team="payments",
+        service="payments-api",
+        summary="payments-api OOM during settlement",
+        diagnosis_id=None,
+    )
+    await repo.bump_occurrence("PAY-7")  # at 2; this run makes it the 3rd, which escalates
+    deps = build_deps(
+        jira_config,
+        repo=repo,
+        dedup=[DedupDecision(matched=True, ticket_key="PAY-7", reasoning="Same cause.")],
+    )
+
+    await graph.ainvoke(
+        {"diagnosis": oom_diagnosis, "thread_ts": "1755000000.000100"}, config=run_config(deps)
+    )
+
+    (message,) = deps.slack.messages
+    assert "has now recurred 3 times" in message.text
+    assert message.thread_ts == "1755000000.000100"
