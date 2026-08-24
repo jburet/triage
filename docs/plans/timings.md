@@ -102,3 +102,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | ADR-0021 proof | make run-mapping ARGS="plt-hcl-software-uat" (live, chart resolved) | 4 |
 | 2026-08-24 | F1 live attempt | make run-incident (live Datadog ok; LiteLLM proxy unreachable, killed) | 622 |
 | 2026-08-24 | F1 live run | make run-incident (live Datadog + LiteLLM; died at qualify, schema shape) | 43 |
+| 2026-08-24 | F1 live re-run | make run-incident (shape correction did not take; nested-list tool args) | 40 |
