@@ -95,8 +95,19 @@ schemas is unmeasured.
 
 And production, until the proxy takes the field. `litellm-euw3` rejects `strict` outright,
 so the path that matters keeps the old rate and the three attempts behind it. Upgrading
-LiteLLM until it forwards `strict` is now the single highest-value thing available, and it
-needs no change here to take effect.
+LiteLLM is now the single highest-value thing available, and it needs no change here.
+
+The fix upstream is [PR #36979](https://github.com/BerriAI/litellm/pull/36979), *"fix(anthropic):
+preserve optional Responses tool properties"*, merged 2026-08-17: it adds `strict` to
+`AnthropicMessagesTool` — the type whose validation produces the refusal we get — and carries
+it through the pass-through adapters. It is **not** in v1.98.0, the current stable; it is in
+the v1.99.0 line from `v1.99.0-dev.1` onwards, including `v1.99.0-rc.1`. So: **deploy v1.99.0
+once it is stable**, or the rc if that is acceptable.
+
+One operational note for that day: whether strict is offered is remembered per client
+instance, for the life of the process. A Triage already running against the old proxy has
+learned that strict is refused and will keep asking without it — the deployment has to be
+restarted after the proxy is, or the upgrade shows no effect at all.
 
 ## Revisit when
 
