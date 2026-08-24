@@ -122,9 +122,9 @@ and 2.3 correctly refuses to pretend otherwise. But that number *is* a tag in Gi
 GitHub will say which commit it points at — so the fact is one read away, and without it
 every F1 analysis keeps running at "the last commit F0 summarised" and apologising for it.
 
-- [ ] 2.6 A lightweight tag on a declared repository resolves to the commit it names, through
+- [x] 2.6 A lightweight tag on a declared repository resolves to the commit it names, through
       one read on the `GitHubClient` protocol, and `deployed_commit` becomes `Filled`.
-- [ ] 2.7 An annotated tag resolves to the commit the tag object points at, not to the tag
+- [x] 2.7 An annotated tag resolves to the commit the tag object points at, not to the tag
       object's own SHA — the two differ, and the second is a ref no clone can check out.
 - [ ] 2.8 A tag the repository does not have falls back to the default branch, and the
       mapping records that it did. No second *tag* spelling is tried on a hunch — a tag

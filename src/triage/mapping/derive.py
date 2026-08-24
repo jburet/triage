@@ -19,6 +19,7 @@ from triage.mapping.resolve import naming_conflict
 from triage.mapping.seed import seed_for
 from triage.schemas.common import Unknown
 from triage.schemas.system_map import (
+    CommitSource,
     Derivation,
     MappingOutcome,
     MappingSource,
@@ -79,6 +80,7 @@ def _from_image(
             image=image.reference,
             image_digest=image.digest,
             deployed_commit=commit or _commit_unknown(image),
+            commit_source=CommitSource.IMAGE_TAG if commit else None,
             iac_repo=iac_repo,
             iac_repo_url=iac.url if iac else None,
             tenancy=declared.tenancy,

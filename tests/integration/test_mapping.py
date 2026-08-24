@@ -17,11 +17,13 @@ from tests.conftest import (
     run_config,
 )
 from triage.graphs.mapping import graph
-from triage.schemas.system_map import MappingOutcome, MappingSource, Tenancy
+from triage.integrations.github import FakeGitHubClient
+from triage.schemas.system_map import CommitSource, MappingOutcome, MappingSource, Tenancy
 
 PLATFORM = "github.com/zeenea/platform"
 PLATFORM_INFRA = "github.com/zeenea/platform-infra"
 DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
+COMMIT = "9f2c1ab8b0e3d4f5a6b7c8d9e0f1a2b3c4d5e6f7"
 
 
 @pytest.fixture
@@ -49,6 +51,17 @@ async def test_a_tenant_is_mapped_to_the_repository_its_running_image_names(zeen
     assert entry.repo_url == PLATFORM
     assert entry.source is MappingSource.IMAGE
     assert state["entries_written"] == 1
+
+
+async def test_the_build_number_the_tenant_runs_becomes_a_commit_through_github(zeenea):
+    """`501` is not a commit and is a tag: the whole reason Phase 2b exists."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(tags={(PLATFORM, "501"): COMMIT}))
+
+    await run(deps)
+
+    entry = deps.repo.workloads[TENANT]
+    assert entry.deployed_commit == COMMIT
+    assert entry.commit_source is CommitSource.GITHUB_TAG
 
 
 async def test_the_entry_records_the_digest_that_was_running(zeenea):

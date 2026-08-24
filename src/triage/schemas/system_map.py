@@ -227,6 +227,19 @@ class MappingSource(StrEnum):
     MANUAL = "manual"
 
 
+class CommitSource(StrEnum):
+    """What said which commit a workload is running, in decreasing directness.
+
+    The image tag is the build itself; a GitHub tag of the same name is the same
+    build, named once removed; the default branch is neither — it is what the
+    repository looked like, which is a different claim and has to read as one.
+    """
+
+    IMAGE_TAG = "image_tag"
+    GITHUB_TAG = "github_tag"
+    DEFAULT_BRANCH = "default_branch"
+
+
 class WorkloadEntry(BaseModel):
     """One running service, joined to the repository whose code it runs (M6).
 
@@ -245,6 +258,9 @@ class WorkloadEntry(BaseModel):
     image: str | None = Field(default=None, description="Image reference exactly as observed.")
     image_digest: str | None = None
     deployed_commit: MaybeUnknown
+    commit_source: CommitSource | None = Field(
+        default=None, description="What answered the commit; None when nothing did."
+    )
     iac_repo: str | None = None
     iac_repo_url: str | None = None
     iac_paths: list[str] = Field(default_factory=list)

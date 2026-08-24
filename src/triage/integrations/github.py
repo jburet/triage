@@ -7,11 +7,13 @@ graph, and the whole point of the Job is that repository content is read inside
 the sandbox. A comparison is different from a clone — it returns filenames, not
 code — so it is a plain read the graph may make itself.
 
-Deliberately one method. The architecture's rule is "MCP servers when they
-exist, Python tools otherwise" and a GitHub MCP server does exist, but reaching
-one for a single unauthenticated-shaped read would put an MCP runtime in the
-graph's path for no gain; when M3 needs richer GitHub reads, this protocol is
-the seam to reconsider it behind.
+M6 added the second question: which commit the build a tenant is running was
+cut from, because the image tag is a build number and that number is a tag here
+(2.6). Both are single-shot reads of metadata, so the reasoning holds — the
+architecture's rule is "MCP servers when they exist, Python tools otherwise" and
+a GitHub MCP server does exist, but reaching one for reads of this shape would
+put an MCP runtime in the graph's path for no gain. This protocol stays the seam
+to reconsider it behind.
 
 :class:`GitHubRestClient` is **unverified against a live server** — the request
 shape is covered by ``tests/integration/test_github_client.py``, whether the
@@ -23,7 +25,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 
 import httpx
 
@@ -51,6 +53,15 @@ def repo_path(repo_url: str) -> str:
 class GitHubClient(Protocol):
     async def changed_paths(self, repo_url: str, *, base: str, head: str) -> list[str]:
         """Paths changed between two commits, repository-relative."""
+        ...
+
+    async def commit_for_tag(self, repo_url: str, tag: str) -> str | None:
+        """The commit this tag points at, or None when the repository has no such tag.
+
+        An absent tag is an answer rather than an error: an image tag that is a
+        build number is a tag in GitHub for the repositories that push one, and
+        is nothing at all for the ones that do not.
+        """
         ...
 
 
@@ -90,6 +101,39 @@ class GitHubRestClient:
             )
         return [str(item["filename"]) for item in files]
 
+    async def commit_for_tag(self, repo_url: str, tag: str) -> str | None:
+        path = repo_path(repo_url)
+        response = await self._client.get(
+            f"/repos/{path}/git/ref/tags/{tag}", headers=self._headers
+        )
+        if response.status_code == 404:
+            return None
+        if response.status_code >= 400:
+            raise GitHubError(f"reading tag {tag!r} in {path} returned {_explain(response)}")
+        return await self._dereferenced(path, tag, response.json().get("object") or {})
+
+    async def _dereferenced(self, path: str, tag: str, obj: dict[str, Any]) -> str:
+        """The commit behind a ref's object, through the tag object of an annotated tag.
+
+        An annotated tag is its own object in the graph, and the ref points at
+        *that*: taking its sha would hand every later analysis a ref no clone can
+        check out, and the failure would look like a repository that lost a commit.
+        """
+        sha = obj.get("sha")
+        if not isinstance(sha, str):
+            raise GitHubError(f"the tag {tag!r} in {path} names no object")
+        if obj.get("type") != "tag":
+            return sha
+        response = await self._client.get(f"/repos/{path}/git/tags/{sha}", headers=self._headers)
+        if response.status_code >= 400:
+            raise GitHubError(
+                f"reading the annotated tag {tag!r} in {path} returned {_explain(response)}"
+            )
+        commit = (response.json().get("object") or {}).get("sha")
+        if not isinstance(commit, str):
+            raise GitHubError(f"the annotated tag {tag!r} in {path} names no commit")
+        return commit
+
 
 def _explain(response: httpx.Response) -> str:
     try:
@@ -110,8 +154,10 @@ class FakeGitHubClient:
     """
 
     changed: Mapping[str, Sequence[str]] = field(default_factory=dict)
+    tags: Mapping[tuple[str, str], str] = field(default_factory=dict)
     error: Exception | None = None
     comparisons: list[tuple[str, str, str]] = field(default_factory=list)
+    tag_lookups: list[tuple[str, str]] = field(default_factory=list)
 
     async def changed_paths(self, repo_url: str, *, base: str, head: str) -> list[str]:
         self.comparisons.append((repo_url, base, head))
@@ -124,9 +170,19 @@ class FakeGitHubClient:
                 f"FakeGitHubClient has no comparison configured for {repo_url!r}"
             ) from None
 
+    async def commit_for_tag(self, repo_url: str, tag: str) -> str | None:
+        """Unlike a comparison, an unconfigured tag is the real answer: no such tag."""
+        self.tag_lookups.append((repo_url, tag))
+        if self.error is not None:
+            raise self.error
+        return self.tags.get((repo_url, tag))
+
 
 def dry_run_github() -> FakeGitHubClient:
     """Dry run makes no GitHub call, and says so rather than claiming nothing changed."""
     return FakeGitHubClient(
-        error=GitHubError("dry run: no comparison was made, so nothing is known to be unchanged")
+        error=GitHubError(
+            "dry run: GitHub was not read, so nothing is known to be unchanged and no "
+            "tag was resolved to a commit"
+        )
     )

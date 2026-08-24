@@ -16,11 +16,12 @@ from langchain_core.runnables import RunnableConfig
 
 from triage.graphs.state import MappingState
 from triage.integrations.datadog import DatadogError
+from triage.mapping.commits import with_deployed_commit
 from triage.mapping.derive import derive_workload
 from triage.mapping.resolve import unclaimed
 from triage.mapping.seed import load_seed
 from triage.runtime import Deps, deps_from_runnable_config
-from triage.schemas.system_map import Derivation, MappingOutcome
+from triage.schemas.system_map import Derivation, MappingOutcome, WorkloadEntry
 
 log = structlog.get_logger(__name__)
 
@@ -60,7 +61,19 @@ async def _events(deps: Deps, service: str, days: int) -> list[dict[str, object]
     return [event for event in data if isinstance(event, dict)]
 
 
-async def _against_what_is_on_record(deps: Deps, derivation: Derivation) -> Derivation:
+async def _with_deployed_commit(deps: Deps, derivation: Derivation) -> Derivation:
+    """Ask GitHub which commit this build was cut from, when the image did not say."""
+    entry = derivation.entry
+    if entry is None or not derivation.mapped:
+        return derivation
+    return derivation.model_copy(
+        update={"entry": await with_deployed_commit(deps.github, deps.config, entry)}
+    )
+
+
+def _against_what_is_on_record(
+    derivation: Derivation, previous: WorkloadEntry | None
+) -> Derivation:
     """Nothing moved, so nothing is rewritten — ADR-0015's reasoning, one level down.
 
     The digest is what makes a derivation *an observation*: while it is the same,
@@ -72,7 +85,6 @@ async def _against_what_is_on_record(deps: Deps, derivation: Derivation) -> Deri
     entry = derivation.entry
     if entry is None or not derivation.mapped or entry.image_digest is None:
         return derivation
-    previous = await deps.repo.workload_for_service(derivation.service)
     if previous != entry:
         return derivation
     return derivation.model_copy(
@@ -107,8 +119,12 @@ async def derive_workloads(
                 )
             )
             continue
-        derived = derive_workload(deps.config, seed, service, events)
-        derivations.append(await _against_what_is_on_record(deps, derived))
+        derived = await _with_deployed_commit(
+            deps, derive_workload(deps.config, seed, service, events)
+        )
+        derivations.append(
+            _against_what_is_on_record(derived, await deps.repo.workload_for_service(service))
+        )
     return {"derivations": derivations}
 
 

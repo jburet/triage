@@ -92,3 +92,61 @@ async def test_a_comparison_at_githubs_file_cap_is_refused_rather_than_read_as_t
 
     with pytest.raises(GitHubError, match="cap"):
         await client.changed_paths("github.com/org/x", base="a", head="b")
+
+
+LIGHTWEIGHT = {"object": {"type": "commit", "sha": "9f2c1ab"}}
+ANNOTATED = {"object": {"type": "tag", "sha": "7a7a7a7"}}
+
+
+def client_routing(routes, requests):
+    """A client whose answer depends on the path, for reads that take two requests."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        status, body = routes.get(request.url.path, (404, {"message": "Not Found"}))
+        return httpx.Response(status, json=body)
+
+    inner = httpx.AsyncClient(base_url=API, transport=httpx.MockTransport(handler))
+    return GitHubRestClient("token-123", api_url=API, client=inner)
+
+
+async def test_a_lightweight_tag_resolves_to_the_commit_it_names():
+    requests: list[httpx.Request] = []
+    client = client_routing({"/repos/org/x/git/ref/tags/501": (200, LIGHTWEIGHT)}, requests)
+
+    assert await client.commit_for_tag("github.com/org/x", "501") == "9f2c1ab"
+    assert [request.url.path for request in requests] == ["/repos/org/x/git/ref/tags/501"]
+
+
+async def test_an_annotated_tag_resolves_to_the_commit_and_not_to_the_tag_object():
+    """The ref points at the tag object; its sha is a ref no clone can check out."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x/git/ref/tags/v2.0": (200, ANNOTATED),
+            "/repos/org/x/git/tags/7a7a7a7": (
+                200,
+                {"object": {"type": "commit", "sha": "9f2c1ab"}},
+            ),
+        },
+        requests,
+    )
+
+    assert await client.commit_for_tag("github.com/org/x", "v2.0") == "9f2c1ab"
+    assert [request.url.path for request in requests][-1] == "/repos/org/x/git/tags/7a7a7a7"
+
+
+async def test_a_tag_the_repository_does_not_have_is_an_answer_rather_than_an_error():
+    requests: list[httpx.Request] = []
+
+    assert await client_routing({}, requests).commit_for_tag("github.com/org/x", "501") is None
+
+
+async def test_a_refused_tag_read_raises_with_what_github_said():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/ref/tags/501": (403, {"message": "API rate limit exceeded"})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="rate limit"):
+        await client.commit_for_tag("github.com/org/x", "501")

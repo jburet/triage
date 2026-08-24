@@ -527,6 +527,7 @@ def build_deps(
     repo: InMemoryRepository | None = None,
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
+    github: FakeGitHubClient | None = None,
     datadog: FakeDatadogClient | None = None,
     platform: FakePlatformClient | None = None,
 ) -> Deps:
@@ -549,7 +550,7 @@ def build_deps(
         slack=FakeSlackClient(),
         repo=repo or InMemoryRepository(),
         runner=runner or canned_runner(),
-        github=FakeGitHubClient(changed=changed or {}),
+        github=github or FakeGitHubClient(changed=changed or {}),
         datadog=datadog or FakeDatadogClient(),
         platform=platform,
         config=config,
