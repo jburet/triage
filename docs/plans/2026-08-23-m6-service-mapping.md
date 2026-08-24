@@ -126,9 +126,11 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       one read on the `GitHubClient` protocol, and `deployed_commit` becomes `Filled`.
 - [ ] 2.7 An annotated tag resolves to the commit the tag object points at, not to the tag
       object's own SHA — the two differ, and the second is a ref no clone can check out.
-- [ ] 2.8 A tag the repository does not have is an `Unknown` naming the repository and the tag
-      that was looked for. No second spelling is tried on a hunch: a tag resolved by guessing
-      is a commit that sends an analysis to the wrong tree.
+- [ ] 2.8 A tag the repository does not have falls back to the default branch, and the
+      mapping records that it did. No second *tag* spelling is tried on a hunch — a tag
+      invented by guessing points somewhere specific and wrong — but the default branch is not
+      a guess of that kind: production runs `main` in essentially every case, and the
+      alternative on this path is not a better commit, it is no commit at all.
 - [ ] 2.9 A repository whose GitHub tags are not spelled as the image tag declares the
       relationship in `config.yaml` (a template such as `v{tag}` or `build-{tag}`), and only
       the declared spelling is looked up.
@@ -136,8 +138,19 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       all, and its `deployed_commit` Unknown says that rather than blaming the tag. The image
       names a repository, `config.yaml` names a *GitHub* repository, and those are not the
       same string — the image is `platform` where the remote is `zeenea/datacatalog`.
-- [ ] 2.11 `deployed_commit` records where it came from (`tag` | `github`), and a commit read
-      from GitHub is preferred over one parsed out of a tag that merely looks like a SHA.
+- [ ] 2.11 `deployed_commit` records where it came from — `image_tag`, `github_tag`,
+      `default_branch` — in that order of preference, and a commit read from GitHub is
+      preferred over one parsed out of a tag that merely looks like a SHA.
+- [ ] 2.14 An image carrying no tag at all takes the same default-branch path as an unfound
+      tag: the two are the same situation, "GitHub knows this repository and not this build".
+- [ ] 2.15 The default-branch commit is the one that branch pointed at **when the incident
+      fired**, not at the moment the mapping runs, whenever the caller knows that time. A
+      diagnosis of Tuesday's outage read against Thursday's `main` is a different repository.
+      With no time to work from, `HEAD` is used and the source says so.
+- [ ] 2.16 A `default_branch` commit is never presented as the deployed one: the diagnosis
+      that uses it states that the analysis read the default branch as it stood, because no
+      build was identifiable, and cannot reach `high` confidence on that alone (4.2's rule,
+      extended to this source).
 - [ ] 2.12 A GitHub read that fails — rate limit, permission, network — leaves an `Unknown`
       carrying the failure and the mapping pass continues; one unreachable repository does not
       cost the other nineteen their mapping.
@@ -193,11 +206,16 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
   image is renamed. 2.2 fails loudly rather than guessing, which turns a silent
   misattribution into a mapping report line.
 - **The commit may not be in the image at all.** Confirmed on 2026-08-23: the tags are build
-  numbers. Phase 2b is the answer — the build number is a GitHub tag — and it rests on two
-  assumptions worth stating. That every deployed image tag has a corresponding GitHub tag
-  (an image built outside the tagged pipeline has none, and 2.8 will say so rather than
-  guess); and that the token in `TRIAGE_GITHUB_TOKEN` can read every declared repository,
-  which is a permissions question a staging run answers, not a design one.
+  numbers. Phase 2b answers it in two steps — the build number is a GitHub tag, and failing
+  that the default branch — and rests on two assumptions worth stating. That the token in
+  `TRIAGE_GITHUB_TOKEN` can read every declared repository, which a staging run answers, not
+  a design decision. And that **production runs the default branch**, which is stated as
+  ~99% true and is exactly the kind of thing that is false for the one tenant whose incident
+  matters: a customer pinned to an older build, a hotfix branch, a rollback. The failure is
+  quiet — the analysis reads real code at a real commit and answers confidently about a tree
+  the tenant is not running — so 2.11 and 2.16 exist to make the source visible in the
+  ticket. If a diagnosis is ever wrong in this way, the fix is not to distrust the fallback
+  generally but to get the commit into the image tag.
 - **Nothing maps until the real repositories are declared.** Against the shipped example
   `config.yaml`, all twenty seed repositories come back unclaimed — correct, and noise. Phase
   2b makes this sharper rather than milder: 2.10 means an undeclared repository gets no commit
