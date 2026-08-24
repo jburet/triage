@@ -7,6 +7,8 @@ truncation handling are worth pinning down; whether a real repository is
 reachable with the configured token is what a staging run is for.
 """
 
+from datetime import UTC, datetime
+
 import httpx
 import pytest
 
@@ -92,3 +94,150 @@ async def test_a_comparison_at_githubs_file_cap_is_refused_rather_than_read_as_t
 
     with pytest.raises(GitHubError, match="cap"):
         await client.changed_paths("github.com/org/x", base="a", head="b")
+
+
+LIGHTWEIGHT = {"object": {"type": "commit", "sha": "9f2c1ab"}}
+ANNOTATED = {"object": {"type": "tag", "sha": "7a7a7a7"}}
+
+
+def client_routing(routes, requests):
+    """A client whose answer depends on the path, for reads that take two requests."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        status, body = routes.get(request.url.path, (404, {"message": "Not Found"}))
+        return httpx.Response(status, json=body)
+
+    inner = httpx.AsyncClient(base_url=API, transport=httpx.MockTransport(handler))
+    return GitHubRestClient("token-123", api_url=API, client=inner)
+
+
+async def test_a_lightweight_tag_resolves_to_the_commit_it_names():
+    requests: list[httpx.Request] = []
+    client = client_routing({"/repos/org/x/git/ref/tags/501": (200, LIGHTWEIGHT)}, requests)
+
+    assert await client.commit_for_tag("github.com/org/x", "501") == "9f2c1ab"
+    assert [request.url.path for request in requests] == ["/repos/org/x/git/ref/tags/501"]
+
+
+async def test_an_annotated_tag_resolves_to_the_commit_and_not_to_the_tag_object():
+    """The ref points at the tag object; its sha is a ref no clone can check out."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x/git/ref/tags/v2.0": (200, ANNOTATED),
+            "/repos/org/x/git/tags/7a7a7a7": (
+                200,
+                {"object": {"type": "commit", "sha": "9f2c1ab"}},
+            ),
+        },
+        requests,
+    )
+
+    assert await client.commit_for_tag("github.com/org/x", "v2.0") == "9f2c1ab"
+    assert [request.url.path for request in requests][-1] == "/repos/org/x/git/tags/7a7a7a7"
+
+
+async def test_a_tag_the_repository_does_not_have_is_an_answer_rather_than_an_error():
+    requests: list[httpx.Request] = []
+
+    assert await client_routing({}, requests).commit_for_tag("github.com/org/x", "501") is None
+
+
+async def test_a_refused_tag_read_raises_with_what_github_said():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/ref/tags/501": (403, {"message": "API rate limit exceeded"})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="rate limit"):
+        await client.commit_for_tag("github.com/org/x", "501")
+
+
+async def test_the_default_branch_commit_is_read_off_the_branch_the_repository_names():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x": (200, {"default_branch": "develop"}),
+            "/repos/org/x/commits": (200, [{"sha": "9f2c1ab"}]),
+        },
+        requests,
+    )
+
+    assert await client.default_branch_commit("github.com/org/x") == "9f2c1ab"
+    assert requests[-1].url.params["sha"] == "develop"
+    assert "until" not in requests[-1].url.params
+
+
+async def test_a_branch_with_no_commit_is_refused_rather_than_answered_empty():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x": (200, {"default_branch": "main"}), "/repos/org/x/commits": (200, [])},
+        requests,
+    )
+
+    with pytest.raises(GitHubError, match="no commit"):
+        await client.default_branch_commit("github.com/org/x")
+
+
+async def test_the_default_branch_is_read_as_it_stood_at_the_time_it_is_asked_about():
+    """Thursday's `main` is a different repository from Tuesday's, and an outage
+    diagnosed against the wrong one reads real code that never ran."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x": (200, {"default_branch": "main"}),
+            "/repos/org/x/commits": (200, [{"sha": "9f2c1ab"}]),
+        },
+        requests,
+    )
+
+    await client.default_branch_commit("github.com/org/x", at=datetime(2026, 8, 22, tzinfo=UTC))
+
+    assert requests[-1].url.params["until"] == "2026-08-22T00:00:00+00:00"
+
+
+async def test_the_repository_tree_lists_the_files_the_default_branch_has():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x/git/trees/HEAD": (
+                200,
+                {
+                    "truncated": False,
+                    "tree": [
+                        {"path": "helm/zeenea-platform", "type": "tree"},
+                        {"path": "helm/zeenea-platform/values.yaml", "type": "blob"},
+                    ],
+                },
+            )
+        },
+        requests,
+    )
+
+    assert await client.default_branch_paths("github.com/org/x") == [
+        "helm/zeenea-platform/values.yaml"
+    ]
+    assert requests[-1].url.params["recursive"] == "1"
+
+
+async def test_a_tree_github_truncated_is_refused_rather_than_read_as_the_whole_repository():
+    """A chart missing from a truncated listing is a workload whose definition
+    silently cannot be found, which is the failure this read exists to fix."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/trees/HEAD": (200, {"truncated": True, "tree": []})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="truncated"):
+        await client.default_branch_paths("github.com/org/x")
+
+
+async def test_a_refused_tree_read_raises_with_what_github_said():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/trees/HEAD": (403, {"message": "API rate limit exceeded"})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="rate limit"):
+        await client.default_branch_paths("github.com/org/x")

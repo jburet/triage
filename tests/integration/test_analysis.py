@@ -10,6 +10,7 @@ from tests.conftest import (
     a_hypothesis,
     a_service_entry,
     a_synthesis,
+    a_workload,
     build_deps,
     mapped,
     run_config,
@@ -17,6 +18,7 @@ from tests.conftest import (
 )
 from triage.analysis.runner import FakeAnalysisRunner
 from triage.config import Config, Repo, RepoKind
+from triage.db.repo import InMemoryRepository
 from triage.graphs.analysis import build_graph
 from triage.runtime import Deps
 from triage.schemas import (
@@ -27,6 +29,8 @@ from triage.schemas import (
     Feature,
     Unknown,
 )
+from triage.schemas.analysis import AnalysisStatus
+from triage.schemas.system_map import MappingSource
 
 
 def graph():
@@ -256,3 +260,209 @@ async def test_a_tenant_instance_is_analysed_in_the_repository_declared_as_servi
     request = deps.runner.requests[0]
     assert request.repo_url == "github.com/org/platform"
     assert request.commit == "abc1234"
+
+
+async def test_an_infrastructure_hypothesis_reads_where_the_mapping_says_the_workload_is(
+    config: Config,
+):
+    """M6 3.2: on 2026-08-23 the repository was right and the files were not — the
+    probe timeouts are in the chart, and the selection read `*.tf`."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            iac_repo="platform-infra",
+            iac_repo_url="github.com/zeenea/platform-infra",
+            iac_paths=["helm/zeenea-platform/values.yaml"],
+        )
+    )
+    deps = build_deps(config, repo=repo)
+
+    await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA)])
+
+    request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
+    assert request.repo_url == "github.com/zeenea/platform-infra"
+    assert request.paths == ["helm/zeenea-platform/values.yaml"]
+
+
+async def test_a_service_with_no_mapped_chart_still_reads_the_teams_terraform_repository(
+    config: Config,
+):
+    """The M3 behaviour, kept: a workload nothing has mapped is analysed by glob."""
+    deps = build_deps(config, repo=mapped(a_service_entry()))
+
+    await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA)])
+
+    request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
+    assert request.repo_url == "github.com/org/infra"
+    assert request.paths == []
+
+
+async def test_a_value_the_tenant_overrides_reaches_the_diagnosis_as_the_unknown_it_is(
+    config: Config,
+):
+    """M6 3.4: the chart's 1s is the chart's. What this customer's StatefulSet was
+    given is a per-tenant override the analysis never saw, and the synthesis has to
+    be told that rather than handed a number to quote."""
+    unreadable = some_findings(
+        configured_values=[
+            {
+                "setting": "readinessProbe.timeoutSeconds",
+                "chart_default": "1, in helm/zeenea-platform/values.yaml",
+                "tenant_value": {
+                    "unknown": True,
+                    "reason": "this tenant's overrides are not in this repository",
+                },
+            }
+        ]
+    )
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry()),
+        runner=FakeAnalysisRunner(
+            results={
+                AnalysisKind.CODE_ANALYSIS: AnalysisResult(
+                    kind=AnalysisKind.CODE_ANALYSIS,
+                    status=AnalysisStatus.SUCCEEDED,
+                    result=unreadable,
+                )
+            }
+        ),
+    )
+
+    await run(deps, hypotheses=[a_hypothesis()])
+
+    prompt = deps.llm.calls[-1].prompt
+    assert "this tenant's overrides are not in this repository" in prompt
+    assert "readinessProbe.timeoutSeconds" in prompt
+
+
+async def test_a_commit_read_off_the_default_branch_is_never_presented_as_the_deployed_one(
+    config: Config,
+):
+    """Production runs the default branch in essentially every case, and the case
+    where it does not is the one whose incident matters — a customer pinned to an
+    older build, a hotfix branch, a rollback. The analysis still runs; what it may
+    not do is claim it read the code this tenant is running."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            commit_source="default_branch",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "default branch" in diagnosis.confidence_rationale
+    assert "no build was identifiable" in diagnosis.confidence_rationale
+
+
+async def test_a_commit_the_image_named_carries_no_such_caveat(config: Config):
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            commit_source="image_tag",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.HIGH
+    assert "default branch" not in diagnosis.confidence_rationale
+
+
+async def test_the_investigation_records_which_of_the_three_answered_for_the_repository(
+    config: Config,
+):
+    """A repository the running image named and one a glob suggested are different
+    facts, and the run is the only place that still knows which it was."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+        )
+    )
+    deps = build_deps(config, repo=repo)
+
+    state = await run(deps, hypotheses=[a_hypothesis()])
+
+    assert state["investigated"][0].mapping_source is MappingSource.IMAGE
+
+
+async def test_a_repository_only_the_system_map_knew_is_recorded_as_the_map_s_answer(
+    config: Config,
+):
+    deps = build_deps(config, repo=mapped(a_service_entry()))
+
+    state = await run(deps, hypotheses=[a_hypothesis()])
+
+    assert state["investigated"][0].mapping_source is MappingSource.MAP
+
+
+async def test_a_repository_only_a_name_pattern_matched_is_never_a_high_confidence_diagnosis(
+    config: Config,
+):
+    """`serves: ["payments-*"]` is a hand-maintained guess about naming, and the
+    commit behind it is the last one F0 summarised for the repository — a fact
+    about the repository, not about the build this service is running."""
+    deps = build_deps(
+        config, repo=mapped(a_service_entry()), syntheses=[a_synthesis(confidence="high")]
+    )
+
+    diagnosis = (
+        await run(deps, hypotheses=[a_hypothesis(service="payments-worker", commit=None)])
+    )["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "name pattern" in diagnosis.confidence_rationale
+    assert "last commit summarised" in diagnosis.confidence_rationale
+
+
+async def test_a_workload_row_the_derivation_only_guessed_carries_the_same_caveat(
+    config: Config,
+):
+    """2.4's fallback writes a row for a service that emitted no image event. It is
+    the patterns wearing a row, and it must not read as the image-derived mapping
+    it is stored next to."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            image=None,
+            image_digest=None,
+            source="pattern",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "name pattern" in diagnosis.confidence_rationale
+
+
+async def test_a_repository_the_map_named_carries_no_pattern_caveat(config: Config):
+    deps = build_deps(
+        config, repo=mapped(a_service_entry()), syntheses=[a_synthesis(confidence="high")]
+    )
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.HIGH
+    assert "name pattern" not in diagnosis.confidence_rationale

@@ -13,6 +13,12 @@ interesting you noticed — the hypothesis under test, confirmed or not.
 - **findings** — each thing you actually found, with `paths` naming the file or symbol
   it is in. A finding nobody can open is of no use: it becomes a line in a ticket that
   sends a developer looking. Every path must be one you were shown.
+- **configured_values** — the settings your answer rests on: for each, what the code
+  you were shown declares, and what *this* service runs. Those are two different facts
+  wherever one chart or module serves many tenants — a per-tenant override lives in a
+  repository you were not shown, so that value is an `Unknown` saying so, and you may
+  only state one by naming the file you read it in. `Unknown` for the whole field when
+  the answer rests on no configured value.
 - **confidence** — `high` only when the code you read settles it: the value, the
   handler, the resource is in front of you. `medium` when the code makes the mechanism
   likely but something needed to confirm it was not read. `low` when you are reasoning

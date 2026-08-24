@@ -6,7 +6,11 @@ is. A repository and a commit are *resolved*, never assumed — an analysis run
 against the wrong commit answers a question nobody asked, and one run against a
 guessed repository is worse than one not run at all. When resolution fails the
 hypothesis still comes back, carrying a failed result that says what was missing,
-because the diagnosis has to be able to state that it could not look.
+because the diagnosis has to be able to state that it could not look. For an
+infrastructure hypothesis "where" includes *where in*: the mapping's
+``iac_paths`` name the chart that defines this workload, and a repository of
+charts and modules selected by glob answered Unknown three times on 2026-08-23
+(M6 3.2).
 
 The branches run concurrently: they are independent Jobs against different
 repositories, and the wall clock of a diagnosis is the slowest one, not the sum.
@@ -50,7 +54,7 @@ def _question(hypothesis: Hypothesis) -> str:
 
 
 def _terraform_repo(deps: Deps, team: str) -> str | None:
-    """The Terraform repository to read an infrastructure hypothesis in.
+    """The Terraform repository to read in when no mapping named one.
 
     The owning team's, when it declares one; otherwise the only one there is. Two
     undeclared candidates is an ambiguity, and picking either would send the
@@ -72,7 +76,10 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
     kind = KIND_FOR_CAUSE[hypothesis.cause_type]
 
     if hypothesis.cause_type is CauseType.INFRA:
-        repo_url = _terraform_repo(deps, state.get("team", ""))
+        workload = await deps.repo.workload_for_service(hypothesis.service)
+        mapped_repo = workload.iac_repo_url if workload else None
+        repo_url = mapped_repo or _terraform_repo(deps, state.get("team", ""))
+        paths = list(workload.iac_paths) if workload and mapped_repo else []
         if repo_url is None:
             return Investigated(
                 hypothesis=hypothesis,
@@ -95,10 +102,12 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
             hypothesis=hypothesis,
             repo_url=repo_url,
             commit=commit,
+            paths=paths,
             result=None,
         )
 
-    repo_url, mapped_commit = await deployed_repo(deps.config, deps.repo, hypothesis.service)
+    deployment = await deployed_repo(deps.config, deps.repo, hypothesis.service)
+    repo_url, mapped_commit = deployment.repo_url, deployment.commit
     if repo_url is None:
         return Investigated(
             hypothesis=hypothesis,
@@ -137,6 +146,8 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
         repo_url=repo_url,
         commit=commit,
         base_commit=base_commit,
+        commit_source=deployment.commit_source,
+        mapping_source=deployment.mapping_source,
         result=None,
     )
 
@@ -152,6 +163,7 @@ async def _run(deps: Deps, planned: Investigated) -> Investigated:
         repo_url=planned.repo_url,
         commit=planned.commit,
         base_commit=planned.base_commit,
+        paths=planned.paths,
         question=_question(hypothesis),
     )
     return planned.model_copy(update={"result": await deps.runner.run(request)})

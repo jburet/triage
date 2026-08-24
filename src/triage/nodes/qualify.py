@@ -33,7 +33,8 @@ NEEDS_COMMIT = (CauseType.APP, CauseType.DEPLOYMENT)
 
 
 async def _resolve(deps: Deps, cause: ProposedCause) -> Hypothesis:
-    repo_url, commit = await deployed_repo(deps.config, deps.repo, cause.service)
+    deployment = await deployed_repo(deps.config, deps.repo, cause.service)
+    repo_url, commit = deployment.repo_url, deployment.commit
     cause_type = cause.cause_type
     if cause_type in NEEDS_COMMIT and not commit:
         cause_type = CauseType.DEPENDENCY if repo_url is None else CauseType.INFRA

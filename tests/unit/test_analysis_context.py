@@ -13,6 +13,7 @@ from triage.analysis.context import (
     TERRAFORM,
     ContextBudget,
     gather,
+    reads,
 )
 
 
@@ -70,6 +71,31 @@ def test_terraform_state_is_never_read(tmp_path):
     assert not [entry for entry in context.tree if "tfstate" in entry]
 
 
+def test_a_helm_chart_is_infrastructure_the_terraform_selection_reads(tmp_path):
+    """M6 3.3: the probe timeouts and memory limits that would have explained the
+    incident of 2026-08-23 are in `helm/zeenea-platform/values.yaml`, and a
+    selection of `*.tf` answered Unknown three times."""
+    write(tmp_path, "helm/zeenea-platform/values.yaml", "readinessProbe:\n  timeoutSeconds: 1\n")
+    write(tmp_path, "helm/zeenea-platform/Chart.yaml", "name: zeenea-platform\n")
+    write(tmp_path, "helm/zeenea-platform/templates/statefulset.yaml", "kind: StatefulSet\n")
+    write(tmp_path, "modules/rds/main.tf", 'resource "aws_db_instance" "primary" {}\n')
+
+    assert set(paths_read(tmp_path, TERRAFORM)) == {
+        "helm/zeenea-platform/values.yaml",
+        "helm/zeenea-platform/Chart.yaml",
+        "helm/zeenea-platform/templates/statefulset.yaml",
+        "modules/rds/main.tf",
+    }
+
+
+def test_the_application_selection_still_answers_from_application_files(tmp_path):
+    """Infrastructure files are read wherever they live; the reverse would put a
+    chart's templates and a module's HCL into every repository summary."""
+    assert not reads("helm/zeenea-platform/templates/statefulset.yaml", APPLICATION)
+    assert not reads("modules/rds/main.tf", APPLICATION)
+    assert not reads("modules/rds/variables.tfvars", APPLICATION)
+
+
 def test_dependency_directories_are_not_walked(tmp_path):
     write(tmp_path, "package.json", '{"name": "web"}\n')
     write(tmp_path, "node_modules/left-pad/package.json", '{"name": "left-pad"}\n')
@@ -108,6 +134,40 @@ def test_the_tree_is_capped_shallowest_first(tmp_path):
 
     assert context.tree == ("README.md", "zzz.py")
     assert any("not listed" in note for note in context.not_examined)
+
+
+def test_the_paths_the_mapping_named_are_read_before_the_profiles_own(tmp_path):
+    """M6 3.2: the mapping knows which chart defines this workload and a glob does
+    not, so a budget spent on the repository's other modules is the answer lost."""
+    write(tmp_path, "modules/eks/main.tf", "module {}\n")
+    write(tmp_path, "helm/zeenea-platform/values.yaml", "timeoutSeconds: 1\n")
+
+    context = gather(
+        tmp_path,
+        TERRAFORM,
+        ContextBudget(max_files=1),
+        first=["helm/zeenea-platform/values.yaml"],
+    )
+
+    assert [f.path for f in context.files] == ["helm/zeenea-platform/values.yaml"]
+
+
+def test_a_named_path_is_read_once_and_not_again_by_its_glob(tmp_path):
+    write(tmp_path, "helm/zeenea-platform/values.yaml", "timeoutSeconds: 1\n")
+
+    context = gather(tmp_path, TERRAFORM, first=["helm/zeenea-platform/values.yaml"])
+
+    assert [f.path for f in context.files] == ["helm/zeenea-platform/values.yaml"]
+
+
+def test_a_named_path_the_tree_does_not_have_is_reported_rather_than_ignored(tmp_path):
+    """The mapping was made against the default branch; the analysis reads a commit,
+    and a chart that moved between the two is a gap the diagnosis has to know about."""
+    write(tmp_path, "modules/eks/main.tf", "module {}\n")
+
+    context = gather(tmp_path, TERRAFORM, first=["helm/zeenea-platform/values.yaml"])
+
+    assert any("helm/zeenea-platform/values.yaml" in note for note in context.not_examined)
 
 
 def test_the_payload_carries_tree_files_and_gaps(tmp_path):

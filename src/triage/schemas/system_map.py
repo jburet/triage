@@ -11,6 +11,7 @@ be acted on.
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, TypeAlias, TypeVar
 
@@ -163,6 +164,152 @@ class TerraformSummary(BaseModel):
     networking: Listed[NetworkFact] | Unknown
     managed_databases: Listed[ManagedDatabase] | Unknown
     modules: Listed[ModuleMapping] | Unknown
+
+
+class Tenancy(StrEnum):
+    """How many customers one deployment of a repository serves.
+
+    The vocabulary is the architecture document's own, so that a cell nobody has
+    taught this enum about is an unrecognised row rather than a row quietly
+    filed under the nearest value (M6 1.1). ``MONO_TENANT`` is the load-bearing
+    one: it is what allows a running service to be named after a customer rather
+    than after the repository it runs.
+    """
+
+    MONO_TENANT = "mono_tenant"
+    MULTI_TENANT = "multi_tenant"
+    PER_TENANT_PROVISIONING = "per_tenant_provisioning"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class Deployer(StrEnum):
+    """What puts a repository into a cluster, and therefore where its IaC lives."""
+
+    APPLICATION_DEPLOYER = "application_deployer"
+    PLATFORM_INFRA = "platform_infra"
+    GITHUB_ACTIONS = "github_actions"
+    AWS_ORGANIZATION = "aws_organization"
+    NOT_DEPLOYED = "not_deployed"
+    """The deployer itself, and anything else nothing deploys."""
+
+
+IAC_REPO: dict[Deployer, str] = {
+    Deployer.APPLICATION_DEPLOYER: "application-deployer",
+    Deployer.PLATFORM_INFRA: "platform-infra",
+}
+"""The two deployers that are themselves repositories an ``iac_analysis`` can read."""
+
+
+class SeedEntry(BaseModel):
+    """One row of the architecture document's repository map.
+
+    The seed answers what no cluster can: whether a repository is mono-tenant,
+    and which IaC repository provisions it. It is not the map — it names no
+    tenant, no namespace and no chart path.
+    """
+
+    repository: str
+    role: str
+    tenancy: Tenancy
+    deployment: Deployer
+
+    @property
+    def iac_repo(self) -> str | None:
+        """The repository whose code defines this workload's infrastructure."""
+        return IAC_REPO.get(self.deployment)
+
+
+class MappingSource(StrEnum):
+    """What answered "which repository is this service?", in decreasing directness.
+
+    ``MAP`` is F0's own answer and is never written on a :class:`WorkloadEntry`:
+    the derivation does not produce it, and the map is consulted only when no
+    workload row exists. It is here so that the three answers a caller can get
+    share one vocabulary rather than needing a second enum to be joined against
+    this one.
+    """
+
+    IMAGE = "image"
+    SEED = "seed"
+    MAP = "map"
+    PATTERN = "pattern"
+    MANUAL = "manual"
+
+
+class CommitSource(StrEnum):
+    """What said which commit a workload is running, in decreasing directness.
+
+    The image tag is the build itself; a GitHub tag of the same name is the same
+    build, named once removed; the default branch is neither — it is what the
+    repository looked like, which is a different claim and has to read as one.
+    """
+
+    IMAGE_TAG = "image_tag"
+    GITHUB_TAG = "github_tag"
+    DEFAULT_BRANCH = "default_branch"
+
+
+class WorkloadEntry(BaseModel):
+    """One running service, joined to the repository whose code it runs (M6).
+
+    Keyed on the service name Datadog uses, which for the one mono-tenant
+    application is a customer name that no repository claims. ``source`` is kept
+    because a mapping derived from the image that was running and a mapping
+    guessed from a name pattern are different facts, and a diagnosis built on the
+    second must not read like one built on the first.
+    """
+
+    service: str
+    repository: str = Field(description="Repository name, as the image and the seed name it.")
+    repo_url: str | None = Field(
+        default=None, description="From config.yaml; None when no team declares this repository."
+    )
+    image: str | None = Field(default=None, description="Image reference exactly as observed.")
+    image_digest: str | None = None
+    deployed_commit: MaybeUnknown
+    commit_source: CommitSource | None = Field(
+        default=None, description="What answered the commit; None when nothing did."
+    )
+    commit_read_at: datetime | None = Field(
+        default=None,
+        description=(
+            "When the default branch was read as of. None means HEAD — or that the "
+            "commit came from a tag, which names one commit for ever."
+        ),
+    )
+    iac_repo: str | None = None
+    iac_repo_url: str | None = None
+    iac_paths: list[str] = Field(default_factory=list)
+    tenancy: Tenancy | Unknown
+    source: MappingSource
+
+
+class MappingOutcome(StrEnum):
+    """What one service's derivation produced. The report is a count per value."""
+
+    MAPPED = "mapped"
+    UNCHANGED = "unchanged"
+    CONFLICT = "conflict"
+    UNRESOLVED_IMAGE = "unresolved_image"
+    NOT_MAPPED = "not_mapped"
+
+
+class Derivation(BaseModel):
+    """One service, after the derivation ran: what it produced and why.
+
+    A service that produced no entry still produces a line — the reason it did
+    not — because an unmapped production workload is Triage's own gap and a
+    silent one is invisible.
+    """
+
+    service: str
+    outcome: MappingOutcome
+    reason: Filled
+    entry: WorkloadEntry | None = None
+
+    @property
+    def mapped(self) -> bool:
+        return self.outcome is MappingOutcome.MAPPED
 
 
 class SystemMapKind(StrEnum):

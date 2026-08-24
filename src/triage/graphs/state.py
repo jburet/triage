@@ -9,6 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.mapping.report import MappingReport
 from triage.schemas.alert import Alert
 from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
@@ -16,7 +17,15 @@ from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
-from triage.schemas.system_map import RepoSummary, SystemMap, TerraformSummary
+from triage.schemas.system_map import (
+    CommitSource,
+    Derivation,
+    MappingSource,
+    RepoSummary,
+    SeedEntry,
+    SystemMap,
+    TerraformSummary,
+)
 from triage.schemas.ticket import DedupDecision, PipelineOutcome, ReviewVerdict, TicketDraft
 
 
@@ -122,6 +131,29 @@ class CartographyState(TypedDict, total=False):
     entries_written: int
 
 
+class MappingState(TypedDict, total=False):
+    """One pass of the service mapping (M6).
+
+    Input is ``services``; an empty list is a full pass over every service that
+    has alerted inside ``lookback_days``. ``at`` is when the incident that
+    prompted the pass fired, so a default-branch fallback reads the branch as it
+    stood then rather than as it stands now. Everything else is what the pass
+    found, reported back rather than only logged, because an unmapped production
+    workload is Triage's own gap.
+    """
+
+    services: list[str]
+    lookback_days: int
+    at: datetime
+
+    seed: list[SeedEntry]
+    targets: list[str]
+    unclaimed: list[str]
+    derivations: list[Derivation]
+    entries_written: int
+    report: MappingReport
+
+
 class Deferred(BaseModel):
     """A hypothesis that was ranked but not analysed, and why (ADR-0005).
 
@@ -145,6 +177,9 @@ class Investigated(BaseModel):
     repo_url: str | None = None
     commit: str | None = None
     base_commit: str | None = None
+    commit_source: CommitSource | None = None
+    mapping_source: MappingSource | None = None
+    paths: list[str] = Field(default_factory=list)
     result: AnalysisResult | None = None
 
     @property

@@ -1,12 +1,13 @@
 """Shared builders. Everything here is offline: no database, no network, no spend."""
 
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
 from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
-from triage.config import Config, load_config
+from triage.config import Config, Repo, RepoKind, load_config
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
 from triage.integrations.datadog import FakeDatadogClient
@@ -32,6 +33,7 @@ from triage.schemas import (
     TerraformModuleEntry,
     TerraformSummary,
     TicketDraft,
+    WorkloadEntry,
 )
 from triage.schemas.alert import Alert
 from triage.schemas.collection import (
@@ -45,7 +47,18 @@ from triage.schemas.postmortem import Postmortem
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
 CAPTURE = "hcl_software_uat_20260822"
+TENANT = "plt-hcl-software-uat"
+CAPTURED_DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 REPO_ROOT = Path(__file__).resolve().parents[1]
+ARCHITECTURE_DOC = REPO_ROOT / "docs" / "reference-aws-architecture-2026-04-20.md"
+
+SEED_HEADER = "| Repository | Role | Tech Stack | Tenancy Model | Deployment Method |"
+SEED_SEPARATOR = "| --- | --- | --- | --- | --- |"
+
+
+def seed_document(*rows: str, header: str = SEED_HEADER, separator: str = SEED_SEPARATOR) -> str:
+    """A document shaped like the architecture one, carrying only the rows a test needs."""
+    return "\n".join(["### 1.1 Repository Map", "", header, separator, *rows, ""])
 
 
 def load_diagnosis(name: str) -> Diagnosis:
@@ -59,6 +72,22 @@ def all_fixture_names() -> list[str]:
 @pytest.fixture
 def config() -> Config:
     return load_config(REPO_ROOT / "config.yaml")
+
+
+def declaring(
+    *urls: str,
+    team: str = "platform",
+    kind: RepoKind = RepoKind.APPLICATION,
+    serves: tuple[str, ...] = (),
+    tag_template: str | None = None,
+) -> Config:
+    """The shipped config with exactly these repositories declared."""
+    base = load_config(REPO_ROOT / "config.yaml")
+    repos = [
+        Repo(url=url, team=team, kind=kind, serves=list(serves), tag_template=tag_template)
+        for url in urls
+    ]
+    return base.model_copy(update={"repos": repos})
 
 
 @pytest.fixture
@@ -185,6 +214,10 @@ def some_findings(**overrides: object) -> AnalysisFindings:
                 "paths": ["src/payments/idempotency.py"],
             }
         ],
+        "configured_values": {
+            "unknown": True,
+            "reason": "the answer is in the code, not in a value anything configures",
+        },
         "confidence": "high",
     }
     base.update(overrides)
@@ -393,6 +426,61 @@ def fake_datadog(slug: str = CAPTURE, **overrides: object) -> FakeDatadogClient:
     return FakeDatadogClient(responses=responses)
 
 
+def a_workload(service: str = TENANT, **overrides: object) -> WorkloadEntry:
+    """A workload as the derivation records it: the captured tenant, on its own image."""
+    base: dict[str, object] = {
+        "service": service,
+        "repository": "platform",
+        "repo_url": "github.com/zeenea/platform",
+        "image": f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:501@{CAPTURED_DIGEST}",
+        "image_digest": CAPTURED_DIGEST,
+        "deployed_commit": {
+            "unknown": True,
+            "reason": "the image was found, but its tag '501' is not a commit",
+        },
+        "iac_repo": "platform-infra",
+        "tenancy": "mono_tenant",
+        "source": "image",
+    }
+    base.update(overrides)
+    return WorkloadEntry.model_validate(base)
+
+
+def statefulset_change_event(slug: str = CAPTURE) -> dict:
+    """The captured change-tracking event, the one carrying the workload's own image."""
+    return next(
+        event
+        for event in captured("events_service", slug)["data"]
+        if (event["attributes"]["attributes"].get("changed_resource") or {}).get("type")
+        == "kube_stateful_set"
+    )
+
+
+def running_image(reference: str, slug: str = CAPTURE) -> dict:
+    """That event, with the workload running some other image."""
+    event = deepcopy(statefulset_change_event(slug))
+    event["attributes"]["attributes"]["new_value"]["containers"] = [
+        {"image": reference, "name": "workload"}
+    ]
+    return event
+
+
+def datadog_running(reference: str, service: str = TENANT) -> FakeDatadogClient:
+    """A client whose only answer is this service running this image."""
+    replay = {"events": {f"service:{service}": {"data": [running_image(reference)]}}}
+    return FakeDatadogClient(responses=replay, wide=replay)
+
+
+def fake_datadog_over_days(slug: str = CAPTURE) -> FakeDatadogClient:
+    """The same capture, answered for a query spanning days rather than an incident.
+
+    A mapping pass asks about a week, which the fake would otherwise treat as the
+    widened emptiness check and answer empty (ADR-0016).
+    """
+    replay = fake_datadog(slug)
+    return FakeDatadogClient(responses=replay.responses, wide=replay.responses)
+
+
 def a_classification(alert_class: AlertClass = AlertClass.CRASH_RESTART) -> AlertClassification:
     return AlertClassification(
         alert_class=alert_class,
@@ -447,6 +535,7 @@ def build_deps(
     repo: InMemoryRepository | None = None,
     runner: AnalysisRunner | None = None,
     changed: dict[str, list[str]] | None = None,
+    github: FakeGitHubClient | None = None,
     datadog: FakeDatadogClient | None = None,
     platform: FakePlatformClient | None = None,
 ) -> Deps:
@@ -469,7 +558,7 @@ def build_deps(
         slack=FakeSlackClient(),
         repo=repo or InMemoryRepository(),
         runner=runner or canned_runner(),
-        github=FakeGitHubClient(changed=changed or {}),
+        github=github or FakeGitHubClient(changed=changed or {}),
         datadog=datadog or FakeDatadogClient(),
         platform=platform,
         config=config,

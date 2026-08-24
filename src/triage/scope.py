@@ -27,10 +27,12 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from fnmatch import fnmatch
+from typing import NamedTuple
 
 from triage.config import Config, RepoKind, Team
 from triage.db.repo import TriageRepository
 from triage.schemas.alert import Alert
+from triage.schemas.system_map import CommitSource, MappingSource
 
 ENV_FILTER = re.compile(r"\benv:([\w.-]+)")
 
@@ -115,26 +117,67 @@ def resolve(config: Config, alert: Alert) -> Routing:
     )
 
 
+class Deployment(NamedTuple):
+    """Where an analysis reads a service, and what claim the answer carries.
+
+    Two independent axes. ``mapping_source`` is what said *this repository is
+    this service* — the running image, F0's map, a name glob — and is what
+    separates a diagnosis built on the image that was running from one built on
+    a guess. ``commit_source`` is what said *this commit is what it runs*, and is
+    only set by a derived workload, the only one of the three answers that
+    observed anything: the map's commit is the last one F0 summarised and a
+    pattern's is nothing at all.
+    """
+
+    repo_url: str | None
+    commit: str | None
+    commit_source: CommitSource | None = None
+    mapping_source: MappingSource | None = None
+
+
 async def deployed_repo(
     config: Config,
     repository: TriageRepository,
     service: str,
     kind: RepoKind = RepoKind.APPLICATION,
-) -> tuple[str | None, str | None]:
+) -> Deployment:
     """The repository and commit to read this service in, and where they came from.
 
-    F0's map first: it is keyed on the name a repository says it deploys as, and
-    when the service *is* that name the commit is the one actually summarised.
-    Otherwise config.yaml's ``serves`` patterns, because a per-customer instance of
-    a multi-tenant platform — the majority of what this monitor fires for — is not
-    its own repository and will never be in the map. The commit is then the last
-    one F0 summarised for that repository: a fact about the repository, not a claim
-    about which build this tenant runs, and the diagnosis says so.
+    The derived workload first (M6): it is keyed on the name the cluster uses, so
+    it is the only one of the three that can answer for a customer's instance of
+    the mono-tenant platform, and its commit is what that instance was actually
+    running. Then F0's map, which is keyed on the name a repository says it
+    deploys as. Then config.yaml's ``serves`` patterns.
+
+    Where the commit is unknown — a workload whose image tag carried none, a
+    pattern match, a map entry — it falls back to the last commit F0 summarised
+    for that repository: a fact about the repository, not a claim about which
+    build this tenant runs, and the diagnosis says so.
     """
+    if kind is RepoKind.APPLICATION:
+        workload = await repository.workload_for_service(service)
+        if workload is not None and workload.repo_url is not None:
+            commit = workload.deployed_commit if isinstance(workload.deployed_commit, str) else None
+            if commit is not None:
+                return Deployment(
+                    workload.repo_url, commit, workload.commit_source, workload.source
+                )
+            return Deployment(
+                workload.repo_url,
+                await repository.last_summarised_commit(workload.repo_url),
+                None,
+                workload.source,
+            )
+
     entry = await repository.system_map_for_service(service)
     if entry is not None:
-        return entry.repo_url, entry.source_commit
+        return Deployment(entry.repo_url, entry.source_commit, None, MappingSource.MAP)
     declared = config.repo_serving(service, kind)
     if declared is None:
-        return None, None
-    return declared.url, await repository.last_summarised_commit(declared.url)
+        return Deployment(None, None)
+    return Deployment(
+        declared.url,
+        await repository.last_summarised_commit(declared.url),
+        None,
+        MappingSource.PATTERN,
+    )

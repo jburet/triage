@@ -66,3 +66,34 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-23 | F0 on real repos | run_cartography --local --db, datacatalog + platform-infra | 60 |
 | 2026-08-23 | F1 on plt-merck-qa | run_incident --db --local, 3 real analyses | 93 |
 | 2026-08-23 | tenant + entrypoint work | make lint + make test (395 passed) | 7 |
+| 2026-08-23 | M6 phase 1.1 | make lint + make test (406 passed) | 42 |
+| 2026-08-23 | M6 phase 1.2 | make lint + make test (408 passed) | 5 |
+| 2026-08-23 | M6 phase 1.3 | make lint + make test (412 passed) | 5 |
+| 2026-08-23 | M6 phase 1.4 | make lint + make test (416 passed) | 4 |
+| 2026-08-23 | M6 phase 2.1 | make lint + make test (446 passed) | 5 |
+| 2026-08-23 | M6 phase 2.2 | make lint + make test (451 passed) | 4 |
+| 2026-08-23 | M6 phase 2.3 | make lint + make test (462 passed) | 5 |
+| 2026-08-23 | M6 phase 2.4 | make lint + make test (467 passed) | 5 |
+| 2026-08-23 | M6 phase 2.5 | make lint + make test (469 passed) | 5 |
+| 2026-08-23 | M6 deployed_repo order | make lint + make test (476 passed) | 4 |
+| 2026-08-23 | M6 public interface | make lint + make test (476 passed) | 4 |
+| 2026-08-23 | M6 one-shot | run_mapping on plt-hcl-software-uat, live Datadog (1 call) | 2 |
+| 2026-08-24 | M6 phase 2.6/2.7 | make lint + make test (485 passed) | 5 |
+| 2026-08-24 | M6 phase 2.9 | make lint + make test (488 passed) | 6 |
+| 2026-08-24 | M6 phase 2.10 | make lint + make test (491 passed) | 5 |
+| 2026-08-24 | M6 phase 2.8/2.14 | make lint + make test (495 passed) | 5 |
+| 2026-08-24 | M6 phase 2.15 | make lint + make test (500 passed) | 5 |
+| 2026-08-24 | M6 phase 2.11 | make lint + make test (505 passed) | 4 |
+| 2026-08-24 | M6 phase 2.12 | make lint + make test (507 passed) | 5 |
+| 2026-08-24 | M6 phase 2.13 | make lint + make test (508 passed) | 5 |
+| 2026-08-24 | M6 phase 2.16 | make lint + make test (517 passed) | 5 |
+| 2026-08-24 | M6 phase 3.3 | make lint + make test (519 passed) | 5 |
+| 2026-08-24 | M6 phase 3.1 | make lint + make test (534 passed) | 5 |
+| 2026-08-24 | M6 phase 3.2 | make lint + make test (540 passed) | 5 |
+| 2026-08-24 | M6 phase 3.4 | make lint + make test (546 passed) | 5 |
+| 2026-08-24 | M6 phase 4.1 | make lint + make test (550 passed) | 5 |
+| 2026-08-24 | M6 phase 4.2 | make lint + make test (553 passed) | 5 |
+| 2026-08-24 | M6 phase 4.3 | make lint + make test (560 passed) | 6 |
+| 2026-08-24 | M6 phase 4.4 | make lint + make test (567 passed) | 5 |
+| 2026-08-24 | M6 phase 4.4 | make run-mapping ARGS="plt-hcl-software-uat" (live Datadog) | 8 |
+| 2026-08-24 | M6 close-out | make lint + make test (567 passed) | 4 |
