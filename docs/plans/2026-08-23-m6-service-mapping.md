@@ -134,7 +134,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [x] 2.9 A repository whose GitHub tags are not spelled as the image tag declares the
       relationship in `config.yaml` (a template such as `v{tag}` or `build-{tag}`), and only
       the declared spelling is looked up.
-- [ ] 2.10 A workload whose repository is not declared in `config.yaml` gets no GitHub read at
+- [x] 2.10 A workload whose repository is not declared in `config.yaml` gets no GitHub read at
       all, and its `deployed_commit` Unknown says that rather than blaming the tag. The image
       names a repository, `config.yaml` names a *GitHub* repository, and those are not the
       same string — the image is `platform` where the remote is `zeenea/datacatalog`.

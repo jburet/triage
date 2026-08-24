@@ -19,6 +19,7 @@ from triage.schemas.common import Unknown
 from triage.schemas.system_map import CommitSource
 
 PLATFORM = "github.com/zeenea/platform"
+PLATFORM_INFRA = "github.com/zeenea/platform-infra"
 COMMIT = "9f2c1ab8b0e3d4f5a6b7c8d9e0f1a2b3c4d5e6f7"
 
 
@@ -99,3 +100,24 @@ async def test_a_declared_spelling_that_does_not_exist_is_not_retried_as_the_ima
 def test_a_tag_template_that_does_not_place_the_image_tag_is_refused():
     with pytest.raises(ValidationError, match=re.escape("{tag}")):
         Repo(url=PLATFORM, team="platform", kind=RepoKind.APPLICATION, tag_template="release")
+
+
+async def test_a_repository_config_does_not_declare_is_not_looked_up_at_all():
+    """The image names a repository; config.yaml names a *GitHub* repository, and the
+    two are not the same string — the image is `platform` where the remote is
+    `zeenea/datacatalog`. With no declaration there is no remote to ask."""
+    client = github(tags={(PLATFORM, "501"): COMMIT})
+
+    entry = await with_deployed_commit(client, declaring(PLATFORM_INFRA), a_workload())
+
+    assert client.tag_lookups == []
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "config.yaml" in entry.deployed_commit.reason
+    assert "'platform'" in entry.deployed_commit.reason
+
+
+async def test_the_undeclared_repository_is_not_blamed_on_its_tag():
+    entry = await with_deployed_commit(github(), declaring(PLATFORM_INFRA), a_workload())
+
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "501" not in entry.deployed_commit.reason

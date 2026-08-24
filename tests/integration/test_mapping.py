@@ -91,6 +91,16 @@ async def test_a_repository_config_does_not_declare_is_mapped_without_a_url(zeen
     assert entry.repo_url is None
 
 
+async def test_an_undeclared_repository_costs_no_github_read_and_is_still_mapped(zeenea):
+    """The mapping holds; nobody has said where the code lives, so nothing is asked."""
+    deps = deps_for(declaring(PLATFORM_INFRA), github=FakeGitHubClient())
+
+    await run(deps)
+
+    assert deps.github.tag_lookups == []
+    assert deps.repo.workloads[TENANT].repository == "platform"
+
+
 async def test_a_service_with_no_events_at_all_is_reported_rather_than_dropped(zeenea):
     deps = deps_for(zeenea)
 
