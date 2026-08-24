@@ -8,9 +8,16 @@ canned here. Prompt quality is measured by ``evals/``, not by these tests.
 import pytest
 
 from tests.conftest import a_draft, a_verdict, build_deps, no_match, run_config
+from triage.config import Config
 from triage.db.repo import InMemoryRepository
 from triage.graphs.ticket_pipeline import graph
 from triage.schemas import DedupDecision, PipelineOutcome, TicketDraft, TicketSection
+
+
+@pytest.fixture
+def config(jira_config: Config) -> Config:
+    """This module exercises the Jira path, which the release configures off."""
+    return jira_config
 
 
 async def run(diagnosis, deps):

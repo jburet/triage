@@ -1,20 +1,14 @@
-"""Terminal nodes: create the Jira ticket, or explain in Slack why there is none."""
+"""Terminal nodes: post the incident report, or take the Jira path config still allows."""
 
 from langchain_core.runnables import RunnableConfig
 
 from triage.graphs.state import TicketPipelineState
+from triage.report import CONFIDENCE_LABEL, render_incident
 from triage.runtime import Deps, deps_from_runnable_config
-from triage.schemas.common import Confidence
 from triage.schemas.common import render as render_field
 from triage.schemas.ticket import PipelineOutcome
 
 from .persist import record_outcome
-
-CONFIDENCE_LABEL: dict[Confidence, str] = {
-    Confidence.LOW: "low",
-    Confidence.MEDIUM: "medium",
-    Confidence.HIGH: "high",
-}
 
 
 def _labels(state: TicketPipelineState) -> list[str]:
@@ -28,6 +22,31 @@ def _labels(state: TicketPipelineState) -> list[str]:
 
 def _channel(deps: Deps, team: str) -> str:
     return deps.config.team(team).slack_channel
+
+
+async def publish_report(
+    state: TicketPipelineState, config: RunnableConfig | None = None
+) -> TicketPipelineState:
+    """The release's one terminal node: the whole diagnosis, in the team's channel.
+
+    Every diagnosis reaches the team (ADR-0023). The confidence threshold decides
+    how the report is framed, not whether it is sent, so there is nothing here to
+    suppress and nothing to file.
+    """
+    deps = deps_from_runnable_config(config)
+    diagnosis = state["diagnosis"]
+    report = render_incident(
+        diagnosis, threshold=deps.config.confidence_threshold(diagnosis.feature)
+    )
+    for message in report.messages:
+        await deps.slack.post(
+            channel=_channel(deps, diagnosis.team),
+            text=message,
+            thread_ts=state.get("thread_ts"),
+        )
+
+    await record_outcome(state, deps, PipelineOutcome.REPORT_POSTED)
+    return {"outcome": PipelineOutcome.REPORT_POSTED, "ticket_key": None, "ticket_url": None}
 
 
 async def create_ticket(

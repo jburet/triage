@@ -110,6 +110,8 @@ class DedupDecision(BaseModel):
 class PipelineOutcome(StrEnum):
     """How a run of the ticket pipeline ended. Recorded for self-evaluation."""
 
+    REPORT_POSTED = "report_posted"
+    """The release's terminal outcome: one report in the team's channel (ADR-0023)."""
     TICKET_CREATED = "ticket_created"
     TICKET_UPDATED = "ticket_updated"
     BELOW_THRESHOLD = "below_threshold"
@@ -117,6 +119,7 @@ class PipelineOutcome(StrEnum):
 
 
 TerminalOutcome = Literal[
+    PipelineOutcome.REPORT_POSTED,
     PipelineOutcome.TICKET_CREATED,
     PipelineOutcome.TICKET_UPDATED,
     PipelineOutcome.BELOW_THRESHOLD,

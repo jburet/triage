@@ -28,6 +28,10 @@ class SignalStatus(StrEnum):
     ANALYSING = "analysing"
     DIAGNOSED = "diagnosed"
     TICKETED = "ticketed"
+    REPORTED = "reported"
+    """The release's terminal state: the diagnosis reached the team as a report,
+    and nothing was filed anywhere (ADR-0023). Distinct from ``discarded``, which
+    is what a signal Triage concluded nothing about looks like."""
     DISCARDED = "discarded"
     SELF_RECOVERED = "self_recovered"
     OUT_OF_SCOPE = "out_of_scope"
@@ -41,6 +45,7 @@ class SignalStatus(StrEnum):
 _TERMINAL = frozenset(
     {
         SignalStatus.TICKETED,
+        SignalStatus.REPORTED,
         SignalStatus.DISCARDED,
         SignalStatus.SELF_RECOVERED,
         SignalStatus.OUT_OF_SCOPE,

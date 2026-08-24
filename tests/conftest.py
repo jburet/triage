@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from triage.analysis.runner import AnalysisRunner, FakeAnalysisRunner
-from triage.config import Config, Repo, RepoKind, load_config
+from triage.config import Config, Repo, RepoKind, WriteTargets, load_config
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.integrations.base import FakeJiraClient, FakeSlackClient
 from triage.integrations.datadog import FakeDatadogClient
@@ -82,6 +82,18 @@ owes is that it parses and satisfies its own invariants, which
 @pytest.fixture
 def config() -> Config:
     return load_config(TEST_CONFIG)
+
+
+@pytest.fixture
+def jira_config() -> Config:
+    """The test config with issue creation switched back on (ADR-0023).
+
+    The release writes only to Slack, so a test of the composing, self-reviewing,
+    Jira-filing chain has to say out loud that it is testing the path a shipped
+    configuration no longer takes. That path is not deleted, so it is not
+    untested either.
+    """
+    return load_config(TEST_CONFIG).model_copy(update={"writes": WriteTargets.SLACK_AND_JIRA})
 
 
 def declaring(

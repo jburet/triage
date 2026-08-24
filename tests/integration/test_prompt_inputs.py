@@ -10,8 +10,15 @@ import json
 import pytest
 
 from tests.conftest import all_fixture_names, build_deps, load_diagnosis, run_config
+from triage.config import Config
 from triage.graphs.ticket_pipeline import graph
 from triage.schemas import ReviewVerdict, TicketDraft
+
+
+@pytest.fixture
+def config(jira_config: Config) -> Config:
+    """This module exercises the Jira path, which the release configures off."""
+    return jira_config
 
 
 def _tagged_block(prompt: str, tag: str) -> dict:

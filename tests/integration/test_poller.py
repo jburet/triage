@@ -8,6 +8,8 @@ discard, and exactly the kind the flap rule is there not to lose.
 
 from datetime import UTC, datetime, timedelta
 
+import pytest
+
 from tests.conftest import (
     a_service_entry,
     build_deps,
@@ -25,6 +27,13 @@ from triage.nodes.poll import POLLER_NAME, poll_alerts
 from triage.runtime import Deps
 from triage.schemas.alert import Alert
 from triage.schemas.signal import SignalStatus
+
+
+@pytest.fixture
+def config(jira_config: Config) -> Config:
+    """This module exercises the Jira path, which the release configures off."""
+    return jira_config
+
 
 FIRED_AT = datetime(2026, 8, 22, 0, 47, 11, tzinfo=UTC)
 

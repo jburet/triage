@@ -33,6 +33,18 @@ class LLMProvider(StrEnum):
     ANTHROPIC = "anthropic"
 
 
+class WriteTargets(StrEnum):
+    """Which systems a deployment of Triage is allowed to write to (ADR-0023).
+
+    The first release is ``slack``: Jira issue creation is gated off here rather
+    than deleted, so the composer, the self-review and the client stay in the
+    tree and stay tested and the decision is reversible by one line of YAML.
+    """
+
+    SLACK = "slack"
+    SLACK_AND_JIRA = "slack_and_jira"
+
+
 class RepoKind(StrEnum):
     """What kind of summary a repository earns. An undeclared kind fails config load."""
 
@@ -204,9 +216,14 @@ class Config(BaseModel):
         description="Datadog kube_cluster_name → environment. No alert carries a usable "
         "env: tag, so this map is the only thing that separates production (ADR-0017).",
     )
+    writes: WriteTargets = WriteTargets.SLACK
     thresholds: Thresholds
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     collection: CollectionConfig = Field(default_factory=CollectionConfig)
+
+    @property
+    def files_tickets(self) -> bool:
+        return self.writes is WriteTargets.SLACK_AND_JIRA
 
     def repo_serving(self, service: str, kind: RepoKind) -> Repo | None:
         """The repository declared as deploying this service, when exactly one is.
