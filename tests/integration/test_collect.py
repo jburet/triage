@@ -257,7 +257,7 @@ async def test_a_collector_triage_does_not_have_is_discarded_and_kept(config: Co
 
 
 async def test_the_loop_stops_when_the_analysis_tier_says_it_has_enough(config: Config):
-    deps = build_deps(config, datadog=fake_datadog(), follow_ups=[a_follow_up(done=True)])
+    deps = build_deps(config, datadog=fake_datadog(), follow_ups=[a_follow_up()])
     collection = await swept(deps)
 
     result = await follow_up(

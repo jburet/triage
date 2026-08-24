@@ -19,8 +19,9 @@ Ask for a further call when:
 
 Do **not** ask for a further call when:
 
-- The sweep already answers the question. Say `done: true` and stop; every call
-  costs latency during an incident and tokens the diagnosis still needs.
+- The sweep already answers the question. Return an empty `requests` list and
+  stop; every call costs latency during an incident and tokens the diagnosis
+  still needs.
 - You are hoping something turns up. A query you cannot justify in `why` is a
   query you should not make.
 - The signal is marked `not_instrumented`. Asking again will return the same

@@ -94,7 +94,16 @@ class FollowUpRequest(BaseModel):
 
 
 class FollowUpPlan(BaseModel):
-    done: bool = Field(description="True when the collection already answers the question.")
+    """What else to collect. Empty means the sweep already answers the question.
+
+    There was a ``done`` flag beside this, and the model omitted it on every real
+    alert: the prompt only had reason to mention it on the branch that asks for
+    nothing, so a plan that *did* ask for calls never set it and the whole plan
+    was rejected as invalid. It said nothing ``requests`` did not — the caller
+    stopped on ``done or not requests`` — so the flag is gone rather than
+    reinforced.
+    """
+
     requests: list[FollowUpRequest] = Field(default_factory=list)
 
 

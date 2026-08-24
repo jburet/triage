@@ -516,8 +516,8 @@ def a_qualification(*causes: dict[str, object], **overrides: object) -> Qualific
     return Qualification.model_validate(base)
 
 
-def a_follow_up(*requests: dict[str, object], done: bool = False) -> FollowUpPlan:
-    return FollowUpPlan.model_validate({"done": done, "requests": list(requests)})
+def a_follow_up(*requests: dict[str, object]) -> FollowUpPlan:
+    return FollowUpPlan.model_validate({"requests": list(requests)})
 
 
 def a_postmortem(**overrides: object) -> Postmortem:
@@ -559,7 +559,7 @@ def build_deps(
         if classifications is not None
         else [a_classification()],
         Qualification: qualifications if qualifications is not None else [a_qualification()],
-        FollowUpPlan: follow_ups if follow_ups is not None else [a_follow_up(done=True)],
+        FollowUpPlan: follow_ups if follow_ups is not None else [a_follow_up()],
         Postmortem: postmortems if postmortems is not None else [a_postmortem()],
     }
     return Deps(

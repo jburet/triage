@@ -127,7 +127,7 @@ async def follow_up(state: IncidentState, config: RunnableConfig | None = None) 
         return {"followup_done": True}
 
     plan = await _plan_follow_up(deps, state, collection)
-    if plan.done or not plan.requests:
+    if not plan.requests:
         return {"followup_done": True}
 
     results, refused = await run_follow_up(
@@ -170,7 +170,7 @@ async def _plan_follow_up(deps: Deps, state: IncidentState, collection: Collecti
         )
     except Exception as exc:
         log.warning("follow_up_not_planned", error=str(exc))
-        return FollowUpPlan(done=True)
+        return FollowUpPlan()
 
 
 def route_after_follow_up(state: IncidentState) -> Literal["follow_up", "qualify"]:
