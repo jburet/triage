@@ -69,9 +69,19 @@ def all_fixture_names() -> list[str]:
     return sorted(path.stem for path in FIXTURE_DIR.glob("*.json"))
 
 
+TEST_CONFIG = REPO_ROOT / "tests" / "fixtures" / "config.yaml"
+"""Tests read this, never the shipped ``config.yaml``.
+
+The shipped file names the real repositories a deployment reads, so asserting
+against it would make every test hostage to an operational edit — declaring one
+more team would turn the suite red for no defect. What the shipped file still
+owes is that it parses and satisfies its own invariants, which
+``test_shipped_config`` checks and nothing else depends on."""
+
+
 @pytest.fixture
 def config() -> Config:
-    return load_config(REPO_ROOT / "config.yaml")
+    return load_config(TEST_CONFIG)
 
 
 def declaring(
@@ -81,8 +91,8 @@ def declaring(
     serves: tuple[str, ...] = (),
     tag_template: str | None = None,
 ) -> Config:
-    """The shipped config with exactly these repositories declared."""
-    base = load_config(REPO_ROOT / "config.yaml")
+    """The test config with exactly these repositories declared."""
+    base = load_config(TEST_CONFIG)
     repos = [
         Repo(url=url, team=team, kind=kind, serves=list(serves), tag_template=tag_template)
         for url in urls

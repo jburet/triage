@@ -29,23 +29,20 @@ clusters:
   preprod-euw3: preprod
 
 repos:
-  - url: github.com/zeenea/datacatalog
-    team: platform
+  - url: github.com/org/payments-api
+    team: payments
     kind: application
     # `serves` names the service patterns this repository is deployed as. The
     # system map is keyed on the name a repository says it deploys as, so a
     # multi-tenant platform — one instance per customer, plt-merck-qa,
     # plt-hcl-software-uat — needs this or every one of its alerts resolves to
     # "not in the system map" and nothing is ever read.
-    serves: ["plt-*"]
+    serves: ["payments-*"]
     # An image tag is a build number and a git tag of the same name is what
     # resolves it to a commit. Where the two are spelled differently, say how —
     # `v{tag}`, `build-{tag}` — because only the declared spelling is looked up.
     # tag_template: "v{tag}"
-  - url: github.com/zeenea/platform-infra
-    team: platform
-    kind: terraform
-  - url: github.com/zeenea/application-deployer
+  - url: github.com/org/infra
     team: platform
     kind: terraform
 
