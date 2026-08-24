@@ -138,7 +138,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       all, and its `deployed_commit` Unknown says that rather than blaming the tag. The image
       names a repository, `config.yaml` names a *GitHub* repository, and those are not the
       same string — the image is `platform` where the remote is `zeenea/datacatalog`.
-- [ ] 2.11 `deployed_commit` records where it came from — `image_tag`, `github_tag`,
+- [x] 2.11 `deployed_commit` records where it came from — `image_tag`, `github_tag`,
       `default_branch` — in that order of preference, and a commit read from GitHub is
       preferred over one parsed out of a tag that merely looks like a SHA.
 - [x] 2.14 An image carrying no tag at all takes the same default-branch path as an unfound

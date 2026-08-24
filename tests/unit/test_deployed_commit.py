@@ -177,3 +177,39 @@ async def test_a_tag_is_resolved_at_no_particular_time(config):
     entry = await with_deployed_commit(client, config, a_workload(), at=FIRED)
 
     assert entry.commit_read_at is None
+
+
+async def test_a_commit_github_names_beats_one_parsed_out_of_a_tag_that_looks_like_a_sha(config):
+    """Seven digits is a plausible build number and a plausible short SHA. The image
+    tag is not read as a commit; GitHub is asked what that tag actually is."""
+    looks_like_one = "097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:1234567"
+    client = github(tags={(PLATFORM, "1234567"): COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload(image=looks_like_one))
+
+    assert entry.deployed_commit == COMMIT
+    assert entry.commit_source is CommitSource.GITHUB_TAG
+
+
+async def test_the_image_tag_is_preferred_over_both_reads_when_it_carries_the_commit(config):
+    client = github(
+        tags={(PLATFORM, "sha-9f2c1ab"): "0000000"}, branch_commits={PLATFORM: "1111111"}
+    )
+
+    entry = await with_deployed_commit(
+        client,
+        config,
+        a_workload(deployed_commit="9f2c1ab", commit_source=CommitSource.IMAGE_TAG),
+    )
+
+    assert entry.deployed_commit == "9f2c1ab"
+    assert (client.tag_lookups, client.branch_reads) == ([], [])
+
+
+async def test_a_tag_github_names_is_preferred_over_the_default_branch(config):
+    client = github(tags={(PLATFORM, "501"): COMMIT}, branch_commits={PLATFORM: "1111111"})
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert entry.deployed_commit == COMMIT
+    assert client.branch_reads == []

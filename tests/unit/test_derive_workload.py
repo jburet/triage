@@ -11,7 +11,7 @@ from tests.conftest import TENANT, captured, declaring, running_image
 from triage.mapping.derive import derive_workload
 from triage.mapping.seed import load_seed
 from triage.schemas.common import Unknown
-from triage.schemas.system_map import MappingOutcome, MappingSource, Tenancy
+from triage.schemas.system_map import CommitSource, MappingOutcome, MappingSource, Tenancy
 
 DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 
@@ -146,3 +146,17 @@ def test_with_neither_an_image_nor_a_pattern_there_is_no_mapping(config, seed):
     assert derivation.outcome is MappingOutcome.NOT_MAPPED
     assert derivation.entry is None
     assert "no serves pattern" in derivation.reason
+
+
+def test_a_commit_the_image_tag_carries_is_recorded_as_having_come_from_there(config, seed):
+    event = running_image("097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:sha-9f2c1ab")
+
+    entry = derive_workload(config, seed, TENANT, [event]).entry
+
+    assert entry.commit_source is CommitSource.IMAGE_TAG
+
+
+def test_a_build_number_leaves_the_commit_source_for_github_to_answer(config, seed):
+    events = captured("events_service")["data"]
+
+    assert derive_workload(config, seed, TENANT, events).entry.commit_source is None
