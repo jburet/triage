@@ -52,6 +52,21 @@ def repo_path(repo_url: str) -> str:
     return f"{match['owner']}/{match['name']}"
 
 
+def clone_url(repo_url: str) -> str:
+    """A URL git can fetch from, from any spelling config.yaml uses.
+
+    ``github.com/org/name`` is what config.yaml declares and what
+    :func:`repo_path` happily parses, and it is also what git reads as a *local
+    path* — so every REST read succeeded while every clone failed with "does not
+    appear to be a git repository", and the analysis behind it came back as a
+    stated failure naming the clone rather than the URL that caused it.
+    """
+    url = repo_url.strip()
+    if "://" in url or url.startswith("git@"):
+        return url
+    return f"https://{url}"
+
+
 class GitHubClient(Protocol):
     async def changed_paths(self, repo_url: str, *, base: str, head: str) -> list[str]:
         """Paths changed between two commits, repository-relative."""

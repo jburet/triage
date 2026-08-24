@@ -160,3 +160,28 @@ async def test_the_request_reaches_the_entrypoint_as_its_environment():
     await runner.run(request)
 
     assert json.loads(seen["TRIAGE_ANALYSIS_REQUEST"])["commit"] == request.commit
+
+
+def _remote_url(url: str) -> str:
+    runner = LocalAnalysisRunner(entrypoint=ENTRYPOINT)
+    steps = runner._clone_steps(an_analysis_request(repo_url=url), Path("/tmp/x"))
+    return next(step for step in steps if "remote" in step)[-1]
+
+
+def test_a_scheme_less_repository_url_is_cloned_over_https():
+    """config.yaml declares `github.com/org/name`; git reads that as a local path.
+
+    The REST client's own parser accepts the scheme-less spelling, so GitHub reads
+    worked while every clone failed with "does not appear to be a git repository"
+    — and the analysis it was cloning for came back as a stated failure naming the
+    clone rather than the URL that caused it.
+    """
+    assert _remote_url("github.com/zeenea/datacatalog") == "https://github.com/zeenea/datacatalog"
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["https://github.com/zeenea/datacatalog", "git@github.com:zeenea/datacatalog.git"],
+)
+def test_a_url_that_already_names_how_to_reach_it_is_left_alone(url: str):
+    assert _remote_url(url) == url

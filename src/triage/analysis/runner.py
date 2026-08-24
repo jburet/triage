@@ -32,6 +32,7 @@ from triage.analysis.jobs import (
 )
 from triage.config import AnalysisJobConfig
 from triage.db.repo import AnalysisResultRecord, TriageRepository
+from triage.integrations.github import clone_url
 from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult, AnalysisStatus
 
 log = structlog.get_logger(__name__)
@@ -199,7 +200,7 @@ class LocalAnalysisRunner:
             fetch.append("--filter=blob:none")
         return [
             [self._git, "init", "--quiet", str(directory)],
-            [*here, "remote", "add", "origin", request.repo_url],
+            [*here, "remote", "add", "origin", clone_url(request.repo_url)],
             [*fetch, "origin", *request.commits],
             [*here, "checkout", "--quiet", request.commit],
         ]
