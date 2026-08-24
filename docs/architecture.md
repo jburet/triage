@@ -333,7 +333,7 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | M4 | F3 daily database review (§2.4) | Not started |
 | M5 | Alert coverage audit, self-evaluation reporting, incident memory | Not started |
 | M6 | Service map: workload → repository → IaC path (§2.5) | **Done in code**; the derivation has run once against live Datadog, the GitHub and IaC halves never have |
-| Infra | Self-hosted Platform, LiteLLM proxy, LangSmith, NetworkPolicies, backups | Not started |
+| Infra | Self-hosted Platform, LiteLLM proxy, LangSmith, NetworkPolicies, backups | **Manifests written, none applied**: `deploy/` holds the namespace, the gVisor RuntimeClass, the Job's RBAC, its egress policy, the Secret's shape, the Postgres role and the Platform cron; no cluster has seen any of it |
 
 What exists today is the shared ticket pipeline, the cartography graph that fills the
 system map, the service-mapping graph that says which repository a running workload
@@ -360,9 +360,11 @@ What M2 does **not** deliver, and should not be assumed to work:
 - **Nothing triggers it.** The GitHub merge webhook lands with the M3 ingress, and the
   weekly full pass needs a Platform cron — both infra track. Today `cartography` is
   invoked by hand (`make run-cartography`) or from Studio.
-- **The sandbox does not exist.** The Job manifest, the gVisor runtime class, the
-  NetworkPolicy and the narrow database role the Job writes its result with are the
-  infra track; `config.analysis.job` only *names* them.
+- **The sandbox is written down and unapplied.** The Job manifest, the gVisor runtime
+  class, the NetworkPolicy and the narrow database role the Job writes its result with
+  now exist under `deploy/` and are held to what Triage submits by
+  `tests/unit/test_deploy_manifests.py` — but nothing has ever been applied to a cluster,
+  so `KubernetesJobApi` is still unverified and the egress is still ungranted in fact.
 
 M3 delivers, in code: the Analysis sub-graph (rank, fan out by cause type, synthesise a
 `Diagnosis` that must earn its own confidence), F1's Datadog collection — the alert
@@ -387,8 +389,10 @@ What M3 does **not** deliver:
   the liveness-probe cause ranks first, and whether the model falls for the
   `StatefulSet … deployed` event whose only change is `ready_replicas` — but it costs money
   and has never been run.
-- **Nothing ticks the poller.** The 60-second cron is a Platform object, and the Platform is
-  the infra track; today `poll_alerts` runs by hand or from Studio.
+- **Nothing ticks the poller.** The 60-second cron exists as
+  `deploy/platform/cron-alert-poller.yaml` and is created by `scripts/apply_cron.py`, but
+  the Platform it would be created on does not exist yet (ADR-0011); today `poll_alerts`
+  runs by hand — `make run-poller`, which has ticked the real Datadog org — or from Studio.
 - **`diff_analysis` has no entrypoint, and no image has ever been built.**
   `triage.analysis.entrypoint` answers four of the five kinds — the two F0 summarisers, and
   `code_analysis` and `iac_analysis` through the shared `investigate` prompt.

@@ -50,17 +50,54 @@ infra track, which this release is the first thing to actually need.
 
 ## Phase 4: the sandbox
 
-- [ ] 4.1 The Job template, the gVisor `RuntimeClass`, the `NetworkPolicy` (egress to GitHub and the registry only) and the read-only role the Job writes its result with exist as manifests under `deploy/`.
+- [x] 4.1 The Job template, the gVisor `RuntimeClass`, the `NetworkPolicy` (egress to GitHub and the registry only) and the read-only role the Job writes its result with exist as manifests under `deploy/`.
+      Validated with `kubeconform -strict -kubernetes-version 1.31.0` (10 resources, 0 invalid) and
+      by `tests/unit/test_deploy_manifests.py`, which holds the reviewed Job template to the object
+      `job_manifest` submits. `kubectl --dry-run=client` cannot validate here: it fetches its schemas
+      from an API server. Two corrections are in `deploy/README.md` — egress to the registry is
+      nothing (image pulls are the kubelet's traffic), and the ADR-0009 "insert-only" role is
+      SELECT/INSERT/UPDATE on one table because `save_analysis_result` reads the row back.
 - [ ] 4.2 `KubernetesJobApi` submits one and reads its result against a real cluster — the first time it has spoken to one.
+      *Blocked on a cluster.* Needs: a namespace on an EKS cluster with gVisor nodes, credentials
+      that can apply `deploy/`, and a Postgres it can reach. Nothing in code is waiting on it.
 - [ ] 4.3 A Job that exceeds its deadline or its memory limit is reported as a stated failure, not a hang: the analysis fails, the diagnosis records why, and the report says so.
+      Two thirds done offline. The Job now *has* a memory, cpu and ephemeral-storage limit
+      (`config.analysis.job.resources`), the runner waits a minute longer than the Job may live so
+      Kubernetes' `DeadlineExceeded` is what gets reported rather than the client's own timeout, and
+      the failure carries the Failed condition's reason, its message and the limits the Job was given
+      — `tests/unit/test_kubernetes_job_runner.py`, and the diagnosis half in
+      `tests/integration/test_analysis.py`. Unticked because "the report says so" waits on the Phase 2
+      renderer, and no Job has ever been killed for real: the failure shapes come from the API
+      reference, not from a cluster.
 - [ ] 4.4 The Job's egress is verified to be refused everywhere it was not granted, by trying.
+      *Blocked on a cluster.* `deploy/41-job-egress-probe.yaml` is the trying: same labels,
+      RuntimeClass and security context as an analysis, curl once per destination, non-zero exit if
+      any of them disagrees with what was granted. Never applied.
 
 ## Phase 5: it runs itself
 
 - [ ] 5.1 The self-hosted LangGraph Platform runs the six registered graphs against the shared Postgres, with Triage's tables in the `triage` schema and checkpoints beside them.
+      *Blocked on the Enterprise licence and a cluster* (ADR-0011) — the one item with an external
+      procurement dependency. Checked offline instead: `tests/integration/test_registered_graphs.py`
+      imports and compiles all six entries in `langgraph.json`, and `tests/unit/test_migrations.py`
+      already holds every table to the `triage` schema. `langgraph dev` is not a stand-in and cannot
+      run here anyway — it needs `langgraph-cli[inmem]`, which is not a dependency.
 - [ ] 5.2 The 60-second `alert_poller` cron creates runs, and a cycle that has not persisted for its gate creates none (ADR-0018).
-- [ ] 5.3 Two alerts for the same monitor and firing group inside one cycle produce one run, not two.
+      The cron object exists — `deploy/platform/cron-alert-poller.yaml`, created by
+      `make cron ARGS=--apply` through `scripts/apply_cron.py`, whose requests are pinned in
+      `tests/integration/test_platform_client.py`. It has never been created on a Platform, because
+      there is none. The second half is verified live: one tick against the real Datadog org over a
+      25-minute window read 20 monitor-alert events — 4 cycles opened, 12 out of scope, 2
+      self-recovered with their durations, 1 in scope with no cartography and told about, **0
+      launched**. The gate, holding, against real alerts.
+- [x] 5.3 Two alerts for the same monitor and firing group inside one cycle produce one run, not two.
+      It did not, on the Platform path: `create_run` returns as soon as the run is queued, so the
+      signal stayed `waiting` and the next tick launched it again — one run a minute for as long as
+      the alert fired. The poller now claims the signal before launching and puts it back if the
+      launch raises (`tests/integration/test_poller.py`, re-notified with a fresh event id).
 - [ ] 5.4 A real production alert reaches a real Slack channel, analysed, without anyone running a command.
+      *Blocked on 5.1 and on Phases 1–3.* Needs the Platform running the cron, the analysis image
+      published, and a real Slack token — `TRIAGE_DRY_RUN=0` with a bot in the team's channel.
 
 ## Out of scope
 

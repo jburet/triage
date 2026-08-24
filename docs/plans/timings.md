@@ -113,3 +113,12 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | follow_up compose | make lint + make test (606) | 4 |
 | 2026-08-24 | model-name check | make lint + make test (611) | 4 |
 | 2026-08-24 | F1 end to end | make run-incident, proxy provider, 4 tier calls, no retries | 64 |
+| 2026-08-24 | M7 phase 4.3 | pytest tests/unit/test_kubernetes_job_runner.py (red, then green) | 10 |
+| 2026-08-24 | M7 phase 4.3 | make lint + make test (615 passed) | 8 |
+| 2026-08-24 | M7 phase 4.1 | kubeconform -strict deploy/*.yaml (10 resources) | 1 |
+| 2026-08-24 | M7 phase 4.1 | make lint + make test (622 passed) | 5 |
+| 2026-08-24 | M7 phase 5.3 | pytest tests/integration/test_poller.py (red, then green) | 2 |
+| 2026-08-24 | M7 phase 5.2 | make lint + make test (628 passed) | 6 |
+| 2026-08-24 | M7 phase 5.2 | live poller tick, real Datadog, 25-minute window, 20 events | 2 |
+| 2026-08-24 | M7 phase 5.1 | pytest tests/integration/test_registered_graphs.py | 1 |
+| 2026-08-24 | M7 phases 4-5 | make lint + make test (636 passed) | 6 |
