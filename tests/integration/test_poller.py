@@ -277,3 +277,28 @@ async def test_the_platform_runs_it_when_there_is_a_platform(config: Config):
     assert deps.jira.created == []
     assert [run.assistant_id for run in platform.runs] == ["incident"]
     assert platform.runs[0].thread_id == f"incident-{result['launched'][0]}"
+
+
+async def test_a_re_notified_cycle_creates_one_run_and_not_one_per_tick(config: Config):
+    """The Platform answers `create_run` immediately, so the poller must not ask twice.
+
+    In-process, `run_incident` has moved the signal on by the time the tick ends;
+    queued, it has not, and a signal left `waiting` is launched again sixty
+    seconds later — one run per tick for as long as the alert keeps firing.
+    """
+    repo = mapped(a_service_entry("plt-hcl-software-uat"))
+    platform = FakePlatformClient()
+    deps = poller_deps(config, repo=repo, platform=platform)
+
+    await tick(deps, FIRED_AT + timedelta(minutes=1))
+    await tick(deps, FIRED_AT + timedelta(minutes=16))
+    # Datadog re-notifies the same cycle: same monitor, same group, a new event id.
+    deps.datadog.responses["events"]["source:alert"] = with_fresh_ids(  # type: ignore[index]
+        alert_events("error"), "renotified"
+    )
+    result = await tick(deps, FIRED_AT + timedelta(minutes=17))
+
+    assert len(repo.signals) == 1
+    assert len(platform.runs) == 1
+    assert result.get("launched") is None
+    assert next(iter(repo.signals.values())).status is SignalStatus.ANALYSING

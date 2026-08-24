@@ -165,8 +165,27 @@ async def _open_the_gate(deps: Deps, config: Config, now: datetime, state: Polle
             await _notify_unmapped(deps, signal)
             state.setdefault("unmapped", []).append(signal.signal_id)
             continue
-        await _launch(deps, signal, alert)
+        await _claim_and_launch(deps, signal, alert)
         state.setdefault("launched", []).append(signal.signal_id)
+
+
+async def _claim_and_launch(deps: Deps, signal: Signal, alert: Alert) -> None:
+    """Take the signal out of `waiting` first, then launch.
+
+    On the Platform, ``create_run`` answers as soon as the run is queued, and the
+    run marks the signal itself — later. A signal still `waiting` when the next
+    tick reads it is launched again, so a cycle that keeps firing buys a run per
+    minute. The poller claims it here instead, and puts it back if the launch
+    fails, because a signal nothing is analysing must not sit in `analysing`.
+    """
+    claimed = await deps.repo.update_signal(
+        signal.model_copy(update={"status": SignalStatus.ANALYSING})
+    )
+    try:
+        await _launch(deps, claimed, alert)
+    except Exception:
+        await deps.repo.update_signal(claimed.model_copy(update={"status": SignalStatus.WAITING}))
+        raise
 
 
 async def _notify_unmapped(deps: Deps, signal: Signal) -> None:
