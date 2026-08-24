@@ -8,6 +8,7 @@ carry the content instead.
 
 from tests.conftest import (
     a_service_entry,
+    a_verdict,
     build_deps,
     fake_datadog,
     mapped,
@@ -16,7 +17,7 @@ from tests.conftest import (
 )
 from triage.graphs.incident import build_graph
 from triage.graphs.ticket_pipeline import graph
-from triage.schemas import PipelineOutcome, TicketDraft
+from triage.schemas import PipelineOutcome, ReviewVerdict, TicketDraft
 from triage.schemas.signal import SignalStatus
 
 
@@ -114,3 +115,31 @@ async def test_the_threshold_frames_the_report_instead_of_routing_it(
     assert "Latency rose across every handler" not in lead
     assert "below the *medium*" in follow
     assert "2 questions" in follow
+
+
+async def test_a_draft_that_could_never_pass_review_is_still_reported(
+    config, jira_config, oom_diagnosis
+):
+    """There is no filing decision left to exhaust, so nothing is handed back.
+
+    The retry budget exists to stop Triage filing a ticket its own reviewer
+    rejected. Nothing is being filed, so the same run that used to end as
+    "failed self-review three times; not filed" now ends as the report, and the
+    two expensive tiers it burned getting there are not spent at all.
+    """
+    always_fails = [a_verdict(False, "Cause is not supported by evidence.")]
+    reported = build_deps(config, verdicts=always_fails)
+    exhausted = build_deps(jira_config, verdicts=always_fails)
+
+    release = await run(oom_diagnosis, reported)
+    old = await run(oom_diagnosis, exhausted)
+
+    assert old["outcome"] is PipelineOutcome.REVIEW_EXHAUSTED
+    assert release["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert reported.llm.calls_for(TicketDraft) == []
+    assert reported.llm.calls_for(ReviewVerdict) == []
+
+    (message,) = reported.slack.messages
+    assert "failed self-review" not in message.text
+    assert oom_diagnosis.symptom.description in message.text
+    assert oom_diagnosis.probable_cause in message.text

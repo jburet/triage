@@ -29,7 +29,7 @@ infra track, which this release is the first thing to actually need.
 - [x] 1.1 With `writes: slack`, a diagnosis above the confidence threshold produces a Slack report and no Jira call is made — asserted against the recording fake, which must record nothing.
 - [x] 1.2 With `writes: slack_and_jira`, today's behaviour is unchanged, so the decision is reversible by configuration and the Jira path stays covered.
 - [x] 1.3 The confidence threshold selects the report's framing rather than its destination: at or above it the report leads with the probable cause, below it with what is established and what is missing.
-- [ ] 1.4 A run that would previously have ended at `notify_review_exhausted` now ends as a report carrying the same draft, because there is no filing decision left to exhaust.
+- [x] 1.4 A run that would previously have ended at `notify_review_exhausted` now ends as a report carrying the same draft, because there is no filing decision left to exhaust.
 - [ ] 1.5 `docs/ticket-spec.md` is restated as the report spec, with the nine sections intact and the Jira workflow section marked postponed.
 
 ## Phase 2: the report is the product
