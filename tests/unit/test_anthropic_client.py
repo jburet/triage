@@ -456,3 +456,34 @@ async def test_a_list_wrapped_twice_is_unwrapped_to_the_end():
     result = await client.call("analysis", "anything else?", FollowUpPlan)
 
     assert [request.collector for request in result.requests] == ["events_namespace"]
+
+
+async def test_an_envelope_that_arrived_as_text_is_both_decoded_and_unwrapped():
+    """The two repairs have to compose: live on 2026-08-24 the envelope was a string.
+
+    `requests` held the text `'{"requests": []}'`. The decode turned it into a
+    dict and stopped there, so the field the schema needs as a list held an
+    envelope — and the run reported `Input should be a valid list` exactly as if
+    neither repair existed. Decoding is not finished until what came out is
+    looked at the same way as what came in.
+    """
+    client, _ = a_proxy_client(
+        Reply(
+            content=[
+                Block(
+                    type="tool_use",
+                    input={
+                        "requests": (
+                            '{"requests": [{"collector": "events_namespace", '
+                            '"why": "who sent the kill", '
+                            '"query": "kube_namespace:hcl-software-uat"}]}'
+                        )
+                    },
+                )
+            ]
+        )
+    )
+
+    result = await client.call("analysis", "anything else?", FollowUpPlan)
+
+    assert [request.collector for request in result.requests] == ["events_namespace"]

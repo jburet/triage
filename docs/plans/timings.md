@@ -109,3 +109,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | F1 end to end | make run-incident, direct provider, live Datadog + 4 tier calls | 100 |
 | 2026-08-24 | follow_up unwrap | make lint | 1 |
 | 2026-08-24 | follow_up unwrap | make test (605) | 3 |
+| 2026-08-24 | F1 live re-run | make run-incident, proxy provider, died at diagnosis on an unknown model name | 40 |
+| 2026-08-24 | follow_up compose | make lint + make test (606) | 4 |

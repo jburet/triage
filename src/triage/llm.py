@@ -209,6 +209,9 @@ def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
       name is peeled, and only for a list field: a dict is what an object field
       is supposed to be, so reaching into one would be guessing.
 
+    They arrive together — an envelope written as a string — so the decode feeds
+    the peel rather than ending beside it.
+
     A field the schema already declares as a string is left alone either way, so
     nothing that legitimately *is* prose gets reinterpreted.
 
@@ -224,19 +227,18 @@ def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
         field_info = fields.get(name)
         if field_info is None or field_info.annotation is str:
             continue
-        if isinstance(value, dict):
-            if get_origin(field_info.annotation) is list:
-                inner = _unenveloped(value, name)
-                if not isinstance(inner, dict):
-                    decoded[name] = inner
-            continue
-        if not isinstance(value, str):
-            continue
-        try:
-            parsed, _ = decoder.raw_decode(value.strip())
-        except ValueError:
-            continue
-        decoded[name] = parsed
+        if isinstance(value, str):
+            try:
+                value, _ = decoder.raw_decode(value.strip())
+            except ValueError:
+                continue
+            decoded[name] = value
+        # Whatever came out of the text is looked at the same way as what came
+        # in: the two shapes arrived together, an envelope written as a string.
+        if isinstance(value, dict) and get_origin(field_info.annotation) is list:
+            inner = _unenveloped(value, name)
+            if not isinstance(inner, dict):
+                decoded[name] = inner
     return decoded
 
 

@@ -23,6 +23,10 @@ and peeling stops at the first value that is not another envelope. Stopping one 
 is worse than not trying: the answer left behind fails the same field with the same
 validator message, so the fix looks exactly like its own absence.
 
+The two shapes arrive **together** — an envelope written as a string — so the decode feeds
+the peel rather than ending beside it. Each repair alone left the run failing on the same
+field with the same message, which is how both were credited to the other.
+
 Tool use is **strict** wherever the schema can express it — every object fully required, so
 that listing every property changes nothing the node asked for. The value constraints strict
 rejects (`minimum`, `minItems`, …) leave the wire and stay in the Pydantic schema: the API
