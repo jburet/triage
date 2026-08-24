@@ -30,7 +30,7 @@ from triage.integrations.base import (
     SlackClient,
 )
 from triage.integrations.datadog import DatadogClient, FakeDatadogClient
-from triage.integrations.github import GitHubClient, dry_run_github
+from triage.integrations.github import GitHubClient, dry_run_github, unconfigured_github
 from triage.integrations.platform import PlatformClient
 from triage.llm import AnthropicClient, LiteLLMClient, StructuredLLM, Tier
 
@@ -124,6 +124,25 @@ def build_llm(settings: Settings) -> StructuredLLM:
     return AnthropicClient(settings.anthropic_api_key, models)
 
 
+def _build_github(settings: Settings) -> GitHubClient:
+    """The real client, or one that states the variable is unset.
+
+    Not a startup refusal: ``build_deps`` is shared by every graph and only
+    cartography and the service mapping read GitHub, so an empty token must not
+    stop a run that never asks it anything.
+    """
+    from triage.integrations.github import GitHubRestClient
+
+    if not settings.github_token:
+        log.warning(
+            "github_token_unset",
+            detail="no TRIAGE_GITHUB_TOKEN; cartography cannot tell what a merge changed "
+            "and the service mapping cannot resolve a tag to a commit",
+        )
+        return unconfigured_github()
+    return GitHubRestClient(settings.github_token)
+
+
 def _build_runner(settings: Settings, config: Config, repo: TriageRepository) -> AnalysisRunner:
     if settings.dry_run:
         return FakeAnalysisRunner(default=dry_run_result)
@@ -159,7 +178,6 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
     from triage.integrations.datadog import DatadogRestClient
-    from triage.integrations.github import GitHubRestClient
     from triage.integrations.jira import JiraRestClient
     from triage.integrations.platform import PlatformRestClient
     from triage.integrations.slack import SlackWebClient
@@ -174,7 +192,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
         slack=SlackWebClient(settings.slack_bot_token),
         repo=repo,
         runner=_build_runner(settings, config, repo),
-        github=GitHubRestClient(settings.github_token),
+        github=_build_github(settings),
         datadog=DatadogRestClient(
             settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
         ),

@@ -265,3 +265,20 @@ def dry_run_github() -> FakeGitHubClient:
             "was resolved to a commit and no repository was listed"
         )
     )
+
+
+def unconfigured_github() -> FakeGitHubClient:
+    """No token was set, and every read says so rather than returning a 401.
+
+    The failure is caught per repository and turned into an Unknown (M6 2.12), so
+    an unset variable would otherwise reach the mapping report as twenty identical
+    "401: Bad credentials" reasons — indistinguishable from a token that exists
+    and cannot see those repositories, which is a different problem with a
+    different fix.
+    """
+    return FakeGitHubClient(
+        error=GitHubError(
+            "TRIAGE_GITHUB_TOKEN is unset, so no GitHub read was attempted: no comparison "
+            "was made, no tag was resolved to a commit and no repository was listed"
+        )
+    )

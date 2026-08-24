@@ -12,8 +12,9 @@ from typing import Any
 import pytest
 
 from triage.config import LLMProvider, Settings
+from triage.integrations.github import GitHubError, GitHubRestClient
 from triage.llm import AnthropicClient, LiteLLMClient, StructuredOutputError, tool_name
-from triage.runtime import build_llm
+from triage.runtime import _build_github, build_llm
 from triage.schemas.collection import AlertClassification
 
 
@@ -194,3 +195,21 @@ def test_naming_only_some_tiers_for_a_proxy_is_refused():
 
     with pytest.raises(ValueError, match="TRIAGE_MODEL_ANALYSIS, TRIAGE_MODEL_DIAGNOSIS"):
         build_llm(settings)
+
+
+@pytest.mark.asyncio
+async def test_an_unset_github_token_names_the_variable_rather_than_returning_401():
+    """An unset token and a token that cannot see the repository are different problems.
+
+    M6 2.12 turns a failed read into an Unknown per repository and carries on, so a
+    401 from an empty Authorization header would reach the mapping report once per
+    repository and read exactly like a permissions problem.
+    """
+    client = _build_github(a_settings(github_token=""))
+
+    with pytest.raises(GitHubError, match="TRIAGE_GITHUB_TOKEN is unset"):
+        await client.commit_for_tag("https://github.com/zeenea/datacatalog", "501")
+
+
+def test_a_configured_github_token_builds_the_real_client():
+    assert isinstance(_build_github(a_settings(github_token="ghp-test")), GitHubRestClient)

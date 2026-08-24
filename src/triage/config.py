@@ -281,7 +281,9 @@ class Settings(BaseSettings):
 
     slack_bot_token: str = ""
 
-    # Read-only, and only ever used to compare two commits (ADR-0015).
+    # Read-only: comparing two commits (ADR-0015), resolving a tag or the default
+    # branch to the commit it points at, and listing a repository's tree (M6).
+    # Unset is not an error — it degrades cartography and the mapping, and says so.
     github_token: str = ""
 
     # Jira Cloud: basic auth with an Atlassian account email and an API token
