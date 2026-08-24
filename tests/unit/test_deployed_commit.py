@@ -6,9 +6,13 @@ GitHub reads go through the protocol's fake, which is what the mapping pass
 holds.
 """
 
+import re
+
 import pytest
+from pydantic import ValidationError
 
 from tests.conftest import TENANT, a_workload, declaring
+from triage.config import Repo, RepoKind
 from triage.integrations.github import FakeGitHubClient
 from triage.mapping.commits import with_deployed_commit
 from triage.schemas.common import Unknown
@@ -68,3 +72,30 @@ async def test_the_service_and_the_tag_are_named_when_github_has_no_such_tag(con
     assert isinstance(entry.deployed_commit, Unknown)
     assert "501" in entry.deployed_commit.reason
     assert TENANT in entry.deployed_commit.reason
+
+
+async def test_a_repository_whose_tags_are_spelled_differently_declares_the_relationship():
+    """`config.yaml` says `v{tag}`; nothing else is tried, because a tag invented by
+    guessing points somewhere specific and wrong."""
+    config = declaring(PLATFORM, tag_template="v{tag}")
+    client = github(tags={(PLATFORM, "v501"): COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert entry.deployed_commit == COMMIT
+    assert client.tag_lookups == [(PLATFORM, "v501")]
+
+
+async def test_a_declared_spelling_that_does_not_exist_is_not_retried_as_the_image_tag():
+    config = declaring(PLATFORM, tag_template="build-{tag}")
+    client = github(tags={(PLATFORM, "501"): COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert client.tag_lookups == [(PLATFORM, "build-501")]
+
+
+def test_a_tag_template_that_does_not_place_the_image_tag_is_refused():
+    with pytest.raises(ValidationError, match=re.escape("{tag}")):
+        Repo(url=PLATFORM, team="platform", kind=RepoKind.APPLICATION, tag_template="release")

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from triage.schemas.common import Confidence, Feature
@@ -73,6 +73,31 @@ class Repo(BaseModel):
             "keyed on the name a repository says it deploys as, will never contain them."
         ),
     )
+    tag_template: str | None = Field(
+        default=None,
+        description=(
+            "How this repository spells, as a git tag, the tag its images carry — "
+            "`v{tag}`, `build-{tag}`. Unset means the two are the same string. Only the "
+            "declared spelling is ever looked up: a tag invented by guessing points "
+            "somewhere specific and wrong."
+        ),
+    )
+
+    @field_validator("tag_template")
+    @classmethod
+    def _places_the_image_tag(cls, value: str | None) -> str | None:
+        if value is not None and "{tag}" not in value:
+            raise ValueError(
+                f"{value!r} places no {{tag}}, so every image of this repository would "
+                f"resolve to the same git tag"
+            )
+        return value
+
+    def github_tag(self, image_tag: str | None) -> str | None:
+        """The git tag this image tag is spelled as here, or None when it carries none."""
+        if image_tag is None:
+            return None
+        return (self.tag_template or "{tag}").format(tag=image_tag)
 
 
 class Database(BaseModel):

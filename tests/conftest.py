@@ -79,10 +79,14 @@ def declaring(
     team: str = "platform",
     kind: RepoKind = RepoKind.APPLICATION,
     serves: tuple[str, ...] = (),
+    tag_template: str | None = None,
 ) -> Config:
     """The shipped config with exactly these repositories declared."""
     base = load_config(REPO_ROOT / "config.yaml")
-    repos = [Repo(url=url, team=team, kind=kind, serves=list(serves)) for url in urls]
+    repos = [
+        Repo(url=url, team=team, kind=kind, serves=list(serves), tag_template=tag_template)
+        for url in urls
+    ]
     return base.model_copy(update={"repos": repos})
 
 

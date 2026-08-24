@@ -38,6 +38,10 @@ repos:
     # plt-hcl-software-uat — needs this or every one of its alerts resolves to
     # "not in the system map" and nothing is ever read.
     serves: ["payments-*"]
+    # An image tag is a build number and a git tag of the same name is what
+    # resolves it to a commit. Where the two are spelled differently, say how —
+    # `v{tag}`, `build-{tag}` — because only the declared spelling is looked up.
+    # tag_template: "v{tag}"
   - url: github.com/org/infra
     team: platform
     kind: terraform

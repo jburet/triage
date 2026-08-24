@@ -131,7 +131,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       invented by guessing points somewhere specific and wrong — but the default branch is not
       a guess of that kind: production runs `main` in essentially every case, and the
       alternative on this path is not a better commit, it is no commit at all.
-- [ ] 2.9 A repository whose GitHub tags are not spelled as the image tag declares the
+- [x] 2.9 A repository whose GitHub tags are not spelled as the image tag declares the
       relationship in `config.yaml` (a template such as `v{tag}` or `build-{tag}`), and only
       the declared spelling is looked up.
 - [ ] 2.10 A workload whose repository is not declared in `config.yaml` gets no GitHub read at

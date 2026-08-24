@@ -72,7 +72,7 @@ async def with_deployed_commit(
 
     _, tag, _ = split_reference(entry.image)
     try:
-        commit, source = await _resolved(github, repo.url, entry, tag)
+        commit, source = await _resolved(github, repo.url, entry, repo.github_tag(tag))
     except GitHubError as error:
         return entry.model_copy(
             update={
