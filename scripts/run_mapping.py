@@ -1,8 +1,9 @@
 """Run the service-mapping graph over real cluster telemetry and print what it found.
 
-    uv run python -m scripts.run_mapping plt-hcl-software-uat
-    uv run python -m scripts.run_mapping --days 14 plt-merck-qa plt-hcl-software-uat
-    uv run python -m scripts.run_mapping --db plt-hcl-software-uat
+    make run-mapping ARGS="plt-hcl-software-uat"
+    make run-mapping ARGS="--days 14 plt-merck-qa plt-hcl-software-uat"
+    make run-mapping ARGS="--db plt-hcl-software-uat"
+    make run-mapping                       # every service seen recently; needs --db
 
 Read-only and free: Datadog events only, no model call anywhere on this path.
 Named services are derived; with none, the pass covers every service that has
@@ -11,8 +12,9 @@ alerted recently, which needs ``--db`` to have anything to enumerate.
 ``--db`` persists the mappings to Postgres, which is what an incident run in
 another process reads. Without it the derivation is printed and thrown away.
 
-The report this prints is deliberately plain: the scored per-outcome report and
-its Slack notice are M6 phase 4.
+The report printed at the end is the one the pass posts to the platform channel,
+rendered by the same function: a local run and a scheduled one must not disagree
+about how much of the map is observed.
 """
 
 import asyncio
@@ -22,6 +24,7 @@ from dataclasses import replace
 from triage.config import get_config, get_settings
 from triage.graphs.mapping import graph
 from triage.integrations.datadog import DatadogRestClient
+from triage.mapping.report import render
 from triage.runtime import DEPS_KEY, build_deps
 from triage.schemas.common import render as render_field
 from triage.schemas.system_map import MappingOutcome
@@ -89,10 +92,10 @@ async def main(argv: list[str]) -> int:
                 print(f"    from       {origin}{stood}")
                 print(f"    iac        {entry.iac_repo or 'none'} — source {entry.source.value}")
 
-    unclaimed = state.get("unclaimed", [])
-    if unclaimed:
-        rule("in the seed, declared by no team in config.yaml")
-        print("  " + ", ".join(unclaimed))
+    report = state.get("report")
+    if report is not None:
+        rule("report")
+        print(render(report))
 
     rule("written")
     print(f"  {state.get('entries_written', 0)} workload rows")

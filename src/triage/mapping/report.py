@@ -89,7 +89,8 @@ def _block(title: str, lines: Sequence[ReportLine]) -> list[str]:
 
 def render(report: MappingReport) -> str:
     """The whole report as one message, for Slack and for the terminal alike."""
-    lines = [f":jigsaw: Service mapping: {report.services} services."]
+    counted = "1 service" if report.services == 1 else f"{report.services} services"
+    lines = [f":jigsaw: Service mapping: {counted}."]
     lines += _block("Mapped from the running image", report.by_image)
     lines += _block("Mapped from a name pattern only", report.by_pattern)
     lines += _block("Not mapped", report.unmapped)

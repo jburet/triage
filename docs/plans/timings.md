@@ -94,3 +94,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M6 phase 4.1 | make lint + make test (550 passed) | 5 |
 | 2026-08-24 | M6 phase 4.2 | make lint + make test (553 passed) | 5 |
 | 2026-08-24 | M6 phase 4.3 | make lint + make test (560 passed) | 6 |
+| 2026-08-24 | M6 phase 4.4 | make lint + make test (567 passed) | 5 |
+| 2026-08-24 | M6 phase 4.4 | make run-mapping ARGS="plt-hcl-software-uat" (live Datadog) | 8 |

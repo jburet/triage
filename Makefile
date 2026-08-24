@@ -1,4 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-incident repository-map evals evals-cartography evals-incident clean
+.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -40,6 +40,9 @@ run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mo
 
 run-cartography: env ## Run the cartography graph over config.yaml in dry-run mode
 	uv run python -m scripts.run_cartography $(REPOS) $(if $(LOCAL),--local)
+
+run-mapping: env ## Derive the service map from real Datadog events and print the report (read-only)
+	uv run python -m scripts.run_mapping $(ARGS)
 
 run-incident: env ## Run F1 end to end on one real alert: read-only Datadog, real models, fake Jira/Slack
 	uv run python -m scripts.run_incident $(ARGS)
