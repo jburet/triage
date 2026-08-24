@@ -277,3 +277,23 @@ async def test_with_no_workspace_the_working_directory_is_the_tree(application_r
     result = await run(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), llm, workspace=None)
 
     assert result.succeeded
+
+
+async def test_a_kind_with_no_analyser_fails_before_anything_is_cloned(tmp_path, remote):
+    """M7 3.4. diff_analysis is still not implemented, and the honest failure names
+    the kind — a clone that ran first would fail for its own reasons instead, and
+    would have paid for a tree nothing was going to read."""
+    url, older, _newer = remote
+    workspace = tmp_path / "workspace"
+
+    result = await run(
+        an_analysis_request(
+            AnalysisKind.DIFF_ANALYSIS, repo_url=url, commit=older, base_commit=older
+        ),
+        FakeLLM(responses={}),
+        workspace=workspace,
+    )
+
+    assert not result.succeeded
+    assert "diff_analysis" in (result.error or "")
+    assert not workspace.exists()

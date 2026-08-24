@@ -118,5 +118,11 @@ def _copied_paths() -> list[str]:
 
 
 def _covers(path: str, module: str) -> bool:
-    target = "src/" + module.replace(".", "/")
-    return path in (target, target + ".py") or target.startswith(path + "/")
+    """Whether a COPY of ``path`` puts ``module``'s file in the image."""
+    file = module_file(module)
+    target = (
+        f"src/{file.relative_to(SRC).as_posix()}"
+        if file is not None
+        else "src/" + module.replace(".", "/")
+    )
+    return path == target or target.startswith(path + "/")

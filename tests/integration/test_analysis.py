@@ -16,6 +16,7 @@ from tests.conftest import (
     run_config,
     some_findings,
 )
+from triage.analysis.entrypoint import unanswerable
 from triage.analysis.runner import FakeAnalysisRunner
 from triage.config import Config, Repo, RepoKind
 from triage.db.repo import InMemoryRepository
@@ -496,3 +497,31 @@ async def test_an_iac_repository_github_cannot_answer_for_still_says_so(config: 
 
     assert deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS) == []
     assert result["investigated"][0].result is not None
+
+
+async def test_a_deployment_hypothesis_is_an_unknown_because_diff_analysis_has_no_entrypoint(
+    config: Config,
+):
+    """M7 3.4. The kind the image refuses has to arrive as an unknown a developer
+    can read, not as a silent gap — so the canned result is the image's own
+    refusal, and implementing diff_analysis is what makes this test say so."""
+    refusal = unanswerable(AnalysisKind.DIFF_ANALYSIS)
+    assert refusal is not None, "diff_analysis has an entrypoint now; M7 3.4 said it does not"
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry()),
+        runner=FakeAnalysisRunner(results={AnalysisKind.DIFF_ANALYSIS: refusal}),
+        syntheses=[a_synthesis(confidence="high")],
+    )
+
+    diagnosis = (
+        await run(
+            deps,
+            hypotheses=[
+                a_hypothesis(CauseType.DEPLOYMENT, commit="bbbbbbb", base_commit="1111111")
+            ],
+        )
+    )["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "diff_analysis" in diagnosis.unknowns[0].why_unresolved

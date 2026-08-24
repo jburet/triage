@@ -117,3 +117,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M7 phase 3.1 (closure) | make test (623 passed, 13 awaiting the Dockerfile) | 5 |
 | 2026-08-24 | M7 phase 3.2 (clone) | make lint | 6 |
 | 2026-08-24 | M7 phase 3.2 (clone) | make test (633 passed, 13 awaiting the Dockerfile) | 6 |
+| 2026-08-24 | M7 phase 3.1 | docker build -f docker/analysis/Dockerfile (cold) | 14 |
+| 2026-08-24 | M7 phase 3.1/3.4 | make lint + make test (648 passed) | 7 |
+| 2026-08-24 | M7 phase 3.4 | docker run, diff_analysis request (stated refusal, exit 1) | 2 |

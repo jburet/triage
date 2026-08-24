@@ -68,6 +68,24 @@ ANALYSERS: dict[AnalysisKind, Analyser] = {
 }
 
 
+def unanswerable(kind: AnalysisKind) -> AnalysisResult | None:
+    """The stated failure for a kind this image has no analyser for, or nothing.
+
+    ``diff_analysis`` needs the patch between two commits rather than one tree,
+    which is a different gather (ADR-0014). Asked for one, the image says so
+    and names the kind — before the clone, because a clone that failed on its
+    own terms first would report *that* instead, and would have fetched a tree
+    nothing was ever going to read.
+    """
+    if kind in ANALYSERS:
+        return None
+    return AnalysisResult.failed(
+        kind,
+        f"{kind.value} has no entrypoint yet; this image answers "
+        f"{', '.join(answerable.value for answerable in ANALYSERS)}",
+    )
+
+
 async def analyse(
     request: AnalysisRequest,
     root: Path,
@@ -76,13 +94,10 @@ async def analyse(
     budget: ContextBudget = DEFAULT_BUDGET,
 ) -> AnalysisResult:
     """Answer the request against the tree at ``root``, or say why it could not be."""
-    analyser = ANALYSERS.get(request.kind)
-    if analyser is None:
-        return AnalysisResult.failed(
-            request.kind,
-            f"{request.kind.value} has no entrypoint yet; this image answers "
-            f"{', '.join(kind.value for kind in ANALYSERS)}",
-        )
+    refusal = unanswerable(request.kind)
+    if refusal is not None:
+        return refusal
+    analyser = ANALYSERS[request.kind]
 
     context = gather(root, analyser.profile, budget, first=request.paths)
     sections: dict[str, object] = {
@@ -133,6 +148,9 @@ async def run(
     then starts the entrypoint inside the result; cloning again there would
     fetch the same tree twice.
     """
+    refusal = unanswerable(request.kind)
+    if refusal is not None:
+        return refusal
     if workspace is None:
         return await analyse(request, Path.cwd(), llm, budget=budget)
     workspace.mkdir(parents=True, exist_ok=True)
