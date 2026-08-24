@@ -15,6 +15,8 @@ which is *not* the deployed commit and must never be presented as one, hence
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from triage.config import Config
 from triage.integrations.github import GitHubClient, GitHubError
 from triage.mapping.images import split_reference
@@ -34,8 +36,8 @@ def _undeclared(entry: WorkloadEntry) -> Unknown:
 
 
 async def _resolved(
-    github: GitHubClient, repo_url: str, tag: str | None
-) -> tuple[MaybeUnknown, CommitSource | None]:
+    github: GitHubClient, repo_url: str, tag: str | None, at: datetime | None
+) -> tuple[MaybeUnknown, CommitSource, datetime | None]:
     """The declared tag spelling, then the default branch — and no third guess.
 
     A tag invented by guessing points somewhere specific and wrong, so no second
@@ -48,19 +50,27 @@ async def _resolved(
     if tag is not None:
         commit = await github.commit_for_tag(repo_url, tag)
         if commit is not None:
-            return commit, CommitSource.GITHUB_TAG
-    return await github.default_branch_commit(repo_url), CommitSource.DEFAULT_BRANCH
+            return commit, CommitSource.GITHUB_TAG, None
+    return (
+        await github.default_branch_commit(repo_url, at=at),
+        CommitSource.DEFAULT_BRANCH,
+        at,
+    )
 
 
 async def with_deployed_commit(
     github: GitHubClient,
     config: Config,
     entry: WorkloadEntry,
+    *,
+    at: datetime | None = None,
 ) -> WorkloadEntry:
     """The same entry, with whatever GitHub can add about which commit it runs.
 
     A pattern mapping is left alone: it observed no build, so there is nothing to
-    resolve and a tag lookup would be about some other service's image.
+    resolve and a tag lookup would be about some other service's image. ``at`` is
+    when the incident fired: a diagnosis of Tuesday's outage read against
+    Thursday's default branch is a different repository.
     """
     if entry.source is not MappingSource.IMAGE or entry.image is None:
         return entry
@@ -72,7 +82,7 @@ async def with_deployed_commit(
 
     _, tag, _ = split_reference(entry.image)
     try:
-        commit, source = await _resolved(github, repo.url, repo.github_tag(tag))
+        commit, source, read_at = await _resolved(github, repo.url, repo.github_tag(tag), at)
     except GitHubError as error:
         return entry.model_copy(
             update={
@@ -81,4 +91,6 @@ async def with_deployed_commit(
                 )
             }
         )
-    return entry.model_copy(update={"deployed_commit": commit, "commit_source": source})
+    return entry.model_copy(
+        update={"deployed_commit": commit, "commit_source": source, "commit_read_at": read_at}
+    )

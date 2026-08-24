@@ -132,13 +132,16 @@ class MappingState(TypedDict, total=False):
     """One pass of the service mapping (M6).
 
     Input is ``services``; an empty list is a full pass over every service that
-    has alerted inside ``lookback_days``. Everything else is what the pass found,
-    reported back rather than only logged, because an unmapped production
+    has alerted inside ``lookback_days``. ``at`` is when the incident that
+    prompted the pass fired, so a default-branch fallback reads the branch as it
+    stood then rather than as it stands now. Everything else is what the pass
+    found, reported back rather than only logged, because an unmapped production
     workload is Triage's own gap.
     """
 
     services: list[str]
     lookback_days: int
+    at: datetime
 
     seed: list[SeedEntry]
     targets: list[str]

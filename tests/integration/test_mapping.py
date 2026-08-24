@@ -6,6 +6,8 @@ system-map entry. Assertions are on what a pass *left behind* — the workload
 rows, and the line it wrote about every service it could not map.
 """
 
+from datetime import UTC, datetime
+
 import pytest
 
 from tests.conftest import (
@@ -62,6 +64,16 @@ async def test_the_build_number_the_tenant_runs_becomes_a_commit_through_github(
     entry = deps.repo.workloads[TENANT]
     assert entry.deployed_commit == COMMIT
     assert entry.commit_source is CommitSource.GITHUB_TAG
+
+
+async def test_a_pass_that_knows_when_the_incident_fired_reads_the_branch_as_it_stood(zeenea):
+    fired = datetime(2026, 8, 22, 0, 43, tzinfo=UTC)
+    deps = deps_for(zeenea, github=FakeGitHubClient(branch_commits={PLATFORM: COMMIT}))
+
+    await graph.ainvoke({"services": [TENANT], "at": fired}, config=run_config(deps))
+
+    assert deps.github.branch_reads == [(PLATFORM, fired)]
+    assert deps.repo.workloads[TENANT].commit_read_at == fired
 
 
 async def test_the_entry_records_the_digest_that_was_running(zeenea):

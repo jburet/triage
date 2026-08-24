@@ -7,6 +7,7 @@ holds.
 """
 
 import re
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -21,6 +22,7 @@ from triage.schemas.system_map import CommitSource
 PLATFORM = "github.com/zeenea/platform"
 PLATFORM_INFRA = "github.com/zeenea/platform-infra"
 COMMIT = "9f2c1ab8b0e3d4f5a6b7c8d9e0f1a2b3c4d5e6f7"
+FIRED = datetime(2026, 8, 22, 0, 43, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -146,3 +148,32 @@ async def test_an_image_with_no_tag_takes_the_same_default_branch_path(config):
     assert entry.commit_source is CommitSource.DEFAULT_BRANCH
     assert client.tag_lookups == []
     assert client.branch_reads == [(PLATFORM, None)]
+
+
+async def test_the_default_branch_is_read_as_it_stood_when_the_incident_fired(config):
+    """A diagnosis of Tuesday's outage read against Thursday's `main` is a different
+    repository. The alert's own time is the only one worth reading it at."""
+    client = github(branch_commits={PLATFORM: COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload(), at=FIRED)
+
+    assert client.branch_reads == [(PLATFORM, FIRED)]
+    assert entry.commit_read_at == FIRED
+
+
+async def test_with_no_time_to_work_from_head_is_used_and_the_entry_says_so(config):
+    client = github(branch_commits={PLATFORM: COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert client.branch_reads == [(PLATFORM, None)]
+    assert entry.commit_read_at is None
+
+
+async def test_a_tag_is_resolved_at_no_particular_time(config):
+    """A tag names one commit for ever; only the branch moves."""
+    client = github(tags={(PLATFORM, "501"): COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload(), at=FIRED)
+
+    assert entry.commit_read_at is None

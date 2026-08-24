@@ -11,6 +11,7 @@ be acted on.
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, TypeAlias, TypeVar
 
@@ -260,6 +261,13 @@ class WorkloadEntry(BaseModel):
     deployed_commit: MaybeUnknown
     commit_source: CommitSource | None = Field(
         default=None, description="What answered the commit; None when nothing did."
+    )
+    commit_read_at: datetime | None = Field(
+        default=None,
+        description=(
+            "When the default branch was read as of. None means HEAD — or that the "
+            "commit came from a tag, which names one commit for ever."
+        ),
     )
     iac_repo: str | None = None
     iac_repo_url: str | None = None

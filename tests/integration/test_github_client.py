@@ -7,6 +7,8 @@ truncation handling are worth pinning down; whether a real repository is
 reachable with the configured token is what a staging run is for.
 """
 
+from datetime import UTC, datetime
+
 import httpx
 import pytest
 
@@ -176,3 +178,20 @@ async def test_a_branch_with_no_commit_is_refused_rather_than_answered_empty():
 
     with pytest.raises(GitHubError, match="no commit"):
         await client.default_branch_commit("github.com/org/x")
+
+
+async def test_the_default_branch_is_read_as_it_stood_at_the_time_it_is_asked_about():
+    """Thursday's `main` is a different repository from Tuesday's, and an outage
+    diagnosed against the wrong one reads real code that never ran."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x": (200, {"default_branch": "main"}),
+            "/repos/org/x/commits": (200, [{"sha": "9f2c1ab"}]),
+        },
+        requests,
+    )
+
+    await client.default_branch_commit("github.com/org/x", at=datetime(2026, 8, 22, tzinfo=UTC))
+
+    assert requests[-1].url.params["until"] == "2026-08-22T00:00:00+00:00"

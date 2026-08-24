@@ -61,13 +61,15 @@ async def _events(deps: Deps, service: str, days: int) -> list[dict[str, object]
     return [event for event in data if isinstance(event, dict)]
 
 
-async def _with_deployed_commit(deps: Deps, derivation: Derivation) -> Derivation:
+async def _with_deployed_commit(
+    deps: Deps, derivation: Derivation, at: datetime | None
+) -> Derivation:
     """Ask GitHub which commit this build was cut from, when the image did not say."""
     entry = derivation.entry
     if entry is None or not derivation.mapped:
         return derivation
     return derivation.model_copy(
-        update={"entry": await with_deployed_commit(deps.github, deps.config, entry)}
+        update={"entry": await with_deployed_commit(deps.github, deps.config, entry, at=at)}
     )
 
 
@@ -120,7 +122,7 @@ async def derive_workloads(
             )
             continue
         derived = await _with_deployed_commit(
-            deps, derive_workload(deps.config, seed, service, events)
+            deps, derive_workload(deps.config, seed, service, events), state.get("at")
         )
         derivations.append(
             _against_what_is_on_record(derived, await deps.repo.workload_for_service(service))

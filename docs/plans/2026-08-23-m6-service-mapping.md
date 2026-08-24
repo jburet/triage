@@ -143,7 +143,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       preferred over one parsed out of a tag that merely looks like a SHA.
 - [x] 2.14 An image carrying no tag at all takes the same default-branch path as an unfound
       tag: the two are the same situation, "GitHub knows this repository and not this build".
-- [ ] 2.15 The default-branch commit is the one that branch pointed at **when the incident
+- [x] 2.15 The default-branch commit is the one that branch pointed at **when the incident
       fired**, not at the moment the mapping runs, whenever the caller knows that time. A
       diagnosis of Tuesday's outage read against Thursday's `main` is a different repository.
       With no time to work from, `HEAD` is used and the source says so.
