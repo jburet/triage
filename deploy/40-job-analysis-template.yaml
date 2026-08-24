@@ -1,0 +1,85 @@
+# The analysis Job, as `triage.analysis.jobs.job_manifest` submits it.
+#
+# Triage builds this object in Python and POSTs it; nothing applies this file in
+# production. It is here for two reasons: it is the reviewable form of the
+# sandbox, and it is what a human applies by hand to try the sandbox on a cluster
+# for the first time (plan M7 4.2 and 4.4) — fill `image`, the request, and go.
+#
+# `tests/unit/test_deploy_manifests.py` asserts that every fixed field below is
+# what `job_manifest` actually produces, so the two cannot drift apart silently.
+# The three placeholders — the name, the image and the request — are what varies
+# per submission.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: triage-code-analysis-000000000000  # job_name(request)
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+    app.kubernetes.io/component: analysis
+    triage.zeenea.com/kind: code_analysis
+spec:
+  # No retry: a second attempt would write the result row twice, and a failed
+  # analysis is a fact for the diagnosis, not something to hide.
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: triage
+        app.kubernetes.io/component: analysis
+        triage.zeenea.com/kind: code_analysis
+    spec:
+      runtimeClassName: gvisor
+      restartPolicy: Never
+      # The Job has no business with the Kubernetes API. Its ServiceAccount holds
+      # no permissions either; this is the belt to that pair of braces.
+      automountServiceAccountToken: false
+      serviceAccountName: triage-analysis
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: analysis
+          image: REGISTRY/triage-analysis:TAG  # config.analysis.job.image
+          workingDir: /workspace
+          env:
+            - name: TRIAGE_ANALYSIS_REQUEST
+              value: '{"kind":"code_analysis","...":"one AnalysisRequest as JSON"}'
+            - name: TRIAGE_ANALYSIS_JOB_NAME
+              value: triage-code-analysis-000000000000
+            - name: HOME
+              value: /workspace
+          envFrom:
+            # TRIAGE_GITHUB_TOKEN, TRIAGE_DATABASE_URL, TRIAGE_LITELLM_URL,
+            # TRIAGE_LITELLM_API_KEY — see 50-secret-analysis.example.yaml.
+            - secretRef:
+                name: triage-analysis
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+              ephemeral-storage: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+              ephemeral-storage: 8Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: tmp
+              mountPath: /tmp

@@ -45,6 +45,11 @@ JOB_NAME_ENV = "TRIAGE_ANALYSIS_JOB_NAME"
 
 ANALYSIS_COMPONENT = "analysis"
 
+WORKSPACE = "/workspace"
+"""Where the clone goes: the only writable place, and the container's working directory."""
+
+_NOBODY = 65532
+
 _SERVICE_ACCOUNT = Path("/var/run/secrets/kubernetes.io/serviceaccount")
 _BATCH_API = "/apis/batch/v1"
 
@@ -98,20 +103,50 @@ def job_manifest(request: AnalysisRequest, *, name: str, spec: AnalysisJobConfig
                 "spec": {
                     "runtimeClassName": spec.runtime_class,
                     "restartPolicy": "Never",
+                    # An account with no permissions, and no token to use them
+                    # with: the analysis has no business with the Kubernetes API.
+                    "serviceAccountName": spec.service_account,
                     "automountServiceAccountToken": False,
+                    # What the namespace's `restricted` Pod Security admission
+                    # demands, and what the sandbox would want anyway: the Job
+                    # reads a tree it did not write and talks to two endpoints.
+                    "securityContext": {
+                        "runAsNonRoot": True,
+                        "runAsUser": _NOBODY,
+                        "runAsGroup": _NOBODY,
+                        "fsGroup": _NOBODY,
+                        "seccompProfile": {"type": "RuntimeDefault"},
+                    },
+                    "volumes": [
+                        {"name": "workspace", "emptyDir": {}},
+                        {"name": "tmp", "emptyDir": {}},
+                    ],
                     "containers": [
                         {
                             "name": "analysis",
                             "image": spec.image,
+                            "workingDir": WORKSPACE,
                             "env": [
                                 {"name": REQUEST_ENV, "value": request.model_dump_json()},
                                 {"name": JOB_NAME_ENV, "value": name},
+                                # git writes its config somewhere; a read-only
+                                # root means that somewhere has to be said.
+                                {"name": "HOME", "value": WORKSPACE},
                             ],
                             "envFrom": [{"secretRef": {"name": spec.secret_ref}}],
                             "resources": {
                                 "requests": dict(spec.resources.requests),
                                 "limits": dict(spec.resources.limits),
                             },
+                            "securityContext": {
+                                "allowPrivilegeEscalation": False,
+                                "readOnlyRootFilesystem": True,
+                                "capabilities": {"drop": ["ALL"]},
+                            },
+                            "volumeMounts": [
+                                {"name": "workspace", "mountPath": WORKSPACE},
+                                {"name": "tmp", "mountPath": "/tmp"},
+                            ],
                         }
                     ],
                 },

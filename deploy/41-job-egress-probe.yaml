@@ -1,0 +1,82 @@
+# Proving the sandbox's egress is refused where it was not granted (plan M7 4.4).
+#
+# The same labels, RuntimeClass and security context as a real analysis, so the
+# NetworkPolicy in 30-networkpolicy-analysis.yaml selects it identically — but it
+# runs curl instead of the analysis, once per destination, and prints a verdict
+# per line. Granted destinations must connect; the rest must time out, and a
+# timeout rather than a refusal is what a dropped packet looks like.
+#
+#   kubectl -n triage apply -f deploy/41-job-egress-probe.yaml
+#   kubectl -n triage logs job/triage-egress-probe -f
+#
+# Expected, and the point of running it: github reachable, everything else not.
+# `169.254.169.254` is the node's instance metadata: a clone that runs code from
+# a repository under investigation must not be able to read the node's
+# credentials, and this is the line that says whether it can.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: triage-egress-probe
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+    app.kubernetes.io/component: analysis
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: triage
+        app.kubernetes.io/component: analysis
+    spec:
+      runtimeClassName: gvisor
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      serviceAccountName: triage-analysis
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: probe
+          image: curlimages/curl:8.10.1
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              probe() {
+                if curl -sS --max-time 8 -o /dev/null "$2"; then verdict=reached; else verdict=refused; fi
+                echo "$1 $2 expected=$3 actual=$verdict"
+                [ "$verdict" = "$3" ] || failed=1
+              }
+              failed=0
+              probe github        https://github.com/                       reached
+              probe github-api    https://api.github.com/                   reached
+              probe datadog       https://api.datadoghq.eu/api/v1/validate  refused
+              probe slack         https://slack.com/api/api.test            refused
+              probe anthropic     https://api.anthropic.com/v1/models       refused
+              probe pypi          https://pypi.org/simple/                  refused
+              probe metadata      http://169.254.169.254/latest/meta-data/  refused
+              echo "egress probe: $([ $failed -eq 0 ] && echo as granted || echo NOT as granted)"
+              exit $failed
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp

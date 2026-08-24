@@ -1,0 +1,24 @@
+# gVisor, the kernel boundary an analysis runs behind (architecture §7).
+#
+# The RuntimeClass is only a name: `runsc` has to be installed on the nodes that
+# carry the `triage.zeenea.com/sandbox: gvisor` label — a containerd shim and a
+# containerd config drop-in, which on EKS is a node bootstrap concern and belongs
+# to the platform-infra Terraform, not here. Applying this file to a cluster whose
+# nodes have no runsc leaves every analysis Job Pending with
+# `RuntimeClass "gvisor" not found` or the shim missing, which is the failure to
+# expect on the first submission.
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor
+handler: runsc
+scheduling:
+  nodeSelector:
+    triage.zeenea.com/sandbox: gvisor
+  # The sandbox nodes are tainted so nothing else lands on them; a Job that names
+  # this RuntimeClass has the toleration merged in for it.
+  tolerations:
+    - key: triage.zeenea.com/sandbox
+      operator: Equal
+      value: gvisor
+      effect: NoSchedule

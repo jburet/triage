@@ -13,6 +13,7 @@ import pytest
 from tests.conftest import a_repo_summary, an_analysis_request, some_findings
 from triage.analysis.jobs import (
     JOB_TIMEOUT_SECONDS,
+    WORKSPACE,
     FakeJobApi,
     JobApiError,
     JobStatus,
@@ -285,3 +286,22 @@ async def test_a_job_killed_for_its_memory_says_which_limits_it_was_given():
     assert "BackoffLimitExceeded" in error
     assert f"memory={SPEC.resources.limits['memory']}" in error
     assert f"deadline={int(JOB_TIMEOUT_SECONDS)}s" in error
+
+
+async def test_the_pod_is_unprivileged_with_a_read_only_root_and_a_writable_workspace():
+    """A sandbox the namespace's `restricted` policy would refuse is not a sandbox."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(statuses=[JobStatus(failed=1)])
+    await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    pod = jobs.created[0]["spec"]["template"]["spec"]
+    container = pod["containers"][0]
+    assert pod["securityContext"]["runAsNonRoot"] is True
+    assert pod["securityContext"]["seccompProfile"]["type"] == "RuntimeDefault"
+    assert container["securityContext"]["allowPrivilegeEscalation"] is False
+    assert container["securityContext"]["capabilities"]["drop"] == ["ALL"]
+    assert container["securityContext"]["readOnlyRootFilesystem"] is True
+    assert container["workingDir"] == WORKSPACE
+    mounts = {mount["name"]: mount["mountPath"] for mount in container["volumeMounts"]}
+    assert mounts == {"workspace": WORKSPACE, "tmp": "/tmp"}
+    assert all("emptyDir" in volume for volume in pod["volumes"])

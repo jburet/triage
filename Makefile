@@ -1,4 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
+.PHONY: help install env dev db proxy proxy-down migrate lint test deploy-check run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -34,6 +34,9 @@ lint: ## ruff + mypy
 
 test: ## Run the test suite (no network, no spend)
 	uv run pytest -q
+
+deploy-check: ## Validate the cluster manifests offline (needs kubeconform)
+	kubeconform -strict -summary -kubernetes-version 1.31.0 deploy/*.yaml
 
 run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mode
 	uv run python -m scripts.run_fixture $(FIXTURE)

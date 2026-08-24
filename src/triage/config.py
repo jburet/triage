@@ -202,6 +202,7 @@ class AnalysisJobConfig(BaseModel):
     image: str = ""
     runtime_class: str = "gvisor"
     secret_ref: str = "triage-analysis"
+    service_account: str = "triage-analysis"
     resources: JobResources = Field(default_factory=JobResources)
 
 

@@ -1,0 +1,56 @@
+# Who may submit an analysis, and what the analysis itself may do.
+#
+# Two ServiceAccounts, because they are two different trust levels. The Platform
+# runs Triage's graphs and needs three verbs on Jobs in this namespace and nothing
+# else — no pods, no secrets, no events (`triage.integrations.platform` and
+# `triage.analysis.jobs` are separate clients for exactly this reason). The
+# analysis Job runs code from a repository under investigation and needs no
+# Kubernetes API at all; its Pod sets `automountServiceAccountToken: false`, so
+# the account below exists to be named and to hold no permissions.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: triage-platform
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: triage-analysis
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+    app.kubernetes.io/component: analysis
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: triage-analysis-jobs
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+rules:
+  # create/get/delete: submit one Job, poll its status, delete it whatever
+  # happened. No `list`, no `watch`, no `update`.
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: triage-analysis-jobs
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: triage-analysis-jobs
+subjects:
+  - kind: ServiceAccount
+    name: triage-platform
+    namespace: triage

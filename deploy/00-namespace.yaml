@@ -1,0 +1,13 @@
+# The namespace everything Triage runs in. `restricted` is enforced, not warned:
+# the analysis Job is the one pod here that runs code it did not write, and a
+# sandbox that admission would have let through unprivileged is not a sandbox.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
