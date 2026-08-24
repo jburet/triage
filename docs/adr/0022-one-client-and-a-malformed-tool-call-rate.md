@@ -1,4 +1,4 @@
-# 0022 — One client for both paths, and a measured malformed-tool-call rate
+# 0022 — One client for both paths, and strict tool use where a schema can say it
 
 Status: Proposed. Supersedes the OpenAI-shaped proxy transport; records an unresolved defect.
 
@@ -14,6 +14,14 @@ declares a field as anything but `str` and the value is a string whose leading J
 parses, that value is used and any trailing markup dropped. This is parsing, not repair —
 nothing is invented, the decode must succeed on its own, and the schema still refuses
 whatever comes out.
+
+Tool use is **strict** wherever the schema can express it — every object fully required, so
+that listing every property changes nothing the node asked for. The value constraints strict
+rejects (`minimum`, `minItems`, …) leave the wire and stay in the Pydantic schema: the API
+guarantees the structure, `model_validate` still refuses a `rank_score` of 2. A proxy too old
+to know the field rejects the whole request, so the client offers strict, notices that
+refusal once, and asks without it thereafter — the proxy gets the fix the day it is upgraded,
+with no configuration.
 
 `qualify` asks up to three times, each retry carrying the required *shape*, and hands the
 collection to the team on Slack when all three fail.
@@ -33,33 +41,38 @@ the same prompt was then measured eight times per variant against the real proxy
 
 | Variant | Valid `Qualification` |
 |---|---|
-| OpenAI-shaped (what production ran) | 4/8 |
-| Anthropic-native, raw | 6/8 |
-| Anthropic-native, via the shipped client | 4/8 |
+| OpenAI-shaped through the proxy (what production ran) | 4/8 |
+| Anthropic-native through the proxy, raw | 6/8 |
+| Anthropic-native through the proxy, shipped client | 4/8 |
+| **Direct to the API, no proxy, no Bedrock** | **3/8** |
 | `causes`-only schema (no `summary`) | 4/8 |
-| `causes` before `summary` | 1/1 |
-| `summary` with a length cap | 0/1 — the cap itself fails validation |
+| `summary` with a length cap | the cap itself fails validation |
 | Prompt sections fenced instead of `<tag>`-wrapped | 4/8 vs 3/8 tagged |
-| Native + `strict: true` | 0/8 — the proxy rejects the field |
+| Prompt reframed as "call the tool" rather than "write two things" | 2/6 |
+| **Direct + `strict: true`** | **6/6 raw; 6/8 and 7/8 through the shipped client** |
+| Proxy + `strict: true` | rejected: `tools.0.custom.strict: Extra inputs are not permitted` |
+| Proxy, shipped client (offers strict, is refused, asks again without) | 3/8 and 4/8 — the unstrict rate, as expected |
 
-Read honestly: **nothing tried changed the rate.** 6/8 was noise; the same client measured
-4/8 on the next run. About one call in two comes back malformed, and it is independent of
-transport, of schema shape and field order, and of how prompt sections are delimited.
+Two things fall out of that table, and the first one killed the theory this ADR was
+originally written around.
 
-What the failures carry is the tell. The values hold tool-call markup cut out of the
-model's answer by a partial parser — `…during the window.</summary>\n<causes">`,
-`\n<parameter name="summary">placeholder`, `[{…}]</causes>`. `<parameter name=…>` is the
-*text* form of a tool call. A model emitting it is not making a native tool call at all,
-which points at the route rather than at the model: a ~50% malformed-tool-call rate from
-Sonnet 5 is not ordinary API behaviour.
+**The route is not at fault.** Direct to the API, no proxy and no Bedrock in the path,
+the same prompt scored 3/8 — indistinguishable from the proxy's 4/8, with the identical
+signature: the whole answer serialised into `summary`, ending `…\n</Qualification>\n\n`.
+The leaked markup (`<parameter name="summary">`, `</causes>`, `</Qualification>`) is the
+*text* form of a tool call, and the model emits it just as often with nothing between it and
+the API. Transport, schema shape, field order and prompt delimiters were each measured and
+each changed nothing.
 
-`strict: true` would end the argument — the API then guarantees `tool_use.input` validates
-against the schema — and this proxy refuses the field outright
-(`tools.0.custom.strict: Extra inputs are not permitted`), which is a LiteLLM version
-limitation and the single most valuable thing to fix upstream.
+**Strict is what changes it.** It is the one thing that makes the API guarantee the tool
+input matches the schema rather than leaving it to the model, and it took the same prompt
+from 3/8 to 6/6. It is not a repair applied after the fact and it invents nothing: it
+constrains generation.
 
-Three attempts rather than two is arithmetic on the measured rate: at one failure in two,
-two asks lose a run in four and three lose one in eight.
+Three attempts rather than two is arithmetic on what is left. Strict does not reach every
+schema — `FollowUpPlan`, `TicketDraft` and `DiagnosisDraft` all carry optional fields, and
+forcing those into `required` would ask the model for something the node did not — so the
+unstrict schemas keep the old rate and the retries carry them.
 
 ## Consequences
 
@@ -73,15 +86,24 @@ two asks lose a run in four and three lose one in eight.
 
 ## What this does not fix
 
-The rate. One incident in eight still ends with no analysis, and every other tier call on
-this route carries the same risk unmeasured — `follow_up` was seen failing the same way on
-2026-08-24, its `requests` list arriving as the string `'{"requests":[]}'`.
+Every schema. Strict reaches `Qualification` and `AlertClassification`; `FollowUpPlan`,
+`ReviewVerdict`, `TicketDraft`, `DiagnosisDraft` and `DedupDecision` all carry an optional
+field somewhere and are sent as they are. `follow_up` was seen failing exactly this way on
+2026-08-24, its `requests` list arriving as the string `'{"requests":[]}'`, and nothing here
+stops that recurring — the decode catches that particular shape, and the rate for those
+schemas is unmeasured.
+
+And production, until the proxy takes the field. `litellm-euw3` rejects `strict` outright,
+so the path that matters keeps the old rate and the three attempts behind it. Upgrading
+LiteLLM until it forwards `strict` is now the single highest-value thing available, and it
+needs no change here to take effect.
 
 ## Revisit when
 
-The same prompt is measured against the Anthropic API directly, with a key, bypassing the
-proxy and Bedrock. That is the one variant not tried and the one that separates "the model
-does this" from "this route does this". If direct comes back clean, this belongs to
-whoever runs `litellm-euw3`, and the decode and the third attempt should be deleted rather
-than kept as folklore. If direct fails too, the schema is asking for too much in one call
-and `qualify` should be split.
+The proxy accepts `strict`. Measure it there — it should reach what the direct path
+measured — and then reconsider whether three attempts and the decode are still earning
+their place, or whether they have become folklore about a defect that no longer happens.
+
+Also when a schema that cannot say strict starts costing runs. The fix there is to make its
+optional fields nullable-and-required rather than to widen the decode, because that keeps
+the guarantee at generation time where this ADR argues it belongs.

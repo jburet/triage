@@ -105,3 +105,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | F1 live re-run | make run-incident (shape correction did not take; nested-list tool args) | 40 |
 | 2026-08-24 | qualify shape probe | scratch probes vs live proxy, 30-odd analysis calls (50% arg-shape failure) | 300 |
 | 2026-08-24 | ADR-0022 probes | ~80 analysis calls measuring the malformed-tool-call rate | 900 |
+| 2026-08-24 | ADR-0022 strict | direct-API probes: 3/8 plain, 6/6 strict, ~40 calls | 420 |

@@ -10,12 +10,17 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from triage.config import LLMProvider, Settings
 from triage.integrations.github import GitHubError, GitHubRestClient
 from triage.llm import AnthropicClient, LiteLLMClient, StructuredOutputError, tool_name
 from triage.runtime import build_github, build_llm
-from triage.schemas.collection import AlertClassification
+from triage.schemas.collection import (
+    AlertClassification,
+    FollowUpPlan,
+    Qualification,
+)
 
 
 @dataclass
@@ -241,7 +246,8 @@ async def test_the_proxy_is_asked_the_same_way_the_api_is():
 
     (request,) = messages.requests
     assert request["tool_choice"] == {"type": "tool", "name": tool_name(AlertClassification)}
-    assert request["tools"][0]["input_schema"] == AlertClassification.model_json_schema()
+    expected = AlertClassification.model_json_schema()
+    assert request["tools"][0]["input_schema"]["properties"] == expected["properties"]
     assert "response_format" not in request
 
 
@@ -285,3 +291,88 @@ async def test_a_list_that_arrived_as_text_is_decoded_rather_than_refused():
 
     assert result.alert_class.value == "crash_restart"
     assert result.reason == "the container exited 137"
+
+
+QUALIFIED = Block(
+    type="tool_use",
+    input={
+        "summary": "The pod restarted once.",
+        "causes": [
+            {
+                "cause_type": "infra",
+                "service": "plt-hcl-software-uat",
+                "description": "The liveness probe times out during startup.",
+                "rank_score": 0.7,
+            }
+        ],
+    },
+)
+
+
+async def test_a_schema_that_can_say_strict_says_it():
+    """Measured: 6/6 valid with strict against 3/8 without, on the prompt that
+    was losing one live incident in two (ADR-0022)."""
+    client, messages = a_client(Reply(content=[QUALIFIED]))
+
+    await client.call("analysis", "qualify this", Qualification)
+
+    (tool,) = messages.requests[0]["tools"]
+    assert tool["strict"] is True
+    assert tool["input_schema"]["additionalProperties"] is False
+    assert tool["input_schema"]["$defs"]["ProposedCause"]["additionalProperties"] is False
+
+
+async def test_the_bounds_strict_will_not_take_are_still_enforced_after_it():
+    """`rank_score`'s range and `causes`'s minimum length leave the wire and stay
+    in the schema: the API enforces the structure, Pydantic the values."""
+    client, messages = a_client(Reply(content=[QUALIFIED]))
+
+    await client.call("analysis", "qualify this", Qualification)
+
+    schema = messages.requests[0]["tools"][0]["input_schema"]
+    assert "minItems" not in schema["properties"]["causes"]
+    assert "maximum" not in schema["$defs"]["ProposedCause"]["properties"]["rank_score"]
+    with pytest.raises(ValidationError):
+        Qualification(summary="x", causes=[])
+
+
+async def test_a_schema_with_an_optional_field_is_sent_as_it_is():
+    """Strict requires every property; listing an optional one would make the
+    model fill a field the schema says it may leave out."""
+    client, messages = a_client(Reply(content=[Block(type="tool_use", input={"requests": []})]))
+
+    await client.call("analysis", "anything else?", FollowUpPlan)
+
+    (tool,) = messages.requests[0]["tools"]
+    assert "strict" not in tool
+    assert tool["input_schema"] == FollowUpPlan.model_json_schema()
+
+
+class _RefusingStrict:
+    """A proxy on a LiteLLM too old to know the field (observed 2026-08-24)."""
+
+    def __init__(self, reply: Reply) -> None:
+        self.reply = reply
+        self.requests: list[dict[str, Any]] = []
+
+    async def create(self, **kwargs: Any) -> Reply:
+        self.requests.append(kwargs)
+        if "strict" in kwargs["tools"][0]:
+            error = Exception("tools.0.custom.strict: Extra inputs are not permitted")
+            error.status_code = 400  # type: ignore[attr-defined]
+            raise error
+        return self.reply
+
+
+async def test_a_proxy_that_will_not_take_strict_is_asked_without_it():
+    messages = _RefusingStrict(Reply(content=[QUALIFIED]))
+    client = LiteLLMClient(
+        "https://litellm.example.test/v1", "sk-proxy", client=StubAnthropic(messages)
+    )
+
+    first = await client.call("analysis", "qualify this", Qualification)
+    await client.call("analysis", "qualify again", Qualification)
+
+    assert first.causes[0].service == "plt-hcl-software-uat"
+    sent_strict = ["strict" in request["tools"][0] for request in messages.requests]
+    assert sent_strict == [True, False, False], "it should stop offering strict once refused"

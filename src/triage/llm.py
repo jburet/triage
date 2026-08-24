@@ -27,9 +27,12 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol, TypeAlias, TypeVar, cast
 
+import structlog
 from pydantic import BaseModel
 
 Tier: TypeAlias = Literal["triage", "analysis", "diagnosis"]
+
+log = structlog.get_logger(__name__)
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -116,6 +119,68 @@ def tool_name(schema: type[BaseModel]) -> str:
     return re.sub(r"[^a-zA-Z0-9_-]", "_", schema.__name__)[:64]
 
 
+UNSUPPORTED_BY_STRICT = (
+    "minimum",
+    "maximum",
+    "exclusiveMinimum",
+    "exclusiveMaximum",
+    "minItems",
+    "maxItems",
+    "minLength",
+    "maxLength",
+)
+"""Value constraints strict tool use rejects outright, and Pydantic keeps enforcing.
+
+Dropping them from the wire loses nothing: the API is asked to guarantee the
+*structure* of the tool input, and `model_validate` still refuses a rank_score
+of 2 or an empty causes list on the way in.
+"""
+
+
+def _objects(schema: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every object in a schema: itself, its `$defs`, and its properties' items."""
+    found = [schema] if "properties" in schema else []
+    for value in list(schema.get("$defs", {}).values()) + list(
+        schema.get("properties", {}).values()
+    ):
+        if isinstance(value, dict):
+            found.extend(_objects(value))
+    items = schema.get("items")
+    if isinstance(items, dict):
+        found.extend(_objects(items))
+    return found
+
+
+def _expressible_strictly(schema: dict[str, Any]) -> bool:
+    """Strict lists every property as required, so a schema with an optional one cannot say it.
+
+    Forcing the optional field into `required` would make the model fill something
+    the schema says it may leave out, which is a different request than the one
+    the node wrote.
+    """
+    return all(
+        set(obj.get("properties", {})) == set(obj.get("required", [])) for obj in _objects(schema)
+    )
+
+
+def _strictly(schema: dict[str, Any]) -> dict[str, Any]:
+    for obj in _objects(schema):
+        obj["additionalProperties"] = False
+    for obj in _objects(schema):
+        for keyword in UNSUPPORTED_BY_STRICT:
+            obj.pop(keyword, None)
+        for value in obj.get("properties", {}).values():
+            if isinstance(value, dict):
+                for keyword in UNSUPPORTED_BY_STRICT:
+                    value.pop(keyword, None)
+    for name in ("properties", "$defs"):
+        for value in schema.get(name, {}).values():
+            if isinstance(value, dict):
+                for keyword in UNSUPPORTED_BY_STRICT:
+                    value.pop(keyword, None)
+    return schema
+
+
 def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
     """Structured fields that arrived as text, decoded back to what they are.
 
@@ -178,6 +243,12 @@ class AnthropicClient:
         self._timeout = timeout
         self._max_tokens = max_tokens
         self._client = client
+        self._strict = True
+
+    @staticmethod
+    def _refuses_strict(exc: Exception) -> bool:
+        """A 400 naming the field, and nothing else — never a blanket retry."""
+        return getattr(exc, "status_code", None) == 400 and "strict" in str(exc)
 
     def _anthropic(self) -> Any:
         """The SDK client. With no key, the SDK resolves its own credentials.
@@ -205,21 +276,43 @@ class AnthropicClient:
                 f"no model configured for tier {tier!r}: set TRIAGE_MODEL_{tier.upper()}"
             ) from exc
 
+    def _tool(self, schema: type[BaseModel]) -> dict[str, Any]:
+        """One tool whose input schema *is* the Pydantic schema, strict where it can be.
+
+        Strict is what makes the API guarantee the tool input matches the schema.
+        Without it, against the real `qualify` prompt, one answer in two came back
+        with the whole reply serialised into the first field and the causes list
+        missing — 3/8 valid; with it, 6/6 (ADR-0022).
+        """
+        json_schema = schema.model_json_schema()
+        tool: dict[str, Any] = {
+            "name": tool_name(schema),
+            "description": (schema.__doc__ or f"Return a {schema.__name__}.").strip(),
+            "input_schema": json_schema,
+        }
+        if self._strict and _expressible_strictly(json_schema):
+            tool["input_schema"] = _strictly(json_schema)
+            tool["strict"] = True
+        return tool
+
     async def call(self, tier: Tier, prompt: str, schema: type[T]) -> T:
         name = tool_name(schema)
-        message = await self._anthropic().messages.create(
-            model=self.model_for(tier),
-            max_tokens=self._max_tokens,
-            tools=[
-                {
-                    "name": name,
-                    "description": (schema.__doc__ or f"Return a {schema.__name__}.").strip(),
-                    "input_schema": schema.model_json_schema(),
-                }
-            ],
-            tool_choice={"type": "tool", "name": name},
-            messages=[{"role": "user", "content": prompt}],
-        )
+        request: dict[str, Any] = {
+            "model": self.model_for(tier),
+            "max_tokens": self._max_tokens,
+            "tool_choice": {"type": "tool", "name": name},
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        try:
+            message = await self._anthropic().messages.create(tools=[self._tool(schema)], **request)
+        except Exception as exc:
+            if not self._refuses_strict(exc):
+                raise
+            # A LiteLLM too old to know the field rejects the whole request rather
+            # than ignoring it. Asked without it, the same proxy answers.
+            log.warning("strict_tool_use_unsupported", detail=str(exc)[:200])
+            self._strict = False
+            message = await self._anthropic().messages.create(tools=[self._tool(schema)], **request)
         if getattr(message, "stop_reason", None) == "refusal":
             raise StructuredOutputError(tier, schema)
         for block in message.content:
