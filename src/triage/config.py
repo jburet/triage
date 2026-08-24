@@ -60,10 +60,24 @@ class Team(BaseModel):
     )
 
 
+def _url_name(url: str) -> str:
+    """The repository's own name, as the last segment of its remote URL."""
+    return url.rstrip("/").rsplit("/", 1)[-1]
+
+
 class Repo(BaseModel):
     url: str
     team: str
     kind: RepoKind
+    image_name: str | None = Field(
+        default=None,
+        description=(
+            "The name the container image and the seed use for this repository, when "
+            "the GitHub remote is spelled differently — the image is `platform` where "
+            "the remote is `zeenea/datacatalog`. Unset, the URL's last segment is the "
+            "name, which is right for every repository whose remote is named after it."
+        ),
+    )
     serves: list[str] = Field(
         default_factory=list,
         description=(
@@ -195,13 +209,16 @@ class Config(BaseModel):
         return matches[0] if len(matches) == 1 else None
 
     def repo_named(self, name: str) -> Repo | None:
-        """The declared repository whose URL ends in this name.
+        """The declared repository this name refers to.
 
         The seed and a container image both name a repository without a host, so
-        this is the join between them and the URLs config.yaml declares.
+        this is the join between them and the URLs config.yaml declares. A
+        declared ``image_name`` is that join stated outright, and replaces the URL
+        rather than adding to it: a repository that says it is called `platform`
+        is not also answering to `datacatalog`.
         """
         return next(
-            (repo for repo in self.repos if repo.url.rstrip("/").rsplit("/", 1)[-1] == name), None
+            (repo for repo in self.repos if (repo.image_name or _url_name(repo.url)) == name), None
         )
 
     def environment_of(self, cluster: str | None) -> str | None:

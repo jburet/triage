@@ -67,3 +67,24 @@ def test_a_repository_with_no_tenancy_model_gets_no_licence_to_differ(seed):
     name for it is a mapping to check, not a tenant."""
     gateway = seed_for(seed, "zeenea-api-gateway")
     assert naming_conflict(gateway, "zeenea-api-gateway-merck") is not None
+
+
+def test_a_repository_whose_remote_is_not_named_after_its_image_is_still_claimed():
+    """The image says `platform`; the remote is `zeenea/datacatalog`.
+
+    M6 2.10 refuses a GitHub read for a repository config.yaml does not declare,
+    and the URL basename is what decides that. On the real mapping pass the
+    workload resolved to the repository `platform`, matched nothing, and lost its
+    commit for a spelling — which is the failure 2.10 exists to report, not one it
+    should be provoking.
+    """
+    config = declaring("github.com/zeenea/datacatalog", image_name="platform")
+
+    assert config.repo_named("platform") is not None
+    assert config.repo_named("datacatalog") is None
+
+
+def test_the_url_basename_still_claims_a_repository_that_declares_no_image_name():
+    config = declaring("github.com/org/payments-api")
+
+    assert config.repo_named("payments-api") is not None

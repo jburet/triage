@@ -32,6 +32,10 @@ repos:
   - url: github.com/zeenea/datacatalog
     team: platform
     kind: application
+    # The image and the seed both call this repository `platform`; the remote does
+    # not. Without this the derivation resolves the workload and then loses its
+    # commit, because no declared repository answers to the name the image gave.
+    image_name: platform
     # `serves` names the service patterns this repository is deployed as. The
     # system map is keyed on the name a repository says it deploys as, so a
     # multi-tenant platform — one instance per customer, plt-merck-qa,
@@ -43,9 +47,6 @@ repos:
     # `v{tag}`, `build-{tag}` — because only the declared spelling is looked up.
     # tag_template: "v{tag}"
   - url: github.com/zeenea/platform-infra
-    team: platform
-    kind: terraform
-  - url: github.com/zeenea/application-deployer
     team: platform
     kind: terraform
 

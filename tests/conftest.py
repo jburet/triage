@@ -90,11 +90,19 @@ def declaring(
     kind: RepoKind = RepoKind.APPLICATION,
     serves: tuple[str, ...] = (),
     tag_template: str | None = None,
+    image_name: str | None = None,
 ) -> Config:
     """The test config with exactly these repositories declared."""
     base = load_config(TEST_CONFIG)
     repos = [
-        Repo(url=url, team=team, kind=kind, serves=list(serves), tag_template=tag_template)
+        Repo(
+            url=url,
+            team=team,
+            kind=kind,
+            serves=list(serves),
+            tag_template=tag_template,
+            image_name=image_name,
+        )
         for url in urls
     ]
     return base.model_copy(update={"repos": repos})
