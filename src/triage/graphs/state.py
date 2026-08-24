@@ -19,6 +19,7 @@ from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
     CommitSource,
     Derivation,
+    MappingSource,
     RepoSummary,
     SeedEntry,
     SystemMap,
@@ -175,6 +176,7 @@ class Investigated(BaseModel):
     commit: str | None = None
     base_commit: str | None = None
     commit_source: CommitSource | None = None
+    mapping_source: MappingSource | None = None
     paths: list[str] = Field(default_factory=list)
     result: AnalysisResult | None = None
 

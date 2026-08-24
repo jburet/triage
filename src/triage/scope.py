@@ -32,7 +32,7 @@ from typing import NamedTuple
 from triage.config import Config, RepoKind, Team
 from triage.db.repo import TriageRepository
 from triage.schemas.alert import Alert
-from triage.schemas.system_map import CommitSource
+from triage.schemas.system_map import CommitSource, MappingSource
 
 ENV_FILTER = re.compile(r"\benv:([\w.-]+)")
 
@@ -118,16 +118,21 @@ def resolve(config: Config, alert: Alert) -> Routing:
 
 
 class Deployment(NamedTuple):
-    """Where an analysis reads a service, and what claim the commit carries.
+    """Where an analysis reads a service, and what claim the answer carries.
 
-    ``commit_source`` is only set by a derived workload, which is the only one of
-    the three answers that observed anything: the map's commit is the last one F0
-    summarised and a pattern's is nothing at all.
+    Two independent axes. ``mapping_source`` is what said *this repository is
+    this service* — the running image, F0's map, a name glob — and is what
+    separates a diagnosis built on the image that was running from one built on
+    a guess. ``commit_source`` is what said *this commit is what it runs*, and is
+    only set by a derived workload, the only one of the three answers that
+    observed anything: the map's commit is the last one F0 summarised and a
+    pattern's is nothing at all.
     """
 
     repo_url: str | None
     commit: str | None
     commit_source: CommitSource | None = None
+    mapping_source: MappingSource | None = None
 
 
 async def deployed_repo(
@@ -154,15 +159,25 @@ async def deployed_repo(
         if workload is not None and workload.repo_url is not None:
             commit = workload.deployed_commit if isinstance(workload.deployed_commit, str) else None
             if commit is not None:
-                return Deployment(workload.repo_url, commit, workload.commit_source)
+                return Deployment(
+                    workload.repo_url, commit, workload.commit_source, workload.source
+                )
             return Deployment(
-                workload.repo_url, await repository.last_summarised_commit(workload.repo_url)
+                workload.repo_url,
+                await repository.last_summarised_commit(workload.repo_url),
+                None,
+                workload.source,
             )
 
     entry = await repository.system_map_for_service(service)
     if entry is not None:
-        return Deployment(entry.repo_url, entry.source_commit)
+        return Deployment(entry.repo_url, entry.source_commit, None, MappingSource.MAP)
     declared = config.repo_serving(service, kind)
     if declared is None:
         return Deployment(None, None)
-    return Deployment(declared.url, await repository.last_summarised_commit(declared.url))
+    return Deployment(
+        declared.url,
+        await repository.last_summarised_commit(declared.url),
+        None,
+        MappingSource.PATTERN,
+    )

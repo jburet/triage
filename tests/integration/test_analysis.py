@@ -30,6 +30,7 @@ from triage.schemas import (
     Unknown,
 )
 from triage.schemas.analysis import AnalysisStatus
+from triage.schemas.system_map import MappingSource
 
 
 def graph():
@@ -379,3 +380,33 @@ async def test_a_commit_the_image_named_carries_no_such_caveat(config: Config):
 
     assert diagnosis.confidence is Confidence.HIGH
     assert "default branch" not in diagnosis.confidence_rationale
+
+
+async def test_the_investigation_records_which_of_the_three_answered_for_the_repository(
+    config: Config,
+):
+    """A repository the running image named and one a glob suggested are different
+    facts, and the run is the only place that still knows which it was."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+        )
+    )
+    deps = build_deps(config, repo=repo)
+
+    state = await run(deps, hypotheses=[a_hypothesis()])
+
+    assert state["investigated"][0].mapping_source is MappingSource.IMAGE
+
+
+async def test_a_repository_only_the_system_map_knew_is_recorded_as_the_map_s_answer(
+    config: Config,
+):
+    deps = build_deps(config, repo=mapped(a_service_entry()))
+
+    state = await run(deps, hypotheses=[a_hypothesis()])
+
+    assert state["investigated"][0].mapping_source is MappingSource.MAP

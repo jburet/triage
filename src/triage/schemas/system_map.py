@@ -220,10 +220,18 @@ class SeedEntry(BaseModel):
 
 
 class MappingSource(StrEnum):
-    """What answered "which repository is this service?", in decreasing directness."""
+    """What answered "which repository is this service?", in decreasing directness.
+
+    ``MAP`` is F0's own answer and is never written on a :class:`WorkloadEntry`:
+    the derivation does not produce it, and the map is consulted only when no
+    workload row exists. It is here so that the three answers a caller can get
+    share one vocabulary rather than needing a second enum to be joined against
+    this one.
+    """
 
     IMAGE = "image"
     SEED = "seed"
+    MAP = "map"
     PATTERN = "pattern"
     MANUAL = "manual"
 
