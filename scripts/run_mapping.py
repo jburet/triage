@@ -25,7 +25,7 @@ from triage.config import get_config, get_settings
 from triage.graphs.mapping import graph
 from triage.integrations.datadog import DatadogRestClient
 from triage.mapping.report import render
-from triage.runtime import DEPS_KEY, build_deps
+from triage.runtime import DEPS_KEY, build_deps, build_github
 from triage.schemas.common import render as render_field
 from triage.schemas.system_map import MappingOutcome
 
@@ -57,6 +57,7 @@ async def main(argv: list[str]) -> int:
         datadog=DatadogRestClient(
             settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
         ),
+        github=build_github(settings),
     )
     if "--db" in flags:
         from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine

@@ -124,12 +124,18 @@ def build_llm(settings: Settings) -> StructuredLLM:
     return AnthropicClient(settings.anthropic_api_key, models)
 
 
-def _build_github(settings: Settings) -> GitHubClient:
+def build_github(settings: Settings) -> GitHubClient:
     """The real client, or one that states the variable is unset.
 
     Not a startup refusal: ``build_deps`` is shared by every graph and only
     cartography and the service mapping read GitHub, so an empty token must not
     stop a run that never asks it anything.
+
+    Public because a dry run still wants it. Dry run swaps every *write* for a
+    recording fake, and GitHub is a read — the same reason the one-shot scripts
+    already reach for a real Datadog client. Faking it made the mapping report
+    "no commit resolved" for every workload on a path that could never have
+    resolved one.
     """
     from triage.integrations.github import GitHubRestClient
 
@@ -192,7 +198,7 @@ def build_deps(settings: Settings | None = None, config: Config | None = None) -
         slack=SlackWebClient(settings.slack_bot_token),
         repo=repo,
         runner=_build_runner(settings, config, repo),
-        github=_build_github(settings),
+        github=build_github(settings),
         datadog=DatadogRestClient(
             settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
         ),
