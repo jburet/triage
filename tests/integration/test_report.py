@@ -9,12 +9,14 @@ carry the content instead.
 from tests.conftest import (
     a_service_entry,
     a_verdict,
+    a_workload,
     build_deps,
     fake_datadog,
     mapped,
     pod_down_alert,
     run_config,
 )
+from triage.db.repo import InMemoryRepository
 from triage.graphs.incident import build_graph
 from triage.graphs.ticket_pipeline import graph
 from triage.schemas import PipelineOutcome, ReviewVerdict, TicketDraft, TicketSection
@@ -191,3 +193,68 @@ async def test_a_section_with_nothing_in_it_says_so_rather_than_vanishing(config
     assert "eliminated no hypothesis" in text
     assert "left no question open" in text
     assert "named nothing the fix must avoid" in text
+
+
+def _section(text: str, heading: str) -> str:
+    body = text.split(f"*{heading}*\n", 1)[1]
+    return body.split("\n\n", 1)[0]
+
+
+async def a_report_located_by(config, diagnosis, workload) -> str:
+    repo = InMemoryRepository()
+    await repo.upsert_workload(workload)
+    deps = build_deps(config, repo=repo)
+    await run(diagnosis, deps)
+    return posted(deps)
+
+
+async def test_an_observed_location_and_a_guessed_one_do_not_read_alike(config, oom_diagnosis):
+    """The rung travels with the location, or the report launders a guess.
+
+    A repository the running image named and one a `serves` glob picked out are
+    different facts (ADR-0019); so are a commit resolved through GitHub's tag and
+    no commit at all (ADR-0020). Rendered identically, a reader has no way to
+    tell which they are looking at.
+    """
+    observed = await a_report_located_by(
+        config,
+        oom_diagnosis,
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab7e4d3c2b1a0987654321fedcba0123456",
+            commit_source="github_tag",
+            iac_repo="infra",
+            iac_paths=["terraform/payments/*"],
+            source="image",
+        ),
+    )
+    guessed = await a_report_located_by(
+        config,
+        oom_diagnosis,
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            image=None,
+            image_digest=None,
+            deployed_commit={"unknown": True, "reason": "no image named a build for it"},
+            commit_source=None,
+            iac_repo=None,
+            iac_paths=[],
+            source="pattern",
+        ),
+    )
+
+    here, there = _section(observed, "Location"), _section(guessed, "Location")
+    assert here != there
+    assert "github.com/org/payments-api" in here
+    assert "9f2c1ab7e4d3c2b1a0987654321fedcba0123456" in here
+    assert "terraform/payments/*" in here
+    assert "image this service is running" in here
+    assert "GitHub" in here
+
+    assert "name pattern" in there
+    assert "nothing observed which build" in there
+    assert "image this service is running" not in there

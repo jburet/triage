@@ -36,7 +36,9 @@ async def publish_report(
     deps = deps_from_runnable_config(config)
     diagnosis = state["diagnosis"]
     report = render_incident(
-        diagnosis, threshold=deps.config.confidence_threshold(diagnosis.feature)
+        diagnosis,
+        await deps.repo.workload_for_service(diagnosis.service),
+        threshold=deps.config.confidence_threshold(diagnosis.feature),
     )
     for message in report.messages:
         await deps.slack.post(

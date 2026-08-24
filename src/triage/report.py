@@ -17,9 +17,10 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from triage.schemas.common import Confidence
+from triage.schemas.common import Confidence, is_unknown
 from triage.schemas.common import render as render_field
-from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.diagnosis import Diagnosis, Location
+from triage.schemas.system_map import CommitSource, MappingSource, WorkloadEntry
 from triage.schemas.ticket import TicketSection
 
 CONFIDENCE_LABEL: dict[Confidence, str] = {
@@ -27,6 +28,35 @@ CONFIDENCE_LABEL: dict[Confidence, str] = {
     Confidence.MEDIUM: "medium",
     Confidence.HIGH: "high",
 }
+
+
+MAPPING_RUNG: dict[MappingSource, str] = {
+    MappingSource.IMAGE: "derived from the image this service is running",
+    MappingSource.SEED: "named by the architecture document's repository map",
+    MappingSource.MAP: "from F0's map, keyed on the name the repository says it deploys as",
+    MappingSource.PATTERN: "matched by a `serves` name pattern in config.yaml — nothing "
+    "running was observed to say so",
+    MappingSource.MANUAL: "declared by hand",
+}
+"""How this service came to be attributed to this repository (ADR-0019).
+
+Rendered because the rungs are different facts. A repository the running image
+named and one a hand-maintained glob picked out are told apart nowhere else in
+the report, and a reader who cannot tell them apart reads the second as the
+first."""
+
+
+COMMIT_RUNG: dict[CommitSource, str] = {
+    CommitSource.IMAGE_TAG: "the image tag is the commit",
+    CommitSource.GITHUB_TAG: "the image tag is a build number, and GitHub's tag of that "
+    "name points at this commit",
+    CommitSource.DEFAULT_BRANCH: "the repository's default branch as it stood when the "
+    "incident fired — not an identified build",
+}
+"""And how that repository came to be read at this commit (ADR-0020)."""
+
+NO_COMMIT_OBSERVED = "nothing observed which build this service is running"
+"""What a pattern mapping has instead of a rung: it saw no image, so it saw no build."""
 
 
 @dataclass(frozen=True)
@@ -113,12 +143,45 @@ def _expected_change(diagnosis: Diagnosis) -> str:
     )
 
 
-def _location(diagnosis: Diagnosis) -> str:
+def _repository_line(location: Location, workload: WorkloadEntry | None) -> str:
+    stated = render_field(location.repo)
+    if workload is None:
+        return f"*Repository:* {stated}"
+    rung = MAPPING_RUNG[workload.source]
+    if is_unknown(location.repo) and workload.repo_url:
+        return f"*Repository:* {stated}\n_The service maps to `{workload.repo_url}`, {rung}._"
+    return f"*Repository:* {stated} — _{rung}_"
+
+
+def _commit_line(location: Location, workload: WorkloadEntry | None) -> str:
+    stated = render_field(location.commit)
+    if workload is None:
+        return f"*Commit:* {stated}"
+    rung = COMMIT_RUNG.get(workload.commit_source) if workload.commit_source else None
+    return f"*Commit:* {stated} — _{rung or NO_COMMIT_OBSERVED}_"
+
+
+def _infrastructure_line(workload: WorkloadEntry | None) -> str | None:
+    if workload is None or workload.iac_repo is None:
+        return None
+    paths = ", ".join(f"`{path}`" for path in workload.iac_paths)
+    return f"*Infrastructure:* `{workload.iac_repo}` — " + (
+        paths or "_no path in it is declared or found for this workload_"
+    )
+
+
+def _location(diagnosis: Diagnosis, workload: WorkloadEntry | None) -> str:
+    """Repository, commit, chart and files — each with what said so.
+
+    The diagnosis states where the analysis read; the workload states how this
+    service came to be attributed there at all. Both, because they can disagree:
+    a run that analysed nothing has no location and the mapping still does.
+    """
     location = diagnosis.location
-    lines = [
-        f"*Repository:* {render_field(location.repo)}",
-        f"*Commit:* {render_field(location.commit)}",
-    ]
+    lines = [_repository_line(location, workload), _commit_line(location, workload)]
+    infrastructure = _infrastructure_line(workload)
+    if infrastructure:
+        lines.append(infrastructure)
     if location.terraform_resource:
         lines.append(f"*Terraform:* `{location.terraform_resource}`")
     lines.append(
@@ -146,6 +209,7 @@ def _headline(diagnosis: Diagnosis, *, threshold: Confidence, confident: bool) -
 
 def render_incident(
     diagnosis: Diagnosis,
+    workload: WorkloadEntry | None = None,
     *,
     threshold: Confidence,
 ) -> SlackReport:
@@ -162,7 +226,7 @@ def render_incident(
         TicketSection.IMPACT: _impact(diagnosis),
         TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
         TicketSection.EVIDENCE: _evidence(diagnosis),
-        TicketSection.LOCATION: _location(diagnosis),
+        TicketSection.LOCATION: _location(diagnosis, workload),
         TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
         TicketSection.OUT_OF_SCOPE: _bullets(
             diagnosis.out_of_scope,
