@@ -8,7 +8,9 @@ fact is one read away, and without it every analysis runs at "the last commit F0
 summarised" and apologises for it.
 
 Preference is stated rather than emergent: the image tag when it carries the
-commit outright, then the tag as GitHub resolves it.
+commit outright, then the tag as GitHub resolves it, then the default branch —
+which is *not* the deployed commit and must never be presented as one, hence
+:data:`CommitSource` on the entry rather than a bare string.
 """
 
 from __future__ import annotations
@@ -32,24 +34,22 @@ def _undeclared(entry: WorkloadEntry) -> Unknown:
 
 
 async def _resolved(
-    github: GitHubClient, repo_url: str, entry: WorkloadEntry, tag: str | None
+    github: GitHubClient, repo_url: str, tag: str | None
 ) -> tuple[MaybeUnknown, CommitSource | None]:
+    """The declared tag spelling, then the default branch — and no third guess.
+
+    A tag invented by guessing points somewhere specific and wrong, so no second
+    tag spelling is tried. The default branch is not a guess of that kind:
+    production runs it in essentially every case, and the alternative on this
+    path is not a better commit, it is no commit at all. What it is *not* is the
+    deployed commit, which is why the source is recorded rather than smoothed
+    over (2.16).
+    """
     if tag is not None:
         commit = await github.commit_for_tag(repo_url, tag)
         if commit is not None:
             return commit, CommitSource.GITHUB_TAG
-    return (
-        Unknown(
-            reason=(
-                f"{entry.service} runs the image tag {tag!r}, which {repo_url} has no tag "
-                f"named, so which commit it was built from is not known"
-                if tag
-                else f"{entry.service} runs an image with no tag, so nothing names the "
-                f"commit {repo_url} was built from for it"
-            )
-        ),
-        None,
-    )
+    return await github.default_branch_commit(repo_url), CommitSource.DEFAULT_BRANCH
 
 
 async def with_deployed_commit(
@@ -72,7 +72,7 @@ async def with_deployed_commit(
 
     _, tag, _ = split_reference(entry.image)
     try:
-        commit, source = await _resolved(github, repo.url, entry, repo.github_tag(tag))
+        commit, source = await _resolved(github, repo.url, repo.github_tag(tag))
     except GitHubError as error:
         return entry.model_copy(
             update={

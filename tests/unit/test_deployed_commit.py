@@ -11,7 +11,7 @@ import re
 import pytest
 from pydantic import ValidationError
 
-from tests.conftest import TENANT, a_workload, declaring
+from tests.conftest import CAPTURED_DIGEST, TENANT, a_workload, declaring
 from triage.config import Repo, RepoKind
 from triage.integrations.github import FakeGitHubClient
 from triage.mapping.commits import with_deployed_commit
@@ -67,12 +67,12 @@ async def test_a_workload_mapped_from_a_pattern_is_left_as_it_is(config):
     assert client.tag_lookups == []
 
 
-async def test_the_service_and_the_tag_are_named_when_github_has_no_such_tag(config):
+async def test_a_github_read_that_fails_leaves_an_unknown_carrying_the_failure(config):
     entry = await with_deployed_commit(github(), config, a_workload())
 
     assert isinstance(entry.deployed_commit, Unknown)
-    assert "501" in entry.deployed_commit.reason
     assert TENANT in entry.deployed_commit.reason
+    assert entry.commit_source is None
 
 
 async def test_a_repository_whose_tags_are_spelled_differently_declares_the_relationship():
@@ -89,11 +89,11 @@ async def test_a_repository_whose_tags_are_spelled_differently_declares_the_rela
 
 async def test_a_declared_spelling_that_does_not_exist_is_not_retried_as_the_image_tag():
     config = declaring(PLATFORM, tag_template="build-{tag}")
-    client = github(tags={(PLATFORM, "501"): COMMIT})
+    client = github(tags={(PLATFORM, "501"): COMMIT}, branch_commits={PLATFORM: "abc1234"})
 
     entry = await with_deployed_commit(client, config, a_workload())
 
-    assert isinstance(entry.deployed_commit, Unknown)
+    assert entry.deployed_commit == "abc1234"
     assert client.tag_lookups == [(PLATFORM, "build-501")]
 
 
@@ -121,3 +121,28 @@ async def test_the_undeclared_repository_is_not_blamed_on_its_tag():
 
     assert isinstance(entry.deployed_commit, Unknown)
     assert "501" not in entry.deployed_commit.reason
+
+
+async def test_a_tag_the_repository_does_not_have_falls_back_to_the_default_branch(config):
+    """No second *tag* spelling is tried; the default branch is the other kind of
+    answer, and the alternative to it is not a better commit but no commit at all."""
+    client = github(branch_commits={PLATFORM: COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert entry.deployed_commit == COMMIT
+    assert entry.commit_source is CommitSource.DEFAULT_BRANCH
+    assert client.tag_lookups == [(PLATFORM, "501")]
+    assert client.branch_reads == [(PLATFORM, None)]
+
+
+async def test_an_image_with_no_tag_takes_the_same_default_branch_path(config):
+    """GitHub knowing the repository and not the build is one situation, not two."""
+    untagged = f"097607883991.dkr.ecr.us-east-1.amazonaws.com/platform@{CAPTURED_DIGEST}"
+    client = github(branch_commits={PLATFORM: COMMIT})
+
+    entry = await with_deployed_commit(client, config, a_workload(image=untagged))
+
+    assert entry.commit_source is CommitSource.DEFAULT_BRANCH
+    assert client.tag_lookups == []
+    assert client.branch_reads == [(PLATFORM, None)]

@@ -25,6 +25,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Protocol
 
 import httpx
@@ -62,6 +63,10 @@ class GitHubClient(Protocol):
         build number is a tag in GitHub for the repositories that push one, and
         is nothing at all for the ones that do not.
         """
+        ...
+
+    async def default_branch_commit(self, repo_url: str, *, at: datetime | None = None) -> str:
+        """The commit the default branch pointed at then, or at HEAD given no time."""
         ...
 
 
@@ -134,6 +139,31 @@ class GitHubRestClient:
             raise GitHubError(f"the annotated tag {tag!r} in {path} names no commit")
         return commit
 
+    async def default_branch_commit(self, repo_url: str, *, at: datetime | None = None) -> str:
+        path = repo_path(repo_url)
+        repository = await self._client.get(f"/repos/{path}", headers=self._headers)
+        if repository.status_code >= 400:
+            raise GitHubError(f"reading {path} returned {_explain(repository)}")
+        branch = repository.json().get("default_branch")
+        if not isinstance(branch, str):
+            raise GitHubError(f"{path} names no default branch")
+
+        params = {"sha": branch, "per_page": "1"}
+        if at is not None:
+            params["until"] = at.isoformat()
+        commits = await self._client.get(
+            f"/repos/{path}/commits", params=params, headers=self._headers
+        )
+        if commits.status_code >= 400:
+            raise GitHubError(f"reading {branch} of {path} returned {_explain(commits)}")
+        head = commits.json() or []
+        if not head or not isinstance(head[0].get("sha"), str):
+            raise GitHubError(
+                f"{branch} of {path} has no commit"
+                + (f" from before {at.isoformat()}" if at else "")
+            )
+        return str(head[0]["sha"])
+
 
 def _explain(response: httpx.Response) -> str:
     try:
@@ -155,9 +185,11 @@ class FakeGitHubClient:
 
     changed: Mapping[str, Sequence[str]] = field(default_factory=dict)
     tags: Mapping[tuple[str, str], str] = field(default_factory=dict)
+    branch_commits: Mapping[str, str] = field(default_factory=dict)
     error: Exception | None = None
     comparisons: list[tuple[str, str, str]] = field(default_factory=list)
     tag_lookups: list[tuple[str, str]] = field(default_factory=list)
+    branch_reads: list[tuple[str, datetime | None]] = field(default_factory=list)
 
     async def changed_paths(self, repo_url: str, *, base: str, head: str) -> list[str]:
         self.comparisons.append((repo_url, base, head))
@@ -176,6 +208,17 @@ class FakeGitHubClient:
         if self.error is not None:
             raise self.error
         return self.tags.get((repo_url, tag))
+
+    async def default_branch_commit(self, repo_url: str, *, at: datetime | None = None) -> str:
+        self.branch_reads.append((repo_url, at))
+        if self.error is not None:
+            raise self.error
+        try:
+            return self.branch_commits[repo_url]
+        except KeyError:
+            raise GitHubError(
+                f"FakeGitHubClient has no default-branch commit for {repo_url!r}"
+            ) from None
 
 
 def dry_run_github() -> FakeGitHubClient:

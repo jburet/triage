@@ -150,3 +150,29 @@ async def test_a_refused_tag_read_raises_with_what_github_said():
 
     with pytest.raises(GitHubError, match="rate limit"):
         await client.commit_for_tag("github.com/org/x", "501")
+
+
+async def test_the_default_branch_commit_is_read_off_the_branch_the_repository_names():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x": (200, {"default_branch": "develop"}),
+            "/repos/org/x/commits": (200, [{"sha": "9f2c1ab"}]),
+        },
+        requests,
+    )
+
+    assert await client.default_branch_commit("github.com/org/x") == "9f2c1ab"
+    assert requests[-1].url.params["sha"] == "develop"
+    assert "until" not in requests[-1].url.params
+
+
+async def test_a_branch_with_no_commit_is_refused_rather_than_answered_empty():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x": (200, {"default_branch": "main"}), "/repos/org/x/commits": (200, [])},
+        requests,
+    )
+
+    with pytest.raises(GitHubError, match="no commit"):
+        await client.default_branch_commit("github.com/org/x")

@@ -126,7 +126,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       one read on the `GitHubClient` protocol, and `deployed_commit` becomes `Filled`.
 - [x] 2.7 An annotated tag resolves to the commit the tag object points at, not to the tag
       object's own SHA — the two differ, and the second is a ref no clone can check out.
-- [ ] 2.8 A tag the repository does not have falls back to the default branch, and the
+- [x] 2.8 A tag the repository does not have falls back to the default branch, and the
       mapping records that it did. No second *tag* spelling is tried on a hunch — a tag
       invented by guessing points somewhere specific and wrong — but the default branch is not
       a guess of that kind: production runs `main` in essentially every case, and the
@@ -141,7 +141,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [ ] 2.11 `deployed_commit` records where it came from — `image_tag`, `github_tag`,
       `default_branch` — in that order of preference, and a commit read from GitHub is
       preferred over one parsed out of a tag that merely looks like a SHA.
-- [ ] 2.14 An image carrying no tag at all takes the same default-branch path as an unfound
+- [x] 2.14 An image carrying no tag at all takes the same default-branch path as an unfound
       tag: the two are the same situation, "GitHub knows this repository and not this build".
 - [ ] 2.15 The default-branch commit is the one that branch pointed at **when the incident
       fired**, not at the moment the mapping runs, whenever the caller knows that time. A
