@@ -46,7 +46,15 @@ A ticket is complete only if a developer could start working on it without askin
 8. **Hypotheses ruled out**, so nobody redoes the work.
 9. **Unknowns**, stated explicitly.
 
-### Jira workflow
+### Jira workflow — postponed
+
+The first release writes **only to Slack** ([ADR-0023](adr/0023-the-first-release-writes-only-to-slack.md)):
+one threaded report per incident in the owning team's channel, containing everything below.
+A ticket asks a human to validate before the work enters a backlog, and nobody has reason to
+trust the agent yet; a message in the channel the team already watches asks for nothing. The
+Jira path stays in the tree, configurable and tested, for when someone asks to keep a report.
+
+When it returns:
 
 - `Proposed by agent` → created automatically, routed to the owning team's board.
 - `Validated` → set by a human (lead dev or SRE); the ticket enters the team's backlog.
@@ -74,7 +82,9 @@ A ticket is complete only if a developer could start working on it without askin
 - Outputs: immediate Slack notice, then a ticket via the core pipeline.
 - Generates the post-mortem draft from the ticket and timeline.
 
-## F3 — Daily database review
+## F3 — Daily database review — postponed
+
+Not in the first release (ADR-0023); the plan of 2026-08-23 stands unstarted.
 
 - Top queries, response times, locks, vacuum/bloat, index usage, connections, storage growth.
 - Traces slow or costly queries back to the calling code and owning team via F0.

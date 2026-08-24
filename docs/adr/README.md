@@ -35,6 +35,7 @@ can override it without touching code.
 | [0020](0020-a-commit-nothing-observed-is-never-the-deployed-one.md) | A commit nothing observed is never presented as the deployed one | Proposed |
 | [0021](0021-where-a-workload-is-defined-is-declared.md) | Where a workload is defined in its IaC repository is declared | Proposed |
 | [0022](0022-one-client-and-a-malformed-tool-call-rate.md) | One client for both paths, and strict tool use where a schema can say it | Proposed |
+| [0023](0023-the-first-release-writes-only-to-slack.md) | The first release writes only to Slack | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.
