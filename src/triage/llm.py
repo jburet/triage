@@ -25,7 +25,7 @@ import json
 import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol, TypeAlias, TypeVar, cast
+from typing import Any, Literal, Protocol, TypeAlias, TypeVar, cast, get_origin
 
 import structlog
 from pydantic import BaseModel
@@ -182,18 +182,24 @@ def _strictly(schema: dict[str, Any]) -> dict[str, Any]:
 
 
 def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
-    """Structured fields that arrived as text, decoded back to what they are.
+    """Structured fields that arrived wrapped, unwrapped back to what they are.
 
-    A tool call is supposed to carry ``input`` as an object, and against the
-    Zeenea proxy on 2026-08-24 it sometimes did not: a field the schema declares
-    as a list arrived as a string holding the model's own JSON with the
-    tool-call markup still trailing it — ``[{…}]</causes>``. The leading value is
-    decoded and the trailing markup dropped; a field the schema already declares
-    as a string is left alone, so nothing that legitimately *is* prose is
-    reinterpreted.
+    A tool call is supposed to carry ``input`` as an object, and on 2026-08-24 it
+    sometimes did not. Two shapes were seen, both of them the whole answer folded
+    into one field:
 
-    Parsing, not repair: nothing is invented, the decode has to succeed on its
-    own, and the schema still refuses whatever comes out (ADR-0022).
+    - as **text** — a list field holding the model's own JSON with the tool-call
+      markup still trailing it, ``[{…}]</causes>``. The leading value is decoded
+      and the trailing markup dropped.
+    - as **its own envelope** — ``requests`` holding ``{"requests": [...]}``. The
+      inner value is taken, and only for a list field: a dict is what an object
+      field is supposed to be, so reaching into one would be guessing.
+
+    A field the schema already declares as a string is left alone either way, so
+    nothing that legitimately *is* prose gets reinterpreted.
+
+    Parsing, not repair: nothing is invented, the unwrap has to be unambiguous,
+    and the schema still refuses whatever comes out (ADR-0022).
     """
     if not isinstance(arguments, dict):
         return arguments
@@ -202,7 +208,13 @@ def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
     decoded = dict(arguments)
     for name, value in arguments.items():
         field_info = fields.get(name)
-        if field_info is None or not isinstance(value, str) or field_info.annotation is str:
+        if field_info is None or field_info.annotation is str:
+            continue
+        if isinstance(value, dict):
+            if get_origin(field_info.annotation) is list and set(value) == {name}:
+                decoded[name] = value[name]
+            continue
+        if not isinstance(value, str):
             continue
         try:
             parsed, _ = decoder.raw_decode(value.strip())

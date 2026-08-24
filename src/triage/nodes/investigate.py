@@ -18,14 +18,18 @@ repositories, and the wall clock of a diagnosis is the slowest one, not the sum.
 
 import asyncio
 
+import structlog
 from langchain_core.runnables import RunnableConfig
 
 from triage.config import RepoKind
 from triage.graphs.state import AnalysisState, Investigated
+from triage.integrations.github import GitHubError
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult
 from triage.schemas.hypothesis import CauseType, Hypothesis
 from triage.scope import deployed_repo
+
+log = structlog.get_logger(__name__)
 
 KIND_FOR_CAUSE: dict[CauseType, AnalysisKind] = {
     CauseType.APP: AnalysisKind.CODE_ANALYSIS,
@@ -69,6 +73,26 @@ def _terraform_repo(deps: Deps, team: str) -> str | None:
     return None
 
 
+async def _default_branch_of(deps: Deps, repo_url: str) -> str | None:
+    """What the Terraform repository says today, when nothing has summarised it.
+
+    [ADR-0020](../../../docs/adr/0020-a-commit-nothing-observed-is-never-the-deployed-one.md)
+    refuses a default-branch commit as *the deployed* one, and is right to: an
+    application's running build is observable, so a guess would displace an
+    answer. Infrastructure code is not deployed by image and has no build to
+    observe, so the default branch is not standing in for the answer — it is the
+    answer, give or take drift this analysis cannot see anyway (the roadmap's F0
+    reads Terraform code, never state). Refusing it cost the 2026-08-24 live run
+    its only infrastructure analysis, on an incident whose leading cause was a
+    probe timeout declared in exactly that code.
+    """
+    try:
+        return await deps.github.default_branch_commit(repo_url)
+    except GitHubError as error:
+        log.warning("iac_default_branch_unavailable", repo=repo_url, error=str(error))
+        return None
+
+
 async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Investigated:
     """Resolve where this hypothesis is analysed, or say why it cannot be."""
     if hypothesis.cause_type is CauseType.DEPENDENCY:
@@ -91,11 +115,15 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
             )
         commit = hypothesis.commit or await deps.repo.last_summarised_commit(repo_url)
         if commit is None:
+            commit = await _default_branch_of(deps, repo_url)
+        if commit is None:
             return Investigated(
                 hypothesis=hypothesis,
                 repo_url=repo_url,
                 result=AnalysisResult.failed(
-                    kind, f"no commit is known for {repo_url}: it has never been summarised"
+                    kind,
+                    f"no commit is known for {repo_url}: it has never been summarised and "
+                    f"GitHub would not name its default branch",
                 ),
             )
         return Investigated(

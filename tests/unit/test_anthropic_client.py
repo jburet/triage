@@ -376,3 +376,46 @@ async def test_a_proxy_that_will_not_take_strict_is_asked_without_it():
     assert first.causes[0].service == "plt-hcl-software-uat"
     sent_strict = ["strict" in request["tools"][0] for request in messages.requests]
     assert sent_strict == [True, False, False], "it should stop offering strict once refused"
+
+
+async def test_a_list_wrapped_in_its_own_name_is_unwrapped():
+    """Observed live on 2026-08-24: `requests` arrived as `{'requests': [...]}`.
+
+    The whole arguments object had been assigned to its own first field. The
+    model had planned real follow-up collection and it was thrown away for the
+    shape of the envelope it came in (ADR-0022).
+    """
+    client, _ = a_proxy_client(
+        Reply(
+            content=[
+                Block(
+                    type="tool_use",
+                    input={
+                        "requests": {
+                            "requests": [
+                                {
+                                    "collector": "events_namespace",
+                                    "why": "who sent the kill",
+                                    "query": "kube_namespace:hcl-software-uat",
+                                }
+                            ]
+                        }
+                    },
+                )
+            ]
+        )
+    )
+
+    result = await client.call("analysis", "anything else?", FollowUpPlan)
+
+    assert [request.collector for request in result.requests] == ["events_namespace"]
+
+
+async def test_a_field_that_is_meant_to_be_an_object_is_left_alone():
+    """Only a list field is unwrapped: a dict is what an object field should be,
+    and reaching into one would be guessing rather than parsing."""
+    nested = {"summary": "x", "causes": [{"causes": "not a list of causes"}]}
+    client, _ = a_proxy_client(Reply(content=[Block(type="tool_use", input=nested)]))
+
+    with pytest.raises(ValidationError):
+        await client.call("analysis", "qualify", Qualification)

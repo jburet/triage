@@ -20,6 +20,7 @@ from triage.analysis.runner import FakeAnalysisRunner
 from triage.config import Config, Repo, RepoKind
 from triage.db.repo import InMemoryRepository
 from triage.graphs.analysis import build_graph
+from triage.integrations.github import FakeGitHubClient
 from triage.runtime import Deps
 from triage.schemas import (
     AnalysisKind,
@@ -466,3 +467,32 @@ async def test_a_repository_the_map_named_carries_no_pattern_caveat(config: Conf
 
     assert diagnosis.confidence is Confidence.HIGH
     assert "name pattern" not in diagnosis.confidence_rationale
+
+
+async def test_an_iac_repository_is_read_at_its_default_branch(config: Config):
+    """ADR-0020 refuses a default-branch commit as *the deployed* one, which is
+    right for an application: the running build is observable and a guess would
+    displace it. Terraform is not deployed by image and has no build to observe,
+    so the default branch is not a substitute for the answer — it is the answer,
+    and refusing it cost the 2026-08-24 live run its only infrastructure analysis.
+    """
+    deps = build_deps(
+        config,
+        repo=InMemoryRepository(),
+        github=FakeGitHubClient(branch_commits={"github.com/org/infra": "abc1234"}),
+    )
+
+    result = await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA, commit=None)])
+
+    request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
+    assert request.commit == "abc1234"
+    assert result["investigated"][0].result.status is AnalysisStatus.SUCCEEDED
+
+
+async def test_an_iac_repository_github_cannot_answer_for_still_says_so(config: Config):
+    deps = build_deps(config, repo=InMemoryRepository(), github=FakeGitHubClient())
+
+    result = await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA, commit=None)])
+
+    assert deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS) == []
+    assert result["investigated"][0].result is not None
