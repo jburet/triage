@@ -74,10 +74,20 @@ infra track, which this release is the first thing to actually need.
 
 ## Open risks
 
-- **The `follow_up` unwrap does not fire on the live path.** Observed twice on 2026-08-24:
-  the model plans follow-up collection, the value arrives wrapped in its own name, and the
-  plan is discarded. The unwrap added for it works in isolation against that exact shape and
-  did not fire in the run. Unresolved, and it costs real collection every incident.
+- **The alert class can contradict its own reasoning, and the class is what routes.** On
+  2026-08-24 at 19:05 the classifier returned `saturation` while its own `why` named
+  `crash_restart`. Both fields are `Filled` and the answer is well-formed, so no schema
+  reaches it. The class chose the recipe: CPU was collected — and became a ranked hypothesis
+  and two evidence lines — while the StatefulSet replica metrics were not. A silent
+  mis-classification changes what the report is built from, in either direction. It argues
+  the recipes are cut too finely as much as it argues for a validator.
+- **Follow-up now parses, and asks for nothing.** The shape defect that discarded three runs'
+  plans is fixed (`4f909dd`: the envelope arrived as a string, so the decode had to feed the
+  peel). The first clean run then planned no calls at all — on a collection where `spans` is
+  `not_instrumented` and the exit-code detail sits at namespace scope, which is the prompt's
+  own worked example of when to ask. One empty plan is not a defect; an empty plan every time
+  means the loop costs an `analysis` call per incident and buys nothing, and the report is
+  poorer for what was never fetched.
 - **Confidence may never exceed low even with analyses running.** Both live runs reached
   `low` because nothing was analysed; whether a real `code_analysis` substantiates a
   mechanism well enough for `medium` is untested and is the whole premise of Phase 3.
