@@ -410,3 +410,59 @@ async def test_a_repository_only_the_system_map_knew_is_recorded_as_the_map_s_an
     state = await run(deps, hypotheses=[a_hypothesis()])
 
     assert state["investigated"][0].mapping_source is MappingSource.MAP
+
+
+async def test_a_repository_only_a_name_pattern_matched_is_never_a_high_confidence_diagnosis(
+    config: Config,
+):
+    """`serves: ["payments-*"]` is a hand-maintained guess about naming, and the
+    commit behind it is the last one F0 summarised for the repository — a fact
+    about the repository, not about the build this service is running."""
+    deps = build_deps(
+        config, repo=mapped(a_service_entry()), syntheses=[a_synthesis(confidence="high")]
+    )
+
+    diagnosis = (
+        await run(deps, hypotheses=[a_hypothesis(service="payments-worker", commit=None)])
+    )["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "name pattern" in diagnosis.confidence_rationale
+    assert "last commit summarised" in diagnosis.confidence_rationale
+
+
+async def test_a_workload_row_the_derivation_only_guessed_carries_the_same_caveat(
+    config: Config,
+):
+    """2.4's fallback writes a row for a service that emitted no image event. It is
+    the patterns wearing a row, and it must not read as the image-derived mapping
+    it is stored next to."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab",
+            image=None,
+            image_digest=None,
+            source="pattern",
+        )
+    )
+    deps = build_deps(config, repo=repo, syntheses=[a_synthesis(confidence="high")])
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.MEDIUM
+    assert "name pattern" in diagnosis.confidence_rationale
+
+
+async def test_a_repository_the_map_named_carries_no_pattern_caveat(config: Config):
+    deps = build_deps(
+        config, repo=mapped(a_service_entry()), syntheses=[a_synthesis(confidence="high")]
+    )
+
+    diagnosis = (await run(deps, hypotheses=[a_hypothesis()]))["diagnosis"]
+
+    assert diagnosis.confidence is Confidence.HIGH
+    assert "name pattern" not in diagnosis.confidence_rationale

@@ -20,7 +20,12 @@ from langchain_core.runnables import RunnableConfig
 from pydantic import ValidationError
 
 from triage.graphs.state import AnalysisState, Investigated
-from triage.mapping.commits import CONFIDENCE_CAP, commit_caveat
+from triage.mapping.commits import (
+    CONFIDENCE_CAP,
+    MAPPING_CONFIDENCE_CAP,
+    commit_caveat,
+    mapping_caveat,
+)
 from triage.prompts import render
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.analysis import AnalysisKind
@@ -139,20 +144,32 @@ def _confidence(draft: DiagnosisDraft, chosen: Investigated | None) -> Confidenc
 
     A cause the code was never read for can be the best available explanation; it
     cannot be a confirmed one (ADR-0004's rule). Neither can one read at a commit
-    nothing established this service to be running (M6 2.16).
+    nothing established this service to be running (M6 2.16), nor one read in a
+    repository a name pattern picked out rather than the running image (M6 4.2).
     """
     caps = [draft.confidence]
     if chosen is not None and chosen.failed:
         caps.append(Confidence.MEDIUM)
     if chosen is not None and chosen.commit_source in CONFIDENCE_CAP:
         caps.append(CONFIDENCE_CAP[chosen.commit_source])
+    if chosen is not None and chosen.mapping_source in MAPPING_CONFIDENCE_CAP:
+        caps.append(MAPPING_CONFIDENCE_CAP[chosen.mapping_source])
     return min(caps, key=lambda level: level.rank)
+
+
+def _caveats(chosen: Investigated | None) -> list[str]:
+    if chosen is None:
+        return []
+    stated = (
+        mapping_caveat(chosen.mapping_source, chosen.hypothesis.service, chosen.repo_url),
+        commit_caveat(chosen.commit_source, chosen.repo_url),
+    )
+    return [caveat for caveat in stated if caveat]
 
 
 def _rationale(draft: DiagnosisDraft, chosen: Investigated | None) -> str:
     """The model's reasoning, plus what the run knows about the tree it read."""
-    caveat = commit_caveat(chosen.commit_source, chosen.repo_url) if chosen else None
-    return f"{draft.confidence_rationale} {caveat}" if caveat else draft.confidence_rationale
+    return " ".join([draft.confidence_rationale, *_caveats(chosen)])
 
 
 def _assemble(state: AnalysisState, draft: DiagnosisDraft, *, degraded: bool = False) -> Diagnosis:

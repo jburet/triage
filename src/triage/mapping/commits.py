@@ -11,6 +11,10 @@ Preference is stated rather than emergent: the image tag when it carries the
 commit outright, then the tag as GitHub resolves it, then the default branch —
 which is *not* the deployed commit and must never be presented as one, hence
 :data:`CommitSource` on the entry rather than a bare string.
+
+The two caps and their caveats live here together because they are the same
+rule seen on two axes: a location nothing observed may be the best available
+one, and may not be presented as a confirmed one.
 """
 
 from __future__ import annotations
@@ -33,6 +37,27 @@ reads real code at a real commit and answers confidently about a tree the tenant
 is not running. So the cap, and :func:`commit_caveat`, are the two things that
 keep that visible in the ticket.
 """
+
+
+MAPPING_CONFIDENCE_CAP: dict[MappingSource, Confidence] = {MappingSource.PATTERN: Confidence.MEDIUM}
+"""How sure a diagnosis may be about a repository this source picked out.
+
+The twin of :data:`CONFIDENCE_CAP`, one axis over. A ``serves`` glob is a
+hand-maintained guess about naming, and the commit behind it is whatever F0 last
+summarised for the repository — so both halves of the location are about the
+repository rather than about this service's build, and neither was observed.
+"""
+
+
+def mapping_caveat(source: MappingSource | None, service: str, repo_url: str | None) -> str | None:
+    """What a diagnosis located by this source has to state, if anything."""
+    if source is not MappingSource.PATTERN:
+        return None
+    return (
+        f"The repository was matched to {service} by a name pattern in config.yaml rather "
+        f"than by the image it is running, and the commit read is the last commit summarised "
+        f"for {repo_url or 'that repository'}, not the build this service has deployed."
+    )
 
 
 def commit_caveat(source: CommitSource | None, repo_url: str | None) -> str | None:

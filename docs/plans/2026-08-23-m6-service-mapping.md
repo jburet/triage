@@ -177,7 +177,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [x] 4.1 `deployed_repo` prefers a `WorkloadEntry`, then the system map, then patterns, and
       the `Hypothesis` records which of the three answered — a diagnosis built on a pattern
       guess must not read like one built on the image that was running.
-- [ ] 4.2 A diagnosis whose commit came from `source = pattern` states in
+- [x] 4.2 A diagnosis whose commit came from `source = pattern` states in
       `confidence_rationale` that the commit is the repository's last summarised one and not
       this tenant's deployed one, and cannot be `high` on that basis alone.
 - [ ] 4.3 One mapping pass over every service seen in the last N days produces a report:
