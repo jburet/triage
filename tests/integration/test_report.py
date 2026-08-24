@@ -84,3 +84,33 @@ async def test_one_line_of_yaml_puts_the_ticket_path_back(config, jira_config, o
     assert reported.jira.created == []
     assert reversed_["outcome"] is PipelineOutcome.TICKET_CREATED
     assert filed.jira.created[0].project == "PAY"
+
+
+async def test_the_threshold_frames_the_report_instead_of_routing_it(
+    config, oom_diagnosis, low_confidence_diagnosis
+):
+    """Both diagnoses reach the same channel; only the first line differs (ADR-0023).
+
+    Above the bar the reader is told the cause, because that is what they act
+    on. Below it, leading with a cause Triage cannot stand behind is the one
+    thing the report may not do — so it leads with what is established and says
+    how much is still open.
+    """
+    confident = build_deps(config)
+    unsure = build_deps(config)
+    await run(oom_diagnosis, confident)
+    await run(low_confidence_diagnosis, unsure)
+
+    (loud,) = confident.slack.messages
+    (quiet,) = unsure.slack.messages
+    assert loud.channel == quiet.channel == "#payments-alerts"
+
+    lead, follow = loud.text.split("\n")[:2]
+    assert "unbounded" in lead.lower()
+    assert "at or above the *medium*" in follow
+
+    lead, follow = quiet.text.split("\n")[:2]
+    assert "p95 latency on GET /payments/{id} rose from 140 ms to 610 ms" in lead
+    assert "Latency rose across every handler" not in lead
+    assert "below the *medium*" in follow
+    assert "2 questions" in follow

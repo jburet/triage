@@ -56,6 +56,30 @@ def _cause(diagnosis: Diagnosis) -> str:
     return render_field(diagnosis.probable_cause)
 
 
+def _open_questions(diagnosis: Diagnosis) -> str:
+    count = len(diagnosis.unknowns)
+    if count == 0:
+        return "Nothing was left open."
+    return f"{count} question{'' if count == 1 else 's'} below are still open."
+
+
+def _headline(diagnosis: Diagnosis, *, threshold: Confidence, confident: bool) -> str:
+    """Two lines: what the reader should take away, then how far to trust it."""
+    level = CONFIDENCE_LABEL[diagnosis.confidence]
+    bar = CONFIDENCE_LABEL[threshold]
+    if confident:
+        return (
+            f":dart: *{diagnosis.service}* — {_cause(diagnosis)}\n"
+            f"Confidence *{level}*, at or above the *{bar}* "
+            f"{diagnosis.feature.value} needs to lead with a cause."
+        )
+    return (
+        f":mag: *{diagnosis.service}* — {diagnosis.symptom.description}\n"
+        f"Confidence *{level}*, below the *{bar}* {diagnosis.feature.value} needs to "
+        f"lead with a cause, so this is what is established. {_open_questions(diagnosis)}"
+    )
+
+
 def render_incident(
     diagnosis: Diagnosis,
     *,
@@ -68,11 +92,7 @@ def render_incident(
     lead with, so it leads with what is established.
     """
     confident = diagnosis.confidence.at_least(threshold)
-    headline = (
-        f":dart: *{diagnosis.service}* — {_cause(diagnosis)}"
-        if confident
-        else f":mag: *{diagnosis.service}* — {diagnosis.symptom.description}"
-    )
+    headline = _headline(diagnosis, threshold=threshold, confident=confident)
     sections = (
         ReportSection("Symptom", f"{diagnosis.symptom.description}\n_{diagnosis.symptom.window}_"),
         ReportSection(
