@@ -11,7 +11,13 @@ whole run.
 import pytest
 
 from tests.conftest import a_repo_summary, an_analysis_request, some_findings
-from triage.analysis.jobs import FakeJobApi, JobApiError, JobStatus, job_name
+from triage.analysis.jobs import (
+    JOB_TIMEOUT_SECONDS,
+    FakeJobApi,
+    JobApiError,
+    JobStatus,
+    job_name,
+)
 from triage.analysis.runner import KubernetesJobRunner
 from triage.config import AnalysisJobConfig
 from triage.db.repo import InMemoryRepository
@@ -103,8 +109,8 @@ async def test_a_wedged_job_is_a_failed_result_not_an_exception():
     result = await a_runner(jobs, repo, clock).run(request)
 
     assert result.status is AnalysisStatus.FAILED
-    assert "900" in (result.error or "")
-    assert clock.now >= 900.0
+    assert "960" in (result.error or "")
+    assert clock.now > JOB_TIMEOUT_SECONDS
     assert jobs.deleted == [job_name(request)]
 
 
@@ -219,3 +225,63 @@ async def test_the_manifest_names_the_sandbox_and_carries_the_request():
     env = {item["name"]: item["value"] for item in pod["containers"][0]["env"]}
     assert env["TRIAGE_ANALYSIS_JOB_NAME"] == job_name(request)
     assert request.commit in env["TRIAGE_ANALYSIS_REQUEST"]
+
+
+async def test_the_manifest_gives_the_sandbox_the_limits_it_may_not_exceed():
+    """A memory limit the Job can be killed for has to be in the manifest to exist."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(statuses=[JobStatus(failed=1)])
+    await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    resources = jobs.created[0]["spec"]["template"]["spec"]["containers"][0]["resources"]
+    assert resources["limits"]["memory"] == SPEC.resources.limits["memory"]
+    assert resources["limits"]["cpu"] == SPEC.resources.limits["cpu"]
+    assert resources["requests"]["memory"] == SPEC.resources.requests["memory"]
+
+
+async def test_the_wait_outlasts_the_job_deadline_so_kubernetes_reports_it_first():
+    """Give up at the Job's own deadline and every deadline failure reads as a hang."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    repo = InMemoryRepository()
+    clock = Clock()
+    polls = int(JOB_TIMEOUT_SECONDS // 5.0) + 1
+    jobs = FakeJobApi(
+        statuses=[
+            *([JobStatus(active=1)] * polls),
+            JobStatus(
+                failed=1,
+                reason="DeadlineExceeded",
+                message="Job was active longer than specified deadline",
+            ),
+        ]
+    )
+
+    result = await KubernetesJobRunner(
+        jobs, repo, SPEC, sleep=clock.sleep, clock=clock, poll_interval=5.0
+    ).run(request)
+
+    assert clock.now > JOB_TIMEOUT_SECONDS
+    assert "DeadlineExceeded" in (result.error or "")
+    assert "longer than specified deadline" in (result.error or "")
+
+
+async def test_a_job_killed_for_its_memory_says_which_limits_it_was_given():
+    """`BackoffLimitExceeded` alone does not tell a reader what ceiling was hit."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(
+        statuses=[
+            JobStatus(
+                failed=1,
+                reason="BackoffLimitExceeded",
+                message="Job has reached the specified backoff limit",
+            )
+        ]
+    )
+
+    result = await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    assert result.status is AnalysisStatus.FAILED
+    error = result.error or ""
+    assert "BackoffLimitExceeded" in error
+    assert f"memory={SPEC.resources.limits['memory']}" in error
+    assert f"deadline={int(JOB_TIMEOUT_SECONDS)}s" in error

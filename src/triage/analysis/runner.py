@@ -24,9 +24,11 @@ import structlog
 
 from triage.analysis.jobs import (
     JOB_TIMEOUT_SECONDS,
+    JOB_WAIT_SECONDS,
     REQUEST_ENV,
     JobApi,
     JobApiError,
+    JobStatus,
     job_manifest,
     job_name,
 )
@@ -256,7 +258,7 @@ class KubernetesJobRunner:
         repo: TriageRepository,
         spec: AnalysisJobConfig,
         *,
-        timeout: float = JOB_TIMEOUT_SECONDS,
+        timeout: float = JOB_WAIT_SECONDS,
         poll_interval: float = DEFAULT_POLL_SECONDS,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         clock: Callable[[], float] = time.monotonic,
@@ -290,10 +292,7 @@ class KubernetesJobRunner:
 
             status = await self._jobs.status(name)
             if status.failed:
-                return AnalysisResult.failed(
-                    request.kind,
-                    f"Job {name} failed: {status.reason or 'no reason reported'}",
-                )
+                return AnalysisResult.failed(request.kind, self._failure(name, status))
             if status.succeeded:
                 # The Job writes its row before exiting, so one that finished
                 # without writing never will; waiting out the deadline for it
@@ -307,6 +306,21 @@ class KubernetesJobRunner:
                     f"Job {name} reported no result within {self._timeout:.0f}s",
                 )
             await self._sleep(self._poll_interval)
+
+    def _failure(self, name: str, status: JobStatus) -> str:
+        """What Kubernetes said, plus the ceilings it does not repeat.
+
+        A Job killed for its memory limit is reported as `BackoffLimitExceeded`,
+        which names no limit at all; carrying the ones the Job was given is the
+        difference between a diagnosis that can say "it ran out of memory" and
+        one that can only say the analysis failed.
+        """
+        said = ": ".join(part for part in (status.reason, status.message) if part)
+        limits = ", ".join(f"{name}={value}" for name, value in self._spec.resources.limits.items())
+        return (
+            f"Job {name} failed: {said or 'no reason reported'} "
+            f"(limits: {limits}, deadline={int(JOB_TIMEOUT_SECONDS)}s)"
+        )
 
     def _admit(
         self, request: AnalysisRequest, name: str, row: AnalysisResultRecord
