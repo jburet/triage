@@ -114,3 +114,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | model-name check | make lint + make test (611) | 4 |
 | 2026-08-24 | F1 end to end | make run-incident, proxy provider, 4 tier calls, no retries | 64 |
 | 2026-08-24 | M7 phase 1.1 | make lint + make test (614 passed) | 6 |
+| 2026-08-24 | M7 phase 1.2 | make lint + make test (616 passed) | 6 |

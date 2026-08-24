@@ -65,3 +65,22 @@ async def test_a_reported_incident_settles_as_reported_rather_than_discarded(con
     assert deps.jira.created == []
     assert deps.jira.comments == []
     assert result["signal"].status is SignalStatus.REPORTED
+
+
+async def test_one_line_of_yaml_puts_the_ticket_path_back(config, jira_config, oom_diagnosis):
+    """The same diagnosis, the same code, two destinations — decided by config alone.
+
+    ADR-0023 postpones Jira; it does not remove it. The composer, the
+    self-review and the client have to stay reachable, or "reversible by
+    configuration" is a claim nothing checks.
+    """
+    reported = build_deps(config)
+    filed = build_deps(jira_config)
+
+    release = await run(oom_diagnosis, reported)
+    reversed_ = await run(oom_diagnosis, filed)
+
+    assert release["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert reported.jira.created == []
+    assert reversed_["outcome"] is PipelineOutcome.TICKET_CREATED
+    assert filed.jira.created[0].project == "PAY"
