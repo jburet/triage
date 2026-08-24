@@ -83,7 +83,7 @@ async def analyse(
             f"{', '.join(kind.value for kind in ANALYSERS)}",
         )
 
-    context = gather(root, analyser.profile, budget)
+    context = gather(root, analyser.profile, budget, first=request.paths)
     sections: dict[str, object] = {
         "request": request.model_dump(mode="json", exclude={"request_id"}),
         "repository": context.as_payload(),

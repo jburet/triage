@@ -161,7 +161,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [x] 3.1 For each mapped service, the IaC repository from the seed is searched once for the
       files that define *this* workload — Helm chart, values file, Terraform module — and the
       paths are stored on the entry as `iac_paths`.
-- [ ] 3.2 `iac_analysis` gathers from `iac_paths` first and the profile's globs second, so a
+- [x] 3.2 `iac_analysis` gathers from `iac_paths` first and the profile's globs second, so a
       probe timeout in `helm/zeenea-platform/values.yaml` is read; the run on 2026-08-23
       returned `Unknown` three times for exactly this reason.
 - [x] 3.3 The Terraform selection profile includes Helm and Kubernetes manifests

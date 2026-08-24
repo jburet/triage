@@ -136,6 +136,40 @@ def test_the_tree_is_capped_shallowest_first(tmp_path):
     assert any("not listed" in note for note in context.not_examined)
 
 
+def test_the_paths_the_mapping_named_are_read_before_the_profiles_own(tmp_path):
+    """M6 3.2: the mapping knows which chart defines this workload and a glob does
+    not, so a budget spent on the repository's other modules is the answer lost."""
+    write(tmp_path, "modules/eks/main.tf", "module {}\n")
+    write(tmp_path, "helm/zeenea-platform/values.yaml", "timeoutSeconds: 1\n")
+
+    context = gather(
+        tmp_path,
+        TERRAFORM,
+        ContextBudget(max_files=1),
+        first=["helm/zeenea-platform/values.yaml"],
+    )
+
+    assert [f.path for f in context.files] == ["helm/zeenea-platform/values.yaml"]
+
+
+def test_a_named_path_is_read_once_and_not_again_by_its_glob(tmp_path):
+    write(tmp_path, "helm/zeenea-platform/values.yaml", "timeoutSeconds: 1\n")
+
+    context = gather(tmp_path, TERRAFORM, first=["helm/zeenea-platform/values.yaml"])
+
+    assert [f.path for f in context.files] == ["helm/zeenea-platform/values.yaml"]
+
+
+def test_a_named_path_the_tree_does_not_have_is_reported_rather_than_ignored(tmp_path):
+    """The mapping was made against the default branch; the analysis reads a commit,
+    and a chart that moved between the two is a gap the diagnosis has to know about."""
+    write(tmp_path, "modules/eks/main.tf", "module {}\n")
+
+    context = gather(tmp_path, TERRAFORM, first=["helm/zeenea-platform/values.yaml"])
+
+    assert any("helm/zeenea-platform/values.yaml" in note for note in context.not_examined)
+
+
 def test_the_payload_carries_tree_files_and_gaps(tmp_path):
     write(tmp_path, "pyproject.toml")
 

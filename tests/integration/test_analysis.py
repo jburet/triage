@@ -260,6 +260,42 @@ async def test_a_tenant_instance_is_analysed_in_the_repository_declared_as_servi
     assert request.commit == "abc1234"
 
 
+async def test_an_infrastructure_hypothesis_reads_where_the_mapping_says_the_workload_is(
+    config: Config,
+):
+    """M6 3.2: on 2026-08-23 the repository was right and the files were not — the
+    probe timeouts are in the chart, and the selection read `*.tf`."""
+    repo = InMemoryRepository()
+    await repo.upsert_workload(
+        a_workload(
+            service="payments-api",
+            iac_repo="platform-infra",
+            iac_repo_url="github.com/zeenea/platform-infra",
+            iac_paths=["helm/zeenea-platform/values.yaml"],
+        )
+    )
+    deps = build_deps(config, repo=repo)
+
+    await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA)])
+
+    request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
+    assert request.repo_url == "github.com/zeenea/platform-infra"
+    assert request.paths == ["helm/zeenea-platform/values.yaml"]
+
+
+async def test_a_service_with_no_mapped_chart_still_reads_the_teams_terraform_repository(
+    config: Config,
+):
+    """The M3 behaviour, kept: a workload nothing has mapped is analysed by glob."""
+    deps = build_deps(config, repo=mapped(a_service_entry()))
+
+    await run(deps, hypotheses=[a_hypothesis(CauseType.INFRA)])
+
+    request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
+    assert request.repo_url == "github.com/org/infra"
+    assert request.paths == []
+
+
 async def test_a_commit_read_off_the_default_branch_is_never_presented_as_the_deployed_one(
     config: Config,
 ):

@@ -182,6 +182,28 @@ async def test_an_investigation_answers_from_the_files_its_kind_selects(
     assert expected_file in [item["path"] for item in shown["files"]]
 
 
+async def test_an_investigation_opens_the_files_the_mapping_says_define_the_workload(tmp_path):
+    """M6 3.2: the chart holds the probe timeout, and the profile would have spent
+    the budget on the repository's other modules first."""
+    write(tmp_path, "modules/eks/main.tf", "module {}\n")
+    write(tmp_path, "helm/zeenea-platform/templates/statefulset.yaml", "kind: StatefulSet\n")
+    llm = FakeLLM(responses={AnalysisFindings: [some_findings()]})
+
+    await analyse(
+        an_analysis_request(
+            AnalysisKind.IAC_ANALYSIS, paths=["helm/zeenea-platform/templates/statefulset.yaml"]
+        ),
+        tmp_path,
+        llm,
+        budget=ContextBudget(max_files=1),
+    )
+
+    shown = tagged(llm.calls[0].prompt, "repository")
+    assert [item["path"] for item in shown["files"]] == [
+        "helm/zeenea-platform/templates/statefulset.yaml"
+    ]
+
+
 async def test_a_tier_that_returns_nothing_parsable_is_a_stated_failure(application_repo):
     result = await analyse(
         an_analysis_request(AnalysisKind.SUMMARIZE_REPO),

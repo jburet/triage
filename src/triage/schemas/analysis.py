@@ -123,6 +123,13 @@ class AnalysisRequest(BaseModel):
     base_commit: str | None = Field(
         default=None, description="Only for diff_analysis: the commit to diff against."
     )
+    paths: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Files the mapping says define this workload, read before the selection "
+            "profile's own globs. Empty means nothing outside the profile is known."
+        ),
+    )
     question: Filled
 
     @model_validator(mode="after")

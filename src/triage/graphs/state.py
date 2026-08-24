@@ -175,6 +175,7 @@ class Investigated(BaseModel):
     commit: str | None = None
     base_commit: str | None = None
     commit_source: CommitSource | None = None
+    paths: list[str] = Field(default_factory=list)
     result: AnalysisResult | None = None
 
     @property

@@ -1,8 +1,9 @@
 """What an analysis is allowed to show the model, and what it must admit it never saw.
 
 A repository does not fit in a context window, so the entrypoint sends a bounded
-selection: the file tree, then the files that decide the answer, taken in
-priority order until a byte budget is spent. The budget is the point of the
+selection: the file tree, then the files that decide the answer — the ones the
+caller's mapping named first, then the profile's globs — taken in priority order
+until a byte budget is spent. The budget is the point of the
 module — an unbounded gather dies on the first large repository, and a silent one
 produces a summary that looks complete and is not. Everything left out is listed
 back to the model, so an area that could not be examined becomes an
@@ -16,7 +17,7 @@ cluster nobody can reproduce from the repository.
 from __future__ import annotations
 
 import os
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -288,15 +289,34 @@ def _read_text(path: Path, limit: int) -> tuple[str, bool] | None:
     return raw[:limit].decode("utf-8", errors="replace"), truncated
 
 
+def _named_first(
+    everything: list[PurePosixPath], first: Sequence[str], profile: SelectionProfile
+) -> tuple[list[PurePosixPath], list[PurePosixPath]]:
+    """The caller's own paths ahead of the profile's, and the ones the tree lacks.
+
+    The mapping knows which chart defines this workload and a glob does not, so
+    a budget spent on the repository's other modules is the answer lost (M6 3.2).
+    """
+    named = [PurePosixPath(path) for path in dict.fromkeys(first)]
+    here = set(everything)
+    present = [path for path in named if path in here]
+    rest = [path for path in _in_priority_order(everything, profile) if path not in set(present)]
+    return present + rest, [path for path in named if path not in here]
+
+
 def gather(
-    root: Path, profile: SelectionProfile, budget: ContextBudget = DEFAULT_BUDGET
+    root: Path,
+    profile: SelectionProfile,
+    budget: ContextBudget = DEFAULT_BUDGET,
+    *,
+    first: Sequence[str] = (),
 ) -> RepoContext:
-    """Read what the profile asks for, up to the budget, and record the rest."""
+    """Read what the caller named and then what the profile asks for, up to the budget."""
     everything = _walk(root)
     listable = sorted(everything, key=lambda path: (len(path.parts), path.as_posix()))
     tree = listable[: budget.max_tree_entries]
 
-    candidates = _in_priority_order(everything, profile)
+    candidates, missing = _named_first(everything, first, profile)
     files: list[SelectedFile] = []
     notes: list[str] = []
     total = 0
@@ -319,6 +339,11 @@ def gather(
                 f"{relative}: truncated at {budget.max_file_bytes} bytes; the rest was not read."
             )
 
+    if missing:
+        notes.append(
+            f"the mapping says these paths define this workload and the tree at this commit "
+            f"has none of them: {', '.join(path.as_posix() for path in missing)}."
+        )
     if stopped_at is not None:
         notes.append(
             f"{len(candidates) - stopped_at} further files matched the {profile.name} "
