@@ -191,9 +191,13 @@ async def test_a_signal_absent_only_in_the_window_is_evidence_not_a_gap(config: 
     assert "the absence is about this incident" in str(spans.detail)
 
 
-async def test_the_collection_handed_on_stays_inside_the_prompt_budget(config: Config):
+async def rendered_collection(config: Config, max_prompt_bytes: int) -> str:
     tight = config.model_copy(
-        update={"collection": config.collection.model_copy(update={"max_prompt_bytes": 4_000})}
+        update={
+            "collection": config.collection.model_copy(
+                update={"max_prompt_bytes": max_prompt_bytes}
+            )
+        }
     )
     deps = build_deps(tight, datadog=fake_datadog(), qualifications=[a_qualification()])
     collection = await swept(deps)
@@ -204,9 +208,32 @@ async def test_the_collection_handed_on_stays_inside_the_prompt_budget(config: C
     )
 
     prompt = deps.llm.calls_for(Qualification)[0].prompt
-    rendered = prompt.split("<collected>")[1].split("</collected>")[0]
-    assert len(rendered.encode()) < 4_000
+    return prompt.split("<collected>")[1].split("</collected>")[0]
+
+
+async def test_the_collection_handed_on_stays_inside_the_prompt_budget(config: Config):
+    rendered = await rendered_collection(config, 8_000)
+
+    assert len(rendered.encode()) < 8_000
     assert "truncated to fit the prompt budget" in rendered
+
+
+async def test_a_budget_below_the_collectors_own_metadata_keeps_them_and_states_the_cuts(
+    config: Config,
+):
+    """The floor is one stub per collector, and that is deliberate (ADR-0016).
+
+    `fit` gives every collector an equal share and never drops one outright — the
+    collectors carry different halves of one story, so a policy that starves one
+    would answer wrongly more cheaply. Below that floor the collection overshoots
+    rather than going silent, and the number to raise is `max_prompt_bytes`. Pinned
+    because the floor moves whenever a recipe gains a collector, and the failure it
+    would otherwise produce is a budget quietly not being honoured.
+    """
+    rendered = await rendered_collection(config, 1_000)
+
+    assert len(rendered.encode()) > 1_000
+    assert rendered.count("truncated to fit the prompt budget") > 1
 
 
 async def test_follow_up_calls_are_capped_and_the_refusal_is_recorded(config: Config):

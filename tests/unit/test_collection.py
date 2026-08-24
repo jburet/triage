@@ -228,3 +228,30 @@ def test_a_monitor_that_declares_no_environment_stays_out_of_scope(config: Confi
 
     assert not routing.in_scope
     assert "cannot be determined" in routing.reason
+
+
+def test_a_memory_alert_collects_the_limit_it_is_a_percentage_of():
+    """99.99% of what? Without the limit the diagnosis cannot say, and guessed.
+
+    On the plt-merck incident (2026-08-24) the only memory signal collected was
+    `usage_pct`. The analysis reached for a Helm chart to find the denominator,
+    read one that does not deploy this workload, and put 6Gi in the ticket; the
+    limit Datadog reports for that tenant is 5Gi. The number is telemetry, so it
+    is collected rather than inferred.
+    """
+    queries = metric_queries(AlertClass.CRASH_RESTART, AlertScope(service="plt-merck"))
+
+    assert "avg:kubernetes.memory.limits{service:plt-merck}" in queries
+    assert "avg:kubernetes.memory.requests{service:plt-merck}" in queries
+
+
+def test_a_memory_alert_collects_the_working_set_the_kernel_kills_on():
+    """`usage` counts page cache; the OOM killer counts the working set.
+
+    Measured on plt-merck at the crash: usage_pct 99.99%, working_set 88% of the
+    limit, rss 67%. Reporting only the first overstates the pressure and makes a
+    reclaimable cache look like an exhausted heap.
+    """
+    queries = metric_queries(AlertClass.SATURATION, AlertScope(service="plt-merck"))
+
+    assert "avg:kubernetes.memory.working_set{service:plt-merck}" in queries

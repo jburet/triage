@@ -172,10 +172,30 @@ REPLICAS = (
 MEMORY = MetricSpec("avg:kubernetes.memory.usage_pct", NAMESPACE)
 CPU = MetricSpec("avg:kubernetes.cpu.usage.total", NAMESPACE)
 
+MEMORY_SIZING = (
+    MetricSpec("avg:kubernetes.memory.limits", NAMESPACE),
+    MetricSpec("avg:kubernetes.memory.requests", NAMESPACE),
+    MetricSpec("avg:kubernetes.memory.working_set", NAMESPACE),
+)
+"""The denominator of ``usage_pct``, and the number the OOM killer actually reads.
+
+Collected because they are telemetry, not configuration. For a mono-tenant
+workload provisioned through Terraform workspaces the deployed limit is in
+workspace state, which Triage does not read (ADR-0009) — so left uncollected it
+is unknowable from code, and the plt-merck incident showed what fills that gap
+instead: the analysis found a Helm chart in the application repository, quoted
+its 6Gi default, and the limit Datadog reports for that tenant is 5Gi.
+
+``working_set`` is here for a different reason. ``usage`` counts reclaimable page
+cache and ``usage_pct`` is computed from it, so the same container read 99.99% by
+that measure and 88% by the one the kernel kills on. One of those is an
+exhausted process and the other is a warm cache.
+"""
+
 RECIPES: dict[AlertClass, Recipe] = {
-    AlertClass.CRASH_RESTART: Recipe(SWEEP, (RESTARTS, *REPLICAS, MEMORY)),
+    AlertClass.CRASH_RESTART: Recipe(SWEEP, (RESTARTS, *REPLICAS, MEMORY, *MEMORY_SIZING)),
     AlertClass.AVAILABILITY: Recipe(SWEEP, (RESTARTS, *REPLICAS)),
-    AlertClass.SATURATION: Recipe(SWEEP, (MEMORY, CPU, RESTARTS)),
+    AlertClass.SATURATION: Recipe(SWEEP, (MEMORY, *MEMORY_SIZING, CPU, RESTARTS)),
     AlertClass.LATENCY: Recipe(
         SWEEP, (MetricSpec("avg:trace.http.request.duration", ("service",)), CPU)
     ),
