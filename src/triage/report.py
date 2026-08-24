@@ -23,6 +23,20 @@ from triage.schemas.diagnosis import Diagnosis, Location
 from triage.schemas.system_map import CommitSource, MappingSource, WorkloadEntry
 from triage.schemas.ticket import TicketSection
 
+MAX_MESSAGE_CHARS = 3900
+"""Where the report is cut, and why it is cut here rather than left to Slack.
+
+``chat.postMessage`` accepts forty thousand characters in ``text``, but past
+about four thousand Slack breaks the message up itself, at a boundary it
+chooses — which lands mid-sentence, mid-evidence-item, mid-link. Cutting first,
+between sections, is the only way the break is somewhere a reader can follow.
+The remainder under four thousand is the part marker's."""
+
+_MARKER_BUDGET = 64
+"""Reserved out of every part for the ``Part i of n`` line, whose length is not
+known until the packing that needs it has already happened."""
+
+
 CONFIDENCE_LABEL: dict[Confidence, str] = {
     Confidence.LOW: "low",
     Confidence.MEDIUM: "medium",
@@ -69,6 +83,31 @@ class ReportSection:
     def render(self) -> str:
         return f"*{self.heading}*\n{self.body}"
 
+    def chunks(self, limit: int) -> list[str]:
+        """This section as one block, or as several that each fit inside ``limit``.
+
+        A section too long for any message is continued rather than truncated,
+        and the continuation is broken between whole lines — an evidence item is
+        one line, so an item is never cut in half. A single line longer than the
+        limit is emitted whole and over it: nothing can be done with it that is
+        better than letting Slack render it.
+        """
+        rendered = self.render()
+        if len(rendered) <= limit:
+            return [rendered]
+        blocks: list[str] = []
+        current: list[str] = []
+        head = self.heading
+        for line in self.body.split("\n"):
+            candidate = "\n".join([f"*{head}*", *current, line])
+            if current and len(candidate) > limit:
+                blocks.append("\n".join([f"*{head}*", *current]))
+                head, current = f"{self.heading} (continued)", [line]
+            else:
+                current.append(line)
+        blocks.append("\n".join([f"*{head}*", *current]))
+        return blocks
+
 
 @dataclass(frozen=True)
 class SlackReport:
@@ -81,7 +120,40 @@ class SlackReport:
 
     @property
     def messages(self) -> list[str]:
-        return ["\n\n".join([self.headline, *(s.render() for s in self.sections)])]
+        """What to post, in order. One message unless the report will not fit.
+
+        A section is never split, even when it alone is over the cap: an evidence
+        list cut in half is exactly the failure this exists to avoid, and a
+        single oversized section is Slack's problem to render rather than ours
+        to mangle.
+        """
+        limit = MAX_MESSAGE_CHARS - _MARKER_BUDGET
+        blocks = [self.headline]
+        for section in self.sections:
+            blocks.extend(section.chunks(limit))
+        parts = _pack(blocks, limit)
+        if len(parts) == 1:
+            return parts
+        return [
+            f"_Part {index} of {len(parts)} — `{self.service}`._\n\n{part}"
+            for index, part in enumerate(parts, start=1)
+        ]
+
+
+def _pack(blocks: Sequence[str], limit: int) -> list[str]:
+    """Group blocks into as few messages as fit, cutting only between them."""
+    parts: list[str] = []
+    current = ""
+    for block in blocks:
+        candidate = f"{current}\n\n{block}" if current else block
+        if current and len(candidate) > limit:
+            parts.append(current)
+            current = block
+        else:
+            current = candidate
+    if current:
+        parts.append(current)
+    return parts
 
 
 def _cause(diagnosis: Diagnosis) -> str:

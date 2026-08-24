@@ -19,6 +19,7 @@ from tests.conftest import (
 from triage.db.repo import InMemoryRepository
 from triage.graphs.incident import build_graph
 from triage.graphs.ticket_pipeline import graph
+from triage.report import MAX_MESSAGE_CHARS
 from triage.schemas import (
     DedupDecision,
     PipelineOutcome,
@@ -26,6 +27,7 @@ from triage.schemas import (
     TicketDraft,
     TicketSection,
 )
+from triage.schemas.diagnosis import Evidence, EvidenceKind
 from triage.schemas.signal import SignalStatus
 
 
@@ -323,3 +325,56 @@ async def test_a_recurrence_escalation_replies_into_the_same_thread(jira_config,
     (message,) = deps.slack.messages
     assert "has now recurred 3 times" in message.text
     assert message.thread_ts == "1755000000.000100"
+
+
+def a_long_incident(diagnosis):
+    """The same diagnosis with an evidence list no single Slack message can hold."""
+    evidence = [
+        Evidence(
+            kind=EvidenceKind.K8S_EVENT,
+            description=f"Restart {index} of payments-api-0: container killed with exit "
+            f"code 137 after the working set reached the 1 Gi limit, {index} minutes into "
+            f"the settlement window.",
+            url=f"https://app.datadoghq.example/events/restart-{index}",
+        )
+        for index in range(1, 61)
+    ]
+    return diagnosis.model_copy(update={"evidence": evidence})
+
+
+async def test_a_report_too_long_for_one_message_is_split_between_sections(config, oom_diagnosis):
+    """Slack splits a long message wherever it likes; we split where we choose.
+
+    Above about four thousand characters Slack breaks the text itself, and the
+    break lands mid-sentence — mid-evidence-item, mid-link. So the report is cut
+    at a section boundary before it gets there, and each part says which part it
+    is, so nobody reads part two as the whole report.
+    """
+    long_one = a_long_incident(oom_diagnosis)
+    deps = build_deps(config)
+    await run(long_one, deps)
+
+    parts = [message.text for message in deps.slack.messages]
+    assert len(parts) > 1
+    assert all(len(part) <= MAX_MESSAGE_CHARS for part in parts)
+    assert f"Part 1 of {len(parts)}" in parts[0]
+    assert f"Part {len(parts)} of {len(parts)}" in parts[-1]
+
+    lines = [line for part in parts for line in part.split("\n")]
+    for section in TicketSection:
+        heading = f"*{section.heading}*"
+        assert lines.count(heading) == 1, f"{section.heading} appears twice unmarked"
+
+    for item in long_one.evidence:
+        bullet = f"• [{item.kind.value}] {item.description} — {item.url}"
+        assert lines.count(bullet) == 1, "an evidence item was cut in half"
+
+    assert "*Evidence (continued)*" in lines, "the oversized section was truncated, not continued"
+
+
+async def test_a_report_that_fits_is_one_message_with_no_part_marker(config, oom_diagnosis):
+    deps = build_deps(config)
+    await run(oom_diagnosis, deps)
+
+    (message,) = deps.slack.messages
+    assert "Part 1 of" not in message.text
