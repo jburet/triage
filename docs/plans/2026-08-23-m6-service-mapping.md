@@ -69,6 +69,12 @@ ECR under the repository's own name. So:
 - `TriageRepository` gains `upsert_workload(entry)`, `workload_for_service(service)`.
 - `triage.scope.deployed_repo` keeps its signature and consults workloads before the map and
   the patterns — every caller (`qualify`, `investigate`) is unchanged.
+- `triage.integrations.github.GitHubClient` gains a second method resolving a tag to the
+  commit it points at, with `FakeGitHubClient` and the dry-run double following it. Still REST
+  and not an MCP server, on the reasoning already written into that module: a single-shot read
+  does not earn an MCP runtime in the graph's path.
+- `config.Repo` gains an optional tag template, for repositories whose GitHub tags are not
+  spelled as their image tags.
 - `triage.mapping.seed`: parses the architecture document's repository table into
   `SeedEntry` rows. A parse that finds fewer rows than the file's table has is an error, not
   a partial import.
@@ -106,6 +112,36 @@ ECR under the repository's own name. So:
       mapping is absent and the caller says "not mapped", as it does today.
 - [x] 2.5 Re-running the derivation for a service whose image digest is unchanged rewrites
       nothing and says so, on the same reasoning as ADR-0015.
+
+## Phase 2b: the commit is in GitHub, not in the image
+
+Phase 2 shipped and the premise held everywhere except the commit: the live run resolved
+`plt-hcl-software-uat` to the `platform` repository and digest `sha256:2e15f697…`, and read
+`deployed_commit` as Unknown because the image tag is `501`. A build number is not a commit,
+and 2.3 correctly refuses to pretend otherwise. But that number *is* a tag in GitHub, and
+GitHub will say which commit it points at — so the fact is one read away, and without it
+every F1 analysis keeps running at "the last commit F0 summarised" and apologising for it.
+
+- [ ] 2.6 A lightweight tag on a declared repository resolves to the commit it names, through
+      one read on the `GitHubClient` protocol, and `deployed_commit` becomes `Filled`.
+- [ ] 2.7 An annotated tag resolves to the commit the tag object points at, not to the tag
+      object's own SHA — the two differ, and the second is a ref no clone can check out.
+- [ ] 2.8 A tag the repository does not have is an `Unknown` naming the repository and the tag
+      that was looked for. No second spelling is tried on a hunch: a tag resolved by guessing
+      is a commit that sends an analysis to the wrong tree.
+- [ ] 2.9 A repository whose GitHub tags are not spelled as the image tag declares the
+      relationship in `config.yaml` (a template such as `v{tag}` or `build-{tag}`), and only
+      the declared spelling is looked up.
+- [ ] 2.10 A workload whose repository is not declared in `config.yaml` gets no GitHub read at
+      all, and its `deployed_commit` Unknown says that rather than blaming the tag. The image
+      names a repository, `config.yaml` names a *GitHub* repository, and those are not the
+      same string — the image is `platform` where the remote is `zeenea/datacatalog`.
+- [ ] 2.11 `deployed_commit` records where it came from (`tag` | `github`), and a commit read
+      from GitHub is preferred over one parsed out of a tag that merely looks like a SHA.
+- [ ] 2.12 A GitHub read that fails — rate limit, permission, network — leaves an `Unknown`
+      carrying the failure and the mapping pass continues; one unreachable repository does not
+      cost the other nineteen their mapping.
+- [ ] 2.13 A derivation for a digest already mapped makes no GitHub call, on 2.5's rule.
 
 ## Phase 3: where the workload is defined
 
@@ -156,7 +192,14 @@ ECR under the repository's own name. So:
   every image observed on 2026-08-23, and it is exactly the kind of thing that holds until an
   image is renamed. 2.2 fails loudly rather than guessing, which turns a silent
   misattribution into a mapping report line.
-- **The commit may not be in the image at all.** If tags are `latest` or a build number with
-  no commit anywhere in ECR metadata, 2.3 degrades to Unknown for every service and the
-  analyses keep running at F0's last summarised commit — the improvement then is only the
-  honesty of 4.2, not the accuracy of the analysis.
+- **The commit may not be in the image at all.** Confirmed on 2026-08-23: the tags are build
+  numbers. Phase 2b is the answer — the build number is a GitHub tag — and it rests on two
+  assumptions worth stating. That every deployed image tag has a corresponding GitHub tag
+  (an image built outside the tagged pipeline has none, and 2.8 will say so rather than
+  guess); and that the token in `TRIAGE_GITHUB_TOKEN` can read every declared repository,
+  which is a permissions question a staging run answers, not a design one.
+- **Nothing maps until the real repositories are declared.** Against the shipped example
+  `config.yaml`, all twenty seed repositories come back unclaimed — correct, and noise. Phase
+  2b makes this sharper rather than milder: 2.10 means an undeclared repository gets no commit
+  either. Declaring the real Zeenea repositories is a prerequisite for Phase 4's report being
+  worth reading, and no plan item currently covers it.
