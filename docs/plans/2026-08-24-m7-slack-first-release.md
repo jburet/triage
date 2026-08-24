@@ -42,11 +42,28 @@ infra track, which this release is the first thing to actually need.
 
 ## Phase 3: the analysis image
 
-- [ ] 3.1 `docker/analysis/Dockerfile` builds an image that runs `triage.analysis.entrypoint` for a given `AnalysisRequest` and writes an `AnalysisResult`, with no Triage source on the path but the entrypoint and its schemas.
-- [ ] 3.2 The image clones over https at the requested commit and refuses a ref it was not given.
-- [ ] 3.3 Running the image locally against the 2026-08-24 hypotheses produces a `code_analysis` and an `iac_analysis` result — the first time either has ever run.
-- [ ] 3.4 `diff_analysis` still has no entrypoint and still fails as a stated failure naming the kind; the diagnosis records it as an unknown and caps confidence (ADR-0014). This release does not add it.
-- [ ] 3.5 The image is published to the infra account's registry and named in `config.analysis.job`.
+- [x] 3.1 `docker/analysis/Dockerfile` builds an image that runs `triage.analysis.entrypoint` for a given `AnalysisRequest` and writes an `AnalysisResult`, with no Triage source on the path but the entrypoint and its schemas.
+- [x] 3.2 The image clones over https at the requested commit and refuses a ref it was not given.
+- [x] 3.3 Running the image locally against the 2026-08-24 hypotheses produces a `code_analysis` and an `iac_analysis` result — the first time either has ever run.
+- [x] 3.4 `diff_analysis` still has no entrypoint and still fails as a stated failure naming the kind; the diagnosis records it as an unknown and caps confidence (ADR-0014). This release does not add it.
+- [ ] 3.5 The image is published to the infra account's registry and named in `config.analysis.job`. **Blocked**: no credentials for the infra account (097607883991), no ECR repository exists for this image, and what was built is `linux/arm64` — the cluster needs `linux/amd64`, so publishing means a buildx cross-build as well as a login.
+
+What the first two live analyses showed (2026-08-24, one `analysis` call each, through the
+proxy). The `iac_analysis` on `platform-infra` at `68648d21` answered `high` and *eliminated*
+the reference incident's leading cause with a mechanism: the platform StatefulSet declares a
+`startup_probe` (`initial_delay_seconds=120, period_seconds=30, failure_threshold=120`), and
+Kubernetes suppresses the liveness probe until it passes, so a liveness probe shorter than
+startup cannot restart the pod. That is a real answer, from real code, that no one had.
+
+The `code_analysis` on `datacatalog` at `fcb58d1b` answered `low`, and the reason is the
+gather, not the model: `APPLICATION` selected 47 files out of 4261 and **not one line of
+Scala** — twenty-six `build.sbt` files, the READMEs, ten GitHub workflows, two
+`docker-compose.yml`, and the Helm chart. The model said so, in a finding whose paths are
+`not_examined`. So the milestone's open risk "confidence may never exceed low even with
+analyses running" is answered in two parts: an IaC repository the mapping points a path
+into reaches `high`, and an application repository whose language the profile does not
+name reaches `low` because nothing worth reading was opened. The fix belongs to
+`triage.analysis.context`, not to the image.
 
 ## Phase 4: the sandbox
 

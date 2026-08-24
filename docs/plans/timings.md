@@ -120,3 +120,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M7 phase 3.1 | docker build -f docker/analysis/Dockerfile (cold) | 14 |
 | 2026-08-24 | M7 phase 3.1/3.4 | make lint + make test (648 passed) | 7 |
 | 2026-08-24 | M7 phase 3.4 | docker run, diff_analysis request (stated refusal, exit 1) | 2 |
+| 2026-08-24 | M7 phase 3.3 | docker run, iac_analysis on platform-infra, 1 live analysis call | 18 |
+| 2026-08-24 | M7 phase 3.3 | docker run, code_analysis on datacatalog, 1 live analysis call | 26 |
+| 2026-08-24 | M7 phase 3.3 | gather probe on a real datacatalog clone (no model call) | 5 |
