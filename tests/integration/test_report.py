@@ -17,7 +17,7 @@ from tests.conftest import (
 )
 from triage.graphs.incident import build_graph
 from triage.graphs.ticket_pipeline import graph
-from triage.schemas import PipelineOutcome, ReviewVerdict, TicketDraft
+from triage.schemas import PipelineOutcome, ReviewVerdict, TicketDraft, TicketSection
 from triage.schemas.signal import SignalStatus
 
 
@@ -143,3 +143,51 @@ async def test_a_draft_that_could_never_pass_review_is_still_reported(
     assert "failed self-review" not in message.text
     assert oom_diagnosis.symptom.description in message.text
     assert oom_diagnosis.probable_cause in message.text
+
+
+def posted(deps) -> str:
+    return "\n\n".join(message.text for message in deps.slack.messages)
+
+
+async def test_the_report_carries_all_nine_sections(config, oom_diagnosis):
+    """The report is the whole diagnosis, because nothing else carries it now.
+
+    Every section of docs/ticket-spec.md, with the numbers, the window, the
+    links and the reasons — the material both live runs on 2026-08-24 computed
+    and reduced to four lines.
+    """
+    deps = build_deps(config)
+    await run(oom_diagnosis, deps)
+    text = posted(deps)
+
+    for section in TicketSection:
+        assert f"*{section.heading}*" in text, f"{section.heading} is missing"
+
+    assert "2026-08-22T02:10:00" in text
+    assert oom_diagnosis.impact.users in text
+    assert oom_diagnosis.impact.slos in text
+    assert "checkout-web" in text
+    assert oom_diagnosis.evidence[0].description in text
+    assert oom_diagnosis.evidence[0].url in text
+    assert oom_diagnosis.expected_change.statement in text
+    assert oom_diagnosis.expected_change.how_to_verify in text
+    assert oom_diagnosis.out_of_scope[0] in text
+    assert oom_diagnosis.ruled_out[0].hypothesis in text
+    assert oom_diagnosis.ruled_out[0].why in text
+    assert oom_diagnosis.unknowns[0].question in text
+    assert oom_diagnosis.unknowns[0].why_unresolved in text
+
+
+async def test_a_section_with_nothing_in_it_says_so_rather_than_vanishing(config, oom_diagnosis):
+    """A missing section reads as an oversight; an empty one has to say it is not."""
+    bare = oom_diagnosis.model_copy(update={"out_of_scope": [], "ruled_out": [], "unknowns": []})
+    deps = build_deps(config)
+    await run(bare, deps)
+    text = posted(deps)
+
+    for section in TicketSection:
+        assert f"*{section.heading}*" in text
+    assert "N/A" not in text
+    assert "eliminated no hypothesis" in text
+    assert "left no question open" in text
+    assert "named nothing the fix must avoid" in text

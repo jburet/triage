@@ -14,11 +14,13 @@ none of the three do.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from triage.schemas.common import Confidence
 from triage.schemas.common import render as render_field
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.ticket import TicketSection
 
 CONFIDENCE_LABEL: dict[Confidence, str] = {
     Confidence.LOW: "low",
@@ -63,6 +65,68 @@ def _open_questions(diagnosis: Diagnosis) -> str:
     return f"{count} question{'' if count == 1 else 's'} below are still open."
 
 
+def _bullets(items: Sequence[str], *, empty: str) -> str:
+    """A list, or a sentence saying the list is empty and what that means.
+
+    An absent section reads as an oversight and a blank one reads as nothing at
+    all. Both are how a reader learns to stop trusting the sections that *are*
+    filled, which is why the specification has no representation for empty.
+    """
+    return "\n".join(f"• {item}" for item in items) if items else f"_{empty}_"
+
+
+def _symptom(diagnosis: Diagnosis) -> str:
+    return f"{diagnosis.symptom.description}\n_Window: {diagnosis.symptom.window}_"
+
+
+def _impact(diagnosis: Diagnosis) -> str:
+    services = ", ".join(f"`{name}`" for name in diagnosis.impact.services)
+    return (
+        f"*Users:* {render_field(diagnosis.impact.users)}\n"
+        f"*SLOs:* {render_field(diagnosis.impact.slos)}\n"
+        f"*Services:* {services or '_none named_'}"
+    )
+
+
+def _probable_cause(diagnosis: Diagnosis) -> str:
+    return (
+        f"{_cause(diagnosis)}\n"
+        f"_Confidence *{CONFIDENCE_LABEL[diagnosis.confidence]}* — "
+        f"{diagnosis.confidence_rationale}_"
+    )
+
+
+def _evidence(diagnosis: Diagnosis) -> str:
+    return _bullets(
+        [
+            f"[{item.kind.value}] {item.description}" + (f" — {item.url}" if item.url else "")
+            for item in diagnosis.evidence
+        ],
+        empty="No checkable evidence was produced.",
+    )
+
+
+def _expected_change(diagnosis: Diagnosis) -> str:
+    return (
+        f"{diagnosis.expected_change.statement}\n"
+        f"_Verify at: {diagnosis.expected_change.how_to_verify}_"
+    )
+
+
+def _location(diagnosis: Diagnosis) -> str:
+    location = diagnosis.location
+    lines = [
+        f"*Repository:* {render_field(location.repo)}",
+        f"*Commit:* {render_field(location.commit)}",
+    ]
+    if location.terraform_resource:
+        lines.append(f"*Terraform:* `{location.terraform_resource}`")
+    lines.append(
+        "*Files:* " + (", ".join(f"`{path}`" for path in location.paths) or "_none suspected_")
+    )
+    return "\n".join(lines)
+
+
 def _headline(diagnosis: Diagnosis, *, threshold: Confidence, confident: bool) -> str:
     """Two lines: what the reader should take away, then how far to trust it."""
     level = CONFIDENCE_LABEL[diagnosis.confidence]
@@ -93,14 +157,28 @@ def render_incident(
     """
     confident = diagnosis.confidence.at_least(threshold)
     headline = _headline(diagnosis, threshold=threshold, confident=confident)
-    sections = (
-        ReportSection("Symptom", f"{diagnosis.symptom.description}\n_{diagnosis.symptom.window}_"),
-        ReportSection(
-            "Probable cause",
-            f"{_cause(diagnosis)}\nConfidence *{CONFIDENCE_LABEL[diagnosis.confidence]}* — "
-            f"{diagnosis.confidence_rationale}",
+    bodies: dict[TicketSection, str] = {
+        TicketSection.SYMPTOM: _symptom(diagnosis),
+        TicketSection.IMPACT: _impact(diagnosis),
+        TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
+        TicketSection.EVIDENCE: _evidence(diagnosis),
+        TicketSection.LOCATION: _location(diagnosis),
+        TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
+        TicketSection.OUT_OF_SCOPE: _bullets(
+            diagnosis.out_of_scope,
+            empty="The diagnosis named nothing the fix must avoid.",
         ),
-    )
+        TicketSection.RULED_OUT: _bullets(
+            [f"{item.hypothesis} — {item.why}" for item in diagnosis.ruled_out],
+            empty="The diagnosis eliminated no hypothesis, so nothing here has been "
+            "checked and dismissed for you.",
+        ),
+        TicketSection.UNKNOWNS: _bullets(
+            [f"{item.question} — {item.why_unresolved}" for item in diagnosis.unknowns],
+            empty="The diagnosis left no question open.",
+        ),
+    }
+    sections = tuple(ReportSection(section.heading, bodies[section]) for section in TicketSection)
     return SlackReport(
         service=diagnosis.service,
         headline=headline,
