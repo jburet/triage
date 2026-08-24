@@ -38,7 +38,7 @@ infra track, which this release is the first thing to actually need.
 - [x] 2.2 The location names the repository, the deployed commit and the IaC path, and carries the mapping rung: an image-derived commit and a `serves`-pattern one must not read alike (ADR-0019, ADR-0020).
 - [x] 2.3 Every message about one incident lands in the thread opened by `open_incident`, including the recurrence escalations (ADR-0003).
 - [x] 2.4 A report longer than Slack accepts is split at a section boundary, never mid-evidence, and the split is stated.
-- [ ] 2.5 The four causes ruled out and the six unknowns produced by the 2026-08-24 run all appear in the rendered report — the fixture is that run, so the thing this milestone exists to deliver is what the test asserts.
+- [x] 2.5 The two causes ruled out at the 0.30 analysis floor and the six unknowns produced by the 2026-08-24 19:05 run all appear in the rendered report — the fixture is that run, so the thing this milestone exists to deliver is what the test asserts. (The plan said four ruled out; the 19:05 run's own output shows four *ranked* causes, of which two were ruled out at the floor. Corrected to what the run printed.)
 
 ## Phase 3: the analysis image
 

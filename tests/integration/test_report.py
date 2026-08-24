@@ -12,6 +12,7 @@ from tests.conftest import (
     a_workload,
     build_deps,
     fake_datadog,
+    load_diagnosis,
     mapped,
     pod_down_alert,
     run_config,
@@ -378,3 +379,38 @@ async def test_a_report_that_fits_is_one_message_with_no_part_marker(config, oom
 
     (message,) = deps.slack.messages
     assert "Part 1 of" not in message.text
+
+
+async def test_the_2026_08_24_incident_reaches_the_channel_whole(config):
+    """The run this milestone exists for, asserted against what it actually produced.
+
+    On 2026-08-24 at 19:05, F1 ran end to end against a real alert for the first
+    time with no failed model call. It produced four ranked causes, two of them
+    ruled out at the 0.30 analysis floor, five pieces of evidence and six named
+    unknowns each with the reason it could not be settled — and posted four lines
+    saying "No ticket raised for `plt-hcl-software-uat` — confidence low". This
+    is that same diagnosis, and every part of it now arrives.
+    """
+    diagnosis = load_diagnosis("pod_down_20260824")
+    assert (len(diagnosis.ruled_out), len(diagnosis.unknowns), len(diagnosis.evidence)) == (2, 6, 5)
+
+    deps = build_deps(config)
+    state = await run(diagnosis, deps)
+    text = posted(deps)
+
+    assert state["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert deps.slack.messages[0].channel == "#platform-alerts"
+    assert "No ticket raised" not in text
+
+    for item in diagnosis.ruled_out:
+        assert item.hypothesis in text
+        assert item.why in text
+    for item in diagnosis.unknowns:
+        assert item.question in text
+        assert item.why_unresolved in text
+    for item in diagnosis.evidence:
+        assert item.description in text
+
+    assert "0.30 floor for analysis" in text
+    assert "not_instrumented" in text
+    assert "2m49s" in text
