@@ -164,9 +164,33 @@ APPLICATION = SelectionProfile(
     ),
 )
 
+# An infrastructure question is answered from infrastructure files wherever they
+# live, not from files with a `.tf` suffix: on 2026-08-23 three analyses of a
+# real incident answered Unknown because the probe timeouts and memory limits
+# that explained it are in `helm/zeenea-platform/values.yaml` (M6 3.3).
 TERRAFORM = SelectionProfile(
     name="terraform",
-    patterns=("*.tf", "*.tf.json", "*.tfvars", "*.hcl", "README*"),
+    patterns=(
+        "values*.yaml",
+        "values*.yml",
+        "Chart.yaml",
+        "*.tf",
+        "*.tf.json",
+        "*.tfvars",
+        "*.hcl",
+        "templates/*.yaml",
+        "templates/*.yml",
+        "helm/*/*.yaml",
+        "chart/*/*.yaml",
+        "charts/*/*.yaml",
+        "k8s/*.yaml",
+        "k8s/*/*.yaml",
+        "kubernetes/*.yaml",
+        "kubernetes/*/*.yaml",
+        "deploy/*.yaml",
+        "deploy/*/*.yaml",
+        "README*",
+    ),
 )
 
 

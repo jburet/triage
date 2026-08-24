@@ -164,7 +164,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [ ] 3.2 `iac_analysis` gathers from `iac_paths` first and the profile's globs second, so a
       probe timeout in `helm/zeenea-platform/values.yaml` is read; the run on 2026-08-23
       returned `Unknown` three times for exactly this reason.
-- [ ] 3.3 The Terraform selection profile includes Helm and Kubernetes manifests
+- [x] 3.3 The Terraform selection profile includes Helm and Kubernetes manifests
       (`*.yaml` under a chart directory, `values*.yaml`, `templates/*.yaml`), and the
       application profile is unchanged — an infrastructure question is answered from
       infrastructure files wherever they live, not from files with a `.tf` suffix.
