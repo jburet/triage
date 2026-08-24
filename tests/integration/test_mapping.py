@@ -17,9 +17,11 @@ from tests.conftest import (
     declaring,
     fake_datadog_over_days,
     run_config,
+    running_image,
 )
 from triage.graphs.mapping import graph
-from triage.integrations.github import FakeGitHubClient
+from triage.integrations.datadog import FakeDatadogClient
+from triage.integrations.github import FakeGitHubClient, GitHubError
 from triage.schemas.system_map import CommitSource, MappingOutcome, MappingSource, Tenancy
 
 PLATFORM = "github.com/zeenea/platform"
@@ -31,6 +33,18 @@ COMMIT = "9f2c1ab8b0e3d4f5a6b7c8d9e0f1a2b3c4d5e6f7"
 @pytest.fixture
 def zeenea():
     return declaring(PLATFORM, PLATFORM_INFRA)
+
+
+def two_tenants():
+    """The captured tenant, plus a second customer of the same repository."""
+    replay = dict(fake_datadog_over_days().responses)
+    replay["events"] = {
+        **replay["events"],
+        "service:plt-merck-qa": {
+            "data": [running_image("097607883991.dkr.ecr.us-east-1.amazonaws.com/platform:502")]
+        },
+    }
+    return FakeDatadogClient(responses=replay, wide=replay)
 
 
 def deps_for(config, **overrides):
@@ -123,6 +137,25 @@ async def test_a_service_with_no_events_at_all_is_reported_rather_than_dropped(z
     assert "ledger-api" in derivation.reason
     assert state["entries_written"] == 0
     assert deps.repo.workloads == {}
+
+
+async def test_one_unreachable_repository_does_not_cost_the_others_their_mapping(zeenea):
+    """A rate limit is not a mapping failure: the repository and the digest still
+    stand, and only the commit is missing, with the failure as its reason."""
+    deps = build_deps(
+        zeenea,
+        datadog=two_tenants(),
+        github=FakeGitHubClient(error=GitHubError("403: API rate limit exceeded")),
+    )
+
+    state = await run(deps, services=[TENANT, "plt-merck-qa"])
+
+    assert [derivation.outcome for derivation in state["derivations"]] == [
+        MappingOutcome.MAPPED,
+        MappingOutcome.MAPPED,
+    ]
+    assert state["entries_written"] == 2
+    assert "rate limit" in deps.repo.workloads[TENANT].deployed_commit.reason
 
 
 async def test_the_pass_lists_seed_repositories_no_team_claims(zeenea):

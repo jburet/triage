@@ -14,7 +14,7 @@ from pydantic import ValidationError
 
 from tests.conftest import CAPTURED_DIGEST, TENANT, a_workload, declaring
 from triage.config import Repo, RepoKind
-from triage.integrations.github import FakeGitHubClient
+from triage.integrations.github import FakeGitHubClient, GitHubError
 from triage.mapping.commits import with_deployed_commit
 from triage.schemas.common import Unknown
 from triage.schemas.system_map import CommitSource
@@ -213,3 +213,13 @@ async def test_a_tag_github_names_is_preferred_over_the_default_branch(config):
 
     assert entry.deployed_commit == COMMIT
     assert client.branch_reads == []
+
+
+async def test_the_unknown_carries_what_github_said_rather_than_a_generic_failure(config):
+    client = github(error=GitHubError("403: API rate limit exceeded"))
+
+    entry = await with_deployed_commit(client, config, a_workload())
+
+    assert isinstance(entry.deployed_commit, Unknown)
+    assert "rate limit" in entry.deployed_commit.reason
+    assert entry.commit_source is None

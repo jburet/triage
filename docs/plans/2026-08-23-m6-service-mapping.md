@@ -151,7 +151,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       that uses it states that the analysis read the default branch as it stood, because no
       build was identifiable, and cannot reach `high` confidence on that alone (4.2's rule,
       extended to this source).
-- [ ] 2.12 A GitHub read that fails — rate limit, permission, network — leaves an `Unknown`
+- [x] 2.12 A GitHub read that fails — rate limit, permission, network — leaves an `Unknown`
       carrying the failure and the mapping pass continues; one unreachable repository does not
       cost the other nineteen their mapping.
 - [ ] 2.13 A derivation for a digest already mapped makes no GitHub call, on 2.5's rule.
