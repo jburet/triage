@@ -154,7 +154,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [x] 2.12 A GitHub read that fails — rate limit, permission, network — leaves an `Unknown`
       carrying the failure and the mapping pass continues; one unreachable repository does not
       cost the other nineteen their mapping.
-- [ ] 2.13 A derivation for a digest already mapped makes no GitHub call, on 2.5's rule.
+- [x] 2.13 A derivation for a digest already mapped makes no GitHub call, on 2.5's rule.
 
 ## Phase 3: where the workload is defined
 

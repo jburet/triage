@@ -62,15 +62,32 @@ async def _events(deps: Deps, service: str, days: int) -> list[dict[str, object]
 
 
 async def _with_deployed_commit(
-    deps: Deps, derivation: Derivation, at: datetime | None
+    deps: Deps, derivation: Derivation, previous: WorkloadEntry | None, at: datetime | None
 ) -> Derivation:
-    """Ask GitHub which commit this build was cut from, when the image did not say."""
+    """Ask GitHub which commit this build was cut from, when the image did not say.
+
+    Not for a digest already on record: the same digest is the same build, so the
+    commit already written is still the commit, and asking again would spend a
+    rate limit on twenty repositories to learn what is in the row (2.5's rule).
+    """
     entry = derivation.entry
     if entry is None or not derivation.mapped:
         return derivation
-    return derivation.model_copy(
-        update={"entry": await with_deployed_commit(deps.github, deps.config, entry, at=at)}
-    )
+    if (
+        previous is not None
+        and entry.image_digest is not None
+        and (entry.image_digest == previous.image_digest)
+    ):
+        resolved = entry.model_copy(
+            update={
+                "deployed_commit": previous.deployed_commit,
+                "commit_source": previous.commit_source,
+                "commit_read_at": previous.commit_read_at,
+            }
+        )
+    else:
+        resolved = await with_deployed_commit(deps.github, deps.config, entry, at=at)
+    return derivation.model_copy(update={"entry": resolved})
 
 
 def _against_what_is_on_record(
@@ -121,12 +138,11 @@ async def derive_workloads(
                 )
             )
             continue
+        previous = await deps.repo.workload_for_service(service)
         derived = await _with_deployed_commit(
-            deps, derive_workload(deps.config, seed, service, events), state.get("at")
+            deps, derive_workload(deps.config, seed, service, events), previous, state.get("at")
         )
-        derivations.append(
-            _against_what_is_on_record(derived, await deps.repo.workload_for_service(service))
-        )
+        derivations.append(_against_what_is_on_record(derived, previous))
     return {"derivations": derivations}
 
 

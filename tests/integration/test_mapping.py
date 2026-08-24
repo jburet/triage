@@ -199,6 +199,20 @@ async def test_a_second_pass_over_an_unchanged_digest_rewrites_nothing(zeenea):
     assert deps.repo.workloads[TENANT].image_digest == DIGEST
 
 
+async def test_a_second_pass_over_an_unchanged_digest_asks_github_nothing(zeenea):
+    """2.5's rule, one level down: the same digest is the same build, so the commit
+    on record is still the commit and a second read would spend a rate limit to
+    learn what is already written."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(tags={(PLATFORM, "501"): COMMIT}))
+    await run(deps)
+
+    state = await run(deps)
+
+    assert deps.github.tag_lookups == [(PLATFORM, "501")]
+    assert state["derivations"][0].outcome is MappingOutcome.UNCHANGED
+    assert deps.repo.workloads[TENANT].deployed_commit == COMMIT
+
+
 async def test_a_digest_that_moved_is_written_over_the_old_one(zeenea):
     moved = "sha256:" + "a" * 64
     deps = deps_for(zeenea)
