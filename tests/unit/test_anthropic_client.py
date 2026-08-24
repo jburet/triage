@@ -14,8 +14,8 @@ from pydantic import ValidationError
 
 from triage.config import LLMProvider, Settings
 from triage.integrations.github import GitHubError, GitHubRestClient
-from triage.llm import AnthropicClient, LiteLLMClient, StructuredOutputError, tool_name
-from triage.runtime import build_github, build_llm
+from triage.llm import AnthropicClient, LiteLLMClient, StructuredOutputError, build_llm, tool_name
+from triage.runtime import build_github
 from triage.schemas.collection import (
     AlertClassification,
     FollowUpPlan,

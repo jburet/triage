@@ -44,8 +44,9 @@ from triage.config import get_config, get_settings
 from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.graphs.incident import build_graph
 from triage.integrations.datadog import DatadogClient, DatadogRestClient
+from triage.llm import verify_models
 from triage.nodes.collect import classify_alert, collect
-from triage.runtime import DEPS_KEY, Deps, build_deps, build_github, verify_models
+from triage.runtime import DEPS_KEY, Deps, build_deps, build_github
 from triage.schemas.alert import Alert, AlertStatus
 from triage.schemas.collection import AlertClass, AlertClassification, Collection
 from triage.schemas.common import render as render_field

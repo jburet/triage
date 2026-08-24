@@ -32,7 +32,7 @@ from triage.analysis.context import (
     gather,
 )
 from triage.analysis.jobs import JOB_NAME_ENV, REQUEST_ENV
-from triage.llm import StructuredLLM, StructuredOutputError
+from triage.llm import StructuredLLM, StructuredOutputError, build_llm
 from triage.prompts import render
 from triage.schemas.analysis import (
     AnalysisFindings,
@@ -156,8 +156,6 @@ async def main() -> int:
     try:
         # build_llm, not a LiteLLMClient: the sandbox must reach a model the same
         # way the graph does, or the provider that works outside it fails here.
-        from triage.runtime import build_llm
-
         result = await analyse(request, Path.cwd(), build_llm(settings))
     except Exception as exc:
         result = AnalysisResult.failed(request.kind, f"{type(exc).__name__}: {exc}")
