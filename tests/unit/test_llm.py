@@ -6,26 +6,40 @@ no parsable structured output, and the value that then flows through the graph i
 later it is an AttributeError on an unrelated line.
 """
 
+from dataclasses import dataclass, field
+from types import SimpleNamespace
+
 import pytest
 
 from tests.conftest import a_draft, a_verdict
-from triage.llm import FakeLLM, LiteLLMClient, StructuredOutputError
+from triage.llm import AnthropicClient, FakeLLM, LiteLLMClient, StructuredOutputError
 from triage.schemas import ReviewVerdict, TicketDraft
 
 
-class _NullRunnable:
-    async def ainvoke(self, _prompt: str) -> None:
-        return None
+@dataclass
+class _Prose:
+    """A reply that answered in text instead of calling the tool it was given."""
+
+    content: list[SimpleNamespace] = field(
+        default_factory=lambda: [SimpleNamespace(type="text", text="I think it restarted.")]
+    )
+    stop_reason: str = "end_turn"
 
 
-class _NullChat:
-    def with_structured_output(self, *_args: object, **_kwargs: object) -> _NullRunnable:
-        return _NullRunnable()
+@dataclass
+class _AnsweringInProse:
+    messages: object = field(default_factory=lambda: _Prose())
+
+    async def create(self, **_kwargs: object) -> _Prose:
+        return _Prose()
 
 
-async def test_unparsable_structured_output_fails_at_the_call_site(monkeypatch):
-    client = LiteLLMClient("http://proxy.invalid/v1", "key")
-    monkeypatch.setattr(client, "_chat", lambda _tier: _NullChat())
+async def test_unparsable_structured_output_fails_at_the_call_site():
+    client = LiteLLMClient(
+        "http://proxy.invalid/v1",
+        "key",
+        client=SimpleNamespace(messages=_AnsweringInProse()),
+    )
 
     with pytest.raises(StructuredOutputError, match="TicketDraft"):
         await client.call("analysis", "prompt", TicketDraft)
@@ -52,14 +66,13 @@ async def test_fake_refuses_a_schema_it_was_not_given():
         await llm.call("analysis", "a", TicketDraft)
 
 
-def test_parallel_tool_calls_is_never_sent():
-    """A Bedrock-backed proxy 400s on it, and one named tool has nothing to parallelise.
+def test_the_proxy_and_the_api_are_one_implementation():
+    """Not a style point: it is what makes a local run evidence about production.
 
-    LiteLLM cannot translate `parallel_tool_calls` for Bedrock, sweeps the
-    unsupported parameters into `additionalModelRequestFields`, and Bedrock then
-    rejects the whole request: "the additional field tool_choice/type conflicts
-    with the existing field toolConfig.toolChoice.tool". Found on a live run.
+    While the proxy was addressed in the OpenAI shape the two paths differed in
+    how a tool call was encoded, and only one of them corrupted it — which is
+    exactly the kind of difference a local reproduction could never show
+    (ADR-0022).
     """
-    chat = LiteLLMClient("http://proxy.invalid/v1", "key")._chat("analysis")
-
-    assert "parallel_tool_calls" in chat.disabled_params
+    assert issubclass(LiteLLMClient, AnthropicClient)
+    assert LiteLLMClient.call is AnthropicClient.call

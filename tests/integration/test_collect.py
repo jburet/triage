@@ -22,7 +22,7 @@ from tests.conftest import (
 from triage.config import Config
 from triage.integrations.datadog import FakeDatadogClient
 from triage.nodes.collect import classify_alert, collect, follow_up
-from triage.nodes.qualify import qualify
+from triage.nodes.qualify import ATTEMPTS, qualify
 from triage.runtime import Deps
 from triage.schemas.alert import Alert
 from triage.schemas.collection import (
@@ -425,7 +425,8 @@ async def test_the_second_ask_states_the_shape_and_not_only_the_mistake_once_see
             run_config(deps),
         )
 
-    first, second = (call.prompt for call in deps.llm.calls_for(Qualification))
+    first, second, *rest = (call.prompt for call in deps.llm.calls_for(Qualification))
+    assert len(rest) == ATTEMPTS - 2
     assert "correction" not in first
     assert "`causes`" in second
     assert "top-level" in second

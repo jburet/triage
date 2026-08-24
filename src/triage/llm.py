@@ -21,6 +21,7 @@ of the shortcut, and it is why the proxy stays the production path.
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -62,72 +63,6 @@ class StructuredLLM(Protocol):
     """
 
     async def call(self, tier: Tier, prompt: str, schema: type[T]) -> T: ...
-
-
-class LiteLLMClient:
-    """Real client. LiteLLM speaks the OpenAI protocol, so `model` is the alias.
-
-    The tier *is* the model name by default, which is what a proxy configured for
-    Triage publishes. A shared proxy nobody will re-configure for us publishes its
-    own names instead, so ``models`` maps tier to whatever that proxy calls it —
-    from ``TRIAGE_MODEL_*``, the same variables the direct client reads. Graph code
-    still asks for a tier and no model name appears under ``src/``: which model
-    serves a tier stays configuration (ADR-0007).
-    """
-
-    def __init__(
-        self,
-        base_url: str,
-        api_key: str,
-        *,
-        models: Mapping[Tier, str] | None = None,
-        timeout: float = 120.0,
-    ) -> None:
-        self._base_url = base_url
-        self._api_key = api_key
-        self._models = dict(models or {})
-        self._timeout = timeout
-        self._cache: dict[Tier, Any] = {}
-
-    def model_for(self, tier: Tier) -> str:
-        return self._models.get(tier, tier)
-
-    def _chat(self, tier: Tier) -> Any:
-        if tier not in self._cache:
-            from langchain_openai import ChatOpenAI
-
-            self._cache[tier] = ChatOpenAI(
-                model=self.model_for(tier),
-                max_tokens=MAX_TOKENS,
-                # `with_structured_output` sends `parallel_tool_calls: false`, which is
-                # right for OpenAI and fatal behind a Bedrock-backed proxy: LiteLLM
-                # cannot translate it, sweeps the unsupported parameters into
-                # `additionalModelRequestFields`, and Bedrock then rejects the request
-                # with "the additional field tool_choice/type conflicts with the
-                # existing field toolConfig.toolChoice.tool". Nothing is lost — one
-                # tool is named by `tool_choice`, so there is no parallelism to forbid.
-                disabled_params={"parallel_tool_calls": None},
-                base_url=self._base_url,
-                api_key=self._api_key,
-                timeout=self._timeout,
-                temperature=0,
-            )
-        return self._cache[tier]
-
-    async def call(self, tier: Tier, prompt: str, schema: type[T]) -> T:
-        # `function_calling`, not the library default of `json_schema`: behind this
-        # proxy every model is an Anthropic one, where tool use is native and
-        # OpenAI-style `response_format` relies on LiteLLM translating it.
-        runnable = self._chat(tier).with_structured_output(
-            schema, method="function_calling", include_raw=False
-        )
-        result = await runnable.ainvoke(prompt)
-        if result is None:
-            # LangChain returns None when the response carries no parsable
-            # structured output. Failing here names the tier and the schema;
-            # letting it through surfaces as an AttributeError several nodes later.
-            raise StructuredOutputError(tier, schema)
-        return cast(T, result)
 
 
 @dataclass(frozen=True)
@@ -181,6 +116,37 @@ def tool_name(schema: type[BaseModel]) -> str:
     return re.sub(r"[^a-zA-Z0-9_-]", "_", schema.__name__)[:64]
 
 
+def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
+    """Structured fields that arrived as text, decoded back to what they are.
+
+    A tool call is supposed to carry ``input`` as an object, and against the
+    Zeenea proxy on 2026-08-24 it sometimes did not: a field the schema declares
+    as a list arrived as a string holding the model's own JSON with the
+    tool-call markup still trailing it — ``[{…}]</causes>``. The leading value is
+    decoded and the trailing markup dropped; a field the schema already declares
+    as a string is left alone, so nothing that legitimately *is* prose is
+    reinterpreted.
+
+    Parsing, not repair: nothing is invented, the decode has to succeed on its
+    own, and the schema still refuses whatever comes out (ADR-0022).
+    """
+    if not isinstance(arguments, dict):
+        return arguments
+    decoder = json.JSONDecoder()
+    fields = schema.model_fields
+    decoded = dict(arguments)
+    for name, value in arguments.items():
+        field_info = fields.get(name)
+        if field_info is None or not isinstance(value, str) or field_info.annotation is str:
+            continue
+        try:
+            parsed, _ = decoder.raw_decode(value.strip())
+        except ValueError:
+            continue
+        decoded[name] = parsed
+    return decoded
+
+
 class AnthropicClient:
     """Direct Anthropic access, for local development without the LiteLLM proxy.
 
@@ -201,12 +167,14 @@ class AnthropicClient:
         api_key: str | None,
         models: Mapping[Tier, str],
         *,
+        base_url: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
         max_tokens: int = MAX_TOKENS,
         client: Any = None,
     ) -> None:
         self._api_key = api_key
         self._models = dict(models)
+        self.base_url = base_url
         self._timeout = timeout
         self._max_tokens = max_tokens
         self._client = client
@@ -221,11 +189,12 @@ class AnthropicClient:
         if self._client is None:
             from anthropic import AsyncAnthropic
 
-            self._client = (
-                AsyncAnthropic(api_key=self._api_key, timeout=self._timeout)
-                if self._api_key
-                else AsyncAnthropic(timeout=self._timeout)
-            )
+            options: dict[str, Any] = {"timeout": self._timeout}
+            if self._api_key:
+                options["api_key"] = self._api_key
+            if self.base_url:
+                options["base_url"] = self.base_url
+            self._client = AsyncAnthropic(**options)
         return self._client
 
     def model_for(self, tier: Tier) -> str:
@@ -255,5 +224,53 @@ class AnthropicClient:
             raise StructuredOutputError(tier, schema)
         for block in message.content:
             if getattr(block, "type", None) == "tool_use":
-                return schema.model_validate(block.input)
+                return schema.model_validate(_decoded(block.input, schema))
         raise StructuredOutputError(tier, schema)
+
+
+class LiteLLMClient(AnthropicClient):
+    """The proxy. The same request the API takes, sent to the proxy's own URL.
+
+    LiteLLM serves the Anthropic protocol on the same host it serves the OpenAI
+    one, so addressing it this way costs nothing in guardrails — the aliases
+    resolve and the spend caps apply exactly as before — and buys back native
+    tool use. That matters because the OpenAI shape is a translation: the proxy
+    has to rebuild ``function.arguments`` as a JSON string from what the model
+    returned, and it does not always rebuild it correctly (ADR-0022).
+
+    The tier *is* the model name by default, which is what a proxy configured
+    for Triage publishes. A shared proxy nobody will re-configure for us
+    publishes its own names instead, so ``models`` maps tier to whatever that
+    proxy calls it — from ``TRIAGE_MODEL_*``, the same variables the direct
+    client reads. Graph code still asks for a tier and no model name appears
+    under ``src/`` (ADR-0007).
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        models: Mapping[Tier, str] | None = None,
+        timeout: float = DEFAULT_TIMEOUT,
+        max_tokens: int = MAX_TOKENS,
+        client: Any = None,
+    ) -> None:
+        super().__init__(
+            api_key,
+            models or {},
+            base_url=_without_openai_path(base_url),
+            timeout=timeout,
+            max_tokens=max_tokens,
+            client=client,
+        )
+
+    def model_for(self, tier: Tier) -> str:
+        """The alias, or the tier itself — never a refusal, unlike the direct client."""
+        return self._models.get(tier, tier)
+
+
+def _without_openai_path(url: str) -> str:
+    """``/v1`` is the OpenAI-shaped route; the SDK appends its own ``/v1/messages``."""
+    trimmed = url.rstrip("/")
+    return trimmed[: -len("/v1")].rstrip("/") if trimmed.endswith("/v1") else trimmed

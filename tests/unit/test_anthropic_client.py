@@ -213,3 +213,75 @@ async def test_an_unset_github_token_names_the_variable_rather_than_returning_40
 
 def test_a_configured_github_token_builds_the_real_client():
     assert isinstance(build_github(a_settings(github_token="ghp-test")), GitHubRestClient)
+
+
+def a_proxy_client(reply: Reply) -> tuple[LiteLLMClient, StubMessages]:
+    messages = StubMessages(reply)
+    client = LiteLLMClient(
+        "https://litellm.example.test/v1",
+        "sk-proxy",
+        models={"analysis": "an-alias"},
+        client=StubAnthropic(messages),
+    )
+    return client, messages
+
+
+async def test_the_proxy_is_asked_the_same_way_the_api_is():
+    """One forced tool call, not an OpenAI-shaped `function_calling` round trip.
+
+    Measured on 2026-08-24 against the real proxy: the OpenAI shape returned a
+    parsable `Qualification` 4 times in 8, the Anthropic shape 6 — and the four
+    losses carried `</summary>` and `<parameter name=…>` markup cut out of the
+    model's answer by a partial parser, a failure the native shape cannot have
+    (ADR-0022).
+    """
+    client, messages = a_proxy_client(Reply(content=[CLASSIFIED]))
+
+    await client.call("analysis", "why did it restart?", AlertClassification)
+
+    (request,) = messages.requests
+    assert request["tool_choice"] == {"type": "tool", "name": tool_name(AlertClassification)}
+    assert request["tools"][0]["input_schema"] == AlertClassification.model_json_schema()
+    assert "response_format" not in request
+
+
+async def test_the_proxy_keeps_resolving_a_tier_it_was_given_no_name_for():
+    """The tier *is* the model name on a proxy configured for Triage; only a
+    shared proxy publishing its own names needs `TRIAGE_MODEL_*` (ADR-0007)."""
+    client, messages = a_proxy_client(Reply(content=[CLASSIFIED]))
+
+    await client.call("triage", "classify", AlertClassification)
+    await client.call("analysis", "classify", AlertClassification)
+
+    assert [request["model"] for request in messages.requests] == ["triage", "an-alias"]
+
+
+def test_the_proxy_is_addressed_at_its_root_not_its_openai_path():
+    """The SDK appends `/v1/messages`; leaving `/v1` on would ask for `/v1/v1/…`."""
+    client = LiteLLMClient("https://litellm.example.test/v1", "sk-proxy")
+
+    assert client.base_url == "https://litellm.example.test"
+
+
+async def test_a_list_that_arrived_as_text_is_decoded_rather_than_refused():
+    """The observed corruption: the value is the model's own JSON with the
+    tool-call markup still trailing it. Decoding the leading value is parsing,
+    not repair — nothing is invented and the schema still has the last word."""
+    client, _ = a_proxy_client(
+        Reply(
+            content=[
+                Block(
+                    type="tool_use",
+                    input={
+                        "alert_class": '"crash_restart"</alert_class>\n',
+                        "reason": "the container exited 137",
+                    },
+                )
+            ]
+        )
+    )
+
+    result = await client.call("analysis", "classify", AlertClassification)
+
+    assert result.alert_class.value == "crash_restart"
+    assert result.reason == "the container exited 137"

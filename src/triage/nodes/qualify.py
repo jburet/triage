@@ -49,8 +49,19 @@ async def _resolve(deps: Deps, cause: ProposedCause) -> Hypothesis:
     )
 
 
+ATTEMPTS = 3
+"""Measured, not chosen: against the real collection one ask in two comes back malformed.
+
+Eight calls of the live `qualify` prompt returned a valid `Qualification` four
+times (ADR-0022). At that rate two asks lose one run in four and three lose one
+in eight, which is the difference between an alert class nobody trusts and one
+that mostly works. A fourth ask buys a sixteenth for another `analysis` call on
+every failure, and the notice already covers what gets through.
+"""
+
+
 async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
-    """Ask once; ask again with the shape. Then let it fail.
+    """Ask, and ask again with the shape, up to ``ATTEMPTS`` times.
 
     Everything downstream is built from the causes, so an answer that does not
     parse costs the collection that produced it.
@@ -61,18 +72,22 @@ async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
     bought a second answer that failed differently — one cause's fields flattened
     into the wrapper. Both are `causes` absent; only the second was a surprise.
     """
-    try:
-        return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
-    except (StructuredOutputError, ValidationError) as exc:
-        log.warning("qualification_rejected", error=str(exc))
-        sections["correction"] = (
-            f"Your previous answer did not satisfy the schema and was discarded. The tool "
-            f"call must carry a top-level `causes` array, holding one object per cause with "
-            f"its own `cause_type`, `service`, `description` and `rank_score`. Do not merge "
-            f"a cause's fields into the wrapper alongside `summary`, and never write the "
-            f"causes as text or markup inside `summary`. The validator reported:\n{exc}"
-        )
-    return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+    for attempt in range(ATTEMPTS):
+        try:
+            return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+        except (StructuredOutputError, ValidationError) as exc:
+            log.warning("qualification_rejected", attempt=attempt + 1, error=str(exc))
+            if attempt == ATTEMPTS - 1:
+                raise
+            sections["correction"] = (
+                f"Your previous answer did not satisfy the schema and was discarded. The "
+                f"tool call must carry a top-level `causes` array, holding one object per "
+                f"cause with its own `cause_type`, `service`, `description` and "
+                f"`rank_score`. Do not merge a cause's fields into the wrapper alongside "
+                f"`summary`, and never write the causes as text or markup inside `summary`. "
+                f"The validator reported:\n{exc}"
+            )
+    raise AssertionError("unreachable: the last attempt either returns or raises")
 
 
 async def _hand_to_the_team(deps: Deps, state: IncidentState, service: str, exc: Exception) -> None:

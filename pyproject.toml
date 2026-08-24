@@ -9,7 +9,6 @@ dependencies = [
     "langgraph>=0.2.60",
     "langgraph-checkpoint-postgres>=2.0.0",
     "langchain-core>=0.3.29",
-    "langchain-openai>=0.2.14",
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "pyyaml>=6.0.2",
@@ -64,7 +63,7 @@ packages = ["triage"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["langgraph.*", "langchain_openai.*", "slack_sdk.*"]
+module = ["langgraph.*", "slack_sdk.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
