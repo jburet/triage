@@ -77,9 +77,9 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
 
     if hypothesis.cause_type is CauseType.INFRA:
         workload = await deps.repo.workload_for_service(hypothesis.service)
-        mapped = workload.iac_repo_url if workload else None
-        repo_url = mapped or _terraform_repo(deps, state.get("team", ""))
-        paths = list(workload.iac_paths) if workload and mapped else []
+        mapped_repo = workload.iac_repo_url if workload else None
+        repo_url = mapped_repo or _terraform_repo(deps, state.get("team", ""))
+        paths = list(workload.iac_paths) if workload and mapped_repo else []
         if repo_url is None:
             return Investigated(
                 hypothesis=hypothesis,

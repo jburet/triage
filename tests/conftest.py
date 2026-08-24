@@ -214,6 +214,10 @@ def some_findings(**overrides: object) -> AnalysisFindings:
                 "paths": ["src/payments/idempotency.py"],
             }
         ],
+        "configured_values": {
+            "unknown": True,
+            "reason": "the answer is in the code, not in a value anything configures",
+        },
         "confidence": "high",
     }
     base.update(overrides)

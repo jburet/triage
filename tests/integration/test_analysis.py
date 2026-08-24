@@ -29,6 +29,7 @@ from triage.schemas import (
     Feature,
     Unknown,
 )
+from triage.schemas.analysis import AnalysisStatus
 
 
 def graph():
@@ -294,6 +295,45 @@ async def test_a_service_with_no_mapped_chart_still_reads_the_teams_terraform_re
     request = deps.runner.requests_for(AnalysisKind.IAC_ANALYSIS)[0]
     assert request.repo_url == "github.com/org/infra"
     assert request.paths == []
+
+
+async def test_a_value_the_tenant_overrides_reaches_the_diagnosis_as_the_unknown_it_is(
+    config: Config,
+):
+    """M6 3.4: the chart's 1s is the chart's. What this customer's StatefulSet was
+    given is a per-tenant override the analysis never saw, and the synthesis has to
+    be told that rather than handed a number to quote."""
+    unreadable = some_findings(
+        configured_values=[
+            {
+                "setting": "readinessProbe.timeoutSeconds",
+                "chart_default": "1, in helm/zeenea-platform/values.yaml",
+                "tenant_value": {
+                    "unknown": True,
+                    "reason": "this tenant's overrides are not in this repository",
+                },
+            }
+        ]
+    )
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry()),
+        runner=FakeAnalysisRunner(
+            results={
+                AnalysisKind.CODE_ANALYSIS: AnalysisResult(
+                    kind=AnalysisKind.CODE_ANALYSIS,
+                    status=AnalysisStatus.SUCCEEDED,
+                    result=unreadable,
+                )
+            }
+        ),
+    )
+
+    await run(deps, hypotheses=[a_hypothesis()])
+
+    prompt = deps.llm.calls[-1].prompt
+    assert "this tenant's overrides are not in this repository" in prompt
+    assert "readinessProbe.timeoutSeconds" in prompt
 
 
 async def test_a_commit_read_off_the_default_branch_is_never_presented_as_the_deployed_one(

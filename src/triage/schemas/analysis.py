@@ -57,6 +57,43 @@ class Finding(BaseModel):
     )
 
 
+class ConfiguredValue(BaseModel):
+    """One setting an answer rests on, split into what the code declares and what runs.
+
+    A number read out of a chart's ``values.yaml`` is *the chart's*. The
+    mono-tenant platform runs one StatefulSet per customer with forty-odd
+    per-tenant parameters and three performance profiles over that chart, so
+    this tenant's number is an override the analysis cannot see — and the
+    default quoted as the tenant's value is a wrong answer that reads like a
+    right one (M6 3.4). They are two fields so there is nowhere to put the
+    confusion.
+    """
+
+    setting: Filled = Field(description="The parameter, as the chart or module spells it.")
+    chart_default: MaybeUnknown = Field(
+        description="What the shared chart or module declares, and the file it is declared in."
+    )
+    tenant_value: MaybeUnknown = Field(
+        description=(
+            "What this service is actually configured with. An override this analysis "
+            "cannot read is an Unknown saying so, never the default repeated."
+        )
+    )
+    tenant_value_read_in: Filled | None = Field(
+        default=None, description="The file this service's own value was read in."
+    )
+
+    @model_validator(mode="after")
+    def _a_tenant_value_names_where_it_was_read(self) -> ConfiguredValue:
+        if isinstance(self.tenant_value, str) and not self.tenant_value_read_in:
+            raise ValueError(
+                f"{self.setting}: a value claimed as this service's own has to name the file "
+                f"it was read in. The chart's own number belongs in chart_default; an "
+                f"override that could not be read is an Unknown saying so."
+            )
+        return self
+
+
 class AnalysisFindings(BaseModel):
     """Answer to a question asked about code or IaC at a commit.
 
@@ -67,6 +104,13 @@ class AnalysisFindings(BaseModel):
 
     answer: MaybeUnknown = Field(description="Direct answer to the question that was asked.")
     findings: Listed[Finding] | Unknown
+    configured_values: Listed[ConfiguredValue] | Unknown = Field(
+        description=(
+            "The settings this answer rests on, each split between what the code declares "
+            "and what this service runs. An Unknown when the answer rests on none, or when "
+            "no file that would carry them was read."
+        )
+    )
     confidence: Confidence
 
 

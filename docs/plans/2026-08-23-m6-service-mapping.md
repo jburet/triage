@@ -168,7 +168,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
       (`*.yaml` under a chart directory, `values*.yaml`, `templates/*.yaml`), and the
       application profile is unchanged — an infrastructure question is answered from
       infrastructure files wherever they live, not from files with a `.tf` suffix.
-- [ ] 3.4 A per-tenant value that overrides the chart default (the 40+ per-tenant parameters,
+- [x] 3.4 A per-tenant value that overrides the chart default (the 40+ per-tenant parameters,
       the three performance profiles) is reported as an unknown when it cannot be read, rather
       than the chart default being quoted as this tenant's value.
 
