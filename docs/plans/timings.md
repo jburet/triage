@@ -100,3 +100,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M6 live GitHub | make run-mapping ARGS="plt-hcl-software-uat" (live Datadog + live GitHub) | 3 |
 | 2026-08-24 | ADR-0021 declares | make lint + make test (588 passed) | 12 |
 | 2026-08-24 | ADR-0021 proof | make run-mapping ARGS="plt-hcl-software-uat" (live, chart resolved) | 4 |
+| 2026-08-24 | F1 live attempt | make run-incident (live Datadog ok; LiteLLM proxy unreachable, killed) | 622 |
+| 2026-08-24 | F1 live run | make run-incident (live Datadog + LiteLLM; died at qualify, schema shape) | 43 |

@@ -14,6 +14,8 @@ a ref that does not exist, and its failure looks like an infrastructure problem
 rather than a fabrication.
 """
 
+import json
+
 import structlog
 from langchain_core.runnables import RunnableConfig
 from pydantic import ValidationError
@@ -48,23 +50,58 @@ async def _resolve(deps: Deps, cause: ProposedCause) -> Hypothesis:
 
 
 async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
-    """Ask once; ask again with the error. Then let it fail.
+    """Ask once; ask again with the shape. Then let it fail.
 
     Everything downstream is built from the causes, so an answer that does not
-    parse costs the collection that produced it. The one observed failure —
-    the causes written as markup inside the summary — is exactly the kind a model
-    fixes when shown the validator's complaint.
+    parse costs the collection that produced it.
+
+    The correction states the shape the tool call must have, not the mistake that
+    was made. On 2026-08-24, against the first real collection, the first answer
+    wrote the causes as markup inside the summary and a correction naming *that*
+    bought a second answer that failed differently — one cause's fields flattened
+    into the wrapper. Both are `causes` absent; only the second was a surprise.
     """
     try:
         return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
     except (StructuredOutputError, ValidationError) as exc:
         log.warning("qualification_rejected", error=str(exc))
         sections["correction"] = (
-            f"Your previous answer did not satisfy the schema and was discarded. "
-            f"Answer again, putting each cause in the `causes` list as a separate "
-            f"object — never as text inside `summary`. The validator reported:\n{exc}"
+            f"Your previous answer did not satisfy the schema and was discarded. The tool "
+            f"call must carry a top-level `causes` array, holding one object per cause with "
+            f"its own `cause_type`, `service`, `description` and `rank_score`. Do not merge "
+            f"a cause's fields into the wrapper alongside `summary`, and never write the "
+            f"causes as text or markup inside `summary`. The validator reported:\n{exc}"
         )
     return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+
+
+async def _hand_to_the_team(deps: Deps, state: IncidentState, service: str, exc: Exception) -> None:
+    """Say what was collected and that nothing will be made of it.
+
+    The collection is what the run is worth: real Datadog calls over a window
+    that closes, reduced and budgeted. Letting a schema failure take it down with
+    the run leaves the team an alert and nothing else, when what Triage holds is
+    exactly the telemetry they would have gone and read.
+
+    The notice says this is Triage's own failure. The exception is re-raised
+    after it, on ``run_incident``'s reasoning: a broken Triage must not look like
+    a quiet one.
+    """
+    team = state.get("team")
+    channel = deps.config.team(team).slack_channel if team else deps.config.platform_channel()
+    collected = collection_payload(state["collection"], deps.config.collection)
+    await deps.slack.post(
+        channel=channel,
+        text=(
+            f":rotating_light: Triage could not qualify `{service}` — the model returned no "
+            f"`causes` twice, so there is no analysis and no ticket for this alert.\n"
+            f"*Validator:* {exc}\n"
+            f"The collection is attached and complete; this is Triage's own failure, not a "
+            f"quiet incident."
+        ),
+        attachment=json.dumps(collected, indent=2, default=str),
+        thread_ts=state.get("thread_ts"),
+    )
 
 
 async def qualify(state: IncidentState, config: RunnableConfig | None = None) -> IncidentState:
@@ -87,7 +124,11 @@ async def qualify(state: IncidentState, config: RunnableConfig | None = None) ->
             }
         ),
     }
-    qualification = await _qualified(deps, sections)
+    try:
+        qualification = await _qualified(deps, sections)
+    except (StructuredOutputError, ValidationError) as exc:
+        await _hand_to_the_team(deps, state, service, exc)
+        raise
     hypotheses = [await _resolve(deps, cause) for cause in qualification.causes]
     return {
         "qualification": qualification,

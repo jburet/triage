@@ -5,6 +5,9 @@ asserted is what Triage would have collected on 2026-08-22 at 00:47 UTC — the
 alert that settled ADR-0016 by hand.
 """
 
+import pytest
+from pydantic import ValidationError
+
 from tests.conftest import (
     a_follow_up,
     a_qualification,
@@ -358,3 +361,72 @@ async def test_an_unresolvable_commit_changes_the_cause_rather_than_inventing_on
     assert unmapped.commit is None
     assert mapped_without_commit.cause_type is CauseType.INFRA
     assert mapped_without_commit.commit is None
+
+
+def _the_shape_returned_live(_prompt: str) -> Qualification:
+    """What the model answered twice against the real 2026-08-24 collection.
+
+    First `<causes>[]</causes>` written inside `summary`, then — after the
+    correction — one cause flattened into the wrapper. Both are the same defect:
+    `causes` absent. Re-validating it here raises the identical error.
+    """
+    return Qualification.model_validate({"summary": "Single pod restart.", "rank_score": 0.6})
+
+
+async def test_a_qualification_that_will_not_take_shape_is_handed_to_the_team(config: Config):
+    """The collection cost real Datadog calls and is the whole value of the run;
+    losing it because the model would not fill a list leaves nobody anything."""
+    deps = build_deps(config, datadog=fake_datadog(), qualifications=_the_shape_returned_live)
+    collection = await swept(deps)
+
+    with pytest.raises(ValidationError):
+        await qualify(
+            {
+                "alert": pod_down_alert(),
+                "collection": collection,
+                "service": "payments-api",
+                "team": "payments",
+                "thread_ts": "1755000000.000100",
+            },
+            run_config(deps),
+        )
+
+    (notice,) = deps.slack.in_thread("1755000000.000100")
+    assert "payments-api" in notice.text
+    assert notice.attachment is not None
+    assert "kubernetes.containers.restarts" in notice.attachment
+
+
+async def test_the_failure_is_reported_as_triages_own_and_not_as_a_quiet_incident(config: Config):
+    deps = build_deps(config, datadog=fake_datadog(), qualifications=_the_shape_returned_live)
+    collection = await swept(deps)
+
+    with pytest.raises(ValidationError):
+        await qualify(
+            {"alert": pod_down_alert(), "collection": collection, "service": "payments-api"},
+            run_config(deps),
+        )
+
+    (notice,) = deps.slack.messages
+    assert "causes" in notice.text
+    assert "no analysis" in notice.text.lower()
+
+
+async def test_the_second_ask_states_the_shape_and_not_only_the_mistake_once_seen(config: Config):
+    """The first correction named the one failure that had been observed. The
+    model's next answer failed differently, which is what a correction written
+    about a symptom rather than about the shape buys."""
+    deps = build_deps(config, datadog=fake_datadog(), qualifications=_the_shape_returned_live)
+    collection = await swept(deps)
+
+    with pytest.raises(ValidationError):
+        await qualify(
+            {"alert": pod_down_alert(), "collection": collection, "service": "payments-api"},
+            run_config(deps),
+        )
+
+    first, second = (call.prompt for call in deps.llm.calls_for(Qualification))
+    assert "correction" not in first
+    assert "`causes`" in second
+    assert "top-level" in second
+    assert "merge" in second
