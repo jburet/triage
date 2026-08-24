@@ -31,6 +31,8 @@ can override it without touching code.
 | [0016](0016-datadog-collected-by-triage.md) | Triage collects Datadog telemetry itself, over REST | Proposed |
 | [0017](0017-alert-ingestion-by-polling.md) | Alerts arrive by polling the Datadog event stream | Proposed |
 | [0018](0018-alert-persistence-gate.md) | An alert is analysed only once it has persisted | Proposed |
+| [0019](0019-workload-mapping-from-the-running-image.md) | A service is mapped to its repository by the image it is running | Proposed |
+| [0020](0020-a-commit-nothing-observed-is-never-the-deployed-one.md) | A commit nothing observed is never presented as the deployed one | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

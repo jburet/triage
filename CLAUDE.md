@@ -9,10 +9,14 @@ developer can act on without further investigation. It is **read-only on every p
 system, writes only to Slack and Jira, and never invents** — an unfillable field is an
 `Unknown` with a reason, enforced by the Pydantic schemas rather than by prompt text.
 
-Current state (see `docs/architecture.md` §10): **M1 (ticket pipeline), M2 (F0 cartography)
-and M3 (Analysis sub-graph, F1 incidents, Datadog collection, alert poller)** exist in code.
-Nothing has run against a live Datadog, Jira, GitHub or Kubernetes: every test replays a
-fixture. F3 (daily DB review), the FastAPI ingress, the analysis Job image for the
+Current state (see `docs/architecture.md` §10): **M1 (ticket pipeline), M2 (F0 cartography),
+M3 (Analysis sub-graph, F1 incidents, Datadog collection, alert poller) and M6 (the service
+map: workload → repository → deployed commit → chart path)** exist in code. Only Datadog has
+ever been read live — `make run-mapping` and `make run-incident` against the real org; Jira,
+GitHub and Kubernetes have never been spoken to, and every test replays a fixture. Against
+the shipped example `config.yaml` the mapping resolves a repository and no commit, because
+no real Zeenea repository is declared: declaring them is the prerequisite for M6 being worth
+running. F3 (daily DB review), the FastAPI ingress, the analysis Job image for the
 investigative kinds, and the whole infra track are not built.
 Design docs: `docs/roadmap.md` (product), `docs/architecture.md` (system),
 `docs/ticket-spec.md` (what a finished ticket must contain), `docs/adr/` (decisions, each
@@ -31,6 +35,9 @@ make test                # uv run pytest -q  — offline: no DB, no network, no 
 uv run pytest tests/integration/test_ticket_pipeline.py -k oom      # single file / test
 uv run ruff format src tests evals scripts                          # apply formatting
 make run-fixture [FIXTURE=tests/fixtures/diagnoses/<name>.json]     # run pipeline on a fixture; calls real model tiers via LiteLLM, Jira/Slack faked
+make run-mapping [ARGS="--days 14 --db plt-hcl-software-uat"]   # derive the service map from
+                         # real Datadog events and print the pass's report; read-only, no model call
+make repository-map      # regenerate config/repository-map.yaml from the architecture document
 make capture-datadog ARGS="find 'pod down'"   # then `triggers <id>`, then
                          # `capture <id> <iso-time> --slug <name> --scope service:<x>`; read-only,
                          # writes tests/fixtures/datadog/<slug>/, needs a Datadog key
@@ -49,13 +56,14 @@ in-memory. Secrets come from `.env` with the `TRIAGE_` prefix (`src/triage/confi
 
 **Graph wiring** — one `StateGraph` per graph in `src/triage/graphs/`, one state TypedDict
 each in `graphs/state.py` (all `total=False`), one module per node under `src/triage/nodes/`,
-routing functions in the graph module. `langgraph.json` registers five:
+routing functions in the graph module. `langgraph.json` registers six:
 
 - `ticket_pipeline` — `record_diagnosis → dedup_check → (update_existing_ticket | confidence_gate) → (notify_below_threshold | compose_ticket → self_review → create_ticket | retry | notify_review_exhausted)`. The retry budget counts composes (`thresholds.max_compose_attempts`).
 - `cartography` — F0; see ADR-0006, ADR-0015.
 - `analysis` — `select_hypotheses → run_analyses → diagnose`. Shared by F1 and F3.
 - `incident` — F1: `open_incident → classify_alert → collect → follow_up ⟲ → qualify → [analysis] → [ticket_pipeline] → draft_postmortem? → settle_signal`. `IncidentState` inherits `AnalysisState` and `TicketPipelineState` so both compiled sub-graphs can be added as nodes.
 - `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
+- `service_mapping` — M6: `select_services → derive_workloads → persist_workloads → report_mapping`. No model call anywhere on it; see ADR-0019, ADR-0020.
 
 **Dependency injection** — nodes are plain async functions; collaborators arrive as a
 `Deps` dataclass (`runtime.py`) in `RunnableConfig["configurable"]["deps"]`, read via
@@ -95,6 +103,19 @@ limits, `FakeDatadogClient` replaying `tests/fixtures/datadog/`), `platform.py` 
 on the LangGraph Platform; absent → in-process, ADR-0011). All are unverified against live
 services. A ticket key the model was not shown is discarded at dedup.
 
+**The service map** — `src/triage/mapping/` is pure functions joining what is already
+structured, so the derivation is a rule and never a tier call: `seed.py` (the architecture
+document's repository table, generated into `config/repository-map.yaml` by
+`make repository-map`), `images.py` and `derive.py` (the running image names the
+repository — a name no repository claims, `plt-hcl-software-uat`, is what F0's map cannot
+key on), `commits.py` (the build number is a GitHub tag; failing that the default branch,
+which is never presented as the deployed commit — the two confidence caps and their caveats
+live here), `iac.py` (which chart in the IaC repository defines *this* workload),
+`resolve.py` (unclaimed repositories, the mono-tenancy naming rule), `report.py` (what the
+pass could and could not attribute). `scope.deployed_repo` consults the derived workload,
+then F0's map, then `config.yaml`'s `serves` patterns, and records which of the three
+answered.
+
 **F1 collection** — `src/triage/collect/` is pure functions over Datadog responses, with no
 graph knowledge: `recipes.py` (window rule, alert-class recipes, the monitor-query idiom),
 `reduce.py` (log templating, event diffing, timeseries downsampling), `sweep.py` (the fixed
@@ -104,7 +125,8 @@ a team by glob pattern and to an environment through the cluster map — never f
 tag, which no alert carries usefully (ADR-0017).
 
 **Persistence** — nodes depend on the `TriageRepository` protocol (`db/repo.py`), never on
-the ORM; a `signals` row is one alert *cycle* (monitor, firing group, duration, recovery) and
+the ORM; a `workloads` row is one running service joined to the repository whose code it
+runs (M6); a `signals` row is one alert *cycle* (monitor, firing group, duration, recovery) and
 its status carries the persistence gate — `received → waiting → analysing → diagnosed →
 ticketed|discarded`, with the terminal `self_recovered` and `out_of_scope` (ADR-0018); `InMemoryRepository` is used in tests and dry-run, `SqlRepository` otherwise.
 Tables live in a dedicated `triage` Postgres schema (shared DB with LangGraph Platform
