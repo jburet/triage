@@ -286,6 +286,32 @@ async def test_a_collector_triage_does_not_have_is_discarded_and_kept(config: Co
     assert "'grafana_dashboards' is not a collector" in result["collection"].refused[0]
 
 
+async def test_a_plan_that_will_not_take_shape_is_recorded_and_not_read_as_enough(
+    config: Config,
+):
+    """An empty plan means the sweep answers the question. A failed one does not.
+
+    Both used to leave the same state — `followup_done`, nothing collected, no
+    trace — so a run that lost the collection the model had planned was
+    indistinguishable from one that never needed it, in the log and in the
+    prompt the diagnosis is written from.
+    """
+
+    def will_not_parse(_prompt: str) -> FollowUpPlan:
+        raise ValidationError.from_exception_data("FollowUpPlan", [])
+
+    deps = build_deps(config, datadog=fake_datadog(), follow_ups=will_not_parse)
+    collection = await swept(deps)
+
+    result = await follow_up(
+        {"alert": pod_down_alert(), "collection": collection, "window": collection.window},
+        run_config(deps),
+    )
+
+    assert result["followup_done"] is True
+    assert "no further collection was planned" in result["collection"].refused[0]
+
+
 async def test_the_loop_stops_when_the_analysis_tier_says_it_has_enough(config: Config):
     deps = build_deps(config, datadog=fake_datadog(), follow_ups=[a_follow_up()])
     collection = await swept(deps)

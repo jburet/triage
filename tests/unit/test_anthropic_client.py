@@ -419,3 +419,40 @@ async def test_a_field_that_is_meant_to_be_an_object_is_left_alone():
 
     with pytest.raises(ValidationError):
         await client.call("analysis", "qualify", Qualification)
+
+
+async def test_a_list_wrapped_twice_is_unwrapped_to_the_end():
+    """What the 2026-08-24 18:39 run actually produced: the envelope was doubled.
+
+    Peeling one layer left `{"requests": [...]}` still sitting in the `requests`
+    field, so the validator reported the same `Input should be a valid list` on
+    the same field — a failure that read exactly like the one the unwrap had just
+    been written to fix. The envelope is peeled to the value inside, however many
+    layers of its own name it arrived in.
+    """
+    client, _ = a_proxy_client(
+        Reply(
+            content=[
+                Block(
+                    type="tool_use",
+                    input={
+                        "requests": {
+                            "requests": {
+                                "requests": [
+                                    {
+                                        "collector": "events_namespace",
+                                        "why": "who sent the kill",
+                                        "query": "kube_namespace:hcl-software-uat",
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                )
+            ]
+        )
+    )
+
+    result = await client.call("analysis", "anything else?", FollowUpPlan)
+
+    assert [request.collector for request in result.requests] == ["events_namespace"]

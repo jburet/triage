@@ -127,6 +127,13 @@ async def follow_up(state: IncidentState, config: RunnableConfig | None = None) 
         return {"followup_done": True}
 
     plan = await _plan_follow_up(deps, state, collection)
+    if plan is None:
+        return {
+            "collection": collection.model_copy(
+                update={"refused": [*collection.refused, PLAN_UNREADABLE]}
+            ),
+            "followup_done": True,
+        }
     if not plan.requests:
         return {"followup_done": True}
 
@@ -151,7 +158,22 @@ async def follow_up(state: IncidentState, config: RunnableConfig | None = None) 
     }
 
 
-async def _plan_follow_up(deps: Deps, state: IncidentState, collection: Collection) -> FollowUpPlan:
+PLAN_UNREADABLE = (
+    "The follow-up plan could not be read: the model's answer did not satisfy FollowUpPlan, "
+    "so no further collection was planned. What follows is the fixed sweep and nothing else — "
+    "not a judgement that the sweep was sufficient."
+)
+"""Said in the collection, because the diagnosis is written from the collection.
+
+An unreadable plan and an empty one leave the same state — nothing more
+collected, the loop over — and mean opposite things: one is the model saying the
+sweep answers the question, the other is Triage losing the calls it asked for.
+"""
+
+
+async def _plan_follow_up(
+    deps: Deps, state: IncidentState, collection: Collection
+) -> FollowUpPlan | None:
     try:
         return await deps.llm.call(
             "analysis",
@@ -170,7 +192,7 @@ async def _plan_follow_up(deps: Deps, state: IncidentState, collection: Collecti
         )
     except Exception as exc:
         log.warning("follow_up_not_planned", error=str(exc))
-        return FollowUpPlan()
+        return None
 
 
 def route_after_follow_up(state: IncidentState) -> Literal["follow_up", "qualify"]:

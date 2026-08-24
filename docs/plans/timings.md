@@ -107,3 +107,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | ADR-0022 probes | ~80 analysis calls measuring the malformed-tool-call rate | 900 |
 | 2026-08-24 | ADR-0022 strict | direct-API probes: 3/8 plain, 6/6 strict, ~40 calls | 420 |
 | 2026-08-24 | F1 end to end | make run-incident, direct provider, live Datadog + 4 tier calls | 100 |
+| 2026-08-24 | follow_up unwrap | make lint | 1 |
+| 2026-08-24 | follow_up unwrap | make test (605) | 3 |

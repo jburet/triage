@@ -181,6 +181,19 @@ def _strictly(schema: dict[str, Any]) -> dict[str, Any]:
     return schema
 
 
+def _unenveloped(value: Any, name: str) -> Any:
+    """Whatever arrived inside however many envelopes of the field's own name.
+
+    Peeling one layer was not enough: on 2026-08-24 the envelope was doubled, and
+    the answer left behind still failed the same field with the same message as
+    the answer the unwrap was written for. Stopping short looks identical to not
+    trying.
+    """
+    while isinstance(value, dict) and set(value) == {name}:
+        value = value[name]
+    return value
+
+
 def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
     """Structured fields that arrived wrapped, unwrapped back to what they are.
 
@@ -191,9 +204,10 @@ def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
     - as **text** — a list field holding the model's own JSON with the tool-call
       markup still trailing it, ``[{…}]</causes>``. The leading value is decoded
       and the trailing markup dropped.
-    - as **its own envelope** — ``requests`` holding ``{"requests": [...]}``. The
-      inner value is taken, and only for a list field: a dict is what an object
-      field is supposed to be, so reaching into one would be guessing.
+    - as **its own envelope** — ``requests`` holding ``{"requests": [...]}``, and
+      once ``{"requests": {"requests": [...]}}``. Every layer of the field's own
+      name is peeled, and only for a list field: a dict is what an object field
+      is supposed to be, so reaching into one would be guessing.
 
     A field the schema already declares as a string is left alone either way, so
     nothing that legitimately *is* prose gets reinterpreted.
@@ -211,8 +225,10 @@ def _decoded(arguments: Any, schema: type[BaseModel]) -> Any:
         if field_info is None or field_info.annotation is str:
             continue
         if isinstance(value, dict):
-            if get_origin(field_info.annotation) is list and set(value) == {name}:
-                decoded[name] = value[name]
+            if get_origin(field_info.annotation) is list:
+                inner = _unenveloped(value, name)
+                if not isinstance(inner, dict):
+                    decoded[name] = inner
             continue
         if not isinstance(value, str):
             continue

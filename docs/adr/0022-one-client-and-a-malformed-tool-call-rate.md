@@ -15,6 +15,14 @@ parses, that value is used and any trailing markup dropped. This is parsing, not
 nothing is invented, the decode must succeed on its own, and the schema still refuses
 whatever comes out.
 
+A structured field that arrives inside an **envelope of its own name** is unwrapped the
+same way, and unwrapped *to the end*: `requests` holding `{"requests": [...]}` was seen on
+2026-08-24, and so was `{"requests": {"requests": [...]}}`. Only a list field is unwrapped —
+a dict is what an object field is supposed to be, so reaching into one would be guessing —
+and peeling stops at the first value that is not another envelope. Stopping one layer short
+is worse than not trying: the answer left behind fails the same field with the same
+validator message, so the fix looks exactly like its own absence.
+
 Tool use is **strict** wherever the schema can express it — every object fully required, so
 that listing every property changes nothing the node asked for. The value constraints strict
 rejects (`minimum`, `minItems`, …) leave the wire and stay in the Pydantic schema: the API
