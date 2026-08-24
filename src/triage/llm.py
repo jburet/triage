@@ -27,6 +27,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol, TypeAlias, TypeVar, cast, get_origin
 
+import httpx
 import structlog
 from pydantic import BaseModel
 
@@ -112,6 +113,8 @@ class FakeLLM:
 
 
 DEFAULT_TIMEOUT = 300.0
+MODELS_TIMEOUT = 10.0
+"""A startup question, not a model call: it must not be what makes startup slow."""
 
 
 def tool_name(schema: type[BaseModel]) -> str:
@@ -298,6 +301,11 @@ class AnthropicClient:
             self._client = AsyncAnthropic(**options)
         return self._client
 
+    @property
+    def configured_models(self) -> Mapping[Tier, str]:
+        """The names chosen for us. Empty on the proxy means the tier is the name."""
+        return self._models
+
     def model_for(self, tier: Tier) -> str:
         try:
             return self._models[tier]
@@ -391,6 +399,31 @@ class LiteLLMClient(AnthropicClient):
     def model_for(self, tier: Tier) -> str:
         """The alias, or the tier itself — never a refusal, unlike the direct client."""
         return self._models.get(tier, tier)
+
+    async def published_models(self) -> list[str] | None:
+        """What the proxy says it serves, or ``None`` when it would not say.
+
+        A name the proxy does not publish is a 400 at whatever hour that tier
+        first runs, and the two tiers fail differently: the diagnosis tier's 400
+        ends the run, the triage tier's is swallowed by the classifier's fallback
+        and costs an alert the right collector recipe without saying so.
+
+        Unreachable is not the same as wrong. A proxy that will not answer is no
+        evidence about the names, so this answers ``None`` and the caller carries
+        on rather than making a blip at 03:00 the thing that stops an incident.
+        """
+        url = f"{self.base_url}/v1/models"
+        try:
+            async with httpx.AsyncClient(timeout=MODELS_TIMEOUT) as client:
+                response = await client.get(
+                    url, headers={"Authorization": f"Bearer {self._api_key}"}
+                )
+                response.raise_for_status()
+                data = response.json().get("data", [])
+        except Exception as exc:
+            log.warning("proxy_models_unreadable", url=url, error=str(exc))
+            return None
+        return [str(entry["id"]) for entry in data if isinstance(entry, dict) and "id" in entry]
 
 
 def _without_openai_path(url: str) -> str:

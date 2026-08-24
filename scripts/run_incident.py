@@ -45,7 +45,7 @@ from triage.db.repo import InMemoryRepository, SystemMapEntry
 from triage.graphs.incident import build_graph
 from triage.integrations.datadog import DatadogClient, DatadogRestClient
 from triage.nodes.collect import classify_alert, collect
-from triage.runtime import DEPS_KEY, Deps, build_deps, build_github
+from triage.runtime import DEPS_KEY, Deps, build_deps, build_github, verify_models
 from triage.schemas.alert import Alert, AlertStatus
 from triage.schemas.collection import AlertClass, AlertClassification, Collection
 from triage.schemas.common import render as render_field
@@ -591,6 +591,11 @@ async def main(argv: list[str]) -> int:
 
     config = get_config()
     deps = build_deps(settings, config)
+    try:
+        await verify_models(deps.llm)
+    except ValueError as refusal:
+        print(refusal)
+        return 2
     client = DatadogRestClient(
         settings.datadog_site, settings.datadog_api_key, settings.datadog_app_key
     )

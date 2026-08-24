@@ -124,6 +124,33 @@ def build_llm(settings: Settings) -> StructuredLLM:
     return AnthropicClient(settings.anthropic_api_key, models)
 
 
+async def verify_models(llm: StructuredLLM) -> None:
+    """Refuse a model name the proxy does not serve, before anything is collected.
+
+    The sibling of ``build_llm``'s half-set refusal, and it has to be async and
+    therefore separate: that one catches a tier nobody configured, this one a
+    tier configured with a name this proxy never heard of. Both are the same
+    mistake — a run that will fail on one tier, at whatever hour that node first
+    runs, having already spent the collection.
+
+    Only names we chose are checked. With ``TRIAGE_MODEL_*`` unset the tier *is*
+    the name, and a proxy configured for Triage publishes those under a listing
+    we have no claim on.
+    """
+    if not isinstance(llm, LiteLLMClient) or not llm.configured_models:
+        return
+    published = await llm.published_models()
+    if published is None:
+        return
+    unknown = {tier: name for tier, name in llm.configured_models.items() if name not in published}
+    if not unknown:
+        return
+    asked = ", ".join(f"TRIAGE_MODEL_{tier.upper()}={name}" for tier, name in unknown.items())
+    raise ValueError(
+        f"the proxy at {llm.base_url} does not serve {asked}. It publishes: {', '.join(published)}."
+    )
+
+
 def build_github(settings: Settings) -> GitHubClient:
     """The real client, or one that states the variable is unset.
 
