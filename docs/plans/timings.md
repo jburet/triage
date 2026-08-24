@@ -98,3 +98,5 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M6 phase 4.4 | make run-mapping ARGS="plt-hcl-software-uat" (live Datadog) | 8 |
 | 2026-08-24 | M6 close-out | make lint + make test (567 passed) | 4 |
 | 2026-08-24 | M6 live GitHub | make run-mapping ARGS="plt-hcl-software-uat" (live Datadog + live GitHub) | 3 |
+| 2026-08-24 | ADR-0021 declares | make lint + make test (588 passed) | 12 |
+| 2026-08-24 | ADR-0021 proof | make run-mapping ARGS="plt-hcl-software-uat" (live, chart resolved) | 4 |

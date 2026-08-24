@@ -10,3 +10,6 @@ build/
 *.egg-info/
 .langgraph_api/
 *.env
+
+# JetBrains
+.idea/

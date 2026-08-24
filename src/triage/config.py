@@ -87,6 +87,17 @@ class Repo(BaseModel):
             "keyed on the name a repository says it deploys as, will never contain them."
         ),
     )
+    defines: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description=(
+            "For an IaC repository: which of its paths define each workload it "
+            "provisions, keyed by the repository that workload runs. Declared because "
+            "no rule can find it — `platform-infra` organises by what it provisions "
+            "on, `terraform/eks_module/`, and the workload's name is a resource label "
+            "inside the file rather than a directory (ADR-0021). A workload with no "
+            "key here falls back to the naming rule."
+        ),
+    )
     tag_template: str | None = Field(
         default=None,
         description=(
@@ -106,6 +117,10 @@ class Repo(BaseModel):
                 f"resolve to the same git tag"
             )
         return value
+
+    def declared_paths(self, repository: str) -> list[str]:
+        """Where this IaC repository says the named workload is defined, if it says."""
+        return self.defines.get(repository, [])
 
     def github_tag(self, image_tag: str | None) -> str | None:
         """The git tag this image tag is spelled as here, or None when it carries none."""

@@ -118,7 +118,16 @@ async def _with_iac_paths(
     if entry is None or not derivation.mapped or entry.iac_repo_url is None:
         return derivation
     tree = await _listing(deps, entry.iac_repo_url, listings)
-    paths = workload_paths(tree, entry.repository, entry.service)
+    iac = deps.config.repo_named(entry.iac_repo) if entry.iac_repo else None
+    declares = iac.declared_paths(entry.repository) if iac else []
+    paths = workload_paths(tree, entry.repository, entry.service, declares=declares)
+    if declares and not paths:
+        log.warning(
+            "iac_declaration_matches_nothing",
+            repo=entry.iac_repo_url,
+            workload=entry.repository,
+            declares=declares,
+        )
     return derivation.model_copy(update={"entry": entry.model_copy(update={"iac_paths": paths})})
 
 

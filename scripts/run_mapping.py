@@ -92,6 +92,10 @@ async def main(argv: list[str]) -> int:
                 print(f"    commit     {render_field(entry.deployed_commit)}")
                 print(f"    from       {origin}{stood}")
                 print(f"    iac        {entry.iac_repo or 'none'} — source {entry.source.value}")
+                if entry.iac_paths:
+                    first, rest = entry.iac_paths[0], len(entry.iac_paths) - 1
+                    more = f" (+{rest} more)" if rest else ""
+                    print(f"    defined in {first}{more}")
 
     report = state.get("report")
     if report is not None:

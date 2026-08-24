@@ -1,10 +1,13 @@
-"""Which files in an IaC repository define one workload (plan M6 3.1).
+"""Which files in an IaC repository define one workload (plan M6 3.1, ADR-0021).
 
-The tree is `platform-infra`'s shape: a chart per workload under `helm/`, a
-Terraform workspace per workload, and shared modules that belong to nobody in
-particular. What the rule must not do is sweep in the neighbours — a selection
-that reads `zeenea-platform-api`'s chart answers about a workload this service
-is not, and says nothing about having done so.
+``TREE`` is a charts repository — one chart per workload under `helm/`, a
+Terraform workspace per workload — which is the shape the naming rule was
+written for and, as the 2026-08-24 live pass found out, not the shape of
+`platform-infra`. What the rule must not do is sweep in the neighbours: a
+selection that reads `zeenea-platform-api`'s chart answers about a workload this
+service is not, and says nothing about having done so.
+
+``REAL_TREE`` is the real one, where nothing but a declaration can answer.
 """
 
 from triage.mapping.iac import MAX_PATHS, workload_paths
@@ -85,3 +88,53 @@ def test_the_list_is_capped_and_what_it_drops_the_profile_still_reaches():
     tree = [f"helm/zeenea-platform/templates/{index}.yaml" for index in range(MAX_PATHS * 2)]
 
     assert len(workload_paths(tree, "platform")) == MAX_PATHS
+
+
+REAL_TREE = [
+    "README.md",
+    "terraform/core-eks/main.tf",
+    "terraform/database/main.tf",
+    "terraform/eks_module/eks.tf",
+    "terraform/eks_module/volumes.tf",
+    "terraform/eks_module/terraform.tfstate",
+    "terraform/storage/main.tf",
+]
+"""`platform-infra` as it actually is: modules named for what they provision on."""
+
+
+def test_a_declaration_finds_what_no_path_segment_names():
+    """The workload is `resource "kubernetes_stateful_set_v1" "platform"` inside
+    `eks.tf`. No segment of that path is `platform`, and no rule over segments
+    reaches a name one level below them."""
+    paths = workload_paths(
+        REAL_TREE, "platform", "plt-hcl-software-uat", declares=["terraform/eks_module/*"]
+    )
+
+    assert "terraform/eks_module/eks.tf" in paths
+    assert "terraform/eks_module/volumes.tf" in paths
+
+
+def test_a_declaration_is_the_whole_selection():
+    """What the operator declared is where the workload is; the rest of the
+    repository provisions the cluster and the database it runs against."""
+    paths = workload_paths(REAL_TREE, "platform", declares=["terraform/eks_module/*"])
+
+    assert "terraform/core-eks/main.tf" not in paths
+    assert "terraform/database/main.tf" not in paths
+
+
+def test_a_declaration_that_matches_nothing_answers_nothing():
+    """Never the name rule's answer instead. A declaration gone stale — the module
+    renamed — is a wrong answer to report, not a reason to fall back to a guess
+    the operator overrode precisely because it was wrong."""
+    assert workload_paths(TREE, "platform", declares=["terraform/eks_module/*"]) == []
+
+
+def test_what_is_declared_is_still_ordered_and_filtered_like_anything_else():
+    paths = workload_paths(REAL_TREE, "platform", declares=["terraform/eks_module/*"])
+
+    assert "terraform/eks_module/terraform.tfstate" not in paths
+
+
+def test_the_name_rule_is_what_answers_when_nothing_is_declared():
+    assert workload_paths(TREE, "platform") == workload_paths(TREE, "platform", declares=[])

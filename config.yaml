@@ -5,15 +5,9 @@
 # groups are per-customer tenants and a list here would be obsolete the day a
 # customer is provisioned (ADR-0017).
 teams:
-  - name: payments
-    slack_channel: "#payments-alerts"
-    jira_project: PAY
-    service_patterns: ["payments-*"]
-    namespace_patterns: ["payments*"]
-    environments: [prod]
   - name: platform
     slack_channel: "#platform-alerts"
-    jira_project: PLAT
+    jira_project: ZEE
     service_patterns: ["plt-*"]
     namespace_patterns: ["*"]
     environments: [prod]
@@ -49,6 +43,12 @@ repos:
   - url: github.com/zeenea/platform-infra
     team: platform
     kind: terraform
+    # Which paths define which workload. This repository organises by what it
+    # provisions on, so no directory is named `platform`: the StatefulSet and its
+    # probe timeouts are `resource "kubernetes_stateful_set_v1" "platform"` inside
+    # terraform/eks_module/eks.tf, a name one level below any path (ADR-0021).
+    defines:
+      platform: ["terraform/eks_module/*"]
 
 # Target databases for F3. Credentials are never inlined: `secret_ref` names a
 # Kubernetes Secret exposing a read-only role (see ADR-0008).

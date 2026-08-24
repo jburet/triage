@@ -354,3 +354,48 @@ async def test_a_pass_that_derived_nothing_posts_nothing(zeenea):
     await graph.ainvoke({"services": []}, config=run_config(deps))
 
     assert deps.slack.messages == []
+
+
+REAL_INFRA_TREE = [
+    "README.md",
+    "terraform/core-eks/main.tf",
+    "terraform/database/main.tf",
+    "terraform/eks_module/eks.tf",
+    "terraform/eks_module/volumes.tf",
+]
+"""`platform-infra` as the 2026-08-24 pass found it: no path names the workload."""
+
+
+def declaring_where_the_workload_is(config, **defines):
+    repos = [
+        repo.model_copy(update={"defines": defines}) if repo.url == PLATFORM_INFRA else repo
+        for repo in config.repos
+    ]
+    return config.model_copy(update={"repos": repos})
+
+
+async def test_the_declared_module_is_where_the_workload_is_defined(zeenea):
+    """ADR-0021. Without the declaration this repository's listing names no
+    workload at all, and the pass reports a chart it could not find."""
+    deps = deps_for(
+        declaring_where_the_workload_is(zeenea, platform=["terraform/eks_module/*"]),
+        github=FakeGitHubClient(trees={PLATFORM_INFRA: REAL_INFRA_TREE}),
+    )
+
+    await run(deps)
+
+    entry = deps.repo.workloads[TENANT]
+    assert "terraform/eks_module/eks.tf" in entry.iac_paths
+    assert "terraform/database/main.tf" not in entry.iac_paths
+
+
+async def test_a_declaration_about_another_workload_is_not_this_ones(zeenea):
+    """One IaC repository provisions several workloads; a declaration names which."""
+    deps = deps_for(
+        declaring_where_the_workload_is(zeenea, scanner=["terraform/eks_module/*"]),
+        github=FakeGitHubClient(trees={PLATFORM_INFRA: REAL_INFRA_TREE}),
+    )
+
+    await run(deps)
+
+    assert deps.repo.workloads[TENANT].iac_paths == []

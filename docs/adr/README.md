@@ -33,6 +33,7 @@ can override it without touching code.
 | [0018](0018-alert-persistence-gate.md) | An alert is analysed only once it has persisted | Proposed |
 | [0019](0019-workload-mapping-from-the-running-image.md) | A service is mapped to its repository by the image it is running | Proposed |
 | [0020](0020-a-commit-nothing-observed-is-never-the-deployed-one.md) | A commit nothing observed is never presented as the deployed one | Proposed |
+| [0021](0021-where-a-workload-is-defined-is-declared.md) | Where a workload is defined in its IaC repository is declared | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

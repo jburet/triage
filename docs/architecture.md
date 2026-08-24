@@ -417,16 +417,16 @@ What M6 does **not** deliver:
   `github_tag` rung, the ladder's most decisive, is the only one observed working; the
   default-branch fallback and the incremental `UNCHANGED` path have still only met
   `FakeGitHubClient`.
-- **The workload is named inside the file, and the rule only reads path segments.** The
-  same run resolved `platform-infra` — the right repository, as the seed says — and found
-  no path in it defining the workload. The file it was looking for is
+- **Where a workload is defined is now declared, and only one repository declares it.**
+  The same run resolved `platform-infra` — the right repository, as the seed says — and
+  found no path in it defining the workload, because M6 3.1's rule matches path *segments*
+  and this repository organises by what it provisions on. The file it needed is
   `terraform/eks_module/eks.tf`: `resource "kubernetes_stateful_set_v1" "platform"`, with
-  the liveness, readiness and startup probes the captured incident turned on. `_defines`
-  matches a path *segment* equal to the repository name or ending in `-<name>`, and this
-  repository names its module for what it provisions on (`eks_module`) rather than for what
-  runs there. The workload's name is the resource label, one level below any path. So the
-  rule cannot find this file, and cannot find it for any repository that organises by
-  infrastructure rather than by service — which is the majority here.
+  the liveness, readiness and startup probes the captured incident turned on — a name one
+  level below any path. `Repo.defines` states it instead ([ADR-0021](adr/0021-where-a-workload-is-defined-is-declared.md)),
+  the naming rule stays as the fallback for charts repositories, and `config.yaml` declares
+  it for `platform`. Every other workload in the seed is still undeclared and still
+  answered by the rule, which has now been observed failing once and succeeding never.
 - **The seed is a snapshot.** Dated 2026-04-20 and hand-written; a repository added since
   is missing and a tenancy model changed since is wrong. Its `deployment` field held up on
   the one workload checked: `platform → platform_infra` is where the StatefulSet is.
