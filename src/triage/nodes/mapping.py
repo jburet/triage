@@ -16,8 +16,10 @@ from langchain_core.runnables import RunnableConfig
 
 from triage.graphs.state import MappingState
 from triage.integrations.datadog import DatadogError
+from triage.integrations.github import GitHubError
 from triage.mapping.commits import with_deployed_commit
 from triage.mapping.derive import derive_workload
+from triage.mapping.iac import workload_paths
 from triage.mapping.resolve import unclaimed
 from triage.mapping.seed import load_seed
 from triage.runtime import Deps, deps_from_runnable_config
@@ -90,6 +92,35 @@ async def _with_deployed_commit(
     return derivation.model_copy(update={"entry": resolved})
 
 
+async def _listing(deps: Deps, repo_url: str, listings: dict[str, list[str]]) -> list[str]:
+    """The IaC repository's files, read once per pass whatever runs out of it.
+
+    One chart serves sixty-odd tenants of the mono-tenant platform, so a listing
+    per service would spend a rate limit reaching the same answer sixty times.
+    A listing GitHub refuses leaves the paths empty and the mapping standing:
+    the analysis then selects by glob, which is what it did before 3.1.
+    """
+    if repo_url not in listings:
+        try:
+            listings[repo_url] = await deps.github.default_branch_paths(repo_url)
+        except GitHubError as error:
+            log.warning("iac_repository_not_listed", repo=repo_url, error=str(error))
+            listings[repo_url] = []
+    return listings[repo_url]
+
+
+async def _with_iac_paths(
+    deps: Deps, derivation: Derivation, listings: dict[str, list[str]]
+) -> Derivation:
+    """Where in its IaC repository this workload is defined (3.1)."""
+    entry = derivation.entry
+    if entry is None or not derivation.mapped or entry.iac_repo_url is None:
+        return derivation
+    tree = await _listing(deps, entry.iac_repo_url, listings)
+    paths = workload_paths(tree, entry.repository, entry.service)
+    return derivation.model_copy(update={"entry": entry.model_copy(update={"iac_paths": paths})})
+
+
 def _against_what_is_on_record(
     derivation: Derivation, previous: WorkloadEntry | None
 ) -> Derivation:
@@ -126,6 +157,7 @@ async def derive_workloads(
     days = state.get("lookback_days") or LOOKBACK_DAYS
 
     derivations: list[Derivation] = []
+    listings: dict[str, list[str]] = {}
     for service in state.get("targets", []):
         try:
             events = await _events(deps, service, days)
@@ -142,6 +174,7 @@ async def derive_workloads(
         derived = await _with_deployed_commit(
             deps, derive_workload(deps.config, seed, service, events), previous, state.get("at")
         )
+        derived = await _with_iac_paths(deps, derived, listings)
         derivations.append(_against_what_is_on_record(derived, previous))
     return {"derivations": derivations}
 

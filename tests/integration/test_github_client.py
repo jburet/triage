@@ -195,3 +195,49 @@ async def test_the_default_branch_is_read_as_it_stood_at_the_time_it_is_asked_ab
     await client.default_branch_commit("github.com/org/x", at=datetime(2026, 8, 22, tzinfo=UTC))
 
     assert requests[-1].url.params["until"] == "2026-08-22T00:00:00+00:00"
+
+
+async def test_the_repository_tree_lists_the_files_the_default_branch_has():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {
+            "/repos/org/x/git/trees/HEAD": (
+                200,
+                {
+                    "truncated": False,
+                    "tree": [
+                        {"path": "helm/zeenea-platform", "type": "tree"},
+                        {"path": "helm/zeenea-platform/values.yaml", "type": "blob"},
+                    ],
+                },
+            )
+        },
+        requests,
+    )
+
+    assert await client.default_branch_paths("github.com/org/x") == [
+        "helm/zeenea-platform/values.yaml"
+    ]
+    assert requests[-1].url.params["recursive"] == "1"
+
+
+async def test_a_tree_github_truncated_is_refused_rather_than_read_as_the_whole_repository():
+    """A chart missing from a truncated listing is a workload whose definition
+    silently cannot be found, which is the failure this read exists to fix."""
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/trees/HEAD": (200, {"truncated": True, "tree": []})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="truncated"):
+        await client.default_branch_paths("github.com/org/x")
+
+
+async def test_a_refused_tree_read_raises_with_what_github_said():
+    requests: list[httpx.Request] = []
+    client = client_routing(
+        {"/repos/org/x/git/trees/HEAD": (403, {"message": "API rate limit exceeded"})}, requests
+    )
+
+    with pytest.raises(GitHubError, match="rate limit"):
+        await client.default_branch_paths("github.com/org/x")

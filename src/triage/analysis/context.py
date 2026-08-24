@@ -16,6 +16,7 @@ cluster nobody can reproduce from the repository.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -237,6 +238,12 @@ def reads(path: str, profile: SelectionProfile) -> bool:
     if _matches(relative, NEVER_READ):
         return False
     return _matches(relative, profile.patterns)
+
+
+def in_profile_order(paths: Iterable[str], profile: SelectionProfile) -> list[str]:
+    """The paths this profile reads, ordered as the gather would open them."""
+    selected = [PurePosixPath(path) for path in paths if reads(path, profile)]
+    return [path.as_posix() for path in _in_priority_order(selected, profile)]
 
 
 def _walk(root: Path) -> list[PurePosixPath]:

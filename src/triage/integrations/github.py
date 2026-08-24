@@ -7,9 +7,10 @@ graph, and the whole point of the Job is that repository content is read inside
 the sandbox. A comparison is different from a clone — it returns filenames, not
 code — so it is a plain read the graph may make itself.
 
-M6 added the second question: which commit the build a tenant is running was
-cut from, because the image tag is a build number and that number is a tag here
-(2.6). Both are single-shot reads of metadata, so the reasoning holds — the
+M6 added two more: which commit the build a tenant is running was cut from,
+because the image tag is a build number and that number is a tag here (2.6),
+and which files of an IaC repository define a given workload (3.1). All are
+single-shot reads of metadata, and none returns code, so the reasoning holds — the
 architecture's rule is "MCP servers when they exist, Python tools otherwise" and
 a GitHub MCP server does exist, but reaching one for reads of this shape would
 put an MCP runtime in the graph's path for no gain. This protocol stays the seam
@@ -67,6 +68,14 @@ class GitHubClient(Protocol):
 
     async def default_branch_commit(self, repo_url: str, *, at: datetime | None = None) -> str:
         """The commit the default branch pointed at then, or at HEAD given no time."""
+        ...
+
+    async def default_branch_paths(self, repo_url: str) -> list[str]:
+        """Every file the default branch has, repository-relative.
+
+        A listing, not content: it says where a workload is defined so the
+        analysis can open those files inside the sandbox (M6 3.1).
+        """
         ...
 
 
@@ -164,6 +173,21 @@ class GitHubRestClient:
             )
         return str(head[0]["sha"])
 
+    async def default_branch_paths(self, repo_url: str) -> list[str]:
+        path = repo_path(repo_url)
+        response = await self._client.get(
+            f"/repos/{path}/git/trees/HEAD", params={"recursive": "1"}, headers=self._headers
+        )
+        if response.status_code >= 400:
+            raise GitHubError(f"listing the files of {path} returned {_explain(response)}")
+        body = response.json()
+        if body.get("truncated"):
+            raise GitHubError(
+                f"GitHub truncated its listing of {path}, so a chart missing from it would "
+                f"read as a workload that is defined nowhere"
+            )
+        return [str(item["path"]) for item in body.get("tree") or [] if item.get("type") == "blob"]
+
 
 def _explain(response: httpx.Response) -> str:
     try:
@@ -186,10 +210,12 @@ class FakeGitHubClient:
     changed: Mapping[str, Sequence[str]] = field(default_factory=dict)
     tags: Mapping[tuple[str, str], str] = field(default_factory=dict)
     branch_commits: Mapping[str, str] = field(default_factory=dict)
+    trees: Mapping[str, Sequence[str]] = field(default_factory=dict)
     error: Exception | None = None
     comparisons: list[tuple[str, str, str]] = field(default_factory=list)
     tag_lookups: list[tuple[str, str]] = field(default_factory=list)
     branch_reads: list[tuple[str, datetime | None]] = field(default_factory=list)
+    tree_reads: list[str] = field(default_factory=list)
 
     async def changed_paths(self, repo_url: str, *, base: str, head: str) -> list[str]:
         self.comparisons.append((repo_url, base, head))
@@ -220,12 +246,22 @@ class FakeGitHubClient:
                 f"FakeGitHubClient has no default-branch commit for {repo_url!r}"
             ) from None
 
+    async def default_branch_paths(self, repo_url: str) -> list[str]:
+        """An unconfigured repository is an error: an empty tree is a chart nowhere."""
+        self.tree_reads.append(repo_url)
+        if self.error is not None:
+            raise self.error
+        try:
+            return list(self.trees[repo_url])
+        except KeyError:
+            raise GitHubError(f"FakeGitHubClient has no file listing for {repo_url!r}") from None
+
 
 def dry_run_github() -> FakeGitHubClient:
     """Dry run makes no GitHub call, and says so rather than claiming nothing changed."""
     return FakeGitHubClient(
         error=GitHubError(
-            "dry run: GitHub was not read, so nothing is known to be unchanged and no "
-            "tag was resolved to a commit"
+            "dry run: GitHub was not read, so nothing is known to be unchanged, no tag "
+            "was resolved to a commit and no repository was listed"
         )
     )

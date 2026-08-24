@@ -107,6 +107,52 @@ async def test_the_seed_supplies_the_tenancy_and_the_iac_repository(zeenea):
     assert entry.iac_repo_url == PLATFORM_INFRA
 
 
+INFRA_TREE = [
+    "README.md",
+    "helm/zeenea-platform/Chart.yaml",
+    "helm/zeenea-platform/values.yaml",
+    "helm/zeenea-platform/templates/statefulset.yaml",
+    "helm/zeenea-connector/values.yaml",
+    "modules/eks/main.tf",
+]
+
+
+async def test_the_entry_says_where_in_the_iac_repository_this_workload_is_defined(zeenea):
+    """M6 3.1: resolving `platform-infra` is only half a mapping — the probe
+    timeouts are in the chart, and nothing said where the chart was."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(trees={PLATFORM_INFRA: INFRA_TREE}))
+
+    await run(deps)
+
+    entry = deps.repo.workloads[TENANT]
+    assert entry.iac_paths[0] == "helm/zeenea-platform/values.yaml"
+    assert "helm/zeenea-connector/values.yaml" not in entry.iac_paths
+
+
+async def test_the_iac_repository_is_listed_once_however_many_tenants_run_it(zeenea):
+    """One chart, sixty-odd tenants: a listing per tenant is how a pass earns a
+    rate limit reaching the same answer it already had."""
+    deps = build_deps(
+        zeenea,
+        datadog=two_tenants(),
+        github=FakeGitHubClient(trees={PLATFORM_INFRA: INFRA_TREE}),
+    )
+
+    await run(deps, services=[TENANT, "plt-merck-qa"])
+
+    assert deps.github.tree_reads == [PLATFORM_INFRA]
+    assert deps.repo.workloads["plt-merck-qa"].iac_paths == deps.repo.workloads[TENANT].iac_paths
+
+
+async def test_a_listing_github_will_not_give_leaves_the_mapping_standing(zeenea):
+    deps = deps_for(zeenea, github=FakeGitHubClient(branch_commits={PLATFORM: COMMIT}))
+
+    state = await run(deps)
+
+    assert state["derivations"][0].outcome is MappingOutcome.MAPPED
+    assert deps.repo.workloads[TENANT].iac_paths == []
+
+
 async def test_a_repository_config_does_not_declare_is_mapped_without_a_url(zeenea):
     """The mapping is still right; nobody has said where the code lives."""
     deps = deps_for(declaring(PLATFORM_INFRA))
