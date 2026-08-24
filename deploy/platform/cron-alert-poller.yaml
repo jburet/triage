@@ -1,0 +1,22 @@
+# The 60-second tick that makes F1 run itself (ADR-0017, ADR-0018).
+#
+# Not a Kubernetes object: a LangGraph Platform cron is a row inside the Platform,
+# created over its API. `scripts/apply_cron.py` reads this file and creates it —
+# `make cron` prints what it would do, `make cron ARGS=--apply` does it. The file
+# is the reviewable form and the record of what the Platform was told.
+#
+# One minute is the finest a cron expression goes, which is the interval ADR-0017
+# measured its costs against. What the tick costs when nothing is firing is one
+# Datadog event search and no model call at all; the gate (ADR-0018) is what keeps
+# a tick from turning into spend.
+#
+# The graph is stateless per tick — it reads its own watermark from Postgres — so
+# this is a cron over `POST /runs/crons` and not one bound to a thread. Each
+# incident gets its own thread later, created by the poller when a signal passes
+# the gate.
+assistant_id: alert_poller
+schedule: "* * * * *"
+input: {}
+metadata:
+  owner: triage
+  source: deploy/platform/cron-alert-poller.yaml
