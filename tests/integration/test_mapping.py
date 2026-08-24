@@ -276,3 +276,81 @@ async def test_a_digest_that_moved_is_written_over_the_old_one(zeenea):
     assert state["derivations"][0].outcome is MappingOutcome.MAPPED
     assert state["entries_written"] == 1
     assert deps.repo.workloads[TENANT].image_digest == moved
+
+
+async def test_the_pass_reports_every_service_it_attributed_and_how(zeenea):
+    """M6 4.3: the pass says what it mapped from the image that was running, what
+    it only guessed from a name, and what it could not map at all."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(trees={PLATFORM_INFRA: INFRA_TREE}))
+
+    state = await run(deps)
+
+    report = state["report"]
+    assert report.services == 1
+    assert [line.service for line in report.by_image] == [TENANT]
+    assert (report.by_pattern, report.unmapped, report.conflicting) == ([], [], [])
+    assert report.without_chart == []
+
+
+async def test_the_report_goes_to_the_platform_channel(zeenea):
+    """An unmapped production workload is Triage's own gap, not the owning team's."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(trees={PLATFORM_INFRA: INFRA_TREE}))
+
+    await run(deps)
+
+    (message,) = deps.slack.messages
+    assert message.channel == zeenea.platform_channel()
+    assert TENANT in message.text
+    assert "running image" in message.text
+
+
+async def test_a_service_mapped_only_by_a_name_pattern_is_counted_apart(zeenea):
+    """The stopgap and the derivation are different facts and read as two lines."""
+    deps = deps_for(declaring(PLATFORM, serves=("ledger-*",)))
+
+    state = await run(deps, services=["ledger-api"])
+
+    assert [line.service for line in state["report"].by_pattern] == ["ledger-api"]
+    assert state["report"].by_image == []
+
+
+async def test_a_service_the_pass_could_not_map_is_named_in_the_report(zeenea):
+    deps = build_deps(zeenea, datadog=datadog_running("ghcr.io/other/thing:2.0"))
+
+    state = await run(deps)
+
+    (line,) = state["report"].unmapped
+    assert line.service == TENANT
+    assert "ghcr.io/other/thing:2.0" in line.detail
+
+
+async def test_a_mapping_the_seed_forbids_is_reported_as_a_conflict(zeenea):
+    """A multi-tenant repository running under a name that is not its own (1.4)."""
+    deps = build_deps(
+        zeenea, datadog=datadog_running("097607883991.dkr.ecr.us-east-1.amazonaws.com/studio:9")
+    )
+
+    state = await run(deps)
+
+    assert [line.service for line in state["report"].conflicting] == [TENANT]
+    assert state["report"].unmapped == []
+
+
+async def test_a_workload_whose_chart_was_not_found_is_reported_as_mapped_and_incomplete(zeenea):
+    """The fifth column: `platform-infra` was resolved and the chart inside it was
+    not, so an iac_analysis there is back to selecting by glob (3.1)."""
+    deps = deps_for(zeenea, github=FakeGitHubClient(branch_commits={PLATFORM: COMMIT}))
+
+    state = await run(deps)
+
+    report = state["report"]
+    assert [line.service for line in report.by_image] == [TENANT]
+    assert [line.service for line in report.without_chart] == [TENANT]
+
+
+async def test_a_pass_that_derived_nothing_posts_nothing(zeenea):
+    deps = deps_for(zeenea)
+
+    await graph.ainvoke({"services": []}, config=run_config(deps))
+
+    assert deps.slack.messages == []

@@ -20,6 +20,7 @@ from triage.integrations.github import GitHubError
 from triage.mapping.commits import with_deployed_commit
 from triage.mapping.derive import derive_workload
 from triage.mapping.iac import workload_paths
+from triage.mapping.report import render, summarise
 from triage.mapping.resolve import unclaimed
 from triage.mapping.seed import load_seed
 from triage.runtime import Deps, deps_from_runnable_config
@@ -191,3 +192,20 @@ async def persist_workloads(
         await deps.repo.upsert_workload(derivation.entry)
         written += 1
     return {"entries_written": written}
+
+
+async def report_mapping(state: MappingState, config: RunnableConfig | None = None) -> MappingState:
+    """One notice per pass about what Triage can and cannot attribute, to itself.
+
+    The platform channel rather than the owning team's: a service whose
+    repository nothing states is not that team's bug report, it is a hole in
+    Triage's own map, and the team would be told about a gap it cannot close. A
+    pass that derived nothing says nothing — there is no gap in having been
+    asked about no services.
+    """
+    deps = deps_from_runnable_config(config)
+    derivations = state.get("derivations", [])
+    report = summarise(derivations, state.get("unclaimed", []))
+    if derivations:
+        await deps.slack.post(channel=deps.config.platform_channel(), text=render(report))
+    return {"report": report}

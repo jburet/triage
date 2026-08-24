@@ -9,6 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.mapping.report import MappingReport
 from triage.schemas.alert import Alert
 from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
@@ -150,6 +151,7 @@ class MappingState(TypedDict, total=False):
     unclaimed: list[str]
     derivations: list[Derivation]
     entries_written: int
+    report: MappingReport
 
 
 class Deferred(BaseModel):

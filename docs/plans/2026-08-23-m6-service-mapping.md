@@ -180,7 +180,7 @@ every F1 analysis keeps running at "the last commit F0 summarised" and apologisi
 - [x] 4.2 A diagnosis whose commit came from `source = pattern` states in
       `confidence_rationale` that the commit is the repository's last summarised one and not
       this tenant's deployed one, and cannot be `high` on that basis alone.
-- [ ] 4.3 One mapping pass over every service seen in the last N days produces a report:
+- [x] 4.3 One mapping pass over every service seen in the last N days produces a report:
       mapped by image, mapped by pattern, unmapped, conflicting. Posted to the platform
       channel, since an unmapped production workload is Triage's own gap.
 - [ ] 4.4 `make run-mapping` prints the same report locally against the real cluster
