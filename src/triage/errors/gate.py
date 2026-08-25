@@ -3,23 +3,33 @@
 ADR-0018 gates an alert on *duration*, because an alert fires and recovers and
 "still failing fifteen minutes later" is the whole question. An Error Tracking
 issue has no such shape: it does not recover, it accumulates. So the gate here
-is volume, and it has three parts, all of them starting points rather than
-measurements.
+is volume, and it has three parts, corrected against a day of real ticks
+(ADR-0025's revisit condition, met on 2026-08-25).
 
-**A floor per tick.** Over the reference hour, occurrences per issue ran 6344,
-5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2, 2, 1. Ten holds back a
-third of them. Whether ten an hour is worth a developer's attention is the first
-week's question, and a floor set too low turns a team's channel into an error
-stream, which is the failure mode ADR-0023 says to watch for.
+**A floor per tick**, and it is measured on the population it applies to: one
+count per *group*, per *tick*, over issues that were new or regressed. Twenty-four
+consecutive hourly ticks on 2026-08-25 brought eleven groups, arriving at 1, 1,
+1, 2, 3, 4, 5, 30, 189, 7758 and 37691 occurrences. Nothing at all lands between
+6 and 29, so every floor in that range decides the same day identically; ten
+takes four of the eleven up on arrival. A floor set too low turns a team's
+channel into an error stream, which is the failure mode ADR-0023 says to watch
+for, and a floor of one would have posted five reports inside a single tick.
 
-**A cumulative escalation, because the floor is a cliff.** An exception that
-happens four times an hour every hour is 96 times a day and never crosses a
-per-tick floor of ten. That is a slow bleed and it is invisible without the
-second number.
+**A cumulative escalation, because the floor would otherwise be a cliff.** An
+exception that happens four times an hour every hour is 96 times a day and never
+crosses a per-tick floor of ten. It is fed by the occurrences that go on
+happening rather than by new ones (ADR-0030), and that is what makes the floor a
+delay rather than a drop: over the measured day every floor from 5 to 200
+produced the same five reports, differing only in which hour each landed in. The
+real case was not hypothetical — one group arrived with 4 occurrences, went on
+to 186,242 in the same day, and was never new again.
 
 **A per-tick cap, with the deferred groups named.** Five groups is what one tick
 will take up; a sixth is deferred and said so, because a cap that drops the
-overflow silently is a cap nobody can tell from a quiet hour.
+overflow silently is a cap nobody can tell from a quiet hour. Five is what the
+busiest tick of the measured day produced — a wave of some ninety new issues in
+one hour, one defect arriving across dozens of tenants at once — and eighteen of
+its twenty-four ticks produced none at all.
 
 Everything below the gate is still *persisted with its count* — that is what the
 escalation counts, and it is the common outcome, so a tick reports how many it

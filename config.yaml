@@ -133,12 +133,33 @@ errors:
   tracks: [trace, logs]
   persona: BACKEND
 
-  # The volume gate. Measured over the reference hour, fifteen issues occurred
-  # with counts of 6344, 5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2,
-  # 2 and 1: a floor of ten holds back a third of them. It is a starting point,
-  # not a measurement — correcting it against a week of real ticks is the first
-  # week's job, and a floor set too low turns a team's channel into an error
-  # stream, which is the failure mode ADR-0023 says to watch for.
+  # The volume gate, corrected on 2026-08-25 against 24 consecutive hourly ticks
+  # run live on the org. That is the first distribution it has been measured
+  # against that is the one it operates on: per *group*, per *tick*, and over
+  # issues that were new or regressed. (The counts it was originally set from —
+  # 6344, 5869, 4009, ... — were per issue, over every issue *occurring* in one
+  # hour, which is a different population and a much louder one.)
+  #
+  # Eleven groups arrived in the day. Their occurrences in the tick each arrived
+  # in: 1, 1, 1, 2, 3, 4, 5, 30, 189, 7758, 37691. Nothing lands between 6 and
+  # 29, so every floor from 6 to 29 behaves identically; ten reports four groups
+  # on arrival and holds seven back. Eighteen of the 24 ticks brought no group at
+  # all. The busiest brought five — a wave of ~90 new-or-regressed issues in one
+  # hour, which is one defect arriving across dozens of tenants at once — and
+  # that is the tick `max_groups_per_tick: 5` is sized for; nothing else in the
+  # day came close to it.
+  #
+  # The floor is no longer a cliff. Now that the escalation is fed by the
+  # occurrences that go on happening (ADR-0030), what the floor holds back is
+  # delayed rather than lost: replayed over the same day, every floor from 5 to
+  # 200 produces the same five reports, and only the hour they land in moves. A
+  # floor of 1 produces seven, five of them inside that one wave tick — the error
+  # stream ADR-0023 says to watch for. Ten is kept because it is the middle of
+  # the range that behaves identically, not because the data singled it out.
+  #
+  # This is one day, and an unusual one: it contained that wave. A quieter day is
+  # what its first ten ticks were — eight hours with nothing new at all, two or
+  # three known groups re-counted per tick, and no report.
   min_occurrences: 10
   cumulative_occurrences: 100
   max_groups_per_tick: 5

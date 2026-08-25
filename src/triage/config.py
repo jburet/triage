@@ -195,13 +195,18 @@ class ErrorsConfig(BaseModel):
     """The hourly code-exception pass, and what it refuses to look at (ADR-0025).
 
     ``min_occurrences`` is a floor per tick and ``cumulative_occurrences`` the
-    escalation that keeps a slow bleed from being invisible forever. Both are
-    starting points rather than measurements: over the reference hour fifteen
-    issues occurred with counts of 6344, 5869, 4009, 850, 835, 650, 435, 200,
-    29, 15, 4, 2, 2, 2 and 1, so a floor of ten holds back a third of them.
-    Correcting these against a week of real ticks is the first week's job, and a
-    floor set too low turns a team's channel into an error stream — the failure
-    mode ADR-0023 says to watch for.
+    escalation that keeps a slow bleed from being invisible forever. Both were
+    corrected on 2026-08-25 against 24 consecutive hourly ticks run live — the
+    first measurement of the population the gate actually sees, which is one
+    count per *group* per *tick* over issues that were new or regressed. Eleven
+    groups arrived in the day, at 1, 1, 1, 2, 3, 4, 5, 30, 189, 7758 and 37691
+    occurrences; nothing lands between 6 and 29, so every floor in that range
+    behaves the same and ten reports four of the eleven on arrival.
+
+    Since the escalation is fed by the occurrences that go on happening
+    (ADR-0030), the floor delays rather than drops: over that day every floor
+    from 5 to 200 produced the same five reports. A floor of 1 produced seven,
+    five of them in one wave — the error stream ADR-0023 says to watch for.
     """
 
     tracks: list[ErrorTrack] = Field(
