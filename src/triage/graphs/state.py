@@ -17,6 +17,7 @@ from triage.schemas.collection import AlertClassification, Collection, Qualifica
 from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
 from triage.schemas.errors import (
+    CodeExceptionContext,
     ErrorCollection,
     ErrorGroup,
     ErrorIssue,
@@ -55,6 +56,13 @@ class TicketPipelineState(TypedDict, total=False):
     # The Slack thread the calling feature opened, if any: every notice about one
     # incident belongs under the message that announced it.
     thread_ts: str | None
+
+    # What F2 is reporting about, when the caller is F2 (M8 4.4). A compiled
+    # sub-graph is invoked with the parent state filtered to its own schema, so a
+    # group and its collection reach the terminal node only by being declared
+    # here — and they are declared as one typed carrier rather than as three keys
+    # the pipeline would have to know the meaning of.
+    exception: CodeExceptionContext | None
 
     # Monotonic clock reading taken at entry, for the time-to-ticket metric.
     started_at: float
@@ -257,6 +265,7 @@ class CodeExceptionState(AnalysisState, TicketPipelineState, total=False):
     group: ErrorGroup
     window: TimeWindow
     collection: ErrorCollection
+    qualification: Qualification
 
 
 class PollerState(TypedDict, total=False):

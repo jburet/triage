@@ -292,3 +292,47 @@ class ErrorCollection(BaseModel):
             "collectors": [result.model_dump(mode="json") for result in self.results],
             "notes": self.notes,
         }
+
+
+class CommitChoice(BaseModel):
+    """Which commit F2's analysis read, and what said it was that one (M8 4.2).
+
+    Two rungs and no third. A repository that carries a tag for the version the
+    exception was *first seen on* answers the question the report is asking —
+    what did the code look like when this appeared — and that is the commit the
+    analysis reads. Everything else is a fallback to whatever the service map
+    knows the workload is running, which is a fact about today rather than about
+    the release the defect entered at.
+
+    ``claimed`` is what keeps the two apart in the report (ADR-0019, ADR-0020).
+    Measured on 2026-08-25, ``first_seen_version`` is blank on 15 of 15 issues in
+    the reference hour and on 16 of 202 over a week, so the fallback is the
+    normal path and must not be able to read like the observed one.
+    """
+
+    commit: str | None = None
+    version: str | None = Field(
+        default=None, description="The version the choice was made from, when there was one."
+    )
+    claimed: bool = Field(default=False, description="A repository carries a tag for that version.")
+    rung: str = Field(description="The sentence the report prints beside the commit.")
+
+
+class CodeExceptionContext(BaseModel):
+    """What F2 hands the shared ticket pipeline so its terminal node can render F2's report.
+
+    The pipeline is a sub-graph and reads only its own state keys, so a group and
+    its collection cannot reach :func:`triage.nodes.publish.publish_report` by
+    inheritance the way ``thread_ts`` does not either. This is the one carrier,
+    typed rather than a loose dictionary, because everything on it is what the
+    report is *about* — take one field away and the report is an F1 report with
+    an exception's name on it.
+    """
+
+    group: ErrorGroup
+    collection: ErrorCollection
+    commit: CommitChoice
+    source_caveat: str | None = Field(
+        default=None,
+        description="How the file path was derived from a class name, when it was (M8 4.1).",
+    )

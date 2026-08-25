@@ -160,3 +160,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 phase 3 | pytest tests/unit/test_error_collection.py | 1 |
 | 2026-08-25 | M8 phases 3.1-3.5 | make lint + make test (875 passed) | 10 |
 | 2026-08-25 | M8 4.1 | make lint && make test | 9 |
+| 2026-08-25 | M8 4.2-4.3 | make lint && make test (899 passed) | 8 |
