@@ -1,0 +1,28 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "Error in query \u00abload_property_by_id_generic_mapper\u00bb with (id -> ec8a18a9-b24d-49e7-8aeb-bf85892d210a) : Not found",
+      "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+      "file_path": "zeenea.repository.orientdb.mapping.Query.scala",
+      "first_seen": 1783449865143,
+      "first_seen_version": "",
+      "function_name": "load",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787635159410,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "regression": {
+        "regressed_at": "2026-08-18T16:28:24.57Z",
+        "regressed_at_version": "",
+        "resolved_at": "2026-07-22T03:56:30.127508Z"
+      },
+      "service": "plt-raiffeisen-uat",
+      "state": "OPEN"
+    },
+    "id": "e13bcc3e-7a33-11f1-baa2-da7ad0900005",
+    "type": "issue"
+  }
+}

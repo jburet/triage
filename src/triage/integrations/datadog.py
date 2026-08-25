@@ -39,12 +39,45 @@ CONCURRENCY: Mapping[str, int] = {
     "events": 4,
     "metrics": 4,
     "monitors": 4,
+    "error_tracking": 1,
 }
-"""Concurrent calls allowed per endpoint family, from the measured limits."""
+"""Concurrent calls allowed per endpoint family, from the measured limits.
+
+``error_tracking`` published no ``x-ratelimit-*`` header at all on 2026-08-25, so
+its budget is unknown rather than generous, and one call at a time is what an
+unknown budget deserves — F2 makes two calls an hour, so serialising costs it
+nothing.
+"""
 
 
 def _millis(moment: datetime) -> int:
     return int(moment.timestamp() * 1000)
+
+
+def error_issue_search_body(
+    *, query: str, frm: datetime, to: datetime, track: str, persona: str
+) -> dict[str, Any]:
+    """The one request shape both the client and ``scripts/capture_errors`` send.
+
+    Defined here rather than inlined twice because the capture is what the whole
+    of F2 is written against: a capture built from a body that has drifted from
+    the client's is a fixture of a call Triage never makes.
+
+    ``query`` may not be empty — Datadog answers 400 ``attribute "query" is
+    required`` — so a pass that filters on nothing sends ``*``.
+    """
+    return {
+        "data": {
+            "type": "search_request",
+            "attributes": {
+                "from": _millis(frm),
+                "to": _millis(to),
+                "query": query,
+                "track": track,
+                "persona": persona,
+            },
+        }
+    }
 
 
 class DatadogError(RuntimeError):
@@ -75,6 +108,12 @@ class DatadogClient(Protocol):
     async def aggregate_spans(
         self, *, query: str, frm: datetime, to: datetime
     ) -> dict[str, Any]: ...
+
+    async def search_error_issues(
+        self, *, query: str, frm: datetime, to: datetime, track: str, persona: str
+    ) -> dict[str, Any]: ...
+
+    async def get_error_issue(self, issue_id: str) -> dict[str, Any]: ...
 
 
 class DatadogRestClient:
@@ -205,6 +244,29 @@ class DatadogRestClient:
             },
         )
 
+    async def search_error_issues(
+        self, *, query: str, frm: datetime, to: datetime, track: str, persona: str
+    ) -> dict[str, Any]:
+        """One track's issues, counts and attributes in one call (F2, ADR-0025).
+
+        ``include=issue`` is a *query parameter*, not a body attribute: sent in
+        the body it is accepted and ignored, and the answer is then a list of
+        issue ids with occurrence counts and nothing to decide anything on. One
+        call per track is only one call because of this parameter.
+        """
+        return await self._call(
+            "error_tracking",
+            "POST",
+            "/api/v2/error-tracking/issues/search",
+            params={"include": "issue"},
+            json=error_issue_search_body(query=query, frm=frm, to=to, track=track, persona=persona),
+        )
+
+    async def get_error_issue(self, issue_id: str) -> dict[str, Any]:
+        return await self._call(
+            "error_tracking", "GET", f"/api/v2/error-tracking/issues/{issue_id}"
+        )
+
 
 @dataclass(frozen=True)
 class RecordedQuery:
@@ -219,6 +281,7 @@ EMPTY_EVENTS: dict[str, Any] = {"data": []}
 EMPTY_LOGS: dict[str, Any] = {"data": []}
 EMPTY_SERIES: dict[str, Any] = {"series": []}
 EMPTY_AGGREGATE: dict[str, Any] = {"data": []}
+EMPTY_ERROR_ISSUES: dict[str, Any] = {"data": [], "included": []}
 
 
 @dataclass
@@ -286,3 +349,20 @@ class FakeDatadogClient:
 
     async def aggregate_spans(self, *, query: str, frm: datetime, to: datetime) -> dict[str, Any]:
         return self._answer("spans", query, EMPTY_AGGREGATE, to - frm)
+
+    async def search_error_issues(
+        self, *, query: str, frm: datetime, to: datetime, track: str, persona: str
+    ) -> dict[str, Any]:
+        """Replayed by track first, because one org's two tracks answer differently.
+
+        The recorded query carries the track and the persona in front of the
+        filter so a fixture can be keyed on ``track:trace`` while a test still
+        asserts, on the same string, that the environment filter was in the query
+        Triage sent rather than applied to the answer (behaviour 1.3).
+        """
+        return self._answer(
+            "error_issues", f"track:{track} persona:{persona} {query}", EMPTY_ERROR_ISSUES
+        )
+
+    async def get_error_issue(self, issue_id: str) -> dict[str, Any]:
+        return self._answer("error_issue", issue_id, {})
