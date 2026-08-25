@@ -37,11 +37,12 @@ can override it without touching code.
 | [0022](0022-one-client-and-a-malformed-tool-call-rate.md) | One client for both paths, and strict tool use where a schema can say it | Proposed |
 | [0023](0023-the-first-release-writes-only-to-slack.md) | The first release writes only to Slack | Proposed |
 | [0024](0024-no-kernel-boundary-for-a-job-that-executes-nothing.md) | No kernel boundary for a Job that executes nothing | Accepted |
-| [0025](0025-code-exceptions-polled-hourly-and-gated-by-volume.md) | Code exceptions are polled hourly and gated by volume | Proposed |
+| [0025](0025-code-exceptions-polled-hourly-and-gated-by-volume.md) | Code exceptions are polled hourly and gated by volume | Proposed, numbers measured; escalation corrected by 0030 |
 | [0026](0026-one-exception-across-tenants-is-one-finding.md) | One exception across tenants is one finding | Proposed |
 | [0027](0027-an-absence-datadog-discards-is-a-finding.md) | An absence Datadog is discarding is a finding, not a gap | Superseded by 0029 |
 | [0028](0028-a-class-name-is-not-a-path.md) | A class name is not a path, and the path built from one says so | Proposed |
 | [0029](0029-the-exception-is-in-the-otel-span-events.md) | The exception is in the OpenTelemetry span events, not in `@error.type` | Proposed |
+| [0030](0030-the-escalation-counts-what-goes-on-happening.md) | The escalation counts what goes on happening, not what is new | Accepted, implemented |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.
