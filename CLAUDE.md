@@ -63,9 +63,10 @@ routing functions in the graph module. `langgraph.json` registers seven:
 - `analysis` — `select_hypotheses → run_analyses → diagnose`. Shared by F1 and F3.
 - `incident` — F1: `open_incident → classify_alert → collect → follow_up ⟲ → qualify → [analysis] → [ticket_pipeline] → draft_postmortem? → settle_signal`. `IncidentState` inherits `AnalysisState` and `TicketPipelineState` so both compiled sub-graphs can be added as nodes.
 - `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
-- `error_poller` — M8/F2: one tick of `poll_error_issues`, hourly. Reads Datadog Error
-  Tracking, keeps only what was first seen or regressed in the window; see ADR-0025,
-  ADR-0026. A node module must **not** carry `from __future__ import annotations` — it
+- `error_poller` — M8/F2: `poll_error_issues → group_error_issues`, hourly. Reads Datadog
+  Error Tracking, keeps only what was first seen or regressed in the window, then collapses
+  those into groups and gates them on volume; see ADR-0025, ADR-0026. No model call anywhere
+  on it. A node module must **not** carry `from __future__ import annotations` — it
   stringifies the `config` annotation, LangGraph then passes no config, and every node
   silently falls back to `build_deps()`.
 - `service_mapping` — M6: `select_services → derive_workloads → persist_workloads → report_mapping`. No model call anywhere on it; see ADR-0019, ADR-0020.
@@ -129,10 +130,22 @@ sweep, the emptiness widening, the bounded follow-up loop), `budget.py` (fit to
 a team by glob pattern and to an environment through the cluster map — never from an `env:`
 tag, which no alert carries usefully (ADR-0017).
 
+**F2 code exceptions** — `src/triage/errors/` is pure functions over Error Tracking, the
+same shape as `triage.collect`: `issues.py` (parse the envelope, the code-exception rule,
+new-or-regressed), `grouping.py` (the group key — exception type, source location and **the
+repository the mono-tenancy rule resolves**, never the message, ADR-0026), `gate.py` (the
+per-tick floor, the cumulative escalation, the per-tick cap, and the `reanalyse_after`
+cooldown that keeps a 10,000-an-hour group from being reposted every tick). Grouping and
+gating are rules; nothing here asks a model anything.
+
 **Persistence** — nodes depend on the `TriageRepository` protocol (`db/repo.py`), never on
 the ORM; a `workloads` row is one running service joined to the repository whose code it
-runs (M6); a `signals` row is one alert *cycle* (monitor, firing group, duration, recovery) and
-its status carries the persistence gate — `received → waiting → analysing → diagnosed →
+runs (M6); an `error_groups` row is one code-exception defect across every tenant that raises it, keyed
+on the grouping rule's own output so a later tick finds it by recomputing the key, and
+carrying the cumulative count the escalation reads and the Slack thread every message about
+it replies under (M8, ADR-0026: `open → analysing → reported`, plus `unmapped` for a service
+no repository claims); a `signals` row is one alert *cycle* (monitor, firing group, duration,
+recovery) and its status carries the persistence gate — `received → waiting → analysing → diagnosed →
 ticketed|discarded`, with the terminal `self_recovered` and `out_of_scope` (ADR-0018); `InMemoryRepository` is used in tests and dry-run, `SqlRepository` otherwise.
 Tables live in a dedicated `triage` Postgres schema (shared DB with LangGraph Platform
 checkpoints, which Triage never touches). Migrations under `db/migrations/` must stay
