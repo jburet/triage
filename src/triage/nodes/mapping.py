@@ -37,8 +37,11 @@ async def select_services(
 ) -> MappingState:
     """The services to derive, and the seed to derive them against.
 
-    Given none, the pass covers every service that has alerted recently: those
-    are exactly the ones whose mapping Triage has needed and may have missed.
+    Given none, the pass covers every service Triage has recently had a reason to
+    map: one that alerted, and one that raised a code exception. Reading only the
+    first covered none of F2's tenants — they raise exceptions and never alert —
+    so on 2026-08-25 a default pass returned nothing while seventy of them were
+    raising, and every report then said no deployed commit was known.
     """
     deps = deps_from_runnable_config(config)
     seed = load_seed()
@@ -47,7 +50,12 @@ async def select_services(
         targets = list(dict.fromkeys(named))
     else:
         since = datetime.now(UTC) - timedelta(days=state.get("lookback_days") or LOOKBACK_DAYS)
-        targets = await deps.repo.services_seen_since(since)
+        targets = sorted(
+            {
+                *await deps.repo.services_seen_since(since),
+                *await deps.repo.services_raising_since(since),
+            }
+        )
     return {
         "seed": seed,
         "targets": targets,

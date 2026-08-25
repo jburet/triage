@@ -185,6 +185,8 @@ class TriageRepository(Protocol):
 
     async def error_groups_open(self) -> list[ErrorGroup]: ...
 
+    async def services_raising_since(self, since: datetime) -> list[str]: ...
+
 
 def _to_record(row: TicketRow) -> TicketRecord:
     return TicketRecord(
@@ -529,6 +531,19 @@ class SqlRepository:
             rows = (await session.scalars(stmt)).all()
         return [ErrorGroup.model_validate(row.payload) for row in rows]
 
+    async def services_raising_since(self, since: datetime) -> list[str]:
+        """Every tenant a code exception was seen in since ``since``.
+
+        The mapping pass's other source is ``services_seen_since``, which reads
+        the signals table. A tenant that raises exceptions never alerts, so
+        without this one the pass that covers "everything whose mapping Triage
+        has needed" covers none of them.
+        """
+        stmt = select(ErrorGroupRow.payload).where(ErrorGroupRow.last_seen >= since)
+        async with self._sessionmaker() as session:
+            payloads = (await session.scalars(stmt)).all()
+        return sorted({service for payload in payloads for service in payload.get("services", {})})
+
 
 def merged_error_group(stored: ErrorGroup | None, incoming: ErrorGroup) -> ErrorGroup:
     """What one tick's observation of a group becomes once the stored one is known.
@@ -810,6 +825,16 @@ class InMemoryRepository:
     async def services_seen_since(self, since: datetime) -> list[str]:
         return sorted(
             {signal.service for signal in self.signals.values() if signal.received_at >= since}
+        )
+
+    async def services_raising_since(self, since: datetime) -> list[str]:
+        return sorted(
+            {
+                service
+                for group in self.error_groups.values()
+                if group.last_seen >= since
+                for service in group.services
+            }
         )
 
     async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup:

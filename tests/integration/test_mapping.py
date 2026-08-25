@@ -6,7 +6,7 @@ system-map entry. Assertions are on what a pass *left behind* — the workload
 rows, and the line it wrote about every service it could not map.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -22,6 +22,9 @@ from tests.conftest import (
 from triage.graphs.mapping import graph
 from triage.integrations.datadog import FakeDatadogClient
 from triage.integrations.github import FakeGitHubClient, GitHubError
+from triage.schemas.common import Feature
+from triage.schemas.errors import ErrorGroup, ErrorTrack, Novelty
+from triage.schemas.signal import Signal
 from triage.schemas.system_map import CommitSource, MappingOutcome, MappingSource, Tenancy
 
 PLATFORM = "github.com/zeenea/platform"
@@ -399,3 +402,57 @@ async def test_a_declaration_about_another_workload_is_not_this_ones(zeenea):
     await run(deps)
 
     assert deps.repo.workloads[TENANT].iac_paths == []
+
+
+class TestWhatAPassCoversByDefault:
+    """Given no service names, a pass covers what Triage has needed a mapping for.
+
+    That was read from the signals table alone — services that *alerted*. A
+    tenant raising a code exception never alerts, so on 2026-08-25 the default
+    pass returned zero services while seventy tenants were raising exceptions,
+    and every F2 report then said no deployed commit was known for its tenant.
+    """
+
+    async def _group_in(self, deps, service: str, *, last_seen: datetime) -> None:
+        await deps.repo.upsert_error_group(
+            ErrorGroup.model_validate(
+                {
+                    "key": f"java.lang.NullPointerException|Property.scala|get|{service}",
+                    "error_type": "java.lang.NullPointerException",
+                    "file_path": "zeenea.repository.orientdb.mapping.Property.scala",
+                    "function_name": "get",
+                    "repository": "platform",
+                    "track": ErrorTrack.TRACE,
+                    "novelty": Novelty.NEW,
+                    "services": {service: 40},
+                    "occurrences": 40,
+                    "first_seen": last_seen,
+                    "last_seen": last_seen,
+                }
+            )
+        )
+
+    async def test_a_tenant_that_only_raised_an_exception_is_covered(self, zeenea):
+        deps = deps_for(zeenea)
+        await self._group_in(deps, TENANT, last_seen=datetime.now(UTC))
+
+        state = await graph.ainvoke({}, config=run_config(deps))
+
+        assert TENANT in state["targets"]
+
+    async def test_a_tenant_whose_group_is_older_than_the_lookback_is_not(self, zeenea):
+        deps = deps_for(zeenea)
+        await self._group_in(deps, TENANT, last_seen=datetime.now(UTC) - timedelta(days=90))
+
+        state = await graph.ainvoke({}, config=run_config(deps))
+
+        assert TENANT not in state["targets"]
+
+    async def test_a_tenant_that_both_alerted_and_raised_is_named_once(self, zeenea):
+        deps = deps_for(zeenea)
+        await self._group_in(deps, TENANT, last_seen=datetime.now(UTC))
+        await deps.repo.save_signal(Signal(feature=Feature.F1, source="datadog", service=TENANT))
+
+        state = await graph.ainvoke({}, config=run_config(deps))
+
+        assert state["targets"].count(TENANT) == 1

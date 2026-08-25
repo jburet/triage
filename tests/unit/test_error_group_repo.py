@@ -232,3 +232,42 @@ def test_the_merge_rule_needs_no_repository_at_all() -> None:
     stored = merged_error_group(None, a_tick(4))
 
     assert merged_error_group(stored, a_tick(6)).cumulative_occurrences == 10
+
+
+class TestServicesRaisingSince:
+    """Which tenants raised a code exception, for the mapping pass to derive (M8).
+
+    The mapping's other source is ``services_seen_since``, which reads the
+    signals table — services that *alerted*. F2's tenants never alert, so
+    without this the pass covering "everything whose mapping Triage has needed"
+    covered none of them: on 2026-08-25 the default run returned zero services
+    while seventy tenants were raising exceptions, and every report then said no
+    deployed commit was known.
+    """
+
+    async def test_names_every_service_a_group_was_seen_in(self) -> None:
+        repo = InMemoryRepository()
+        await repo.upsert_error_group(
+            a_tick(services={"plt-bred": 90, "plt-merck-qa": 10}, occurrences=100)
+        )
+
+        assert await repo.services_raising_since(NOW - timedelta(hours=1)) == [
+            "plt-bred",
+            "plt-merck-qa",
+        ]
+
+    async def test_ignores_a_group_last_seen_before_the_window(self) -> None:
+        repo = InMemoryRepository()
+        stale = NOW - timedelta(days=30)
+        await repo.upsert_error_group(a_tick(first_seen=stale, last_seen=stale))
+
+        assert await repo.services_raising_since(NOW - timedelta(hours=1)) == []
+
+    async def test_a_service_in_two_groups_is_named_once(self) -> None:
+        repo = InMemoryRepository()
+        await repo.upsert_error_group(a_tick(services={"plt-bred": 4}))
+        await repo.upsert_error_group(
+            a_tick(key=KEY + "|other", services={"plt-bred": 7}, occurrences=7)
+        )
+
+        assert await repo.services_raising_since(NOW - timedelta(hours=1)) == ["plt-bred"]
