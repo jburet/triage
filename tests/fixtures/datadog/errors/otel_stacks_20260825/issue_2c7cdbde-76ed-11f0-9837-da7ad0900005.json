@@ -1,0 +1,23 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "Error in query \u00abload_contact_by_id\u00bb with (id -> contact:868d1237-56c9-497a-83bc-b5cc8bc3af47) : Not found",
+      "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+      "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+      "first_seen": 1754942145957,
+      "first_seen_version": "",
+      "function_name": "$anonfun$load$6",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787645293884,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "service": "plt-merck-dev",
+      "state": "ACKNOWLEDGED"
+    },
+    "id": "2c7cdbde-76ed-11f0-9837-da7ad0900005",
+    "type": "issue"
+  }
+}

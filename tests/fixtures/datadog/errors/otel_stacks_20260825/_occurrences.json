@@ -1,0 +1,47 @@
+[
+  {
+    "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+    "matching": 0,
+    "query": "service:plt-merck-qa status:error",
+    "service": "plt-merck-qa",
+    "spans": 20,
+    "types": {
+      "zeenea.service.api.ScannerUpsertItemException": 20
+    },
+    "with_stack": 20
+  },
+  {
+    "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+    "matching": 0,
+    "query": "service:plt-autostrade status:error",
+    "service": "plt-autostrade",
+    "spans": 20,
+    "types": {
+      "java.net.ConnectException": 4,
+      "org.postgresql.util.PSQLException": 2
+    },
+    "with_stack": 6
+  },
+  {
+    "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+    "matching": 0,
+    "query": "service:plt-merck status:error",
+    "service": "plt-merck",
+    "spans": 20,
+    "types": {
+      "zeenea.service.api.ScannerUpsertItemException": 20
+    },
+    "with_stack": 20
+  },
+  {
+    "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+    "matching": 0,
+    "query": "service:plt-merck-dev status:error",
+    "service": "plt-merck-dev",
+    "spans": 20,
+    "types": {
+      "zeenea.service.api.ScannerUpsertItemException": 20
+    },
+    "with_stack": 20
+  }
+]

@@ -7,9 +7,11 @@ The sibling of ``scripts/capture_datadog``, and for the same reason: everything
 F2 is written against must be a payload the org actually returned, not the shape
 the OpenAPI document implies. It writes ``tests/fixtures/datadog/errors/<slug>/``
 — one ``search_<track>.json`` per track, one ``issue_<id>.json`` for the issues
-the search named, ``_calls.json`` with latency, size and every ``X-RateLimit-*``
-header, and ``summary.md`` stating how many issues came back per track and how
-many of them name a file and a function.
+the search named, one ``spans_<service>.json`` of the raw error spans behind the
+loudest services, ``_calls.json`` with latency, size and every ``X-RateLimit-*``
+header, and ``summary.md`` stating how many issues came back per track, how many
+of them name a file and a function, and how many of the error spans carry the
+exception the issue is about.
 
 That last count is the point. F2 is only cheaper than F1 because an Error
 Tracking issue already says where in the code the exception was raised; a capture
@@ -34,6 +36,70 @@ from triage.integrations.datadog import error_issue_search_body
 FIXTURE_ROOT = Path("tests/fixtures/datadog/errors")
 MAX_ISSUE_READS = 5
 MAX_RECONSTRUCTIONS = 3
+MAX_SPAN_CAPTURES = 4
+SPAN_LIMIT = 20
+
+
+def occurrences(
+    session: Session, service: str, error_type: str | None, frm: datetime, to: datetime
+) -> dict[str, Any]:
+    """The raw error spans of one service, and how many carry this exception.
+
+    The join is not a Datadog attribute. The platform runs the OpenTelemetry Java
+    agent, so the exception type, message and stack live inside ``custom.events``
+    — a JSON-encoded array of OTel span events — and ``@error.type`` is empty.
+    This is the call F2's span collector makes, and the count it returns is the
+    hit rate the collector's statuses are derived from (ADR-0029).
+    """
+    query = f"service:{service} status:error"
+    body = session.call(
+        f"spans.{service}",
+        "POST",
+        "/api/v2/spans/events/search",
+        json={
+            "data": {
+                "type": "search_request",
+                "attributes": {
+                    "filter": {"query": query, "from": frm.isoformat(), "to": to.isoformat()},
+                    "page": {"limit": SPAN_LIMIT},
+                    "sort": "-timestamp",
+                },
+            }
+        },
+    )
+    spans = body.get("data", []) or []
+    types: Counter[str] = Counter()
+    stacks = 0
+    for span in spans:
+        for event in _exception_events(span):
+            attributes = event.get("attributes", {}) or {}
+            if attributes.get("exception.stacktrace"):
+                stacks += 1
+            if attributes.get("exception.type"):
+                types[str(attributes["exception.type"])] += 1
+    return {
+        "service": service,
+        "query": query,
+        "error_type": error_type,
+        "spans": len(spans),
+        "with_stack": stacks,
+        "matching": types.get(error_type or "", 0),
+        "types": dict(types),
+        "body": body,
+    }
+
+
+def _exception_events(span: dict[str, Any]) -> list[dict[str, Any]]:
+    raw = ((span.get("attributes", {}) or {}).get("custom", {}) or {}).get("events")
+    if not isinstance(raw, str):
+        return []
+    try:
+        parsed = json.loads(raw)
+    except ValueError:
+        return []
+    if not isinstance(parsed, list):
+        return []
+    return [item for item in parsed if isinstance(item, dict) and item.get("name") == "exception"]
 
 
 def reconstruct(
@@ -126,6 +192,7 @@ def summarise(
     persona: str,
     found: dict[str, list],
     rebuilt: list[dict[str, Any]],
+    sampled: list[dict[str, Any]],
     calls: list[dict[str, Any]],
 ) -> str:
     lines = [
@@ -176,6 +243,25 @@ def summarise(
                 f"| `{row['issue_id'][:8]}` | `{row['query']}` | {row['claimed']} | "
                 f"{row['spans']} | {row['logs']} |"
             )
+    if sampled:
+        lines += [
+            "",
+            "## The occurrences, found by the query that works",
+            "",
+            "`service:X status:error` over raw spans, joined on `exception.type` inside the",
+            "JSON string `custom.events` — the OpenTelemetry span events, where this platform",
+            "puts the type, the message and the stack. `@error.type` is empty here.",
+            "",
+            "| service | error spans | with an OTel stack | the issue's type | matching | "
+            "types actually retained |",
+            "|---|---|---|---|---|---|",
+        ]
+        for row in sampled:
+            found_types = ", ".join(f"`{name}` ×{count}" for name, count in row["types"].items())
+            lines.append(
+                f"| `{row['service']}` | {row['spans']} | {row['with_stack']} | "
+                f"`{row['error_type']}` | {row['matching']} | {found_types or '—'} |"
+            )
     limited = [call for call in calls if call.get("ratelimit")]
     lines += [
         "",
@@ -200,6 +286,7 @@ def cmd_capture(hours: float, slug: str, tracks: list[str], persona: str, query:
     session = open_session()
     found: dict[str, list[dict[str, Any]]] = {}
     rebuilt: list[dict[str, Any]] = []
+    sampled: list[dict[str, Any]] = []
     with session.client:
         for track in tracks:
             body = search(session, track, persona, query, frm, to)
@@ -221,16 +308,31 @@ def cmd_capture(hours: float, slug: str, tracks: list[str], persona: str, query:
                     ),
                 )
 
-        for issue in next((issues for issues in found.values() if issues), [])[
-            :MAX_RECONSTRUCTIONS
-        ]:
+        ranked = next((issues for issues in found.values() if issues), [])
+        for issue in ranked[:MAX_RECONSTRUCTIONS]:
             rebuilt.append(reconstruct(session, issue, frm, to))
         if rebuilt:
             save("_reconstruction", rebuilt)
 
+        seen: set[str] = set()
+        for issue in ranked:
+            service = issue.get("service")
+            if not service or service in seen or len(seen) >= MAX_SPAN_CAPTURES:
+                continue
+            seen.add(service)
+            row = occurrences(session, service, issue.get("error_type"), frm, to)
+            save(f"spans_{service}", row.pop("body"))
+            sampled.append(row)
+            print(
+                f"  {service:26s} {row['spans']} error spans, {row['with_stack']} with a stack, "
+                f"{row['matching']} matching {row['error_type']}"
+            )
+        if sampled:
+            save("_occurrences", sampled)
+
     save("_calls", session.calls)
     (out / "summary.md").write_text(
-        summarise(slug, frm, to, query, persona, found, rebuilt, session.calls)
+        summarise(slug, frm, to, query, persona, found, rebuilt, sampled, session.calls)
     )
     print(f"\n{len(session.calls)} calls -> {out}")
     print((out / "summary.md").read_text())
