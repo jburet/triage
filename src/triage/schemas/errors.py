@@ -42,6 +42,19 @@ class ErrorPersona(StrEnum):
     FRONTEND = "FRONTEND"
 
 
+class Novelty(StrEnum):
+    """Why a tick is looking at an issue at all.
+
+    Kept apart because they are different reports: a defect nobody has seen and
+    a fix that did not hold are not the same news. It lives with the schema
+    rather than with the rule that decides it, because the group carries it too
+    and a schema may not import the rules that fill it.
+    """
+
+    NEW = "new"
+    REGRESSED = "regressed"
+
+
 class ErrorIssue(BaseModel):
     """One Error Tracking issue in one service, with its count over a window.
 
@@ -93,3 +106,118 @@ class SkippedIssue(BaseModel):
     issue_id: str
     service: str
     reason: str
+
+
+class ErrorGroupStatus(StrEnum):
+    """The life of one error group, as ``SignalStatus`` is for one alert cycle.
+
+    The gate is volume rather than duration (ADR-0025), so the state that
+    matters is whether a group has ever been taken up: ``open`` is persisted
+    with its count and nothing more, which is the common outcome and the one a
+    tick has to report or it looks like a pass that found nothing.
+    """
+
+    OPEN = "open"
+    ANALYSING = "analysing"
+    REPORTED = "reported"
+    UNMAPPED = "unmapped"
+    """No repository resolves for the service, so there is no tree to read
+    (ADR-0026). Reported as Triage's own gap, never analysed."""
+
+
+class ErrorGroup(BaseModel):
+    """One defect, however many tenants raise it (ADR-0026).
+
+    Two halves. The first is derived by :mod:`triage.errors.grouping` from what
+    Datadog returned this tick — the key, the location, the services and their
+    counts — and is recomputed identically every tick, which is why the fourth
+    occurrence finds the first one's row without anything having stored a
+    pointer to it. The second half is the lifecycle the repository keeps: the
+    cumulative count the escalation reads, how many times the group has been
+    taken up, and the Slack thread every message about it goes into.
+
+    ``services`` is deliberately a count per service and not a total. The honest
+    cost of grouping across tenants is that a defect only one customer hits
+    reads as a platform bug; a group that is 99% one tenant looks different from
+    one spread evenly, and that difference only survives if nothing sums it away.
+
+    Nothing here claims more than the search answered. There is no collected
+    evidence on a group and no promise there ever will be: measured on
+    2026-08-25, a query rebuilt from an issue's own fields returns zero spans and
+    zero logs for an issue claiming 6,344 occurrences, because the error spans
+    are sampled away and the logs are barely shipped.
+    """
+
+    key: str = Field(description="The rule's own output: type, location and repository.")
+    error_type: str
+    file_path: str
+    function_name: str | None = None
+
+    repository: str | None = Field(
+        default=None, description="Repository name; None when nothing claims the services."
+    )
+    repo_url: str | None = None
+    team: str | None = None
+
+    track: ErrorTrack
+    novelty: Novelty
+
+    services: dict[str, int] = Field(
+        default_factory=dict, description="Occurrences this tick, per service. Never summed away."
+    )
+    occurrences: int = Field(default=0, ge=0, description="This tick, across every service.")
+    issue_ids: list[str] = Field(default_factory=list)
+    sample_message: str | None = Field(
+        default=None,
+        description=(
+            "One issue's message, as an example and not as the group's identity — "
+            "the six tenants of the reference hour carry six different queried "
+            "entities in one message shape."
+        ),
+    )
+
+    first_seen: datetime
+    last_seen: datetime
+    first_seen_version: str | None = None
+    last_seen_version: str | None = None
+
+    unanalysable_reason: str | None = None
+
+    status: ErrorGroupStatus = ErrorGroupStatus.OPEN
+    cumulative_occurrences: int = Field(
+        default=0,
+        ge=0,
+        description=(
+            "Across every tick that has seen this group. Zero on a group as the "
+            "rule derived it: the total belongs to the repository, which is what "
+            "lets an upsert tell one tick's observation from a group read back."
+        ),
+    )
+    cumulative_services: dict[str, int] = Field(default_factory=dict)
+    analysis_count: int = Field(
+        default=0,
+        ge=0,
+        description="How many times the group has been taken up — which occurrence a report is.",
+    )
+    analysed_at_cumulative: int = Field(
+        default=0,
+        ge=0,
+        description="Cumulative count when it was last taken up; the escalation counts from here.",
+    )
+    last_analysed_at: datetime | None = None
+    thread_ts: str | None = Field(
+        default=None,
+        description="The Slack thread every message about this group replies under, across ticks.",
+    )
+    first_report_url: str | None = Field(
+        default=None, description="Permalink of the first report, so a later one can link it."
+    )
+
+    @property
+    def analysable(self) -> bool:
+        """Whether there is a tree to read. A group without one is reported, not analysed."""
+        return self.repository is not None
+
+    @property
+    def source_location(self) -> str:
+        return f"{self.file_path}:{self.function_name}" if self.function_name else self.file_path

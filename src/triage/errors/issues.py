@@ -25,19 +25,19 @@ which is the whole reason an hourly pass over a busy org is cheap.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import StrEnum
 from typing import Any
 
 from triage.config import Config
 from triage.schemas.common import TimeWindow
-from triage.schemas.errors import ErrorIssue, ErrorTrack
+from triage.schemas.errors import ErrorIssue, ErrorTrack, Novelty
 
-
-class Novelty(StrEnum):
-    """Why this tick is looking at an issue at all."""
-
-    NEW = "new"
-    REGRESSED = "regressed"
+__all__ = [
+    "Novelty",
+    "environment_filter",
+    "not_a_code_exception",
+    "novelty",
+    "parse_issues",
+]
 
 
 def _moment(value: Any) -> datetime | None:
