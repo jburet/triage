@@ -20,7 +20,7 @@ import structlog
 from langchain_core.runnables import RunnableConfig
 
 from triage.collect.budget import fit
-from triage.collect.recipes import collection_window
+from triage.collect.recipes import F1_COLLECTORS, collection_window
 from triage.collect.sweep import follow_up as run_follow_up
 from triage.collect.sweep import sweep
 from triage.config import CollectionConfig
@@ -33,7 +33,6 @@ from triage.schemas.collection import (
     AlertClass,
     AlertClassification,
     Collection,
-    Collector,
     FollowUpPlan,
 )
 
@@ -180,7 +179,7 @@ async def _plan_follow_up(
             render(
                 "follow_up",
                 alert=alert_payload(state["alert"]),
-                collectors=[collector.value for collector in Collector],
+                collectors=sorted(collector.value for collector in F1_COLLECTORS),
                 budget={
                     "spent": collection.followup_calls,
                     "remaining": deps.config.collection.max_followup_calls

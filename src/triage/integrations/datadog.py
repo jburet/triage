@@ -35,6 +35,7 @@ MAX_THROTTLE_WAIT = 30.0
 
 CONCURRENCY: Mapping[str, int] = {
     "spans": 1,
+    "spans_search": 2,
     "logs": 1,
     "events": 4,
     "metrics": 4,
@@ -47,6 +48,11 @@ CONCURRENCY: Mapping[str, int] = {
 its budget is unknown rather than generous, and one call at a time is what an
 unknown budget deserves — F2 makes two calls an hour, so serialising costs it
 nothing.
+
+``spans_search`` is its own family rather than sharing the aggregate's gate
+because the two endpoints are limited differently: Datadog documents the raw span
+search at 300 requests an hour, against the aggregate's measured 5 per 60 s. One
+gate for both would spend the generous budget at the scarce one's rate.
 """
 
 
@@ -106,7 +112,11 @@ class DatadogClient(Protocol):
     ) -> dict[str, Any]: ...
 
     async def aggregate_spans(
-        self, *, query: str, frm: datetime, to: datetime
+        self, *, query: str, frm: datetime, to: datetime, group_by: Sequence[str] = ("service",)
+    ) -> dict[str, Any]: ...
+
+    async def search_spans(
+        self, *, query: str, frm: datetime, to: datetime, limit: int = 10
     ) -> dict[str, Any]: ...
 
     async def search_error_issues(
@@ -223,7 +233,9 @@ class DatadogRestClient:
             },
         )
 
-    async def aggregate_spans(self, *, query: str, frm: datetime, to: datetime) -> dict[str, Any]:
+    async def aggregate_spans(
+        self, *, query: str, frm: datetime, to: datetime, group_by: Sequence[str] = ("service",)
+    ) -> dict[str, Any]:
         return await self._call(
             "spans",
             "POST",
@@ -238,7 +250,37 @@ class DatadogRestClient:
                             "to": to.isoformat(),
                         },
                         "compute": [{"aggregation": "count", "type": "total"}],
-                        "group_by": [{"facet": "service", "limit": 10}],
+                        "group_by": [{"facet": facet, "limit": 10} for facet in group_by],
+                    },
+                }
+            },
+        )
+
+    async def search_spans(
+        self, *, query: str, frm: datetime, to: datetime, limit: int = 10
+    ) -> dict[str, Any]:
+        """Raw spans, not an aggregate: F2 wants one trace to open (M8 3.2).
+
+        Reads only what a retention filter kept. Measured on 2026-08-25, that is
+        nothing at all for the services Error Tracking raises issues for — which
+        is a fact about the org's retention filters and is reported as one
+        (ADR-0027), not a reason to skip the call.
+        """
+        return await self._call(
+            "spans_search",
+            "POST",
+            "/api/v2/spans/events/search",
+            json={
+                "data": {
+                    "type": "search_request",
+                    "attributes": {
+                        "filter": {
+                            "query": query,
+                            "from": frm.isoformat(),
+                            "to": to.isoformat(),
+                        },
+                        "page": {"limit": limit},
+                        "sort": "-timestamp",
                     },
                 }
             },
@@ -281,6 +323,7 @@ EMPTY_EVENTS: dict[str, Any] = {"data": []}
 EMPTY_LOGS: dict[str, Any] = {"data": []}
 EMPTY_SERIES: dict[str, Any] = {"series": []}
 EMPTY_AGGREGATE: dict[str, Any] = {"data": []}
+EMPTY_SPANS: dict[str, Any] = {"data": []}
 EMPTY_ERROR_ISSUES: dict[str, Any] = {"data": [], "included": []}
 
 
@@ -347,8 +390,15 @@ class FakeDatadogClient:
     ) -> dict[str, Any]:
         return self._answer("logs", query, EMPTY_LOGS, to - frm)
 
-    async def aggregate_spans(self, *, query: str, frm: datetime, to: datetime) -> dict[str, Any]:
+    async def aggregate_spans(
+        self, *, query: str, frm: datetime, to: datetime, group_by: Sequence[str] = ("service",)
+    ) -> dict[str, Any]:
         return self._answer("spans", query, EMPTY_AGGREGATE, to - frm)
+
+    async def search_spans(
+        self, *, query: str, frm: datetime, to: datetime, limit: int = 10
+    ) -> dict[str, Any]:
+        return self._answer("spans_search", query, EMPTY_SPANS, to - frm)
 
     async def search_error_issues(
         self, *, query: str, frm: datetime, to: datetime, track: str, persona: str

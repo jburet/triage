@@ -52,6 +52,14 @@ class Collector(StrEnum):
     METRICS = "metrics"
     SPANS = "spans"
 
+    ERROR_LOGS = "error_logs"
+    ERROR_SPANS = "error_spans"
+    ERROR_SPAN_COUNTS = "error_span_counts"
+    """F2's three (M8 Phase 3). They live in the same enum as F1's because they are
+    the same thing — one deterministic query whose answer is spent as prompt tokens
+    — but they are not in F1's sweep and F1's follow-up loop refuses them, because a
+    collector asked for outside the feature it was written for has no scope to run in."""
+
 
 class CollectorStatus(StrEnum):
     OK = "ok"
@@ -59,6 +67,16 @@ class CollectorStatus(StrEnum):
     """Nothing in the incident window, but the same query returns data when widened."""
     NOT_INSTRUMENTED = "not_instrumented"
     """Nothing in the window and nothing namespace-wide over seven days."""
+    SAMPLED_AWAY = "sampled_away"
+    """The events happened, something counted them, and they are not searchable.
+
+    Told from ``NOT_INSTRUMENTED`` by a control query — the same scope with the
+    error predicate dropped — coming back alive (ADR-0027). The distinction is the
+    whole reason this status exists: both are an empty list, and they are opposite
+    instructions. "Not instrumented" tells a developer to look elsewhere. "Sampled
+    away" tells an SRE which retention filter to turn on, and nobody turns one on
+    for a report that only said "empty".
+    """
     FAILED = "failed"
     SKIPPED = "skipped"
     """Not runnable at all: a monitor whose query has no re-runnable form, a scope
@@ -128,7 +146,12 @@ class Collection(BaseModel):
         return [
             result
             for result in self.results
-            if result.status in (CollectorStatus.NOT_INSTRUMENTED, CollectorStatus.FAILED)
+            if result.status
+            in (
+                CollectorStatus.NOT_INSTRUMENTED,
+                CollectorStatus.SAMPLED_AWAY,
+                CollectorStatus.FAILED,
+            )
         ]
 
     def as_payload(self) -> dict[str, Any]:

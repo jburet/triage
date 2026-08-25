@@ -119,6 +119,11 @@ SWEEP = (
 )
 """Every class sweeps the same shape; the classes differ in which metrics they ask for."""
 
+F1_COLLECTORS = frozenset({*SWEEP, Collector.MONITOR_DEFINITION})
+"""What F1 may run. ``Collector`` also holds F2's three, which have no alert scope
+to run in: asked for here they would fall through to an unscoped event search and
+answer a question about the whole org. The follow-up loop refuses them by name."""
+
 TAG_FOR = {
     "cluster": "kube_cluster_name",
     "namespace": "kube_namespace",
