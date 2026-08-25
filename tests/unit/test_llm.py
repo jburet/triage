@@ -12,8 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 from tests.conftest import a_draft, a_verdict
-from triage.llm import AnthropicClient, FakeLLM, LiteLLMClient, StructuredOutputError
-from triage.runtime import verify_models
+from triage.llm import AnthropicClient, FakeLLM, LiteLLMClient, StructuredOutputError, verify_models
 from triage.schemas import ReviewVerdict, TicketDraft
 
 

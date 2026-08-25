@@ -32,6 +32,13 @@ JOB_TIMEOUT_SECONDS = 900.0
 REQUEST_ENV = "TRIAGE_ANALYSIS_REQUEST"
 JOB_NAME_ENV = "TRIAGE_ANALYSIS_JOB_NAME"
 
+WORKSPACE_ENV = "TRIAGE_ANALYSIS_WORKSPACE"
+"""Set, the entrypoint clones into it; unset, it reads the directory it was started in.
+
+The image sets it, because nothing clones for a Job's container. The host runner
+leaves it unset, because it has already cloned (M7 3.2).
+"""
+
 _SERVICE_ACCOUNT = Path("/var/run/secrets/kubernetes.io/serviceaccount")
 _BATCH_API = "/apis/batch/v1"
 

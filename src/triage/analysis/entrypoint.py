@@ -23,6 +23,7 @@ from pathlib import Path
 import structlog
 from pydantic import ValidationError
 
+from triage.analysis.clone import clone
 from triage.analysis.context import (
     APPLICATION,
     DEFAULT_BUDGET,
@@ -32,8 +33,8 @@ from triage.analysis.context import (
     SelectionProfile,
     gather,
 )
-from triage.analysis.jobs import JOB_NAME_ENV, REQUEST_ENV
-from triage.llm import StructuredLLM, StructuredOutputError
+from triage.analysis.jobs import JOB_NAME_ENV, JOB_TIMEOUT_SECONDS, REQUEST_ENV, WORKSPACE_ENV
+from triage.llm import StructuredLLM, StructuredOutputError, build_llm
 from triage.prompts import render
 from triage.schemas.analysis import (
     AnalysisFindings,
@@ -68,6 +69,24 @@ ANALYSERS: dict[AnalysisKind, Analyser] = {
 }
 
 
+def unanswerable(kind: AnalysisKind) -> AnalysisResult | None:
+    """The stated failure for a kind this image has no analyser for, or nothing.
+
+    ``diff_analysis`` needs the patch between two commits rather than one tree,
+    which is a different gather (ADR-0014). Asked for one, the image says so
+    and names the kind — before the clone, because a clone that failed on its
+    own terms first would report *that* instead, and would have fetched a tree
+    nothing was ever going to read.
+    """
+    if kind in ANALYSERS:
+        return None
+    return AnalysisResult.failed(
+        kind,
+        f"{kind.value} has no entrypoint yet; this image answers "
+        f"{', '.join(answerable.value for answerable in ANALYSERS)}",
+    )
+
+
 async def analyse(
     request: AnalysisRequest,
     root: Path,
@@ -76,13 +95,10 @@ async def analyse(
     budget: ContextBudget = DEFAULT_BUDGET,
 ) -> AnalysisResult:
     """Answer the request against the tree at ``root``, or say why it could not be."""
-    analyser = ANALYSERS.get(request.kind)
-    if analyser is None:
-        return AnalysisResult.failed(
-            request.kind,
-            f"{request.kind.value} has no entrypoint yet; this image answers "
-            f"{', '.join(kind.value for kind in ANALYSERS)}",
-        )
+    refusal = unanswerable(request.kind)
+    if refusal is not None:
+        return refusal
+    analyser = ANALYSERS[request.kind]
 
     context = gather(root, analyser.profile, budget, first=request.paths)
     sections: dict[str, object] = {
@@ -115,6 +131,34 @@ async def analyse(
         return AnalysisResult(kind=request.kind, status=AnalysisStatus.SUCCEEDED, result=payload)
 
     return AnalysisResult.failed(request.kind, f"{request.kind.value} was not answered: {failure}")
+
+
+async def run(
+    request: AnalysisRequest,
+    llm: StructuredLLM,
+    *,
+    workspace: Path | None,
+    token: str = "",
+    budget: ContextBudget = DEFAULT_BUDGET,
+) -> AnalysisResult:
+    """Get the tree, then answer against it.
+
+    A workspace means the caller has nothing cloned — the image's case, where
+    the container is all there is on the far side of the Job boundary and no
+    step before it ran. No workspace means the host runner, which clones and
+    then starts the entrypoint inside the result; cloning again there would
+    fetch the same tree twice.
+    """
+    refusal = unanswerable(request.kind)
+    if refusal is not None:
+        return refusal
+    if workspace is None:
+        return await analyse(request, Path.cwd(), llm, budget=budget)
+    workspace.mkdir(parents=True, exist_ok=True)
+    failure = await clone(request, workspace, timeout=JOB_TIMEOUT_SECONDS, token=token)
+    if failure is not None:
+        return AnalysisResult.failed(request.kind, failure)
+    return await analyse(request, workspace, llm, budget=budget)
 
 
 def report(result: AnalysisResult) -> int:
@@ -154,12 +198,16 @@ async def main() -> int:
 
     request = AnalysisRequest.model_validate_json(os.environ[REQUEST_ENV])
     settings = get_settings()
+    workspace = os.environ.get(WORKSPACE_ENV)
     try:
         # build_llm, not a LiteLLMClient: the sandbox must reach a model the same
         # way the graph does, or the provider that works outside it fails here.
-        from triage.runtime import build_llm
-
-        result = await analyse(request, Path.cwd(), build_llm(settings))
+        result = await run(
+            request,
+            build_llm(settings),
+            workspace=Path(workspace) if workspace else None,
+            token=settings.github_token,
+        )
     except Exception as exc:
         result = AnalysisResult.failed(request.kind, f"{type(exc).__name__}: {exc}")
 

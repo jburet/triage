@@ -22,6 +22,13 @@ from typing import Protocol
 
 import structlog
 
+from triage.analysis.clone import (
+    CommandRunner,
+    clone,
+    clone_steps,
+    run_command,
+    tail,
+)
 from triage.analysis.jobs import (
     JOB_TIMEOUT_SECONDS,
     REQUEST_ENV,
@@ -32,17 +39,11 @@ from triage.analysis.jobs import (
 )
 from triage.config import AnalysisJobConfig
 from triage.db.repo import AnalysisResultRecord, TriageRepository
-from triage.integrations.github import clone_url
 from triage.schemas.analysis import AnalysisKind, AnalysisRequest, AnalysisResult, AnalysisStatus
 
 log = structlog.get_logger(__name__)
 
-CLONE_DEPTH = 1
-"""ADR-0009: the analyses read a tree at a commit, not a history."""
-
 DEFAULT_POLL_SECONDS = 5.0
-
-_STDERR_TAIL = 500
 
 
 class AnalysisRunner(Protocol):
@@ -96,63 +97,6 @@ class FakeAnalysisRunner:
         return [request for request in self.requests if request.kind is kind]
 
 
-@dataclass(frozen=True)
-class CompletedCommand:
-    argv: tuple[str, ...]
-    returncode: int
-    stdout: str
-    stderr: str
-
-    @property
-    def ok(self) -> bool:
-        return self.returncode == 0
-
-
-class CommandRunner(Protocol):
-    """A shell, narrow enough that a test can be one."""
-
-    async def __call__(
-        self,
-        argv: Sequence[str],
-        *,
-        cwd: Path | None = None,
-        env: Mapping[str, str] | None = None,
-        timeout: float,
-    ) -> CompletedCommand: ...
-
-
-async def run_command(
-    argv: Sequence[str],
-    *,
-    cwd: Path | None = None,
-    env: Mapping[str, str] | None = None,
-    timeout: float,
-) -> CompletedCommand:
-    process = await asyncio.create_subprocess_exec(
-        *argv,
-        cwd=cwd,
-        env=dict(env) if env is not None else None,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    try:
-        out, err = await asyncio.wait_for(process.communicate(), timeout=timeout)
-    except TimeoutError:
-        process.kill()
-        await process.wait()
-        return CompletedCommand(tuple(argv), 124, "", f"timed out after {timeout:.0f}s")
-    return CompletedCommand(
-        tuple(argv),
-        process.returncode or 0,
-        out.decode(errors="replace"),
-        err.decode(errors="replace"),
-    )
-
-
-def _tail(text: str) -> str:
-    return text.strip()[-_STDERR_TAIL:] or "no output"
-
-
 class LocalAnalysisRunner:
     """Runs the analysis entrypoint on this host, in a throwaway clone.
 
@@ -172,12 +116,14 @@ class LocalAnalysisRunner:
         workdir: Path | None = None,
         timeout: float = JOB_TIMEOUT_SECONDS,
         git: str = "git",
+        token: str = "",
     ) -> None:
         self._entrypoint = tuple(entrypoint)
         self._command = command
         self._workdir = workdir
         self._timeout = timeout
         self._git = git
+        self._token = token
 
     async def run(self, request: AnalysisRequest) -> AnalysisResult:
         directory = Path(
@@ -194,26 +140,18 @@ class LocalAnalysisRunner:
             shutil.rmtree(directory, ignore_errors=True)
 
     def _clone_steps(self, request: AnalysisRequest, directory: Path) -> list[list[str]]:
-        here = [self._git, "-C", str(directory)]
-        fetch = [*here, "fetch", "--depth", str(CLONE_DEPTH)]
-        if request.base_commit:
-            fetch.append("--filter=blob:none")
-        return [
-            [self._git, "init", "--quiet", str(directory)],
-            [*here, "remote", "add", "origin", clone_url(request.repo_url)],
-            [*fetch, "origin", *request.commits],
-            [*here, "checkout", "--quiet", request.commit],
-        ]
+        return clone_steps(request, directory, git=self._git)
 
     async def _clone(self, request: AnalysisRequest, directory: Path) -> AnalysisResult | None:
-        for argv in self._clone_steps(request, directory):
-            completed = await self._command(argv, cwd=directory, timeout=self._timeout)
-            if not completed.ok:
-                return AnalysisResult.failed(
-                    request.kind,
-                    f"clone failed at `{' '.join(argv)}`: {_tail(completed.stderr)}",
-                )
-        return None
+        failure = await clone(
+            request,
+            directory,
+            command=self._command,
+            timeout=self._timeout,
+            git=self._git,
+            token=self._token,
+        )
+        return None if failure is None else AnalysisResult.failed(request.kind, failure)
 
     async def _analyse(self, request: AnalysisRequest, directory: Path) -> AnalysisResult:
         completed = await self._command(
@@ -225,7 +163,7 @@ class LocalAnalysisRunner:
         if not completed.ok:
             return AnalysisResult.failed(
                 request.kind,
-                f"analysis entrypoint exited {completed.returncode}: {_tail(completed.stderr)}",
+                f"analysis entrypoint exited {completed.returncode}: {tail(completed.stderr)}",
             )
         try:
             raw = json.loads(completed.stdout)

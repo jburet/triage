@@ -19,7 +19,7 @@ from tests.conftest import (
     some_findings,
 )
 from triage.analysis.context import ContextBudget
-from triage.analysis.entrypoint import analyse, report
+from triage.analysis.entrypoint import analyse, report, run
 from triage.llm import FakeLLM, StructuredOutputError
 from triage.schemas.analysis import AnalysisFindings, AnalysisKind, AnalysisResult
 from triage.schemas.common import Unknown
@@ -234,3 +234,66 @@ def test_a_failed_analysis_exits_non_zero_and_says_why(capsys):
     assert code == 1
     assert "clone was empty" in captured.err
     assert not captured.out.strip()
+
+
+async def test_the_image_clones_the_workspace_it_is_handed_and_answers_from_it(tmp_path, remote):
+    """M7 3.2. A Job's container is all there is on the far side of the boundary,
+    so nothing has cloned for it — the host runner's arrangement does not reach here."""
+    url, older, _newer = remote
+    llm = FakeLLM(responses={AnalysisFindings: [some_findings()]})
+    workspace = tmp_path / "workspace"
+
+    result = await run(
+        an_analysis_request(AnalysisKind.CODE_ANALYSIS, repo_url=url, commit=older),
+        llm,
+        workspace=workspace,
+    )
+
+    assert result.succeeded
+    assert (workspace / "old.py").exists()
+    assert "old.py" in tagged(llm.calls[0].prompt, "repository")["tree"]
+
+
+async def test_a_clone_that_failed_is_a_stated_failure_and_costs_no_model_call(tmp_path, remote):
+    url, _older, _newer = remote
+    llm = FakeLLM(responses={})
+
+    result = await run(
+        an_analysis_request(AnalysisKind.CODE_ANALYSIS, repo_url=url, commit="0" * 40),
+        llm,
+        workspace=tmp_path / "workspace",
+    )
+
+    assert not result.succeeded
+    assert "0" * 40 in (result.error or "")
+    assert llm.calls == []
+
+
+async def test_with_no_workspace_the_working_directory_is_the_tree(application_repo, monkeypatch):
+    """The host runner clones first and runs the entrypoint inside the result."""
+    llm = FakeLLM(responses={RepoSummary: [a_repo_summary()]})
+    monkeypatch.chdir(application_repo)
+
+    result = await run(an_analysis_request(AnalysisKind.SUMMARIZE_REPO), llm, workspace=None)
+
+    assert result.succeeded
+
+
+async def test_a_kind_with_no_analyser_fails_before_anything_is_cloned(tmp_path, remote):
+    """M7 3.4. diff_analysis is still not implemented, and the honest failure names
+    the kind — a clone that ran first would fail for its own reasons instead, and
+    would have paid for a tree nothing was going to read."""
+    url, older, _newer = remote
+    workspace = tmp_path / "workspace"
+
+    result = await run(
+        an_analysis_request(
+            AnalysisKind.DIFF_ANALYSIS, repo_url=url, commit=older, base_commit=older
+        ),
+        FakeLLM(responses={}),
+        workspace=workspace,
+    )
+
+    assert not result.succeeded
+    assert "diff_analysis" in (result.error or "")
+    assert not workspace.exists()

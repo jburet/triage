@@ -1,4 +1,6 @@
-.PHONY: help install env dev db proxy proxy-down migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
+.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
+
+ANALYSIS_IMAGE ?= triage-analysis:dev
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -23,6 +25,9 @@ proxy: env ## Start the local LiteLLM proxy (tier aliases + the daily cap)
 
 proxy-down: ## Stop the local LiteLLM proxy
 	docker compose stop litellm
+
+analysis-image: ## Build the image one analysis runs in (docker/analysis/Dockerfile)
+	docker build -f docker/analysis/Dockerfile -t $(ANALYSIS_IMAGE) .
 
 migrate: ## Apply Alembic migrations
 	uv run alembic upgrade head
