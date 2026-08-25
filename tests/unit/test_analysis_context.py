@@ -10,6 +10,7 @@ from pathlib import Path
 
 from triage.analysis.context import (
     APPLICATION,
+    INVESTIGATION,
     TERRAFORM,
     ContextBudget,
     gather,
@@ -178,3 +179,84 @@ def test_the_payload_carries_tree_files_and_gaps(tmp_path):
     assert payload["tree"] == ["pyproject.toml"]
     assert payload["files"][0]["path"] == "pyproject.toml"
     assert "not_examined" in payload
+
+
+def a_scala_service(root: Path) -> Path:
+    """The shape of the repository the 2026-08-24 incident was about.
+
+    Twenty-six build files, a README, workflows, a chart — and every line that
+    runs under `src/main/scala`, where the application profile has no pattern.
+    """
+    for module in ("core", "api", "indexer"):
+        write(root, f"{module}/build.sbt", 'name := "x"\n')
+        write(root, f"{module}/src/main/scala/com/zeenea/{module}/Server.scala", "object Server\n")
+        write(root, f"{module}/src/main/scala/com/zeenea/{module}/Store.scala", "object Store\n")
+    write(root, "build.sbt", 'ThisBuild / scalaVersion := "2.13.14"\n')
+    write(root, "README.md", "# datacatalog\n")
+    write(root, ".github/workflows/ci.yml", "on: push\n")
+    write(
+        root, "core/src/main/resources/application.conf", "pekko.http.server.idle-timeout = 60s\n"
+    )
+    return root
+
+
+def test_an_investigation_reads_the_source_the_summary_profile_cannot_see(tmp_path):
+    """Measured on 2026-08-24: `code_analysis` of a 4261-file Scala repository
+    selected 47 files and not one line of Scala, so it answered `low` about code
+    it had never opened. The summary profile is a list of entry-point *names*,
+    and a JVM repository has none of them."""
+    a_scala_service(tmp_path)
+
+    summarised = paths_read(tmp_path, APPLICATION)
+    investigated = paths_read(tmp_path, INVESTIGATION)
+
+    assert not [path for path in summarised if path.endswith(".scala")]
+    assert len([path for path in investigated if path.endswith(".scala")]) == 6
+
+
+def test_what_configures_the_running_service_is_read_before_its_source(tmp_path):
+    """An incident is usually explained by a timeout, a pool size or a limit, and
+    on the JVM those are in configuration rather than in code."""
+    a_scala_service(tmp_path)
+
+    read = paths_read(tmp_path, INVESTIGATION)
+    conf = read.index("core/src/main/resources/application.conf")
+
+    assert conf < min(index for index, path in enumerate(read) if path.endswith(".scala"))
+
+
+def test_a_selection_that_opened_no_source_at_all_says_so(tmp_path):
+    """The failure that hid for a day: 47 files, none of them code, and a `low`
+    that read like the model's judgement rather than an empty selection."""
+    write(tmp_path, "build.sbt")
+    write(tmp_path, "README.md")
+
+    context = gather(tmp_path, INVESTIGATION)
+
+    assert any("no source file" in note for note in context.not_examined)
+
+
+def test_a_selection_that_did_open_source_says_nothing_of_the_kind(tmp_path):
+    a_scala_service(tmp_path)
+
+    context = gather(tmp_path, INVESTIGATION)
+
+    assert not [note for note in context.not_examined if "no source file" in note]
+
+
+def test_the_summary_profile_is_unchanged_so_invalidation_does_not_widen(tmp_path):
+    """`reads()` is what ADR-0015 asks of every file a merge touched. Teaching the
+    *summary* to read all source would re-summarise every repository on every
+    commit; the investigation is a different profile for exactly that reason."""
+    assert not reads("core/src/main/scala/com/zeenea/core/Server.scala", APPLICATION)
+    assert reads("core/src/main/scala/com/zeenea/core/Server.scala", INVESTIGATION)
+
+
+def test_the_two_kinds_that_answer_a_question_select_differently_from_the_two_that_summarise():
+    """ "What differs is which files are worth opening" — the entrypoint said so
+    while handing both application kinds the same profile."""
+    from triage.analysis.entrypoint import ANALYSERS
+    from triage.schemas.analysis import AnalysisKind
+
+    assert ANALYSERS[AnalysisKind.SUMMARIZE_REPO].profile is APPLICATION
+    assert ANALYSERS[AnalysisKind.CODE_ANALYSIS].profile is INVESTIGATION
