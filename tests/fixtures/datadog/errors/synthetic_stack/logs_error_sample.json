@@ -1,0 +1,211 @@
+{
+  "data": [
+    {
+      "id": "AAAAA-synthetic-000",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:10:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c0) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e00-0000-4000-8000-000000000000"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-001",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:11:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c1) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e01-0000-4000-8000-000000000001"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-002",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:12:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c2) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e02-0000-4000-8000-000000000002"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-003",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:13:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c3) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e03-0000-4000-8000-000000000003"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-004",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:14:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c4) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e04-0000-4000-8000-000000000004",
+          "error": {
+            "kind": "zeenea.commons.exceptions.EntityNotFoundException",
+            "message": "Error in query «load_contact_by_id» : Not found",
+            "stack": "zeenea.commons.exceptions.EntityNotFoundException: Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c9) : Not found\n\tat zeenea.repository.orientdb.OdbClient$.$anonfun$load$6(OdbClient.scala:412)\n\tat scala.util.Success.$anonfun$map$1(Try.scala:255)\n\tat scala.util.Success.map(Try.scala:213)\n\tat scala.concurrent.Future.$anonfun$map$1(Future.scala:292)\n\tat scala.concurrent.impl.Promise.liftedTree1$1(Promise.scala:33)\n\tat zeenea.repository.orientdb.OdbClient$.load(OdbClient.scala:398)\n\tat zeenea.service.ContactService.byId(ContactService.scala:77)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n\tat java.base/java.lang.Thread.run(Thread.java:840)"
+          }
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-005",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:15:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_contact_by_id» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c5) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e05-0000-4000-8000-000000000005"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-006",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:16:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_inventory_item_by_path» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c6) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e06-0000-4000-8000-000000000006"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-007",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:17:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_inventory_item_by_path» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c7) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e07-0000-4000-8000-000000000007"
+        }
+      }
+    },
+    {
+      "id": "AAAAA-synthetic-008",
+      "type": "log",
+      "attributes": {
+        "timestamp": "2026-08-25T05:18:24.000Z",
+        "status": "error",
+        "service": "plt-systeme-u-rec",
+        "host": "plt-systeme-u-rec-0",
+        "message": "Error in query «load_inventory_item_by_path» with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c8) : Not found",
+        "tags": [
+          "env:prod",
+          "service:plt-systeme-u-rec"
+        ],
+        "attributes": {
+          "logger": {
+            "name": "zeenea.repository.orientdb.OdbClient",
+            "thread_name": "pekko-io-2"
+          },
+          "requestId": "7c0f1e08-0000-4000-8000-000000000008"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "elapsed": 87,
+    "status": "done"
+  }
+}

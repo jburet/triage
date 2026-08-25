@@ -48,7 +48,9 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "ANN", "PT"]
 # UP040: PEP 695 `type` aliases are lazily evaluated and Pydantic's handling of
 # Annotated inside them is version-sensitive; explicit TypeAlias stays.
-ignore = ["ANN401", "UP040"]
+# UP047: same reason one step along — a PEP 695 type parameter on a function that
+# is generic over a Protocol reads no better and drags in the same lazy scoping.
+ignore = ["ANN401", "UP040", "UP047"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN"]

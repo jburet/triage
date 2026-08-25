@@ -18,8 +18,12 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field
+
+from triage.schemas.collection import CollectorResult
+from triage.schemas.common import TimeWindow
 
 
 class ErrorTrack(StrEnum):
@@ -221,3 +225,70 @@ class ErrorGroup(BaseModel):
     @property
     def source_location(self) -> str:
         return f"{self.file_path}:{self.function_name}" if self.function_name else self.file_path
+
+
+class Reconstruction(BaseModel):
+    """The queries a collector rebuilt from a group's own fields (M8 3.3, ADR-0027).
+
+    Datadog documents no attribute joining a span or a log back to the Error
+    Tracking issue it was grouped into — nine candidate endpoints answered 404 and
+    four candidate facets returned nothing over seven days when this was probed on
+    2026-08-25 — so the only way to look for the occurrences is to rebuild the
+    query. That makes it a *guess about identity*, and a guess has to be shown.
+
+    Three shapes rather than one, because the layering is measured. Over the
+    reference hour ``@error.type:"…"`` returned zero spans for the services that
+    raised the exception, and over seven days it still did, while ``status:error``
+    on the same services returned 48. And the control — the same services with the
+    error predicate dropped — returned 211,179 in the hour, which is what says the
+    absence is a discard rather than a quiet service.
+    """
+
+    narrow: str = Field(description="The group's services and its exception type.")
+    broad: str = Field(description="The group's services and any error at all.")
+    control: str = Field(
+        description="The group's services and nothing else: is anything collected here?"
+    )
+
+
+class ErrorCollection(BaseModel):
+    """Everything F2 collected about one error group — including what it did not find.
+
+    ``claimed_occurrences`` is here because it is half of the finding. Zero spans
+    is a shrug; zero spans against 6,344 occurrences Datadog counted in the same
+    window is a statement about the telemetry pipeline, and it is the statement
+    that gets a retention filter turned on (ADR-0027).
+    """
+
+    group_key: str
+    window: TimeWindow
+    reconstruction: Reconstruction
+    claimed_occurrences: int = Field(default=0, ge=0)
+    results: list[CollectorResult] = Field(default_factory=list)
+    notes: list[str] = Field(
+        default_factory=list, description="Every cut and every refusal. Kept, never dropped."
+    )
+
+    @property
+    def evidence(self) -> list[CollectorResult]:
+        return [result for result in self.results if result.has_data]
+
+    @property
+    def under_matched(self) -> bool:
+        """The issue counted occurrences and the rebuilt query found none of them."""
+        return self.claimed_occurrences > 0 and not self.evidence
+
+    def as_payload(self) -> dict[str, Any]:
+        return {
+            "group": self.group_key,
+            "window": {"start": self.window.start, "end": self.window.end},
+            "claimed_occurrences": self.claimed_occurrences,
+            "reconstructed_queries": self.reconstruction.model_dump(mode="json"),
+            "reconstruction_caveat": (
+                "No Datadog attribute joins an occurrence to its Error Tracking issue, so "
+                "these queries are rebuilt from the group's own fields and may match less "
+                "than the issue counted."
+            ),
+            "collectors": [result.model_dump(mode="json") for result in self.results],
+            "notes": self.notes,
+        }

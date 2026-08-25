@@ -16,7 +16,13 @@ from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
 from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
-from triage.schemas.errors import ErrorGroup, ErrorIssue, ErrorTrack, SkippedIssue
+from triage.schemas.errors import (
+    ErrorCollection,
+    ErrorGroup,
+    ErrorIssue,
+    ErrorTrack,
+    SkippedIssue,
+)
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
@@ -237,6 +243,20 @@ class IncidentState(AnalysisState, TicketPipelineState, total=False):
 
     qualification: Qualification
     postmortem: str
+
+
+class CodeExceptionState(AnalysisState, TicketPipelineState, total=False):
+    """F2, from one gated error group to a report (M8, ADR-0025, ADR-0026).
+
+    The input is an ``ErrorGroup`` the tick already persisted and the gate already
+    took up. It inherits both sub-graph states for the same reason
+    :class:`IncidentState` does — the compiled ``analysis`` and ``ticket_pipeline``
+    graphs are added as nodes and read their own keys.
+    """
+
+    group: ErrorGroup
+    window: TimeWindow
+    collection: ErrorCollection
 
 
 class PollerState(TypedDict, total=False):
