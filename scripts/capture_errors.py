@@ -257,7 +257,7 @@ def summarise(
             "|---|---|---|---|---|---|",
         ]
         for row in sampled:
-            found_types = ", ".join(f"`{name}` ×{count}" for name, count in row["types"].items())
+            found_types = ", ".join(f"`{name}` x{count}" for name, count in row["types"].items())
             lines.append(
                 f"| `{row['service']}` | {row['spans']} | {row['with_stack']} | "
                 f"`{row['error_type']}` | {row['matching']} | {found_types or '—'} |"

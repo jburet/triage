@@ -237,42 +237,76 @@ class ErrorGroup(BaseModel):
 
 
 class Reconstruction(BaseModel):
-    """The queries a collector rebuilt from a group's own fields (M8 3.3, ADR-0027).
+    """How a collector looked for a group's occurrences (M8 3.3, ADR-0029).
 
-    Datadog documents no attribute joining a span or a log back to the Error
-    Tracking issue it was grouped into — nine candidate endpoints answered 404 and
-    four candidate facets returned nothing over seven days when this was probed on
-    2026-08-25 — so the only way to look for the occurrences is to rebuild the
-    query. That makes it a *guess about identity*, and a guess has to be shown.
+    Datadog exposes no attribute joining a span back to the Error Tracking issue
+    it was grouped into, so the occurrences have to be looked for rather than
+    fetched — and that is still a *guess about identity*, which is why all three
+    parts are shown to whoever reads the report.
 
-    Three shapes rather than one, because the layering is measured. Over the
-    reference hour ``@error.type:"…"`` returned zero spans for the services that
-    raised the exception, and over seven days it still did, while ``status:error``
-    on the same services returned 48. And the control — the same services with the
-    error predicate dropped — returned 211,179 in the hour, which is what says the
-    absence is a discard rather than a quiet service.
+    What changed on 2026-08-25 is where the join lives. It is not
+    ``@error.type``, which is empty because the platform runs the OpenTelemetry
+    agent; it is ``exception.type`` inside the span's own ``custom.events``, and
+    ``query`` is the broad shape that returns the spans carrying it. ``match`` is
+    the value they are filtered on, in Triage rather than in Datadog, and saying
+    so is the difference between a report a reader can re-run and one they cannot.
     """
 
-    narrow: str = Field(description="The group's services and its exception type.")
-    broad: str = Field(description="The group's services and any error at all.")
+    query: str = Field(description="What was sent to Datadog: the services, and any error.")
+    match: str = Field(
+        description="The exception.type the returned spans are filtered on, inside custom.events."
+    )
     control: str = Field(
         description="The group's services and nothing else: is anything collected here?"
     )
 
 
+class ExceptionExemplar(BaseModel):
+    """One real occurrence of the group's exception, stack and all (ADR-0029).
+
+    The thing F2 was built to deliver and could not, until the OTel span events
+    were found. ``stack`` is verbatim and includes the ``Caused by:`` chain —
+    the reference stack's cause names ``LoadControl.scala:14``, two frames the
+    top-level exception never mentions, and cutting the chain would throw away
+    the half a developer acts on.
+
+    ``frames`` is the application's own frames as ``path:line``, runtime frames
+    filtered out. They are *observed*, which is what separates them from the
+    paths ADR-0028 derives from a class name, and the report says which it has.
+    """
+
+    error_type: str | None = None
+    message: str | None = None
+    stack: str
+    frames: list[str] = Field(default_factory=list)
+    trace_id: str | None = None
+    span_id: str | None = None
+    at: str | None = None
+    service: str | None = None
+    operation: str | None = None
+    resource: str | None = None
+
+
 class ErrorCollection(BaseModel):
     """Everything F2 collected about one error group — including what it did not find.
 
-    ``claimed_occurrences`` is here because it is half of the finding. Zero spans
-    is a shrug; zero spans against 6,344 occurrences Datadog counted in the same
-    window is a statement about the telemetry pipeline, and it is the statement
-    that gets a retention filter turned on (ADR-0027).
+    ``claimed_occurrences`` is here because it is half of the finding. Zero
+    matching spans is a shrug; zero against 6,344 occurrences Datadog counted in
+    the same window is a statement about what the sampler kept, and it is the
+    statement that gets a retention filter turned on (ADR-0027, ADR-0029).
+
+    ``exemplar`` is the other half, and the half that was missing until
+    2026-08-25: one occurrence with its stack. It is lifted onto the collection
+    rather than left inside a collector's payload because every reader of a
+    collection wants it — the prompt, the report, and the paths an analysis
+    opens — and none of them should have to know which collector found it.
     """
 
     group_key: str
     window: TimeWindow
     reconstruction: Reconstruction
     claimed_occurrences: int = Field(default=0, ge=0)
+    exemplar: ExceptionExemplar | None = None
     results: list[CollectorResult] = Field(default_factory=list)
     notes: list[str] = Field(
         default_factory=list, description="Every cut and every refusal. Kept, never dropped."
@@ -288,19 +322,23 @@ class ErrorCollection(BaseModel):
         return self.claimed_occurrences > 0 and not self.evidence
 
     def as_payload(self) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "group": self.group_key,
             "window": {"start": self.window.start, "end": self.window.end},
             "claimed_occurrences": self.claimed_occurrences,
-            "reconstructed_queries": self.reconstruction.model_dump(mode="json"),
+            "reconstructed_query": self.reconstruction.model_dump(mode="json"),
             "reconstruction_caveat": (
                 "No Datadog attribute joins an occurrence to its Error Tracking issue, so "
-                "these queries are rebuilt from the group's own fields and may match less "
-                "than the issue counted."
+                "the query is rebuilt from the group's own fields and the exception type is "
+                "matched inside each span's OpenTelemetry events; it may match less than the "
+                "issue counted."
             ),
             "collectors": [result.model_dump(mode="json") for result in self.results],
             "notes": self.notes,
         }
+        if self.exemplar is not None:
+            payload["exemplar"] = self.exemplar.model_dump(mode="json")
+        return payload
 
 
 class CommitChoice(BaseModel):

@@ -16,6 +16,7 @@ from triage.schemas.errors import (
     ErrorCollection,
     ErrorGroup,
     ErrorTrack,
+    ExceptionExemplar,
     Novelty,
     Reconstruction,
 )
@@ -53,22 +54,22 @@ def a_collection(**overrides: object) -> ErrorCollection:
         "group_key": "k",
         "window": WINDOW,
         "reconstruction": Reconstruction(
-            narrow='service:plt-systeme-u-rec @error.type:"…"',
-            broad="service:plt-systeme-u-rec status:error",
+            query="service:plt-systeme-u-rec status:error",
+            match='exception.type:"…" inside each span\'s custom.events',
             control="service:plt-systeme-u-rec",
         ),
         "claimed_occurrences": 5909,
         "results": [
             CollectorResult(
                 collector=Collector.ERROR_SPANS,
-                query='service:plt-systeme-u-rec @error.type:"…"',
+                query="service:plt-systeme-u-rec status:error",
                 status=CollectorStatus.SAMPLED_AWAY,
                 detail="Error Tracking counted 5,909 occurrences in this window and the "
                 "same services returned 211,179 spans with the error predicate dropped",
             ),
             CollectorResult(
                 collector=Collector.ERROR_LOGS,
-                query='service:plt-systeme-u-rec @error.type:"…"',
+                query="service:plt-systeme-u-rec status:error",
                 status=CollectorStatus.NOT_INSTRUMENTED,
                 detail="nothing at all for these services either",
             ),
@@ -300,3 +301,69 @@ class TestManyTenants:
 
         assert "`plt-t03` 1" in header
         assert "more" not in header
+
+
+class TestARetainedOccurrence:
+    """ADR-0029 — what an F2 report carries once a real stack has been retrieved."""
+
+    STACK = (
+        "zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert\n"
+        "\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9."
+        "$anonfun$applyOrElse$3(ScannerService.scala:124)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:1)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:2)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:3)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:4)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:5)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:6)\n"
+        "\tat io.opentelemetry.javaagent.a.run(A.java:7)\n"
+        "Caused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index events\n"
+        "\tat zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\n"
+    )
+
+    def collection(self):
+        return a_collection(
+            exemplar=ExceptionExemplar(
+                error_type="zeenea.service.api.ScannerUpsertItemException",
+                message="TooBusyIndexingException on item upsert",
+                stack=self.STACK,
+                frames=[
+                    "zeenea/service/api/ScannerService.scala:124",
+                    "zeenea/datacatalog/loadcontrol/LoadControl.scala:14",
+                ],
+                trace_id="3a83b9a36ce25524334abbbb39f0072a",
+                service="plt-merck-qa",
+                operation="grpc.server.request",
+                at="2026-08-25T03:33:15.967Z",
+            )
+        )
+
+    def test_the_evidence_section_shows_the_stack_and_the_trace_that_carried_it(self):
+        evidence = body(render(collection=self.collection()), "Evidence")
+
+        assert "One retained occurrence" in evidence
+        assert "trace `3a83b9a36ce25524334abbbb39f0072a`" in evidence
+        assert "`grpc.server.request`" in evidence
+        assert "ScannerService.scala:124" in evidence
+
+    def test_the_caused_by_chain_survives_the_slack_bound(self):
+        """A head-and-tail cut would show seven agent frames and lose the cause."""
+        evidence = body(render(collection=self.collection()), "Evidence")
+
+        assert "Caused by: zeenea.commons.exceptions.TooBusyIndexingException" in evidence
+        assert "LoadControl.scala:14" in evidence
+        assert "… 2 more frames" in evidence
+
+    def test_it_stops_saying_nothing_was_found_when_something_was(self):
+        no_evidence = load_diagnosis("oom_payments").model_copy(update={"evidence": []})
+        evidence = body(render(diagnosis=no_evidence, collection=self.collection()), "Evidence")
+
+        assert "No checkable evidence was produced." not in evidence
+        assert "what Datadog retained is below" in evidence
+
+    def test_an_observed_frame_and_a_derived_path_do_not_read_alike(self):
+        located = body(render(collection=self.collection()), "Location")
+
+        assert "*Stack frames:* `zeenea/service/api/ScannerService.scala:124`" in located
+        assert "the file and the line are observed" in located
+        assert "*Stack frames:*" not in body(render(), "Location")

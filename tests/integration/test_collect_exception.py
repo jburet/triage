@@ -1,8 +1,9 @@
 """The ``collect_exception`` node, through the deps it is given (M8 Phase 3).
 
-Offline: the Datadog client is the recording fake, and no model tier is called at
-all — F2 has nothing to classify, because the group already names its exception
-type and its source location.
+Offline: the Datadog client is the recording fake replaying
+``tests/fixtures/datadog/errors/otel_stacks_20260825/``, and no model tier is
+called at all — F2 has nothing to classify, because the group already names its
+exception type and its source location.
 """
 
 import json
@@ -18,14 +19,12 @@ from triage.schemas.common import TimeWindow
 from triage.schemas.errors import ErrorGroup, ErrorTrack, Novelty
 
 NOW = datetime(2026, 8, 25, 5, 35, 24, tzinfo=UTC)
-SYNTHETIC = (
-    Path(__file__).parent.parent
-    / "fixtures"
-    / "datadog"
-    / "errors"
-    / "synthetic_stack"
-    / "logs_error_sample.json"
-)
+CAPTURE = Path(__file__).parent.parent / "fixtures" / "datadog" / "errors" / "otel_stacks_20260825"
+SCANNER = "zeenea.service.api.ScannerUpsertItemException"
+
+
+def retained_spans() -> dict:
+    return json.loads((CAPTURE / "spans_plt-merck-qa.json").read_text())
 
 
 def a_group(**overrides: object) -> ErrorGroup:
@@ -59,12 +58,11 @@ async def test_the_node_collects_over_a_window_it_derives_from_the_tick(config: 
 
 async def test_a_group_whose_evidence_was_discarded_reports_the_discard(config: Config):
     """The measured case, end to end: the report says why there is nothing to read."""
-    # The control query is a substring of the other two, so the error-predicate
-    # shapes are declared first and answer empty — as the org answers them.
+    # The control query is a substring of the error-predicate one, so the
+    # narrower shape is declared first and answers empty — as the org answers it.
     client = FakeDatadogClient(
         responses={
             "spans": {
-                "@error.type": {"data": []},
                 "status:error": {"data": []},
                 "service:plt-systeme-u-rec": _aggregate("plt-systeme-u-rec", 211179),
             },
@@ -76,29 +74,33 @@ async def test_a_group_whose_evidence_was_discarded_reports_the_discard(config: 
 
     collection = state["collection"]
     assert collection.under_matched
+    assert collection.exemplar is None
     statuses = {result.collector: result.status for result in collection.results}
     assert statuses[Collector.ERROR_SPANS] is CollectorStatus.SAMPLED_AWAY
     assert statuses[Collector.ERROR_LOGS] is CollectorStatus.SAMPLED_AWAY
 
-    payload = collection.as_payload()
-    rendered = json.dumps(payload, default=str)
+    rendered = json.dumps(collection.as_payload(), default=str)
     assert "5,869 occurrences" in rendered
     assert "211,179 spans" in rendered
-    assert '@error.type:\\"zeenea.commons.exceptions.EntityNotFoundException\\"' in rendered
+    assert "service:plt-systeme-u-rec status:error" in rendered
+    assert 'exception.type:\\"zeenea.commons.exceptions.EntityNotFoundException\\"' in rendered
 
 
 async def test_the_stack_reaches_the_payload_a_prompt_would_be_shown(config: Config):
-    client = FakeDatadogClient(
-        responses={"logs": {"@error.type": json.loads(SYNTHETIC.read_text())}}
-    )
+    """The whole point of ADR-0029: a real occurrence, with the code it names."""
+    client = FakeDatadogClient(responses={"spans_search": {"status:error": retained_spans()}})
     deps = build_deps(config, datadog=client)
-    state = await collect_exception({"group": a_group()}, run_config(deps))
+    state = await collect_exception({"group": a_group(error_type=SCANNER)}, run_config(deps))
 
-    logs = next(
-        result for result in state["collection"].results if result.collector is Collector.ERROR_LOGS
-    )
-    assert logs.status is CollectorStatus.OK
-    assert "OdbClient.scala:412" in logs.payload["stack"]
+    collection = state["collection"]
+    spans = next(r for r in collection.results if r.collector is Collector.ERROR_SPANS)
+    assert spans.status is CollectorStatus.OK
+    assert "ScannerService.scala:124" in spans.payload["stack"]
+
+    assert collection.exemplar is not None
+    rendered = json.dumps(collection.as_payload(), default=str)
+    assert "Caused by: zeenea.commons.exceptions.TooBusyIndexingException" in rendered
+    assert "zeenea/datacatalog/loadcontrol/LoadControl.scala:14" in rendered
 
 
 async def test_a_refused_call_does_not_stop_the_others(config: Config):

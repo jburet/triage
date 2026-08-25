@@ -4,33 +4,37 @@ Three collectors and one rule. The collectors are the logs behind the group, the
 error spans behind it, and the operations those spans ran under. The rule is what
 happens when they come back empty, and it is the only interesting part.
 
-**The queries are a reconstruction, and are stated as one.** Datadog exposes no
-attribute joining a span or a log back to the Error Tracking issue it was grouped
-into — probed 2026-08-25: nine candidate endpoints answered 404, four candidate
-include values answered ``invalid include``, four candidate facets returned zero
-spans over seven days. So the query is rebuilt from the group's own fields, and a
-rebuilt query is a guess about identity that has to be shown to whoever reads the
-report (:class:`~triage.schemas.errors.Reconstruction`).
+**The query is a reconstruction, and the join is not Datadog's.** Nothing joins a
+span back to the Error Tracking issue it was grouped into, so the occurrences are
+looked for rather than fetched. Where they are looked for changed on 2026-08-25
+(ADR-0029): the platform runs the OpenTelemetry agent, so ``@error.type`` is
+empty and matches nothing, and the exception's type, message and whole stack are
+inside the span attribute ``custom.events``. The query is therefore
+``service:<svc> status:error`` and the match is ``exception.type`` inside each
+returned span — done here, in Python. Both halves are stated
+(:class:`~triage.schemas.errors.Reconstruction`), because a reader who cannot
+re-run the search cannot check the finding.
 
-**Empty has three meanings here, not two.** F1 separates "quiet window" from "not
+**Empty has four meanings here, not two.** F1 separates "quiet window" from "not
 instrumented" by widening in *time* (ADR-0016). F2 cannot: the issue already
 proves the exceptions happened inside this window, so time is not the question.
-The question is whether what happened is retained, and that is separated by
-widening in *predicate* — drop the error clause and ask whether anything at all
-is collected for these services. Alive means the events were counted and
-discarded (``sampled_away``); dead means nobody collects this signal here
-(``not_instrumented``). ADR-0027 has the measurement: 211,179 spans in the
-reference hour for a service whose 5,869 counted exceptions returned nothing.
+The question is what the sampler kept, and the answers are different sentences:
+error spans were retained and one carries this exception (evidence); error spans
+were retained and none carries it (this defect's occurrences were discarded);
+none at all was retained though the services are alive (the whole error track is
+discarded for them); nothing is collected for these services at all
+(``not_instrumented``). The control query — the same services with the error
+predicate dropped — is what tells the last two apart.
 
 **The stack is never reduced away.** Template-and-count is right for a hundred
 lines of the same message and wrong for the one thing F2 exists to show, so the
-reduction lifts a complete stack trace out before it counts anything and hands it
-back whole. Measured on the org, no service ships one today — ``@error.stack:*``
-returns zero spans org-wide and two services ship such logs, neither a tenant —
-which makes the rule unobserved, not optional.
+reduction lifts a complete stack out before it counts anything and hands it back
+whole, ``Caused by:`` chain included. Measured on the reference capture: 66 of 80
+retained error spans carried one.
 """
 
 import asyncio
+from collections import Counter
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -40,10 +44,16 @@ import structlog
 
 from triage.collect import reduce as reducers
 from triage.config import CollectionConfig
+from triage.errors.otel import ExceptionEvent, exceptions_in
 from triage.integrations.datadog import DatadogClient, DatadogError
 from triage.schemas.collection import Collector, CollectorResult, CollectorStatus
 from triage.schemas.common import TimeWindow
-from triage.schemas.errors import ErrorCollection, ErrorGroup, Reconstruction
+from triage.schemas.errors import (
+    ErrorCollection,
+    ErrorGroup,
+    ExceptionExemplar,
+    Reconstruction,
+)
 
 log = structlog.get_logger(__name__)
 
@@ -77,11 +87,11 @@ def _scope(services: Sequence[str]) -> str:
 
 
 def reconstruct(group: ErrorGroup) -> Reconstruction:
-    """The three queries, built from the group's own fields and nothing else."""
+    """The search, the match and the control, built from the group's own fields."""
     scope = _scope(list(group.services))
     return Reconstruction(
-        narrow=f'{scope} @error.type:"{group.error_type}"',
-        broad=f"{scope} status:error",
+        query=f"{scope} status:error",
+        match=f'exception.type:"{group.error_type}" inside each span\'s custom.events',
         control=scope,
     )
 
@@ -138,30 +148,72 @@ def reduce_error_logs(
     return reduced
 
 
-def reduce_error_spans(payload: dict[str, Any], max_spans: int) -> dict[str, Any]:
-    """Enough of a span to open the trace in Datadog, and the stack if it carried one."""
+RETAINED = "retained_error_spans"
+OTHERS = "other_exception_types"
+
+
+def reduce_error_spans(payload: dict[str, Any], max_spans: int, error_type: str) -> dict[str, Any]:
+    """The spans that carry *this* exception, and a count of the ones that did not.
+
+    The query cannot ask for the exception type — with OpenTelemetry it is not an
+    attribute Datadog indexes — so the filter is here, over the parsed span
+    events. What does not match is still counted and named: "twenty error spans
+    were retained and none of them is this defect" is the finding that separates
+    a sampler discarding these occurrences from a service nobody instruments,
+    and it is only available on the way past.
+    """
     raw = payload.get("data", []) or []
-    spans = []
-    for event in raw[:max_spans]:
-        attributes = event.get("attributes", {}) or {}
-        custom = _flatten(attributes.get("custom", {}) or {})
-        spans.append(
-            {
-                "at": attributes.get("start_timestamp") or attributes.get("timestamp"),
-                "trace_id": attributes.get("trace_id") or custom.get("otel.trace_id"),
-                "span_id": attributes.get("span_id"),
-                "service": attributes.get("service"),
-                "operation": attributes.get("operation_name") or custom.get("operation_name"),
-                "resource": attributes.get("resource_name"),
-                "error_type": custom.get("error.type"),
-                "error_message": custom.get("error.message"),
-            }
-        )
-    reduced: dict[str, Any] = {"count": len(raw), "lines": spans}
-    stack = _first_stack(raw)
+    matched = [event for event in exceptions_in(payload) if event.error_type == error_type]
+    others = Counter(
+        event.error_type
+        for event in exceptions_in(payload)
+        if event.error_type and event.error_type != error_type
+    )
+    reduced: dict[str, Any] = {
+        "count": len(matched),
+        "lines": [_span_line(event) for event in matched[:max_spans]],
+        RETAINED: len(raw),
+    }
+    if others:
+        reduced[OTHERS] = dict(others.most_common())
+    stack = next((event.stacktrace for event in matched if event.stacktrace), None)
+    if stack is None:
+        stack = _first_stack(raw)
     if stack is not None:
         reduced["stack"] = stack
     return reduced
+
+
+def _span_line(event: ExceptionEvent) -> dict[str, Any]:
+    return {
+        "at": event.at,
+        "trace_id": event.trace_id,
+        "span_id": event.span_id,
+        "service": event.service,
+        "operation": event.operation,
+        "resource": event.resource,
+        "error_type": event.error_type,
+        "error_message": event.message,
+    }
+
+
+def exemplar_of(payload: dict[str, Any], error_type: str) -> ExceptionExemplar | None:
+    """One occurrence with a stack, or nothing. The report's whole new fact (ADR-0029)."""
+    for event in exceptions_in(payload):
+        if event.error_type == error_type and event.stacktrace:
+            return ExceptionExemplar(
+                error_type=event.error_type,
+                message=event.message,
+                stack=event.stacktrace,
+                frames=[frame.located for frame in event.frames],
+                trace_id=event.trace_id,
+                span_id=event.span_id,
+                at=event.at,
+                service=event.service,
+                operation=event.operation,
+                resource=event.resource,
+            )
+    return None
 
 
 def _total(reduced: dict[str, Any]) -> int:
@@ -186,21 +238,26 @@ class Call:
 
 @dataclass(frozen=True)
 class Attempt:
-    """One collector after its queries were run, before the absence was named."""
+    """One collector after its query was run, before the absence was named."""
 
     call: Call
     query: str
     payload: dict[str, Any]
     detail: str | None = None
     failure: str | None = None
+    raw: dict[str, Any] | None = None
+    """What Datadog answered, before the reduction — the exemplar is lifted from it."""
 
 
 class Collectors:
-    """F2's three, bound to one client and one set of caps."""
+    """F2's three, bound to one client, one set of caps and one exception type."""
 
-    def __init__(self, client: DatadogClient, config: CollectionConfig) -> None:
+    def __init__(
+        self, client: DatadogClient, config: CollectionConfig, error_type: str = ""
+    ) -> None:
         self._client = client
         self._config = config
+        self._error_type = error_type
 
     async def _logs(self, query: str, window: TimeWindow) -> dict[str, Any]:
         return await self._client.search_logs(query=query, frm=window.start, to=window.end)
@@ -222,7 +279,7 @@ class Collectors:
         )
 
     def _reduce_spans(self, payload: dict[str, Any]) -> dict[str, Any]:
-        return reduce_error_spans(payload, self._config.max_log_lines)
+        return reduce_error_spans(payload, self._config.max_log_lines, self._error_type)
 
     def calls(self) -> list[Call]:
         return [
@@ -237,29 +294,13 @@ class Collectors:
         ]
 
     async def attempt(self, call: Call, queries: Reconstruction, window: TimeWindow) -> Attempt:
-        """The narrow query, then the broad one. Nothing raises out of here (M8 3.5)."""
+        """One query, then the match. Nothing raises out of here (M8 3.5)."""
         try:
-            payload = call.reduce(await call.fetch(queries.narrow, window))
+            raw = await call.fetch(queries.query, window)
+            payload = call.reduce(raw)
         except Exception as exc:
-            return self._failed(call, queries.narrow, exc)
-        if not reducers.is_empty(payload):
-            return Attempt(call, queries.narrow, payload)
-        try:
-            broadened = call.reduce(await call.fetch(queries.broad, window))
-        except Exception as exc:
-            return self._failed(call, queries.broad, exc)
-        if not reducers.is_empty(broadened):
-            return Attempt(
-                call,
-                queries.broad,
-                broadened,
-                detail=(
-                    f"the group's own exception type matched nothing (`{queries.narrow}`), so "
-                    f"this is every error on the same services — it may include errors that "
-                    f"are not this defect"
-                ),
-            )
-        return Attempt(call, queries.narrow, payload, detail=_nothing_matched(queries))
+            return self._failed(call, queries.query, exc)
+        return Attempt(call, queries.query, payload, detail=_caveat(call, payload), raw=raw)
 
     def _failed(self, call: Call, query: str, exc: Exception) -> Attempt:
         if not isinstance(exc, DatadogError):
@@ -283,15 +324,74 @@ def _unnamed(exc: Exception) -> bool:
     return not isinstance(exc, DatadogError)
 
 
-def _nothing_matched(queries: Reconstruction) -> str:
-    return (
-        f"nothing matched `{queries.narrow}`, nor the broader `{queries.broad}`, over the "
-        f"collection window"
+def _caveat(call: Call, payload: dict[str, Any]) -> str | None:
+    """What a collector that found something still has to admit about it."""
+    if call.collector is Collector.ERROR_SPAN_COUNTS:
+        return (
+            "counts every error on these services over the window, not only this "
+            "exception — the exception type is not an attribute Datadog can filter on here"
+        )
+    retained = payload.get(RETAINED)
+    if call.collector is Collector.ERROR_SPANS and isinstance(retained, int):
+        return (
+            f"{payload.get('count', 0)} of the {retained} error spans Datadog retained for "
+            f"these services carry this exception, matched on `exception.type` inside their "
+            f"OpenTelemetry events"
+        )
+    return None
+
+
+def _absence(attempt: Attempt, control: int | None, claimed: int) -> tuple[CollectorStatus, str]:
+    """Which of the four nothings this is, and the sentence that says so (ADR-0029).
+
+    The order is the order of what a reader can act on. Retained error spans that
+    are not this exception name a sampler decision about *this defect*; no
+    retained error spans at all name one about the whole service; nothing at all
+    names an absent pipeline. Only the last tells a developer to look elsewhere.
+    """
+    call = attempt.call
+    query = attempt.query
+    retained = attempt.payload.get(RETAINED)
+    others = attempt.payload.get(OTHERS)
+    if isinstance(retained, int) and retained > 0:
+        named = (
+            ", ".join(f"`{name}` {count}" for name, count in others.items())
+            if isinstance(others, dict)
+            else ""
+        )
+        carried = f" (they carry {named})" if named else ""
+        return CollectorStatus.SAMPLED_AWAY, (
+            f"`{query}` returned {retained:,} retained error spans and none of them carries "
+            f"this exception{carried}, while Error Tracking counted {claimed:,} occurrences "
+            f"of it in the same window — this defect's spans were discarded by the sampler "
+            f"before they could be searched"
+        )
+    if control is None:
+        return CollectorStatus.EMPTY, (
+            f"nothing matched `{query}` over the collection window; the control query could "
+            f"not be run, so whether anything is collected for these services is unknown"
+        )
+    if control > 0 and claimed > 0:
+        return CollectorStatus.SAMPLED_AWAY, (
+            f"nothing matched `{query}`, and no error {call.track} were retained for these "
+            f"services at all, although they returned {control:,} {call.track} with the error "
+            f"predicate dropped and Error Tracking counted {claimed:,} occurrences — the "
+            f"whole error track is being discarded here, and only a retention filter can "
+            f"bring it back"
+        )
+    if control > 0:
+        return CollectorStatus.EMPTY, (
+            f"nothing matched `{query}`, although the same services returned {control:,} "
+            f"{call.track} with the error predicate dropped"
+        )
+    return CollectorStatus.NOT_INSTRUMENTED, (
+        f"nothing matched `{query}`, and nothing at all for these services either: this "
+        f"signal is not collected for them"
     )
 
 
 def _settle(attempt: Attempt, controls: dict[str, int | None], claimed: int) -> CollectorResult:
-    """Turn an attempt into a result, naming which kind of nothing it found (ADR-0027)."""
+    """Turn an attempt into a result, naming which kind of nothing it found (ADR-0029)."""
     call = attempt.call
     if attempt.failure is not None:
         return CollectorResult(
@@ -308,45 +408,12 @@ def _settle(attempt: Attempt, controls: dict[str, int | None], claimed: int) -> 
             detail=attempt.detail,
             payload=attempt.payload,
         )
-    control = controls.get(call.track)
-    if control is None:
-        return CollectorResult(
-            collector=call.collector,
-            query=attempt.query,
-            status=CollectorStatus.EMPTY,
-            detail=f"{attempt.detail}; the control query could not be run, so whether "
-            f"anything is collected for these services is unknown",
-            payload=attempt.payload,
-        )
-    if control > 0 and claimed > 0:
-        return CollectorResult(
-            collector=call.collector,
-            query=attempt.query,
-            status=CollectorStatus.SAMPLED_AWAY,
-            detail=(
-                f"{attempt.detail}. Error Tracking counted {claimed:,} occurrences in this "
-                f"window and the same services returned {control:,} {call.track} with the "
-                f"error predicate dropped, so the telemetry exists and is being discarded "
-                f"before it can be searched — a retention filter keeps error spans, and "
-                f"nothing here can recover them"
-            ),
-            payload=attempt.payload,
-        )
-    if control > 0:
-        return CollectorResult(
-            collector=call.collector,
-            query=attempt.query,
-            status=CollectorStatus.EMPTY,
-            detail=f"{attempt.detail}, although the same services returned {control:,} "
-            f"{call.track} with the error predicate dropped",
-            payload=attempt.payload,
-        )
+    status, detail = _absence(attempt, controls.get(call.track), claimed)
     return CollectorResult(
         collector=call.collector,
         query=attempt.query,
-        status=CollectorStatus.NOT_INSTRUMENTED,
-        detail=f"{attempt.detail}, and nothing at all for these services either: this "
-        f"signal is not collected for them",
+        status=status,
+        detail=detail,
         payload=attempt.payload,
     )
 
@@ -359,7 +426,7 @@ async def collect_group(
 ) -> ErrorCollection:
     """Every collector, then the control that says what an empty one means."""
     queries = reconstruct(group)
-    collectors = Collectors(client, config)
+    collectors = Collectors(client, config, group.error_type)
     calls = collectors.calls()
     attempts = list(
         await asyncio.gather(*(collectors.attempt(call, queries, window) for call in calls))
@@ -380,5 +447,13 @@ async def collect_group(
         window=window,
         reconstruction=queries,
         claimed_occurrences=group.occurrences,
+        exemplar=_exemplar(attempts, group.error_type),
         results=[_settle(attempt, controls, group.occurrences) for attempt in attempts],
     )
+
+
+def _exemplar(attempts: Sequence[Attempt], error_type: str) -> ExceptionExemplar | None:
+    for attempt in attempts:
+        if attempt.call.collector is Collector.ERROR_SPANS and attempt.raw is not None:
+            return exemplar_of(attempt.raw, error_type)
+    return None

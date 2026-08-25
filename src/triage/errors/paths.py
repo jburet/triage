@@ -19,11 +19,19 @@ inside, which is the name a developer would search for.
 Nothing here guesses at a path it cannot derive: a file name with no package
 stays a file name, and an issue naming no file at all produces no paths and a
 reason.
+
+**And a guess is only used when nothing was observed.** Since ADR-0029 a
+collection can carry a real stack, whose frames name real files at real line
+numbers. Those come first, the conversion is the fallback, and the report says
+which of the two it read — an observed path and a manufactured one must not be
+able to read alike, for the same reason ADR-0019 and ADR-0020 separate an
+observed commit from a fallback.
 """
 
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 SOURCE_ROOTS: dict[str, str] = {
@@ -42,23 +50,76 @@ _QUALIFIED = re.compile(
 _LAMBDA = re.compile(r"^(?:\$anonfun\$|lambda\$)(?P<method>[^$]+)\$")
 
 
+MAX_OBSERVED_PATHS = 3
+"""How many frames of a real stack an analysis is pointed at.
+
+The reference stack names seven application frames across its ``Caused by:``
+chain. Opening all seven would spend an eighth of the analysis budget on one
+hypothesis; opening the top three covers the throw site and the two frames the
+cause names, which is where a fix goes."""
+
+
 @dataclass(frozen=True)
 class SourceLocation:
     """Candidate paths for one issue's source, and what has to be said about them.
 
     ``paths`` is ordered: the most conventional spelling first, because the
     gather reads in order and stops at its budget. ``derived`` is what separates
-    a path Datadog gave from one this module built, and ``caveat`` is the
-    sentence a report carries when it did the building.
+    a path Datadog gave, or a stack named, from one this module built, and
+    ``caveat`` is the sentence a report carries either way. ``frames`` is
+    non-empty only when the paths were read off a retained stack, and it carries
+    the line numbers, which a path cannot.
     """
 
     paths: tuple[str, ...]
     derived: bool
     caveat: str | None = None
+    frames: tuple[str, ...] = ()
 
 
-def source_location(file_path: str | None, function_name: str | None) -> SourceLocation:
-    """The paths an analysis should open first, from the issue's own two fields."""
+def observed_location(frames: Sequence[str], file_path: str | None) -> SourceLocation | None:
+    """The paths a real stack named, or ``None`` when no stack was retrieved.
+
+    ``frames`` are ``path:line`` in stack order, already filtered to the
+    application's own code (:mod:`triage.errors.otel`). They are facts, so
+    ``derived`` is false and the caveat says where they came from rather than
+    what was converted.
+    """
+    if not frames:
+        return None
+    ordered = list(dict.fromkeys(frames))
+    paths: list[str] = []
+    first: list[str] = []
+    for frame in ordered:
+        path = frame.rsplit(":", 1)[0]
+        if path in paths:
+            continue
+        if len(paths) >= MAX_OBSERVED_PATHS:
+            break
+        paths.append(path)
+        first.append(frame)
+    named = ", ".join(f"`{frame}`" for frame in first)
+    reported = f" Error Tracking reported the class `{file_path}`." if file_path else ""
+    return SourceLocation(
+        paths=tuple(paths),
+        derived=False,
+        caveat=(
+            f"These frames were read from a stack trace Datadog retained for this "
+            f"exception — {named} — so the file and the line are observed, not converted "
+            f"from a class name.{reported} Which module of the build holds them was still "
+            f"not observed."
+        ),
+        frames=tuple(ordered),
+    )
+
+
+def source_location(
+    file_path: str | None, function_name: str | None, frames: Sequence[str] = ()
+) -> SourceLocation:
+    """Where an analysis should look: what a stack said, or what a class name implies."""
+    observed = observed_location(frames, file_path)
+    if observed is not None:
+        return observed
     if not file_path:
         return SourceLocation(
             paths=(),

@@ -22,6 +22,7 @@ from triage.schemas.errors import (
     ErrorCollection,
     ErrorGroup,
     ErrorTrack,
+    ExceptionExemplar,
     Novelty,
     Reconstruction,
 )
@@ -58,12 +59,13 @@ def a_group(**overrides: object) -> ErrorGroup:
     return ErrorGroup.model_validate(base)
 
 
-def a_collection(group: ErrorGroup) -> ErrorCollection:
+def a_collection(group: ErrorGroup, exemplar: ExceptionExemplar | None = None) -> ErrorCollection:
     """The measured shape: the queries ran and Datadog had discarded the evidence."""
     return ErrorCollection(
+        exemplar=exemplar,
         group_key=group.key,
         window=TimeWindow(start=NOW - timedelta(hours=1), end=NOW),
-        reconstruction=Reconstruction(narrow="a", broad="b", control="c"),
+        reconstruction=Reconstruction(query="a", match="b", control="c"),
         claimed_occurrences=group.occurrences,
         results=[
             CollectorResult(
@@ -96,7 +98,7 @@ async def qualify(group: ErrorGroup, **over: object) -> dict:
         github=over.pop("github", None) or FakeGitHubClient(),
         qualifications=over.pop("qualifications", None),
     )
-    state = {"group": group, "collection": a_collection(group)}
+    state = {"group": group, "collection": a_collection(group, over.pop("exemplar", None))}
     return dict(await qualify_exception(state, run_config(deps)))  # type: ignore[arg-type]
 
 
@@ -174,3 +176,26 @@ async def test_the_prompt_carries_the_exception_as_a_tagged_json_block():
     assert block["error_type"] == group.error_type
     assert block["method"] == "load"
     assert block["occurrences_per_service"] == group.services
+
+
+async def test_a_retained_stack_is_read_instead_of_the_class_name():
+    """ADR-0029 — an observed frame beats a path built from a class name."""
+    result = await qualify(
+        a_group(),
+        qualifications=[a_qualification(AN_APP_CAUSE)],
+        exemplar=ExceptionExemplar(
+            stack="boom",
+            frames=[
+                "zeenea/service/api/ScannerService.scala:124",
+                "zeenea/datacatalog/loadcontrol/LoadControl.scala:14",
+            ],
+        ),
+    )
+
+    app = next(h for h in result["hypotheses"] if h.cause_type is CauseType.APP)
+    assert app.paths == [
+        "zeenea/service/api/ScannerService.scala",
+        "zeenea/datacatalog/loadcontrol/LoadControl.scala",
+    ]
+    assert "read from a stack trace Datadog retained" in result["exception"].source_caveat
+    assert result["context"]["source_frames"][0] == ("zeenea/service/api/ScannerService.scala:124")

@@ -450,10 +450,10 @@ def _exception_section(group: ErrorGroup, source_caveat: str | None) -> ReportSe
 def _telemetry(collection: ErrorCollection) -> list[str]:
     """What each collector found, and — where it found nothing — which nothing.
 
-    ADR-0027: an absence Datadog is discarding is a finding, and it is the one
-    finding an F2 report in this org reliably has. It is listed beside the
-    evidence rather than instead of it, because a reader has to be able to tell
-    "nothing was looked for" from "everything was looked for and discarded".
+    ADR-0027 as amended by ADR-0029: an absence Datadog is discarding is still a
+    finding, and it is listed beside the evidence rather than instead of it,
+    because a reader has to be able to tell "nothing was looked for" from
+    "everything was looked for and this defect's share was discarded".
     """
     return [
         f"[{result.collector.value}] {result.status.value}"
@@ -463,16 +463,78 @@ def _telemetry(collection: ErrorCollection) -> list[str]:
     ]
 
 
-def _exception_evidence(diagnosis: Diagnosis, collection: ErrorCollection) -> str:
-    body = _evidence(diagnosis)
-    gaps = _telemetry(collection)
-    if not gaps:
-        return body
-    return (
-        body
-        + "\n\n_What was searched for and not found:_\n"
-        + "\n".join(f"• {line}" for line in gaps)
+STACK_FRAMES_PER_CHAPTER = 6
+"""How much of each `Caused by:` chapter of a stack a Slack message carries.
+
+Per chapter rather than per stack, because the cause is the half a developer acts
+on and a head-and-tail cut would show six frames of the OpenTelemetry agent and
+none of `LoadControl.scala:14`. Every chapter keeps its own header — the
+exception line — so the chain reads whole even where the frames do not."""
+
+
+def _stack_excerpt(stack: str) -> str:
+    """The stack, short enough for one message, cut where a reader can see the cut."""
+    kept: list[str] = []
+    chapter: list[str] = []
+    for line in stack.splitlines():
+        if line.startswith("Caused by:") and chapter:
+            kept.extend(_chapter(chapter))
+            chapter = []
+        chapter.append(line)
+    kept.extend(_chapter(chapter))
+    return "\n".join(kept)
+
+
+def _chapter(lines: list[str]) -> list[str]:
+    head, frames = lines[0], lines[1:]
+    if len(frames) <= STACK_FRAMES_PER_CHAPTER:
+        return [head, *frames]
+    dropped = len(frames) - STACK_FRAMES_PER_CHAPTER
+    return [
+        head,
+        *frames[:STACK_FRAMES_PER_CHAPTER],
+        f"\t… {dropped} more frame{'' if dropped == 1 else 's'}",
+    ]
+
+
+def _occurrence(collection: ErrorCollection) -> str | None:
+    """One real occurrence and its stack, when a retained span carried one (ADR-0029)."""
+    exemplar = collection.exemplar
+    if exemplar is None:
+        return None
+    naming = " · ".join(
+        part
+        for part in (
+            f"`{exemplar.service}`" if exemplar.service else "",
+            f"`{exemplar.operation}`" if exemplar.operation else "",
+            f"trace `{exemplar.trace_id}`" if exemplar.trace_id else "",
+            exemplar.at or "",
+        )
+        if part
     )
+    lines = ["_One retained occurrence, with the stack it carried:_"]
+    if naming:
+        lines.append(naming)
+    lines.append(f"```\n{_stack_excerpt(exemplar.stack)}\n```")
+    return "\n".join(lines)
+
+
+def _exception_evidence(diagnosis: Diagnosis, collection: ErrorCollection) -> str:
+    occurrence = _occurrence(collection)
+    blocks = [
+        _evidence(diagnosis)
+        if diagnosis.evidence or occurrence is None
+        else "_The analysis produced no checkable evidence of its own; what Datadog "
+        "retained is below._"
+    ]
+    if occurrence:
+        blocks.append(occurrence)
+    gaps = _telemetry(collection)
+    if gaps:
+        blocks.append(
+            "_What was searched for and not found:_\n" + "\n".join(f"• {line}" for line in gaps)
+        )
+    return "\n\n".join(blocks)
 
 
 def _exception_repository(
@@ -495,11 +557,26 @@ def _exception_repository(
     )
 
 
+MAX_REPORTED_FRAMES = 6
+
+FRAMES_ARE_OBSERVED = (
+    "_Read off the stack Datadog retained: the file and the line are observed, not "
+    "converted from the class name the issue reported._"
+)
+"""Why the frames get a line of their own rather than joining `*Files:*`.
+
+`*Files:*` is what the analysis chose to open, and until ADR-0029 everything in
+it was manufactured from a class name (ADR-0028). A path that was read off a real
+stack is a different kind of claim and must not be able to read like the other
+one — the same separation ADR-0019 and ADR-0020 make for a commit."""
+
+
 def _exception_location(
     diagnosis: Diagnosis,
     group: ErrorGroup,
     workload: WorkloadEntry | None,
     commit: CommitChoice,
+    collection: ErrorCollection,
 ) -> str:
     """As F1's, except the commit line is F2's own choice rather than the map's.
 
@@ -519,6 +596,13 @@ def _exception_location(
     lines.append(
         "*Files:* " + (", ".join(f"`{path}`" for path in location.paths) or "_none suspected_")
     )
+    frames = collection.exemplar.frames if collection.exemplar else []
+    if frames:
+        named = " → ".join(f"`{frame}`" for frame in frames[:MAX_REPORTED_FRAMES])
+        rest = len(frames) - MAX_REPORTED_FRAMES
+        if rest > 0:
+            named += f" (+{rest} more)"
+        lines.append(f"*Stack frames:* {named}\n{FRAMES_ARE_OBSERVED}")
     return "\n".join(lines)
 
 
@@ -568,7 +652,7 @@ def render_code_exception(
         TicketSection.IMPACT: _impact(diagnosis),
         TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
         TicketSection.EVIDENCE: _exception_evidence(diagnosis, collection),
-        TicketSection.LOCATION: _exception_location(diagnosis, group, workload, commit),
+        TicketSection.LOCATION: _exception_location(diagnosis, group, workload, commit, collection),
         TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
         TicketSection.OUT_OF_SCOPE: _bullets(
             diagnosis.out_of_scope,

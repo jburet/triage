@@ -5,11 +5,14 @@ issue names the exception type, the file and the function, so the model's job he
 is narrower — propose mechanisms — and the two facts that decide what an analysis
 actually opens are rules rather than answers.
 
-The first is the address. Datadog's ``file_path`` is a fully-qualified class name
-and its ``function_name`` a JVM symbol, neither of which matches anything in a
-tree; :mod:`triage.errors.paths` turns them into candidate paths and they go into
-the hypothesis, ahead of the selection profile's globs. Handing them over raw is
-what M7 3.3 measured: 47 files of build configuration and not one line of Scala.
+The first is the address. When the collection retrieved a real stack its frames
+name real files and real line numbers, and those are what the analysis opens
+(ADR-0029). When it did not, Datadog's ``file_path`` is a fully-qualified class
+name and its ``function_name`` a JVM symbol, neither of which matches anything in
+a tree, and :mod:`triage.errors.paths` converts them by convention. Either way
+they go into the hypothesis ahead of the selection profile's globs, and the
+report says which of the two it had. Handing them over raw is what M7 3.3
+measured: 47 files of build configuration and not one line of Scala.
 
 The second is the commit. A repository that carries a tag for the version the
 exception was *first seen on* answers what the code looked like when the defect
@@ -96,7 +99,10 @@ async def qualify_exception(
     deps = deps_from_runnable_config(config)
     group = state["group"]
     collection = state["collection"]
-    located = source_location(group.file_path, group.function_name)
+    exemplar = collection.exemplar
+    located = source_location(
+        group.file_path, group.function_name, exemplar.frames if exemplar else ()
+    )
     choice = await commit_for_group(deps.github, deps.config, deps.repo, group)
 
     entry = await deps.repo.system_map_for_service(group.repository or "")
@@ -126,6 +132,7 @@ async def qualify_exception(
         commit=choice.commit,
         from_version=choice.claimed,
         paths=list(located.paths),
+        paths_observed=not located.derived and bool(located.frames),
     )
     return {
         "qualification": qualification,
@@ -144,6 +151,7 @@ async def qualify_exception(
             "telemetry_summary": qualification.summary,
             "collected": collection.as_payload(),
             "source_paths": list(located.paths),
+            "source_frames": list(located.frames),
             "source_caveat": located.caveat,
             "commit_read": choice.model_dump(mode="json"),
         },
