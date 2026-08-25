@@ -59,7 +59,11 @@ should be revisited against it rather than against Jira.
   [ticket_pipeline] → settle_group`). `prompts/qualify_exception.md` produces the existing
   `Qualification`, so the Analysis sub-graph is untouched.
 - `triage.report.render_code_exception(diagnosis, group, workload, collection) -> SlackReport`.
-- `make run-errors`, `make capture-errors`, `deploy/platform/cron-error-poller.yaml` (hourly).
+  **Built with two keyword arguments more**: `commit` (the `CommitChoice` 4.2 resolves) and
+  `source_caveat` (how 4.1 derived the paths). Both are facts F1 has no equivalent of and
+  neither can be recovered from the four positional ones.
+- `make run-errors` (`ARGS="--analyse"` drives every gated group end to end),
+  `make capture-errors`, `deploy/platform/cron-error-poller.yaml` (hourly).
 
 ## Phase 1: the input exists, and says what we think it says
 
@@ -243,22 +247,69 @@ an answer about the whole org, shaped like an answer about the incident.
 
 ## Phase 4: where in the code, and the report
 
-- [ ] 4.1 The `code_analysis` reads the file and the function the issue named, ahead of the selection
+- [x] 4.1 The `code_analysis` reads the file and the function the issue named, ahead of the selection
       profile's own globs — the fix for what M7 3.3 measured.
-- [ ] 4.2 When a repository claims the version the exception was first seen on, that is the commit
+- [x] 4.2 When a repository claims the version the exception was first seen on, that is the commit
       the analysis reads; when nothing claims it, the commit falls back and the report says which of
       the two it got (ADR-0019, ADR-0020 — an observed version and a fallback must not read alike).
-- [ ] 4.3 A group whose exception first appears at a version later than the previous one produces a
+- [x] 4.3 A group whose exception first appears at a version later than the previous one produces a
       `deployment` hypothesis naming both versions; with no `diff_analysis` entrypoint it comes back
       as a stated failure and lands in the report as an unknown, never as silence (ADR-0014).
-- [ ] 4.4 The report carries the nine sections of `docs/ticket-spec.md` plus an exception header: the
+- [x] 4.4 The report carries the nine sections of `docs/ticket-spec.md` plus an exception header: the
       type, the message, the count over the window, the services it was seen in, the versions it was
       first and last seen on, and a link to the Datadog issue.
-- [ ] 4.5 Every message about one group lands in one Slack thread, across ticks — the group row holds
+- [x] 4.5 Every message about one group lands in one Slack thread, across ticks — the group row holds
       the thread, so the fourth occurrence replies under the first report rather than starting a
       fifth conversation.
-- [ ] 4.6 A group settles as `reported` on its own row, and a run that dies leaves it recoverable
+- [x] 4.6 A group settles as `reported` on its own row, and a run that dies leaves it recoverable
       rather than stuck mid-analysis, as `run_incident` does for a signal.
+
+## What Phase 4 measured, and what it changes
+
+Done 2026-08-25. The `code_exception` graph is registered, and one real group was driven
+through it end to end — `make run-errors ARGS="--hours 72 --analyse"` against the live org,
+read-only on Datadog, real model tiers, Jira and Slack recorded rather than sent. Four
+findings, two of which were defects the fixtures could not have shown.
+
+- **The path conversion is the phase, and it is a convention.** Datadog names
+  `zeenea.service.api.ScannerService.scala` and `$anonfun$applyOrElse$3`; the analysis was
+  pointed at `src/main/scala/zeenea/service/api/ScannerService.scala` and at the
+  package-relative path, with the tree free to resolve either by suffix, and the method
+  printed as `applyOrElse`. [ADR-0028](../adr/0028-a-class-name-is-not-a-path.md) records
+  it, including the part that is not yet true: **no analysis has ever opened one of these
+  paths**, because the investigative kinds still have no image (M7 3.4). The conversion is
+  proven against fixtures and unobserved against a repository.
+- **`first_seen_version` was blank on the group that ran, as Phase 1 said it would be.**
+  The report read `Error Tracking recorded no application version for this exception, which
+  is the usual case in this org`, and the commit line said the fallback was a fallback. The
+  version path (4.2, 4.3) is built and tested and has never fired on real data — 4.3's
+  deployment hypothesis has only ever been produced from a fixture.
+- **A deployment hypothesis was diffing the wrong way round.** `run_analyses` filled a
+  missing `base_commit` from the service map, which holds what the workload is running
+  *now* — later than the version an exception first appeared on, not earlier. F1 never hit
+  it because its two commits are the same one; F2 is the first caller to name a commit of
+  its own. The rule is now: the map stands in for "what was deployed before" only when the
+  hypothesis named no commit itself.
+- **Two things the report said Unknown about, it knew.** The live run's every analysis
+  failed, so `Location` said the repository was unknown — when the grouping rule had
+  resolved these tenants to one repository, which is what made them a group at all
+  (ADR-0026). And a fallback commit lookup that itself came up empty printed a sentence
+  explaining which commit had been read. Both are now stated for what they are. Neither
+  would have appeared in a test whose analyses succeed, which is what the live run bought.
+
+**What an F2 report is today**, from that run: an exception header (type, the full message,
+the source location with its derivation stated, 126 occurrences over the window, the tenant
+and its count, "no application version recorded", the Datadog issue link), the nine sections,
+four Slack parts. Its Evidence section carries one real fact and, under *What was searched
+for and not found*, three collectors saying `sampled_away` and `not_instrumented` with the
+control counts beside them (ADR-0027). Its Unknowns section carries seven questions, every
+one of them naming the analysis that failed and why. That is a report that is honest about
+having read no code — which is what it did, because nothing clones a repository yet.
+
+**Not built, and not pretended:** `first_report_url` stays empty. Slack's `chat.postMessage`
+returns a timestamp and not a permalink, and nothing has spoken to Slack live, so behaviour
+2.5's "links the first" is served by the thread rather than by a URL. The Datadog issue
+deep-link shape has never been opened either.
 
 ## Out of scope
 
@@ -294,6 +345,12 @@ an answer about the whole org, shaped like an answer about the incident.
   happens for one customer is a fact about that customer's data or configuration, and a group
   that reports "seen in 6 services" flattens it. The per-service counts in 2.1 are the
   mitigation; whether they are enough is unknown until a real group exists.
-- **`strict` still does not reach production** until LiteLLM is past v1.98.0 (ADR-0022), so
-  `qualify_exception` will fail about half of its calls and lean on the retry budget, exactly
-  as `qualify` does.
+- ~~**`strict` still does not reach production**~~ **Confirmed on the live run of
+  2026-08-25**: the first `qualify_exception` call came back
+  `tools.0.custom.strict: Extra inputs are not permitted`, the retry answered, and four
+  causes arrived. Exactly as `qualify` does, and no change is warranted until LiteLLM is past
+  v1.98.0 (ADR-0022).
+- **Nothing has read a repository.** `AnalysisRequest.paths` now carries a real address for
+  the first time and the investigative kinds still have no deployed image (M7 3.4), so every
+  F2 analysis comes back a stated failure and every F2 report is honest about having read no
+  code. That is the largest gap between what F2 computes and what it is worth.

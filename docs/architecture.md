@@ -146,7 +146,40 @@ Triage collects the telemetry itself over Datadog's REST API and does the correl
 diffed (`prev_value` vs `new_value`), never read by title; an empty collector is disambiguated
 by re-querying namespace-wide over seven days before it is recorded as an unknown.
 
-### 2.4 F3 — DB review graph
+### 2.4 F2 — Code exception graph
+
+```
+hourly_tick          (error_poller: one Error Tracking search per track, then group and gate)
+  → open_group         (the one Slack thread this group ever uses, held on its own row)
+  → collect_exception  (logs, spans, span counts — and which kind of nothing each found)
+  → qualify_exception  (Sonnet: ranked causes; the paths and the commit are rules, not answers)
+  → [Analysis sub-graph]
+  → [Ticket pipeline]
+  → settle_group       (reported, on the group itself)
+```
+
+The input is what makes F2 cheap: an Error Tracking issue already names the exception type,
+the message, **the file and the function it was raised in**, and the versions it was first
+and last seen on. F1 has to infer where to look; F2 is told. Issues are polled hourly and
+gated on volume rather than duration, because an error issue accumulates rather than
+recovering ([ADR-0025](adr/0025-code-exceptions-polled-hourly-and-gated-by-volume.md)), and
+the same exception in six tenants of the mono-tenant platform is **one** finding keyed on
+the repository the tenancy rule resolves ([ADR-0026](adr/0026-one-exception-across-tenants-is-one-finding.md)).
+
+Two conversions stand between the issue and an analysis that reads code. Datadog's
+`file_path` is a fully-qualified class name and its `function_name` a synthetic JVM symbol;
+both are converted by convention, the tree resolves which module holds the result, and the
+conversion is stated in the report ([ADR-0028](adr/0028-a-class-name-is-not-a-path.md)). And
+the commit is the one a repository's tag for `first_seen_version` names when it has one, and
+a labelled fallback to the service map's when it does not — measured blank on 15 of 15 issues
+in the reference hour, so the fallback is the normal path.
+
+The collection usually finds nothing, for a reason it states: the org's "Error Default" span
+retention filter is disabled, so the exceptions Error Tracking counts are discarded before
+they can be searched. That absence is reported as a finding rather than as an empty section
+([ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)).
+
+### 2.5 F3 — DB review graph
 
 ```
 daily_tick
@@ -161,7 +194,7 @@ daily_tick
 Target databases are declared in `config.yaml`, each naming a Kubernetes Secret; the role has
 `pg_read_all_stats` and no table-level `SELECT` ([ADR-0008](adr/0008-f3-database-access.md)).
 
-### 2.5 F0 — Cartography graph
+### 2.6 F0 — Cartography graph
 
 ```
 repo_list (YAML) or merge_webhook
@@ -212,6 +245,11 @@ Budget guardrails enforced by the LiteLLM proxy: 500 k tokens per run **and** $5
 - `workloads` — one running service joined to the repository whose code it runs, the
   digest it was seen on, the commit and how it was resolved, and where its chart lives
   (from M6's mapping pass; [ADR-0019](adr/0019-workload-mapping-from-the-running-image.md)).
+- `error_groups` — one code-exception defect across every tenant that raises it, keyed on
+  the grouping rule's own output so a later tick finds the row by recomputing the key; it
+  carries the cumulative count the escalation reads, how many times the group has been
+  reported, and the Slack thread every message about it replies under, across ticks (from
+  M8; [ADR-0026](adr/0026-one-exception-across-tenants-is-one-finding.md)).
 - `signals` — every ingested alert / db tick, raw payload, status.
 - `diagnoses` — structured output of F1/F3 before ticketing.
 - `tickets` — Jira key, state mirror, linked signal and diagnosis.
@@ -321,6 +359,16 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 18 | Analyse only after 15 minutes of continuous firing; count the flapping instead | [0018](adr/0018-alert-persistence-gate.md) |
 | 14 | F0 summaries are a bounded context gather plus one structured call | [0014](adr/0014-analysis-entrypoint-context-gather.md) |
 | 15 | Incremental refresh invalidates a whole repository summary, or none of it | [0015](adr/0015-incremental-refresh-unit.md) |
+| 19 | A service is mapped to its repository by the image it is running | [0019](adr/0019-workload-mapping-from-the-running-image.md) |
+| 20 | A commit nothing observed is never presented as the deployed one | [0020](adr/0020-a-commit-nothing-observed-is-never-the-deployed-one.md) |
+| 21 | Where a workload is defined in its IaC repository is declared, not guessed | [0021](adr/0021-where-a-workload-is-defined-is-declared.md) |
+| 22 | One client for both paths; strict tool use where a schema can say it | [0022](adr/0022-one-client-and-a-malformed-tool-call-rate.md) |
+| 23 | The first release writes only to Slack | [0023](adr/0023-the-first-release-writes-only-to-slack.md) |
+| 24 | No kernel boundary for a Job that executes nothing | [0024](adr/0024-no-kernel-boundary-for-a-job-that-executes-nothing.md) |
+| 25 | Code exceptions are polled hourly and gated by volume | [0025](adr/0025-code-exceptions-polled-hourly-and-gated-by-volume.md) |
+| 26 | One exception across tenants is one finding | [0026](adr/0026-one-exception-across-tenants-is-one-finding.md) |
+| 27 | An absence Datadog is discarding is a finding, not a gap | [0027](adr/0027-an-absence-datadog-discards-is-a-finding.md) |
+| 28 | A class name is not a path, and the path built from one says so | [0028](adr/0028-a-class-name-is-not-a-path.md) |
 
 ---
 
@@ -330,11 +378,12 @@ reasoning and, more usefully, the condition that would make each one wrong.
 |---|---|---|
 | M0 | Repo, schemas, config, model tiers, persistence, migrations, CI | **Done** |
 | M1 | Ticket pipeline sub-graph (§2.2), end to end against fixtures | **Done** |
-| M2 | F0 cartography (§2.5), analysis Job contract, `system_map` | **Done in code**; the Job template and its cluster objects are the infra track |
+| M2 | F0 cartography (§2.6), analysis Job contract, `system_map` | **Done in code**; the Job template and its cluster objects are the infra track |
 | M3 | Analysis sub-graph (§2.1), F1 incident graph (§2.3), Datadog collection and the alert poller | **Done in code**; never run against a live Datadog org, and the Platform cron that would tick the poller is the infra track |
-| M4 | F3 daily database review (§2.4) | Not started |
+| M4 | F3 daily database review (§2.5) | Not started |
 | M5 | Alert coverage audit, self-evaluation reporting, incident memory | Not started |
-| M6 | Service map: workload → repository → IaC path (§2.5) | **Done in code**; the derivation has run once against live Datadog, the GitHub and IaC halves never have |
+| M6 | Service map: workload → repository → IaC path (§2.6) | **Done in code**; the derivation has run once against live Datadog, the GitHub and IaC halves never have |
+| M8 | F2 code exceptions (§2.4): the hourly poller, cross-tenant grouping, the volume gate, the collection, the `code_exception` graph and its report | **Done in code**; the poller and one whole pass have run against the live Datadog org, and no analysis in that pass read any code |
 | Infra | Self-hosted Platform, LiteLLM proxy, LangSmith, NetworkPolicies, backups | **Manifests written, none applied**: `deploy/` holds the namespace, the gVisor RuntimeClass, the Job's RBAC, its egress policy, the Secret's shape, the Postgres role and the Platform cron; no cluster has seen any of it |
 
 What exists today is the shared ticket pipeline, the cartography graph that fills the
@@ -442,6 +491,43 @@ What M6 does **not** deliver:
 - **Nothing schedules a pass.** The graph is registered and runs by hand
   (`make run-mapping`) or from Studio; the cron is a Platform object, infra track.
 
+M8 delivers, in code: the Error Tracking client calls and their fixture replays, the
+`triage.errors` rules (parse, group, gate, sweep, path conversion, version resolution), the
+`error_groups` table, the `error_poller` and `code_exception` graphs, the
+`qualify_exception` prompt against the *existing* `Qualification` schema, and
+`render_code_exception` — the nine ticket-spec sections plus an exception header.
+
+What M8 does **not** deliver:
+
+- **Its analyses read no code, so its central claim is unproven.** F2 exists because the
+  issue names the file and the function, and that name is now converted into repository
+  paths and put ahead of the selection profile's globs
+  ([ADR-0028](adr/0028-a-class-name-is-not-a-path.md)). But the investigative kinds have no
+  *published* image, so every hypothesis in the one live pass came back a stated failure and
+  the report said so seven times over. Publishing the image is what turns F2 from a
+  well-formed report into a useful one.
+- **The evidence is discarded before Triage can search it.** Measured against the org on
+  2026-08-25: the "Error Default" span retention filter is disabled, so a query rebuilt from
+  an issue's own fields returns zero spans against 5,869 counted occurrences
+  ([ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)). Every F2 report today
+  states that rather than carrying a stack trace. Turning that filter on is a Zeenea-side
+  change and nothing in Triage substitutes for it.
+- **The version path has never fired.** `first_seen_version` was blank on 15 of 15 issues in
+  the reference hour and on 16 of 202 over a week, and blank on the one group driven end to
+  end. The tag lookup, its two rungs and the release-boundary hypothesis are built and tested
+  against fixtures only.
+- **Slack has still never been written to.** The thread that makes a fourth report reply
+  under the first is held on the group's row and exercised against the recording fake; no
+  message has been posted, and `first_report_url` stays empty because `chat.postMessage`
+  returns a timestamp rather than a permalink.
+- **The gate's numbers are guesses.** `min_occurrences: 10` and `cumulative_occurrences: 100`
+  come from one hour's distribution, not from any outcome. Whether ten an hour is worth a
+  developer's attention is the first week's question, and a floor set too low is the error
+  stream [ADR-0023](adr/0023-the-first-release-writes-only-to-slack.md) says to watch for.
+- **Nothing ticks it.** `deploy/platform/cron-error-poller.yaml` describes the hourly cron
+  and `scripts/apply_cron.py` would create it, on a Platform that does not exist (ADR-0011).
+  Today it runs by hand: `make run-errors`, and `--analyse` to drive a group all the way.
+
 The tables in §4 are all migrated, including those M4 will fill. Still not built: the
-ingress service (GitHub and Jira webhooks), the F3 collectors, the analysis Job image,
-and the whole infra track.
+ingress service (GitHub and Jira webhooks), the F3 collectors, a *published* analysis Job
+image, and the whole infra track.

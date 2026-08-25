@@ -40,6 +40,7 @@ can override it without touching code.
 | [0025](0025-code-exceptions-polled-hourly-and-gated-by-volume.md) | Code exceptions are polled hourly and gated by volume | Proposed |
 | [0026](0026-one-exception-across-tenants-is-one-finding.md) | One exception across tenants is one finding | Proposed |
 | [0027](0027-an-absence-datadog-discards-is-a-finding.md) | An absence Datadog is discarding is a finding, not a gap | Proposed |
+| [0028](0028-a-class-name-is-not-a-path.md) | A class name is not a path, and the path built from one says so | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

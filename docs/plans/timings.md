@@ -166,3 +166,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 phase 4 | make run-errors (live, read-only, no model call) | 2 |
 | 2026-08-25 | M8 phase 4 | make run-errors ARGS="--hours 72 --analyse" (live, real tiers) | 56 |
 | 2026-08-25 | M8 phase 4 | make lint && make test (924 passed) | 8 |
+| 2026-08-25 | M8 phase 4 close-out | make lint && make test (924 passed) | 8 |
