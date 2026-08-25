@@ -50,7 +50,7 @@ infra track, which this release is the first thing to actually need.
 
 ## Phase 4: the sandbox
 
-- [x] 4.1 The Job template, the gVisor `RuntimeClass`, the `NetworkPolicy` (egress to GitHub and the registry only) and the read-only role the Job writes its result with exist as manifests under `deploy/`.
+- [x] 4.1 The Job template, the `NetworkPolicy` (egress to GitHub and the registry only) and the read-only role the Job writes its result with exist as manifests under `deploy/`.
       Validated with `kubeconform -strict -kubernetes-version 1.31.0` (10 resources, 0 invalid) and
       by `tests/unit/test_deploy_manifests.py`, which holds the reviewed Job template to the object
       `job_manifest` submits. `kubectl --dry-run=client` cannot validate here: it fetches its schemas

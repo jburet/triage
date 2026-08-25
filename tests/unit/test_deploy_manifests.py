@@ -41,7 +41,6 @@ def test_the_job_template_is_the_job_that_gets_submitted(submitted):
     reviewed = template["spec"]["template"]["spec"]
     actual = submitted["spec"]["template"]["spec"]
     for field in (
-        "runtimeClassName",
         "restartPolicy",
         "automountServiceAccountToken",
         "serviceAccountName",
@@ -72,7 +71,7 @@ def test_the_egress_probe_is_selected_by_the_same_policy_as_an_analysis():
     labels = load("41-job-egress-probe.yaml")["spec"]["template"]["metadata"]["labels"]
 
     assert selector.items() <= labels.items()
-    assert probe["runtimeClassName"] == "gvisor"
+    assert "runtimeClassName" not in probe
 
 
 def test_the_sandbox_may_not_reach_slack_datadog_or_the_metadata_service():
@@ -121,3 +120,16 @@ def test_the_committed_secret_holds_no_secrets():
         key for key, value in secret["stringData"].items() if value and "CHANGEME" not in value
     ]
     assert filled == ["TRIAGE_LITELLM_URL"]
+
+
+def test_no_manifest_asks_for_a_runtime_class_no_node_provides(submitted):
+    """gVisor went with the agent it was chosen for (ADR-0024).
+
+    A RuntimeClass naming a handler the nodes do not install leaves every Job
+    Pending, so a manifest that asks for one on a cluster nobody prepared is the
+    failure it was meant to prevent.
+    """
+    for name in ("40-job-analysis-template.yaml", "41-job-egress-probe.yaml"):
+        assert "runtimeClassName" not in load(name)["spec"]["template"]["spec"], name
+    assert "runtimeClassName" not in submitted["spec"]["template"]["spec"]
+    assert not list(Path("deploy").glob("*runtimeclass*"))

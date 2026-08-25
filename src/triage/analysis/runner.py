@@ -1,7 +1,7 @@
 """Ways to run one analysis (architecture §7, ADR-0009).
 
 One method, three implementations, chosen by where the code is running: a fake in
-tests, a subprocess on the host for development and evals, and a gVisor
+tests, a subprocess on the host for development and evals, and a sandboxed
 Kubernetes Job in production. The node that submits the request cannot tell them
 apart, which is the point — an analysis is expensive and sandboxed, and no graph
 should have to know how.

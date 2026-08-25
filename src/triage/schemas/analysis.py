@@ -3,7 +3,7 @@
 A node never runs code analysis itself: it submits an :class:`AnalysisRequest`
 and receives an :class:`AnalysisResult`. Everything in between — the shallow
 clone, the sandbox, the Agent SDK — belongs to the runner, which is what lets one
-node run against a fake in tests, a subprocess in development and a gVisor Job in
+node run against a fake in tests, a subprocess in development and a Kubernetes Job in
 production.
 
 The per-kind payload registry is the single place a result is admitted. A payload

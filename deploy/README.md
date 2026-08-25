@@ -1,6 +1,6 @@
 # The cluster objects Triage names
 
-`config.analysis.job` names a namespace, a RuntimeClass, a ServiceAccount and a Secret;
+`config.analysis.job` names a namespace, a ServiceAccount and a Secret;
 `triage.analysis.jobs` submits a Job into them. Until this directory existed, none of those
 things did. These are the manifests for them.
 
@@ -15,7 +15,6 @@ contact (plan M7 4.2 and 4.4).
 | | What | Why it is first |
 |---|---|---|
 | `00-namespace.yaml` | namespace `triage`, Pod Security `restricted` **enforced** | every later object lives in it |
-| `10-runtimeclass-gvisor.yaml` | RuntimeClass `gvisor` | a Job naming a missing RuntimeClass stays Pending |
 | `20-rbac-analysis-jobs.yaml` | two ServiceAccounts, a Role of three verbs, its binding | the Platform cannot submit without it |
 | `30-networkpolicy-analysis.yaml` | the sandbox's egress | apply *before* the first Job, not after |
 | `50-secret-analysis.example.yaml` | the shape of the Job's Secret — **an example, no values** | the real one is created out of band |
@@ -23,10 +22,16 @@ contact (plan M7 4.2 and 4.4).
 | `40-job-analysis-template.yaml` | the Job itself | Triage builds this in Python; the file is the reviewable form |
 | `41-job-egress-probe.yaml` | curl, once per destination, from inside the sandbox | how 4.4 is answered: by trying |
 
-The gVisor half is not a manifest. `runsc` has to be installed on the nodes carrying
-`triage.zeenea.com/sandbox: gvisor` — a containerd shim and a config drop-in, which on EKS
-is node bootstrap and belongs to `platform-infra`'s Terraform. The RuntimeClass here is only
-the name those nodes answer to.
+`optional/runtimeclass-gvisor.yaml` is **not applied** and is not in that order. gVisor was
+chosen for a Job that ran an agent with tool use; ADR-0014 removed the agent and ADR-0024
+draws the consequence — what is left clones with `git`, reads files and makes one HTTPS
+call, and never executes what it reads. It is kept because the two conditions that bring a
+kernel boundary back are written down, and the day one is met this is `runtime_class:
+gvisor` in `config.yaml` plus `runsc` on the nodes, not a rewrite.
+
+A RuntimeClass applied without that node work is worse than none: every analysis Job stays
+Pending on a handler no node installs, which is the failure the manifest was there to
+prevent.
 
 ## Two places the plan's wording is wider than the truth
 
@@ -51,5 +56,6 @@ says something narrower than what is granted, and the SQL file says so where it 
   non-zero if any of them disagrees with what was granted. That is the verification; it has
   not been run.
 
-Both need the same thing: a namespace on a cluster with gVisor nodes, credentials that can
-apply this directory, and a Postgres reachable from it.
+Both need the same thing: a namespace on a cluster, credentials that can apply this
+directory, and a Postgres reachable from it. No special node pool — that requirement left
+with gVisor (ADR-0024).

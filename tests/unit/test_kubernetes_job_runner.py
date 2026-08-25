@@ -17,6 +17,7 @@ from triage.analysis.jobs import (
     FakeJobApi,
     JobApiError,
     JobStatus,
+    job_manifest,
     job_name,
 )
 from triage.analysis.runner import KubernetesJobRunner
@@ -25,9 +26,7 @@ from triage.db.repo import InMemoryRepository
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.system_map import RepoSummary
 
-SPEC = AnalysisJobConfig(
-    namespace="triage", image="registry.invalid/triage-analysis:1", runtime_class="gvisor"
-)
+SPEC = AnalysisJobConfig(namespace="triage", image="registry.invalid/triage-analysis:1")
 
 
 class Clock:
@@ -220,7 +219,7 @@ async def test_the_manifest_names_the_sandbox_and_carries_the_request():
 
     spec = jobs.created[0]["spec"]
     pod = spec["template"]["spec"]
-    assert pod["runtimeClassName"] == "gvisor"
+    assert "runtimeClassName" not in pod
     assert spec["backoffLimit"] == 0
     assert spec["activeDeadlineSeconds"] == 900
     env = {item["name"]: item["value"] for item in pod["containers"][0]["env"]}
@@ -305,3 +304,16 @@ async def test_the_pod_is_unprivileged_with_a_read_only_root_and_a_writable_work
     mounts = {mount["name"]: mount["mountPath"] for mount in container["volumeMounts"]}
     assert mounts == {"workspace": WORKSPACE, "tmp": "/tmp"}
     assert all("emptyDir" in volume for volume in pod["volumes"])
+
+
+def test_a_runtime_class_is_named_only_when_one_is_configured():
+    """The path stays, gated by configuration: the conditions that bring a kernel
+    boundary back are written down, and the day one is met this is a config line
+    rather than a rewrite (ADR-0024)."""
+    spec = SPEC.model_copy(update={"runtime_class": "gvisor"})
+
+    request = an_analysis_request(AnalysisKind.SUMMARIZE_REPO)
+    manifest = job_manifest(request, name="triage-analysis-1", spec=spec)
+    pod = manifest["spec"]["template"]["spec"]
+
+    assert pod["runtimeClassName"] == "gvisor"

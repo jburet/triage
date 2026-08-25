@@ -30,7 +30,6 @@ spec:
         app.kubernetes.io/part-of: triage
         app.kubernetes.io/component: analysis
     spec:
-      runtimeClassName: gvisor
       restartPolicy: Never
       automountServiceAccountToken: false
       serviceAccountName: triage-analysis

@@ -5,7 +5,7 @@ exactly the RBAC the Platform's ServiceAccount is granted. Deliberately not the
 read-only client M3 needs for events and pods: different verbs, different role,
 and one client for both would widen both.
 
-The manifest names the gVisor runtime class and the Secret the Job's credentials
+The manifest names the Secret the Job's credentials
 come from. Creating either, along with the NetworkPolicy and the narrow database
 role the Job writes its result with, is the infra track's work — this module
 submits, it does not own the cluster's policy.
@@ -101,7 +101,7 @@ def job_manifest(request: AnalysisRequest, *, name: str, spec: AnalysisJobConfig
             "template": {
                 "metadata": {"labels": labels},
                 "spec": {
-                    "runtimeClassName": spec.runtime_class,
+                    **({"runtimeClassName": spec.runtime_class} if spec.runtime_class else {}),
                     "restartPolicy": "Never",
                     # An account with no permissions, and no token to use them
                     # with: the analysis has no business with the Kubernetes API.

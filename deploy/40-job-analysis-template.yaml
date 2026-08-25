@@ -30,7 +30,6 @@ spec:
         app.kubernetes.io/component: analysis
         triage.zeenea.com/kind: code_analysis
     spec:
-      runtimeClassName: gvisor
       restartPolicy: Never
       # The Job has no business with the Kubernetes API. Its ServiceAccount holds
       # no permissions either; this is the belt to that pair of braces.

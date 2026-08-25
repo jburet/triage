@@ -200,7 +200,12 @@ class AnalysisJobConfig(BaseModel):
 
     namespace: str = "triage"
     image: str = ""
-    runtime_class: str = "gvisor"
+    runtime_class: str = ""
+    """Empty is no ``runtimeClassName`` at all — the node's own runtime (ADR-0024).
+
+    gVisor was chosen for a Job that ran an agent with tool use. ADR-0014 removed
+    the agent, and what is left never executes the code it reads. Set this the day
+    it does."""
     secret_ref: str = "triage-analysis"
     service_account: str = "triage-analysis"
     resources: JobResources = Field(default_factory=JobResources)
