@@ -153,3 +153,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 phase 1.7 | make run-errors ARGS="--hours 168", catch-up clamped to 6 h | 1 |
 | 2026-08-25 | M8 phase 1 (close) | make lint + make test (762 passed) | 8 |
 | 2026-08-25 | M8 phases 2.1/2.2 | make lint + make test (777 passed) | 10 |
+| 2026-08-25 | M8 phase 2.3 | pytest tests/unit/test_error_gate.py (red, then green) | 1 |
+| 2026-08-25 | M8 phases 2.3-2.6 | pytest tests/integration/test_error_groups.py | 1 |
+| 2026-08-25 | M8 phases 2.3-2.6 | make lint + make test (854 passed) | 9 |

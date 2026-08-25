@@ -79,6 +79,14 @@ decides what comes back.
   [ADR-0023](0023-the-first-release-writes-only-to-slack.md)'s amended consequence says F1
   cannot. If this table proves that store is cheap, F1's recurrence should be revisited
   against it rather than against Jira.
+- **The escalation is gated by `errors.reanalyse_after` for a group already reported**, and
+  this is measured rather than cautious (M8 Phase 2). The loudest group of the reference hour
+  does 10,763 occurrences in it, so against a cumulative threshold of a hundred it crosses the
+  next escalation interval on every tick for ever; a rule that only counted would repost the
+  same defect hourly, which is the error stream this ADR already says to watch for. The
+  escalation says whether there is more to say, the cooldown says when it may be said, and a
+  regression bypasses both. The *first* analysis of a group is not gated by time at all — the
+  slow bleed still escalates at a hundred with no wait.
 - The org's `logs` track answered empty at every window and persona tried. It is asked
   anyway, for eleven bytes an hour, because an empty answer is evidence and a track nobody
   asks about is not.

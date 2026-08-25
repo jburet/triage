@@ -62,6 +62,24 @@ def report(state: dict) -> None:
         print(f"  {'failed':<12} {failure}")
     if state.get("skipped_span"):
         print(f"  {'behind':<12} {state['skipped_span']}")
+    _groups(state)
+
+
+def _groups(state: dict) -> None:
+    """What the tick made of the issues it looked at. Held back is not nothing found."""
+    decisions = state.get("decisions") or []
+    if not decisions:
+        return
+    print(f"  {DIM}groups{RESET}     {len(state.get('groups') or [])}")
+    for decision in decisions:
+        group = decision.group
+        services = ", ".join(f"{name} {count:,d}" for name, count in group.services.items())
+        print(
+            f"  {decision.outcome.value:<12} {group.occurrences:>8,d}  "
+            f"{group.error_type.rsplit('.', 1)[-1]} at {group.source_location}"
+        )
+        print(f"  {'':<12} {DIM}{services}{RESET}")
+        print(f"  {'':<12} {DIM}{decision.reason}{RESET}")
 
 
 async def main(argv: list[str]) -> int:

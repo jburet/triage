@@ -131,6 +131,11 @@ class Repo(BaseModel):
             )
         return value
 
+    @property
+    def name(self) -> str:
+        """What an image, the seed and a workload all call this repository."""
+        return self.image_name or _url_name(self.url)
+
     def declared_paths(self, repository: str) -> list[str]:
         """Where this IaC repository says the named workload is defined, if it says."""
         return self.defines.get(repository, [])
@@ -307,9 +312,11 @@ class Config(BaseModel):
         rather than adding to it: a repository that says it is called `platform`
         is not also answering to `datacatalog`.
         """
-        return next(
-            (repo for repo in self.repos if (repo.image_name or _url_name(repo.url)) == name), None
-        )
+        return next((repo for repo in self.repos if repo.name == name), None)
+
+    def repo_by_url(self, url: str) -> Repo | None:
+        """The declared repository at this remote. The join back from a resolved deployment."""
+        return next((repo for repo in self.repos if repo.url == url), None)
 
     def environment_of(self, cluster: str | None) -> str | None:
         """The environment a cluster runs, or None — never a guess (ADR-0017)."""

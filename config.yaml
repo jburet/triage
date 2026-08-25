@@ -146,5 +146,9 @@ errors:
   # The first tick has no watermark, and every collection runs back this far.
   lookback_minutes: 60
 
-  # Hours before a group already reported is looked at again.
+  # Hours before a group already reported is looked at again. It gates the
+  # cumulative escalation too, and that is measured: the loudest group of the
+  # reference hour did 10,763 occurrences in it, so it crosses any 100-occurrence
+  # interval every tick for ever. A regression bypasses this — a fix that did not
+  # hold is news the moment it happens (ADR-0025).
   reanalyse_after: 168

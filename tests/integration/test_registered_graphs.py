@@ -53,10 +53,11 @@ def test_the_poller_the_cron_ticks_has_the_one_node_it_is_named_for():
     assert "poll_alerts" in graph.nodes
 
 
-def test_the_error_poller_the_hourly_cron_ticks_has_its_one_node():
+def test_the_error_poller_the_hourly_cron_ticks_reads_then_groups():
     graph = load(REGISTERED["error_poller"])
 
     assert "poll_error_issues" in graph.nodes
+    assert "group_error_issues" in graph.nodes
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,172 @@
+"""How much is enough to spend an analysis on (ADR-0025).
+
+ADR-0018 gates an alert on *duration*, because an alert fires and recovers and
+"still failing fifteen minutes later" is the whole question. An Error Tracking
+issue has no such shape: it does not recover, it accumulates. So the gate here
+is volume, and it has three parts, all of them starting points rather than
+measurements.
+
+**A floor per tick.** Over the reference hour, occurrences per issue ran 6344,
+5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2, 2, 1. Ten holds back a
+third of them. Whether ten an hour is worth a developer's attention is the first
+week's question, and a floor set too low turns a team's channel into an error
+stream, which is the failure mode ADR-0023 says to watch for.
+
+**A cumulative escalation, because the floor is a cliff.** An exception that
+happens four times an hour every hour is 96 times a day and never crosses a
+per-tick floor of ten. That is a slow bleed and it is invisible without the
+second number.
+
+**A per-tick cap, with the deferred groups named.** Five groups is what one tick
+will take up; a sixth is deferred and said so, because a cap that drops the
+overflow silently is a cap nobody can tell from a quiet hour.
+
+Everything below the gate is still *persisted with its count* — that is what the
+escalation counts, and it is the common outcome, so a tick reports how many it
+held back or it looks like a pass that found nothing.
+"""
+
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from enum import StrEnum
+
+from triage.config import ErrorsConfig
+from triage.schemas.errors import ErrorGroup, Novelty
+
+
+class GateOutcome(StrEnum):
+    """What one tick decided about one group."""
+
+    ANALYSE = "analyse"
+    HELD_BACK = "held_back"
+    """Below the floor and below the escalation. Persisted with its count."""
+    DEFERRED = "deferred"
+    """Would have been analysed; the per-tick cap took the louder ones first."""
+    SETTLED = "settled"
+    """Already reported, and nothing has happened since that changes the report."""
+    UNMAPPED = "unmapped"
+    """No repository resolves for it, so there is no tree to read (ADR-0026)."""
+
+
+@dataclass(frozen=True)
+class GateDecision:
+    """One group, what the tick decided, and the sentence that says why."""
+
+    group: ErrorGroup
+    outcome: GateOutcome
+    reason: str
+
+    @property
+    def analysed(self) -> bool:
+        return self.outcome is GateOutcome.ANALYSE
+
+
+def gate(groups: Sequence[ErrorGroup], config: ErrorsConfig, now: datetime) -> list[GateDecision]:
+    """Decide every group, loudest first, and cap how many one tick takes up.
+
+    The groups must carry the cumulative counts the repository keeps: the whole
+    point of the escalation is that it reads a total no single tick can see.
+    """
+    ordered = sorted(groups, key=lambda group: (-group.occurrences, group.key))
+    decisions: list[GateDecision] = []
+    taken = 0
+    for group in ordered:
+        outcome, reason = _decide(group, config, now)
+        if outcome is GateOutcome.ANALYSE:
+            if taken >= config.max_groups_per_tick:
+                outcome = GateOutcome.DEFERRED
+                reason = (
+                    f"{reason}, but this tick had already taken up "
+                    f"{config.max_groups_per_tick} groups — it waits for the next one"
+                )
+            else:
+                taken += 1
+        decisions.append(GateDecision(group=group, outcome=outcome, reason=reason))
+    return decisions
+
+
+def held_back(decisions: Sequence[GateDecision]) -> int:
+    """How many groups the volume gate kept. The number a tick has to report."""
+    return sum(1 for decision in decisions if decision.outcome is GateOutcome.HELD_BACK)
+
+
+def _decide(group: ErrorGroup, config: ErrorsConfig, now: datetime) -> tuple[GateOutcome, str]:
+    if not group.analysable:
+        return GateOutcome.UNMAPPED, group.unanalysable_reason or "no repository resolves for it"
+    if group.analysis_count:
+        return _again(group, config, now)
+    if group.occurrences >= config.min_occurrences:
+        return (
+            GateOutcome.ANALYSE,
+            f"{group.occurrences} occurrences this tick, at or above the floor of "
+            f"{config.min_occurrences}",
+        )
+    if group.cumulative_occurrences >= config.cumulative_occurrences:
+        return (
+            GateOutcome.ANALYSE,
+            f"{group.occurrences} occurrences this tick is below the floor of "
+            f"{config.min_occurrences}, but {group.cumulative_occurrences} in total has "
+            f"crossed the escalation threshold of {config.cumulative_occurrences} — a slow "
+            f"bleed nobody would otherwise see",
+        )
+    return (
+        GateOutcome.HELD_BACK,
+        f"{group.occurrences} occurrences this tick and {group.cumulative_occurrences} in "
+        f"total, below both the floor of {config.min_occurrences} and the escalation "
+        f"threshold of {config.cumulative_occurrences}",
+    )
+
+
+def _again(group: ErrorGroup, config: ErrorsConfig, now: datetime) -> tuple[GateOutcome, str]:
+    """Why a group that has already been reported is worth reporting a second time.
+
+    A regression reopens it at once and on its own: a fix that did not hold is
+    news the moment it happens, and no cooldown should sit on it.
+
+    Everything else waits for ``reanalyse_after``, and that gate is measured
+    rather than cautious. The loudest group of the reference hour did 10,763
+    occurrences in it; against a cumulative threshold of a hundred it crosses the
+    next escalation interval on *every* tick, for ever. A rule that only counted
+    would therefore repost the same defect hourly, which is precisely the error
+    stream ADR-0023 says to watch for. So the escalation says *whether* there is
+    more to say and the cooldown says *when* it may be said.
+
+    Past the cooldown, two things earn a second report: another whole escalation
+    threshold bled since the last one — counted from where that left it, not from
+    zero — or a group that is simply still going at the floor a week later.
+    """
+    ordinal = group.analysis_count + 1
+    if group.novelty is Novelty.REGRESSED:
+        return (
+            GateOutcome.ANALYSE,
+            f"regressed since it was last reported, which makes this report number {ordinal}",
+        )
+    next_interval = group.analysed_at_cumulative + config.cumulative_occurrences
+    cooldown = timedelta(hours=config.reanalyse_after)
+    if group.last_analysed_at is not None and now - group.last_analysed_at < cooldown:
+        return (
+            GateOutcome.SETTLED,
+            f"reported {group.analysis_count} time(s), most recently "
+            f"{group.last_analysed_at.isoformat()} — under the {config.reanalyse_after} hours "
+            f"before a group that has not regressed is looked at again",
+        )
+    if group.cumulative_occurrences >= next_interval:
+        return (
+            GateOutcome.ANALYSE,
+            f"{group.cumulative_occurrences} in total has crossed the next escalation "
+            f"interval at {next_interval}; this is report number {ordinal}",
+        )
+    if group.occurrences >= config.min_occurrences:
+        return (
+            GateOutcome.ANALYSE,
+            f"still at {group.occurrences} occurrences a tick {config.reanalyse_after} hours "
+            f"after it was last reported; this is report number {ordinal}",
+        )
+    return (
+        GateOutcome.SETTLED,
+        f"already reported {group.analysis_count} time(s); it has not regressed, its "
+        f"{group.cumulative_occurrences} total has not reached the next escalation "
+        f"interval at {next_interval}, and {group.occurrences} this tick is below the "
+        f"floor of {config.min_occurrences}",
+    )

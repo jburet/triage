@@ -9,13 +9,14 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.errors.gate import GateDecision
 from triage.mapping.report import MappingReport
 from triage.schemas.alert import Alert
 from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
 from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
-from triage.schemas.errors import ErrorIssue, ErrorTrack, SkippedIssue
+from triage.schemas.errors import ErrorGroup, ErrorIssue, ErrorTrack, SkippedIssue
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
@@ -279,3 +280,14 @@ class ErrorPollerState(TypedDict, total=False):
     skipped: list[SkippedIssue]
     failures: list[str]
     skipped_span: str | None
+
+    # What the tick made of what it found (M8 phase 2). Every one of these is
+    # reported rather than only logged: a tick that held four groups back and
+    # deferred two looks exactly like a tick that found nothing, until the
+    # numbers are said out loud.
+    groups: list[ErrorGroup]
+    decisions: list[GateDecision]
+    analysing: list[ErrorGroup]
+    held_back: int
+    deferred: list[str]
+    unmapped: list[str]

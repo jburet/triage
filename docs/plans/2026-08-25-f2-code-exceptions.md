@@ -114,19 +114,47 @@ which is where `min_occurrences: 10` comes from.
 
 ## Phase 2: one exception, however many tenants
 
-- [ ] 2.1 Two issues with the same exception type, message shape and source location, seen in
+- [x] 2.1 Two issues with the same exception type, message shape and source location, seen in
       different `plt-*` services, are one group — because the mono-tenancy rule resolves both to the
       same repository — and the group names every service it was seen in and the count in each.
-- [ ] 2.2 Two issues that look alike but resolve to different repositories stay two groups, and a
+- [x] 2.2 Two issues that look alike but resolve to different repositories stay two groups, and a
       service that resolves to no repository is its own group, reported and never analysed.
-- [ ] 2.3 A group whose occurrences this tick are below the floor is persisted with its count and
+- [x] 2.3 A group whose occurrences this tick are below the floor is persisted with its count and
       analysed nothing; the tick reports how many it held back.
-- [ ] 2.4 A group that stays below the floor tick after tick is analysed once its cumulative count
+- [x] 2.4 A group that stays below the floor tick after tick is analysed once its cumulative count
       crosses the escalation threshold — the slow bleed, made visible.
-- [ ] 2.5 A group already analysed is not analysed again until it regresses or crosses the next
+- [x] 2.5 A group already analysed is not analysed again until it regresses or crosses the next
       escalation interval, and the second report says which occurrence it is and links the first.
-- [ ] 2.6 A tick analyses at most `max_groups_per_tick` groups, ordered by occurrences, and names the
+- [x] 2.6 A tick analyses at most `max_groups_per_tick` groups, ordered by occurrences, and names the
       groups it deferred rather than dropping them silently.
+
+## What Phase 2 measured, and what it changes
+
+Done 2026-08-25. Three findings.
+
+- **The group key is the ADR's, not the behaviour's.** Behaviour 2.1 says "same exception
+  type, message shape and source location"; [ADR-0026](../adr/0026-one-exception-across-tenants-is-one-finding.md)
+  says type, source location and repository, with the message named as the finer key to reach
+  for only if a group is ever shown to have merged two defects. The ADR is right and it is
+  measured: the captured hour's six-tenant `EntityNotFoundException` group carries six
+  different queried entities — `load_contact_by_id`, `load_inventory_item_by_path`,
+  `load_user_by_email_read` — inside one message shape. Keying on the raw message collapses
+  nothing at all (15 issues to 15 groups); keying on a normalised shape gives 12. The ADR's
+  key gives **7**, which is the 6-tenant group the ADR argues from. The message is out.
+- **The reference hour's own collapse is 2.1 to one, not 5.8.** 15 issues to 7 groups. The
+  5.8 in Phase 1's notes is over seven days, where 202 issues span 99 services; one hour
+  spans twelve. The hour reproduces the ADR's headline case exactly — `OdbClient.scala:
+  $anonfun$load$6` in six tenants, one group, 10,763 occurrences — which is the check that
+  can be made against a fixture at all.
+- **The cumulative escalation needs the cooldown, or it is an error stream.** ADR-0025 sets
+  the escalation at 100 cumulative occurrences. The loudest group of the reference hour does
+  **10,763 an hour**, so it crosses the next escalation interval on every single tick, for
+  ever. A re-analysis rule that only counted would repost the same defect hourly — precisely
+  the failure ADR-0023 says to watch for. So `errors.reanalyse_after` gates the escalation
+  path for a group that has already been reported: the escalation says *whether* there is
+  more to say, the cooldown says *when* it may be said, and a **regression bypasses both**
+  because a fix that did not hold is news the moment it happens. The first analysis of a
+  group is untouched — a slow bleed still escalates at 100 with no wait.
 
 ## Phase 3: the log, the trace, and the window
 

@@ -206,3 +206,46 @@ class SystemMapRow(Base, TimestampMixin):
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
 
     __table_args__ = (Index("uq_system_map_kind_name", "kind", "name", unique=True),)
+
+
+class ErrorGroupRow(Base, TimestampMixin):
+    """One code-exception defect, however many tenants raise it (ADR-0026).
+
+    Keyed on the rule's own output rather than on anything Datadog issued: the
+    key is recomputed identically every tick, so the fourth occurrence finds this
+    row without a pointer to it having been stored anywhere. Datadog's own issue
+    ids are in the payload, several of them, because one group is one issue *per
+    tenant*.
+
+    The counters are what separates this from a log of what was seen.
+    ``cumulative_occurrences`` is what the escalation reads — no single tick can
+    see it — and ``analysed_at_cumulative`` is where the last analysis left it, so
+    the next interval is counted from there and not from zero. ``thread_ts`` is
+    the Slack thread every message about this group replies under, which is the
+    only reason a report can say "this is the fourth time" at all.
+    """
+
+    __tablename__ = "error_groups"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    group_key: Mapped[str] = mapped_column(Text, unique=True)
+    error_type: Mapped[str] = mapped_column(String(256))
+    file_path: Mapped[str] = mapped_column(Text)
+    function_name: Mapped[str | None] = mapped_column(Text)
+    repository: Mapped[str | None] = mapped_column(String(128), index=True)
+    team: Mapped[str | None] = mapped_column(String(128))
+    status: Mapped[str] = mapped_column(String(32), index=True)
+
+    occurrences: Mapped[int] = mapped_column(Integer, default=0)
+    cumulative_occurrences: Mapped[int] = mapped_column(BigInteger, default=0)
+    analysed_at_cumulative: Mapped[int] = mapped_column(BigInteger, default=0)
+    analysis_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    thread_ts: Mapped[str | None] = mapped_column(String(64))
+    first_report_url: Mapped[str | None] = mapped_column(Text)
+
+    first_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    last_analysed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)

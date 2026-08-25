@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from triage.db.models import (
     AnalysisResultRow,
     DiagnosisRow,
+    ErrorGroupRow,
     EvaluationRow,
     PollerWatermarkRow,
     SignalRow,
@@ -29,6 +30,7 @@ from triage.db.models import (
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.common import Feature
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.errors import ErrorGroup, ErrorGroupStatus
 from triage.schemas.signal import Signal, SignalStatus
 from triage.schemas.system_map import ServiceEntry, SystemMapKind, WorkloadEntry
 from triage.schemas.ticket import PipelineOutcome
@@ -42,6 +44,14 @@ OPEN_SIGNAL_STATES = (
     SignalStatus.DIAGNOSED,
 )
 """Cycles the poller still has to decide about. Everything else is settled."""
+
+OPEN_ERROR_GROUP_STATES = (ErrorGroupStatus.OPEN, ErrorGroupStatus.ANALYSING)
+"""Groups a tick may still take up.
+
+``analysing`` is open on purpose: a run that dies mid-analysis has to be
+recoverable rather than stuck, exactly as a signal is. ``reported`` and
+``unmapped`` are settled — the second one permanently, because no repository
+will resolve for it by being looked at again."""
 
 
 @dataclass(frozen=True)
@@ -166,6 +176,12 @@ class TriageRepository(Protocol):
     async def workload_for_service(self, service: str) -> WorkloadEntry | None: ...
 
     async def services_seen_since(self, since: datetime) -> list[str]: ...
+
+    async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup: ...
+
+    async def error_group(self, key: str) -> ErrorGroup | None: ...
+
+    async def error_groups_open(self) -> list[ErrorGroup]: ...
 
 
 def _to_record(row: TicketRow) -> TicketRecord:
@@ -468,6 +484,113 @@ class SqlRepository:
         async with self._sessionmaker() as session:
             return sorted((await session.scalars(stmt)).all())
 
+    async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup:
+        async with self._sessionmaker() as session, session.begin():
+            row = await session.scalar(
+                select(ErrorGroupRow).where(ErrorGroupRow.group_key == group.key)
+            )
+            stored = ErrorGroup.model_validate(row.payload) if row else None
+            merged = merged_error_group(stored, group)
+            if row is None:
+                row = ErrorGroupRow(group_key=merged.key)
+                session.add(row)
+            for column, value in _error_group_columns(merged).items():
+                setattr(row, column, value)
+            await session.flush()
+        return merged
+
+    async def error_group(self, key: str) -> ErrorGroup | None:
+        async with self._sessionmaker() as session:
+            row = await session.scalar(select(ErrorGroupRow).where(ErrorGroupRow.group_key == key))
+        return ErrorGroup.model_validate(row.payload) if row else None
+
+    async def error_groups_open(self) -> list[ErrorGroup]:
+        stmt = (
+            select(ErrorGroupRow)
+            .where(ErrorGroupRow.status.in_([s.value for s in OPEN_ERROR_GROUP_STATES]))
+            .order_by(ErrorGroupRow.cumulative_occurrences.desc())
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.scalars(stmt)).all()
+        return [ErrorGroup.model_validate(row.payload) for row in rows]
+
+
+def merged_error_group(stored: ErrorGroup | None, incoming: ErrorGroup) -> ErrorGroup:
+    """What one tick's observation of a group becomes once the stored one is known.
+
+    The discriminator is ``cumulative_occurrences``. A group as
+    :mod:`triage.errors.grouping` derived it carries none — the total is the
+    repository's to keep — so it is one tick's observation and is *added* to what
+    is stored, with the lifecycle (the thread, how many times it has been taken
+    up, where the last analysis left the escalation) carried over untouched. A
+    group that arrives carrying a total is one that was read back and changed,
+    and is written as it stands.
+
+    The counting is knowingly generous by a few percent: the poller reads back
+    past its watermark by five minutes, so an issue first seen inside that sliver
+    is counted by two consecutive ticks. The error is bounded by the overlap over
+    the hour and it escalates slightly sooner rather than slightly later, which is
+    the direction to be wrong in; a ledger of what was already counted would cost
+    more than it saves.
+    """
+    merged = incoming.model_copy(deep=True)
+    if stored is None:
+        if not merged.cumulative_occurrences:
+            merged.cumulative_occurrences = merged.occurrences
+            merged.cumulative_services = dict(merged.services)
+        return merged
+    if incoming.cumulative_occurrences:
+        return merged
+
+    merged.cumulative_occurrences = stored.cumulative_occurrences + incoming.occurrences
+    merged.cumulative_services = dict(stored.cumulative_services)
+    for service, count in incoming.services.items():
+        merged.cumulative_services[service] = merged.cumulative_services.get(service, 0) + count
+    merged.first_seen = min(stored.first_seen, incoming.first_seen)
+    merged.last_seen = max(stored.last_seen, incoming.last_seen)
+    merged.analysis_count = stored.analysis_count
+    merged.analysed_at_cumulative = stored.analysed_at_cumulative
+    merged.last_analysed_at = stored.last_analysed_at
+    merged.thread_ts = stored.thread_ts
+    merged.first_report_url = stored.first_report_url
+    merged.status = _carried_status(stored, incoming)
+    return merged
+
+
+def _carried_status(stored: ErrorGroup, incoming: ErrorGroup) -> ErrorGroupStatus:
+    """A tick seeing a group again must not knock it back to the start.
+
+    Except in the one case where the answer genuinely changed: a service that no
+    repository claimed and now does, or the reverse. That is Triage's map moving,
+    not the defect.
+    """
+    if not incoming.analysable:
+        return ErrorGroupStatus.UNMAPPED
+    if stored.status is ErrorGroupStatus.UNMAPPED:
+        return ErrorGroupStatus.OPEN
+    return stored.status
+
+
+def _error_group_columns(group: ErrorGroup) -> dict[str, Any]:
+    return {
+        "error_type": group.error_type,
+        "file_path": group.file_path,
+        "function_name": group.function_name,
+        "repository": group.repository,
+        "team": group.team,
+        "status": group.status.value,
+        "occurrences": group.occurrences,
+        "cumulative_occurrences": group.cumulative_occurrences,
+        "analysed_at_cumulative": group.analysed_at_cumulative,
+        "analysis_count": group.analysis_count,
+        "thread_ts": group.thread_ts,
+        "first_report_url": group.first_report_url,
+        "first_seen": group.first_seen,
+        "last_seen": group.last_seen,
+        "last_analysed_at": group.last_analysed_at,
+        "payload": group.model_dump(mode="json"),
+    }
+
 
 def _workload_columns(entry: WorkloadEntry) -> dict[str, Any]:
     return {
@@ -513,6 +636,7 @@ class InMemoryRepository:
     analysis_results: dict[str, AnalysisResultRecord] = field(default_factory=dict)
     system_map: dict[tuple[SystemMapKind, str], SystemMapEntry] = field(default_factory=dict)
     workloads: dict[str, WorkloadEntry] = field(default_factory=dict)
+    error_groups: dict[str, ErrorGroup] = field(default_factory=dict)
 
     async def save_signal(self, signal: Signal) -> Signal:
         self.signals[signal.signal_id] = signal
@@ -663,6 +787,24 @@ class InMemoryRepository:
     async def services_seen_since(self, since: datetime) -> list[str]:
         return sorted(
             {signal.service for signal in self.signals.values() if signal.received_at >= since}
+        )
+
+    async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup:
+        merged = merged_error_group(self.error_groups.get(group.key), group)
+        self.error_groups[merged.key] = merged
+        return merged
+
+    async def error_group(self, key: str) -> ErrorGroup | None:
+        return self.error_groups.get(key)
+
+    async def error_groups_open(self) -> list[ErrorGroup]:
+        return sorted(
+            (
+                group
+                for group in self.error_groups.values()
+                if group.status in OPEN_ERROR_GROUP_STATES
+            ),
+            key=lambda group: -group.cumulative_occurrences,
         )
 
     async def advance_source_commit(self, repo_url: str, commit: str) -> int:
