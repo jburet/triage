@@ -181,3 +181,9 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (1 group, real tiers) | 46 |
 | 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (re-run after the window fix) | 55 |
 | 2026-08-25 | M8 OTel correction | make lint && make test (957 passed) | 9 |
+| 2026-08-25 | M8 gate correction | uv run pytest tests/unit/test_error_gate.py | 1 |
+| 2026-08-25 | M8 gate correction | uv run pytest tests/integration/test_error_groups.py | 1 |
+| 2026-08-25 | M8 gate correction | make lint | 2 |
+| 2026-08-25 | M8 gate correction | make test (967 passed) | 7 |
+| 2026-08-25 | M8 gate correction | 24 live hourly ticks replayed, read-only, no model call | 8 |
+| 2026-08-25 | M8 gate correction | the same day at six floors (1, 5, 10, 25, 50, 200) | 37 |

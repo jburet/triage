@@ -126,7 +126,8 @@ which is where `min_occurrences: 10` comes from.
 - [x] 2.3 A group whose occurrences this tick are below the floor is persisted with its count and
       analysed nothing; the tick reports how many it held back.
 - [x] 2.4 A group that stays below the floor tick after tick is analysed once its cumulative count
-      crosses the escalation threshold — the slow bleed, made visible.
+      crosses the escalation threshold — the slow bleed, made visible. **Built unable to fire,
+      and made true on 2026-08-25** (ADR-0030): see "What the gate measured over a day".
 - [x] 2.5 A group already analysed is not analysed again until it regresses or crosses the next
       escalation interval, and the second report says which occurrence it is and links the first.
 - [x] 2.6 A tick analyses at most `max_groups_per_tick` groups, ordered by occurrences, and names the
@@ -159,6 +160,10 @@ Done 2026-08-25. Three findings.
   more to say, the cooldown says *when* it may be said, and a **regression bypasses both**
   because a fix that did not hold is news the moment it happens. The first analysis of a
   group is untouched — a slow bleed still escalates at 100 with no wait.
+- **Read the day's measurement below with this section.** Two of the three findings here are
+  about a threshold that, as Phase 2 left it, no group's total could ever reach: the
+  escalation was fed only by issues that were new or regressed, and Datadog marks an issue new
+  exactly once. ADR-0030 fixes what feeds it; the cooldown reasoning above is unchanged.
 
 ## Phase 3: the log, the trace, and the window
 
@@ -395,6 +400,53 @@ returns a timestamp and not a permalink, and nothing has spoken to Slack live, s
 2.5's "links the first" is served by the thread rather than by a URL. The Datadog issue
 deep-link shape has never been opened either.
 
+## What the gate measured over a day
+
+Done 2026-08-25, after Phase 4. 24 consecutive hourly ticks against the live org, through the
+real pipeline — `parse_issues` → `novelty` → `not_a_code_exception` → `group_issues` → the
+gate — with an in-memory table, so the day starts from nothing exactly as the first day of the
+feature would. Read-only, no model call. This is the first distribution the gate has been
+measured against that is *the one it operates on*: per group, per tick.
+
+- **The floor's justification was wrong and its value was right by luck.** `config.yaml`
+  argued from 6344, 5869, 4009, … — occurrences per *issue*, over every issue *occurring* in
+  one hour. The gate applies to occurrences per *group*, over issues that were *new or
+  regressed*, which is a far quieter population. The eleven groups of the measured day arrived
+  at **1, 1, 1, 2, 3, 4, 5, 30, 189, 7758, 37691**. Nothing lands between 6 and 29, so every
+  floor in that range decides the day identically. `min_occurrences: 10` and
+  `max_groups_per_tick: 5` are kept; their reasoning is replaced.
+- **Eighteen of the 24 ticks brought no group at all, and the busiest brought five** — a wave
+  of some ninety new-or-regressed issues in one hour, one defect arriving across dozens of
+  tenants at once. That is the tick the cap is sized for, and nothing else in the day came
+  near it.
+- **Behaviour 2.4 could not fire, and that was the real defect.** A group is only built from
+  issues `novelty()` calls new or regressed; Datadog marks an issue new exactly once; so a
+  group held back below the floor was never observed again and its cumulative total never
+  moved. The integration test that appeared to prove 2.4 moved every issue's `first_seen` into
+  every tick's window — it was testing a defect that goes new hourly, which does not happen.
+  The day names the cost: `EntityNotFoundException` at `OdbClient.scala:$anonfun$load$6`
+  arrived with **4 occurrences**, was held back, did **1,517 the next hour** and **186,242
+  over the day**, and was never new again. It would have been reported never.
+- **The fix is [ADR-0030](../adr/0030-the-escalation-counts-what-goes-on-happening.md):** a
+  tick keeps the issues that are neither new nor regressed and uses them for one thing —
+  adding their count to a group it already knows. Such an issue creates no group (a key
+  nothing knows is dropped, or a tick would persist the org's whole past and then escalate
+  it), and clears no floor (refreshing a count is not reporting, which is ADR-0025's rule
+  kept). Only the escalation may promote it, and `reanalyse_after` still gates a group already
+  reported. With it, that group was reported one hour after it started.
+- **The floor is now a delay rather than a cliff, and the sensitivity says so.** Replayed over
+  the same day, **every floor from 5 to 200 produces the same five reports** — only the hour
+  each lands in moves. A floor of **1** produces seven, five of them inside the wave tick,
+  which is ADR-0023's error stream. That is the argument for keeping ten: on this data it
+  decides *when*, not *whether*.
+- **What a corrected day costs a channel:** five reports in 24 hours, at most two in any one
+  tick, and nothing at all in 20 of the 24. Four came by the floor, one by the escalation.
+  One day, and an unusual one — it held that wave; the first ten ticks are what a quiet day
+  looks like, eight hours with nothing new and two or three known groups re-counted per tick.
+- **Not measured:** whether any of the five reports was worth a developer's time. The gate's
+  volumes are now measured; its *outcomes* still are not, and that stays the first week's
+  question.
+
 ## Out of scope
 
 - **RUM and browser errors.** No source maps, no cartography for the front-end repositories;
@@ -422,11 +474,12 @@ deep-link shape has never been opened either.
   [ADR-0029](../adr/0029-the-exception-is-in-the-otel-span-events.md). What remains is not a
   risk about identity but a measured hit rate: the sampler often keeps error spans that are
   not this defect's, and F2 says so.
-- **The volume floor is a guess until there are numbers.** F1's 15 minutes came from 961
-  measured cycles. The distribution is now measured (see above) but no *outcome* is: whether
-  ten occurrences an hour is worth a developer's attention is the first week's question. A
-  floor set too low turns the team's channel into an error stream, which is the failure mode
-  ADR-0023 says to watch for.
+- ~~**The volume floor is a guess until there are numbers.**~~ **Corrected against 24 live
+  ticks on 2026-08-25** — see "What the gate measured over a day". The floor and the cap
+  survive with new reasoning, and the cumulative escalation was found unable to fire and
+  repaired (ADR-0030). What is still not measured is any *outcome*: whether ten occurrences
+  an hour is worth a developer's attention remains the first week's question, and a floor set
+  too low is still ADR-0023's error stream.
 - **Grouping across tenants can hide a tenant-specific defect.** An exception that only ever
   happens for one customer is a fact about that customer's data or configuration, and a group
   that reports "seen in 6 services" flattens it. The per-service counts in 2.1 are the
