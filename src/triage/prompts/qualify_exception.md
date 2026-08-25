@@ -40,17 +40,24 @@ Read what you were given in these ways:
   `NullPointerException` and an `EntityNotFoundException` fail for opposite
   reasons — one is a missing guard, the other is a lookup that legitimately found
   nothing and was treated as fatal.
+- **An `exemplar`, when there is one, is a real occurrence of this exception.**
+  Its `stack` is verbatim, `Caused by:` chain included, and the cause chain is
+  usually where the defect is. Its `frames` are the application's own files and
+  line numbers with the runtime filtered out. Reason from these before anything
+  else: they are the only thing here that was observed rather than counted.
 - **An empty collection is a fact about the telemetry, not about the defect.**
   The collectors say which kind of nothing they found: `sampled_away` means
-  Datadog counted these occurrences and discarded the spans and logs before they
-  could be searched, `not_instrumented` means nobody collects that signal for
-  these services, `empty` means it was searched and there was nothing. In every
-  one of those cases you have the exception's own fields and nothing more — say
-  so in the summary, and rank your causes as the speculation they are. Do not
-  reason *from* an absence.
-- **The file and the function are a top stack frame, not a whole stack.** They
-  say where it surfaced. Where it was *caused* may be a caller, and an `app`
-  cause may point at one — the analysis reads the repository, not only that file.
+  Datadog kept error telemetry for these services but not this exception's — or
+  none at all — and discarded the occurrences before they could be searched;
+  `not_instrumented` means nobody collects that signal for these services;
+  `empty` means it was searched and there was nothing. In every one of those
+  cases you have the exception's own fields and nothing more — say so in the
+  summary, and rank your causes as the speculation they are. Do not reason *from*
+  an absence.
+- **Without an exemplar, the file and the function are a top stack frame, not a
+  whole stack.** They say where it surfaced. Where it was *caused* may be a
+  caller, and an `app` cause may point at one — the analysis reads the
+  repository, not only that file.
 - **The counts are per tenant and are not summed.** Use them.
 
 Never invent. Do not name a commit, a version, a line number or a release — you

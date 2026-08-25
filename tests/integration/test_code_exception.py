@@ -1,7 +1,7 @@
 """F2 end to end: one gated group becomes one threaded report (M8 4.1-4.6).
 
 Offline. Datadog is the recording fake and answers the way the real org does —
-nothing, for a stated reason (ADR-0027) — the model is `FakeLLM`, and the
+nothing, for a stated reason (ADR-0029) — the model is `FakeLLM`, and the
 analysis runner is canned. What is worth pinning here is not that a model was
 called: it is where the analysis was pointed, which commit it read, that the diff
 that cannot run says so, and that the group's row and its Slack thread survive

@@ -174,10 +174,14 @@ the commit is the one a repository's tag for `first_seen_version` names when it 
 a labelled fallback to the service map's when it does not — measured blank on 15 of 15 issues
 in the reference hour, so the fallback is the normal path.
 
-The collection usually finds nothing, for a reason it states: the org's "Error Default" span
-retention filter is disabled, so the exceptions Error Tracking counts are discarded before
-they can be searched. That absence is reported as a finding rather than as an empty section
-([ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)).
+The collection looks for the occurrences with `service:<svc> status:error` over raw spans and
+matches them on `exception.type` inside the span's `custom.events` — the OpenTelemetry span
+events, where this platform puts the type, the message and the whole stack. When one matches,
+the report carries a real stack and its frames are the paths the analysis opens. When none
+does, the collection says which kind of nothing it found: error spans retained but not this
+defect's, none retained at all, or nothing collected for these services
+([ADR-0029](adr/0029-the-exception-is-in-the-otel-span-events.md), superseding
+[ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)).
 
 ### 2.5 F3 — DB review graph
 
@@ -369,6 +373,7 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 26 | One exception across tenants is one finding | [0026](adr/0026-one-exception-across-tenants-is-one-finding.md) |
 | 27 | An absence Datadog is discarding is a finding, not a gap | [0027](adr/0027-an-absence-datadog-discards-is-a-finding.md) |
 | 28 | A class name is not a path, and the path built from one says so | [0028](adr/0028-a-class-name-is-not-a-path.md) |
+| 29 | The exception is in the OpenTelemetry span events, not in `@error.type` | [0029](adr/0029-the-exception-is-in-the-otel-span-events.md) |
 
 ---
 
@@ -506,12 +511,16 @@ What M8 does **not** deliver:
   *published* image, so every hypothesis in the one live pass came back a stated failure and
   the report said so seven times over. Publishing the image is what turns F2 from a
   well-formed report into a useful one.
-- **The evidence is discarded before Triage can search it.** Measured against the org on
-  2026-08-25: the "Error Default" span retention filter is disabled, so a query rebuilt from
-  an issue's own fields returns zero spans against 5,869 counted occurrences
-  ([ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)). Every F2 report today
-  states that rather than carrying a stack trace. Turning that filter on is a Zeenea-side
-  change and nothing in Triage substitutes for it.
+- **The evidence exists, and often is not this defect's.** Measured against the org on
+  2026-08-25: the exception, its message and its whole stack are inside the OpenTelemetry
+  span events, so `service:<svc> status:error` finds them where `@error.type` never could
+  ([ADR-0029](adr/0029-the-exception-is-in-the-otel-span-events.md)). 66 of 80 retained error
+  spans carried a complete stack — and for four of the six services probed, none of the
+  retained spans carried the exception their loudest issue is about, because the "Error
+  Default" span retention filter is still disabled. So an F2 report carries a real stack when
+  the sampler happened to keep one and says which kind of absence it hit when it did not.
+  Turning that filter on is a Zeenea-side change and is what would make the first case the
+  normal one.
 - **The version path has never fired.** `first_seen_version` was blank on 15 of 15 issues in
   the reference hour and on 16 of 202 over a week, and blank on the one group driven end to
   end. The tag lookup, its two rungs and the release-boundary hypothesis are built and tested

@@ -146,10 +146,10 @@ class ErrorGroup(BaseModel):
     one spread evenly, and that difference only survives if nothing sums it away.
 
     Nothing here claims more than the search answered. There is no collected
-    evidence on a group and no promise there ever will be: measured on
-    2026-08-25, a query rebuilt from an issue's own fields returns zero spans and
-    zero logs for an issue claiming 6,344 occurrences, because the error spans
-    are sampled away and the logs are barely shipped.
+    evidence on a group and no promise there ever will be: the evidence lives on
+    the :class:`ErrorCollection`, and whether there is any depends on what the
+    sampler kept — measured 2026-08-25, four of six probed services retained
+    error spans of some other exception and none of this one (ADR-0029).
     """
 
     key: str = Field(description="The rule's own output: type, location and repository.")

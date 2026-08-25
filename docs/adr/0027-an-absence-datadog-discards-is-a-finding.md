@@ -1,7 +1,14 @@
 # 0027 — An absence Datadog is discarding is a finding, not a gap
 
-Status: Proposed. The collectors and the `sampled_away` status exist in code (M8 Phase 3);
-no report has been posted from them.
+Status: **Superseded by [ADR-0029](0029-the-exception-is-in-the-otel-span-events.md)** in
+its central claim, on the day it was written. Its "Decision" below is wrong where it says the
+absence is all there is: the occurrences were reachable all along, by a query nobody had
+tried, because the platform runs the OpenTelemetry agent and the exception is a span event
+rather than an `error.*` attribute. Everything it *measured* still holds and is still worth
+reading — `@error.type` really does return nothing, the "Error Default" retention filter
+really is disabled — and the `sampled_away` status it introduced survives, with a sharper
+meaning. Kept unedited below that line, because an ADR is a record of what was decided and
+when, not of what turned out to be true.
 
 *Date: 2026-08-25*
 

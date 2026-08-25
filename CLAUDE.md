@@ -19,9 +19,13 @@ Against the shipped example `config.yaml` the mapping resolves a repository and 
 because no real Zeenea repository is declared: declaring them is the prerequisite for M6
 being worth running. **No analysis has ever read a repository** — the investigative kinds
 have no deployed image (M7 3.4) — so every F1 and F2 report today is honest about having
-read no code, and F2's whole point, the file and function Datadog names, is proven against
-fixtures and unobserved against a tree. F3 (daily DB review), the FastAPI ingress, the
-analysis Job image, and the whole infra track are not built.
+read no code, and the paths F2 hands it are proven against fixtures and unobserved against a
+tree. F2 *does* now carry real evidence where the sampler kept some: the exception, its
+message and its whole stack live inside the OpenTelemetry span events, so
+`service:<svc> status:error` finds occurrences that `@error.type` never could
+(ADR-0029, superseding ADR-0027 the day it was written).
+F3 (daily DB review), the FastAPI ingress, the analysis Job image, and the whole infra track
+are not built.
 Design docs: `docs/roadmap.md` (product), `docs/architecture.md` (system),
 `docs/ticket-spec.md` (what a finished report must contain), `docs/adr/` (decisions, each
 with the condition that would make it wrong — add an ADR when changing one).
@@ -151,9 +155,12 @@ new-or-regressed), `grouping.py` (the group key — exception type, source locat
 repository the mono-tenancy rule resolves**, never the message, ADR-0026), `gate.py` (the
 per-tick floor, the cumulative escalation, the per-tick cap, and the `reanalyse_after`
 cooldown that keeps a 10,000-an-hour group from being reposted every tick), `sweep.py` (the
-three collectors, and which kind of nothing each found — ADR-0027), `paths.py` (Datadog's
-`file_path` is a fully-qualified class name and its `function_name` a JVM symbol; both are
-converted by convention and the conversion is stated — ADR-0028), `versions.py` (the commit
+three collectors, the join, and which kind of nothing each found — ADR-0029), `otel.py` (the
+exception and its stack out of the JSON string Datadog calls `custom.events`, and the
+application frames out of the stack), `paths.py` (a real frame beats a guess: the stack's
+`File.scala:line` frames are the paths when there is a stack, and Datadog's
+`file_path` — a fully-qualified class name — is converted by convention when there is not,
+with the report saying which it had — ADR-0028, ADR-0029), `versions.py` (the commit
 the version an exception was first seen on names, the fallback when nothing claims it, and
 the release-boundary hypothesis). Every one of these is a rule; nothing here asks a model
 anything. The one tier call on the F2 path is `qualify_exception`, which fills the

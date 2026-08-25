@@ -70,12 +70,17 @@ class CollectorStatus(StrEnum):
     SAMPLED_AWAY = "sampled_away"
     """The events happened, something counted them, and they are not searchable.
 
-    Told from ``NOT_INSTRUMENTED`` by a control query — the same scope with the
-    error predicate dropped — coming back alive (ADR-0027). The distinction is the
-    whole reason this status exists: both are an empty list, and they are opposite
-    instructions. "Not instrumented" tells a developer to look elsewhere. "Sampled
-    away" tells an SRE which retention filter to turn on, and nobody turns one on
-    for a report that only said "empty".
+    Two shapes, told apart by the detail rather than by a fifth member
+    (ADR-0029): error events were retained for this scope and none is this
+    exception, or none was retained at all though a control query — the same scope
+    with the error predicate dropped — comes back alive. Both are told from
+    ``NOT_INSTRUMENTED``, where the control is dead too.
+
+    The distinction is the whole reason this status exists: all of them are an
+    empty list, and they are opposite instructions. "Not instrumented" tells a
+    developer to look elsewhere. "Sampled away" tells an SRE which retention
+    filter to turn on, and nobody turns one on for a report that only said
+    "empty".
     """
     FAILED = "failed"
     SKIPPED = "skipped"

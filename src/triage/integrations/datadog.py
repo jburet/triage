@@ -259,12 +259,13 @@ class DatadogRestClient:
     async def search_spans(
         self, *, query: str, frm: datetime, to: datetime, limit: int = 10
     ) -> dict[str, Any]:
-        """Raw spans, not an aggregate: F2 wants one trace to open (M8 3.2).
+        """Raw spans, not an aggregate: F2 wants the exception and one trace to open.
 
-        Reads only what a retention filter kept. Measured on 2026-08-25, that is
-        nothing at all for the services Error Tracking raises issues for — which
-        is a fact about the org's retention filters and is reported as one
-        (ADR-0027), not a reason to skip the call.
+        Raw because the exception lives in the span's own ``custom.events`` and no
+        aggregate carries it (ADR-0029). Reads only what a retention filter kept,
+        which is often error spans of some *other* exception — that is a fact
+        about the org's retention filters and is reported as one, not a reason to
+        skip the call.
         """
         return await self._call(
             "spans_search",

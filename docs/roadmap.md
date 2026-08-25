@@ -105,9 +105,12 @@ regressed, and reports the ones that are loud enough to be worth a developer's h
 - Outputs: one threaded Slack report per group, in the owning team's channel, carrying the
   nine ticket-spec sections plus the exception's own identity. Every later report about the
   same group replies in the same thread, across ticks.
-- What it does not have today: **evidence**. The org's error-span retention filter is
-  disabled, so the occurrences Datadog counts are discarded before Triage can search them;
-  F2 says so, names the filter, and reports anyway ([ADR-0027](adr/0027-an-absence-datadog-discards-is-a-finding.md)).
+- Evidence, when the sampler kept some: the occurrences are found by `service:<svc>
+  status:error` over raw spans and matched on the exception type inside the OpenTelemetry
+  span events, and the report then carries a real stack trace and the frames it names
+  ([ADR-0029](adr/0029-the-exception-is-in-the-otel-span-events.md)). The org's error-span
+  retention filter is still disabled, so for many groups nothing retained is this defect —
+  F2 says which kind of absence that is, names the filter, and reports anyway.
 
 ## F3 — Daily database review — postponed
 

@@ -168,13 +168,21 @@ Done 2026-08-25. Three findings.
 - [x] 3.2 It collects the error spans behind it, so the report can name the operation and one trace
       to open. A service with no APM instrumentation is `not_instrumented`, not empty — the
       distinction the collection schema already draws. **Amended:** a third outcome,
-      `sampled_away`, for evidence Datadog counted and discarded (ADR-0027).
+      `sampled_away`, for evidence Datadog counted and discarded (ADR-0027) —
+      **re-derived** by the OTel correction into four outcomes (ADR-0029).
 - [x] 3.3 The occurrences are re-found by a query built from the group's own fields, and the
       collection states that query verbatim, because it is a reconstruction and not the issue's own
       identity (see Open risks).
 - [x] 3.4 The collection window runs back from the tick to the configured lookback, and the whole
       payload fits `collection.max_prompt_bytes`, stating every cut.
 - [x] 3.5 A collector Datadog refuses is a stated failure and the run continues, exactly as F1's does.
+- [x] 3.6 **Added by the OTel correction.** The exception, its message and its whole stack —
+      `Caused by:` chain included — are read out of the JSON string Datadog calls
+      `custom.events`, and the group is joined to its occurrences by `exception.type` inside
+      it. A span with no events, or with malformed JSON, is skipped and never raises.
+- [x] 3.7 **Added by the OTel correction.** The stack's frames become repository-relative
+      `path:line`, filtered to the application's own code, and they are what the analysis
+      opens — ahead of 4.1's conversion, which stays as the fallback and reads differently.
 
 ## What Phase 3 measured, and what it changes
 
@@ -244,6 +252,60 @@ because that is the shape it will have.
 One incidental fix: `Collector` now holds F2's three as well as F1's, so F1's follow-up loop
 refuses them by name. Left to fall through they would have run as an unscoped event search —
 an answer about the whole org, shaped like an answer about the incident.
+
+## What the OTel correction measured, and what it overturns
+
+Done 2026-08-25, hours after Phase 4. Everything above under "What Phase 3 measured" was
+measured correctly and concluded wrongly, and this section is the correction. The decision
+is [ADR-0029](../adr/0029-the-exception-is-in-the-otel-span-events.md), which supersedes
+ADR-0027 in its central claim.
+
+**The route exists. It is not `@error.type`, it is the OpenTelemetry span events.** The
+platform runs the OTel Java agent, not Datadog's tracer, so Datadog's own `error.*`
+attributes are never set — which is why `@error.type:"<fqcn>"` matched nothing and
+`@error.stack:*` returned zero spans org-wide. The exception is a **span event**, and
+Datadog surfaces span events as a JSON-encoded string in the span attribute
+`custom.events`. Inside it: `exception.type`, `exception.message` and
+`exception.stacktrace` — the full stack, `Caused by:` chain and all, with real files and
+real line numbers. Phase 3 read "zero results" as a fact about retention. It was a fact
+about which agent is running.
+
+**The query that works is `service:<svc> status:error` over raw spans.** Measured over 24
+hours at `limit=20`:
+
+| service | error spans | with an OTel stack | matching the issue's own type |
+|---|---|---|---|
+| `plt-merck-qa` | 20 | 20 | 0 |
+| `plt-merck` | 20 | 20 | 0 |
+| `plt-merck-dev` | 20 | 20 | 0 |
+| `plt-autostrade` | 20 | 6 | 0 |
+| `plt-bred` | 20 | 7 | 5 |
+| `plt-gema-uat` | 8 | 7 | 0 |
+
+66 of the capture's 80 spans carry a complete stack. The reference one is 2,334 bytes, six
+frames plus a twelve-frame `Caused by: TooBusyIndexingException` chain naming
+`ScannerService.scala:124`, `ScannerService.scala:194` and `LoadControl.scala:14`.
+
+**And "unrelated noise" was never unrelated.** Phase 4's report said the collectors
+"returned unrelated noise (profiler rate-limit errors, http.client spans)". Nothing was
+matching them against the group, because the matching attribute was wrong. Matched properly,
+they are the finding that separates *this defect's occurrences were discarded* from *nothing
+is collected here*.
+
+**What changed in code.** `errors/otel.py` parses the events and the frames; the
+reconstruction is one query plus a stated match instead of a narrow-then-broad layering that
+could never have answered; the four statuses are re-derived from what was retained rather
+than from a query that could not match; `ErrorCollection` carries an `ExceptionExemplar` —
+stack, frames, trace id, operation — and the report shows it, cut per `Caused by:` chapter so
+Slack's four-thousand characters cannot eat the cause; and `AnalysisRequest.paths` prefers
+observed frames over ADR-0028's conversion, with the report saying which of the two it had.
+`tests/fixtures/datadog/errors/synthetic_stack/` is deleted and replaced by
+`otel_stacks_20260825/`, a real capture, exactly as its own notes said to do.
+
+**What is unchanged.** The org's "Error Default" retention filter is still disabled and is
+still the one Zeenea-side switch that would move the mismatch column. `first_seen_version` is
+still blank on nearly every issue — 8 of 184 over 24 hours. And nothing has still ever opened
+one of these paths in a real tree.
 
 ## Phase 4: where in the code, and the report
 
@@ -330,12 +392,14 @@ deep-link shape has never been opened either.
 - ~~**Nothing here has ever been read from the real org, and Error Tracking may not be
   populated at all.**~~ **Closed by 1.1.** It is populated, and every issue names its file
   and function.
-- ~~**An occurrence cannot be traced back to its issue by identity.**~~ **Confirmed, and
-  worse than feared, and now closed as a decision rather than a risk.** The reconstruction
-  returns nothing at all, not merely the wrong things; no API route exists to the exemplar
-  either. See "What Phase 3 measured" and
-  [ADR-0027](../adr/0027-an-absence-datadog-discards-is-a-finding.md): F2 states the absence
-  and names the retention filter that would end it.
+- ~~**An occurrence cannot be traced back to its issue by identity.**~~ **Closed by a
+  join, not by a caveat.** Phase 3 concluded there was no route and ADR-0027 recorded it;
+  both were wrong. The exception type is inside each span's OpenTelemetry events, and
+  matching on it joins a `service:<svc> status:error` search back to the group — see "What
+  the OTel correction measured" and
+  [ADR-0029](../adr/0029-the-exception-is-in-the-otel-span-events.md). What remains is not a
+  risk about identity but a measured hit rate: the sampler often keeps error spans that are
+  not this defect's, and F2 says so.
 - **The volume floor is a guess until there are numbers.** F1's 15 minutes came from 961
   measured cycles. The distribution is now measured (see above) but no *outcome* is: whether
   ten occurrences an hour is worth a developer's attention is the first week's question. A

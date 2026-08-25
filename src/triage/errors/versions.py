@@ -36,7 +36,7 @@ DEPLOYMENT_RANK = 0.9
 """High enough to be bought, and deliberately so.
 
 A recorded version boundary is the one dated fact in an F2 run — the collection
-is usually empty (ADR-0027) and every cause the model proposes is read off the
+is usually empty (ADR-0025) and every cause the model proposes is read off the
 issue's own fields. The analysis it buys costs nothing today, because it is
 refused for want of a base commit before any Job is started, and that refusal is
 the point: the report has to say the diff was never read (ADR-0014). Ranked first

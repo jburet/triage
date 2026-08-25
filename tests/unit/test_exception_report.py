@@ -1,7 +1,7 @@
 """What one recurring code exception looks like in Slack (M8 4.4).
 
 The nine sections of ``docs/ticket-spec.md`` plus an exception header, and — this
-being the shape a real F2 report has in this org today (ADR-0027) — it has to
+being a shape a real F2 report has in this org today (ADR-0029) — it has to
 read well with no evidence at all behind it.
 """
 
@@ -161,8 +161,8 @@ def test_a_commit_from_a_claimed_version_and_a_fallback_do_not_read_alike():
 
 
 def test_the_discarded_evidence_is_stated_beside_the_evidence_that_exists():
-    """ADR-0027: the absence is the finding, and a report that only said 'empty' gets
-    nobody to turn a retention filter on."""
+    """ADR-0027, as ADR-0029 keeps it: the absence is a finding, and a report that only
+    said 'empty' gets nobody to turn a retention filter on."""
     evidence = body(render(), "Evidence")
 
     assert "What was searched for and not found:" in evidence
