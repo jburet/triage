@@ -54,7 +54,7 @@ run-mapping: env ## Derive the service map from real Datadog events and print th
 run-poller: env ## Tick the alert poller by hand, as the Platform cron would (read-only Datadog)
 	uv run python -m scripts.run_poller $(ARGS)
 
-run-errors: env ## Tick the code-exception poller by hand, as the hourly cron would (read-only)
+run-errors: env ## Tick the code-exception poller by hand (read-only; ARGS="--analyse" spends)
 	uv run python -m scripts.run_errors $(ARGS)
 
 cron: env ## Show, or with ARGS="--apply" create, the Platform cron that ticks the poller

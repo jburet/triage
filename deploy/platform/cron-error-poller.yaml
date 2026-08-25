@@ -1,0 +1,26 @@
+# The hourly tick that makes F2 run itself (ADR-0025).
+#
+# Not a Kubernetes object: a LangGraph Platform cron is a row inside the Platform,
+# created over its API. `scripts/apply_cron.py` reads a file like this one and
+# creates it — `make cron ARGS="--file deploy/platform/cron-error-poller.yaml"`
+# prints what it would do, adding `--apply` does it. The file is the reviewable
+# form and the record of what the Platform was told.
+#
+# An hour, where F1 ticks every minute, because the two inputs behave differently
+# (ADR-0025). An alert fires and recovers, so a minute is what separates "still
+# failing" from "already over"; an Error Tracking issue does not recover, it
+# accumulates, and asking every minute would buy sixty times the calls to watch a
+# counter go up. What one tick costs when nothing is new is one search per
+# configured track — two — and no model call at all: the volume gate is what
+# turns a tick into spend.
+#
+# The graph is stateless per tick — it reads its own watermark from Postgres —
+# so this is a cron over `POST /runs/crons` and not one bound to a thread. Each
+# group that clears the gate gets its own `code_exception` run, launched by the
+# tick, and its own Slack thread that lives on the group's row across ticks.
+assistant_id: error_poller
+schedule: "0 * * * *"
+input: {}
+metadata:
+  owner: triage
+  source: deploy/platform/cron-error-poller.yaml

@@ -158,7 +158,11 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
         )
     base_commit = None
     if hypothesis.cause_type is CauseType.DEPLOYMENT:
-        base_commit = hypothesis.base_commit or mapped_commit
+        # The map's commit stands in for "what was deployed before" only when the
+        # hypothesis did not name a commit of its own. When it did — F2 names the
+        # commit the exception was first seen on — the map holds what is running
+        # *now*, which is later, and diffing against it runs the change backwards.
+        base_commit = hypothesis.base_commit or (mapped_commit if not hypothesis.commit else None)
         if not base_commit or base_commit == commit:
             return Investigated(
                 hypothesis=hypothesis,

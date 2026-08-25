@@ -3,7 +3,7 @@
 The Platform reads this file and imports each entry; an entry naming a module
 that moved, or an attribute that is not a compiled graph, is a deployment that
 fails at start-up rather than a test that fails here. This is the half of 5.1
-that can be checked without a Platform — that the six graphs it would serve
+that can be checked without a Platform — that the graphs it would serve
 import, compile and expose their nodes. Whether a Platform serves them against
 the shared Postgres is a deployment, and there has not been one.
 """
@@ -33,6 +33,7 @@ def test_it_registers_the_graphs_the_architecture_describes():
         "cartography",
         "analysis",
         "incident",
+        "code_exception",
         "alert_poller",
         "error_poller",
         "service_mapping",
@@ -51,6 +52,15 @@ def test_the_poller_the_cron_ticks_has_the_one_node_it_is_named_for():
     graph = load(REGISTERED["alert_poller"])
 
     assert "poll_alerts" in graph.nodes
+
+
+def test_the_code_exception_graph_composes_the_two_shared_sub_graphs():
+    graph = load(REGISTERED["code_exception"])
+
+    assert {"open_group", "collect_exception", "qualify_exception", "settle_group"} <= set(
+        graph.nodes
+    )
+    assert {"analysis", "ticket_pipeline"} <= set(graph.nodes)
 
 
 def test_the_error_poller_the_hourly_cron_ticks_reads_then_groups():

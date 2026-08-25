@@ -3,6 +3,7 @@
     make run-errors                          # one tick, in-memory, nothing persisted
     make run-errors ARGS="--db"              # one tick against Postgres, watermark and all
     make run-errors ARGS="--hours 168"       # a week, to see what a backlog sweep would find
+    make run-errors ARGS="--analyse"         # then drive every gated group end to end
 
 The sibling of ``scripts/run_poller``. F2 needs no Platform cron to be developed:
 this is the schedule made manual, and `deploy/platform/cron-error-poller.yaml`
@@ -11,7 +12,16 @@ will run the same `error_poller` graph on the same hourly period.
 **What it touches.** Datadog: read-only, one Error Tracking search per configured
 track. Postgres: only with ``--db``, and without it every tick starts from an
 empty watermark and re-reads the configured lookback. No model call anywhere on
-this path — Phase 1 classifies and counts, and nothing it decides costs money.
+the tick itself — it classifies and counts, and nothing it decides costs money.
+
+``--analyse`` is the part that does. It runs the ``code_exception`` graph over
+every group the gate took up, which is roughly one ``analysis`` call to qualify,
+one ``diagnosis`` call to synthesise and one ``triage`` call to deduplicate, per
+group — capped by ``errors.max_groups_per_tick``. GitHub is read for real, so a
+version a repository claims resolves to a real commit; Jira and Slack stay
+recording fakes and what would have been posted is printed instead. The analysis
+runner is the dry-run one: no repository is cloned and no code is read, so what
+this shows is the *shape* of a report and not its findings.
 """
 
 import argparse
@@ -21,9 +31,11 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
 from triage.config import get_config, get_settings
+from triage.graphs.code_exception import run_code_exception
 from triage.graphs.error_poller import graph
 from triage.integrations.datadog import DatadogRestClient
-from triage.runtime import DEPS_KEY, build_deps
+from triage.runtime import DEPS_KEY, Deps, build_deps, build_github
+from triage.schemas.errors import ErrorGroup
 
 BOLD, DIM, RESET = "\033[1m", "\033[2m", "\033[0m"
 
@@ -31,6 +43,11 @@ BOLD, DIM, RESET = "\033[1m", "\033[2m", "\033[0m"
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", action="store_true", help="read and write Postgres")
+    parser.add_argument(
+        "--analyse",
+        action="store_true",
+        help="run the code_exception graph over every group the gate took up (spends money)",
+    )
     parser.add_argument(
         "--hours",
         type=float,
@@ -115,7 +132,35 @@ async def main(argv: list[str]) -> int:
 
     state = await graph.ainvoke({}, config={"configurable": {DEPS_KEY: deps}})
     report(state)
+    if options.analyse:
+        await analyse(deps, state.get("analysing") or [])
     return 0
+
+
+async def analyse(deps: Deps, groups: list[ErrorGroup]) -> None:
+    """Drive each gated group end to end, and print what Slack would have received."""
+    if not groups:
+        print(f"\n{DIM}no group cleared the gate this tick, so there is nothing to analyse{RESET}")
+        return
+    deps = replace(deps, github=build_github(get_settings()))
+    for group in groups:
+        print(f"\n{BOLD}── {group.key} {'─' * max(0, 60 - len(group.key))}{RESET}")
+        before = len(deps.slack.messages) if hasattr(deps.slack, "messages") else 0
+        try:
+            final = await run_code_exception({"group": group}, deps)
+        except Exception as exc:
+            print(f"  {DIM}failed{RESET}     {type(exc).__name__}: {exc}")
+            continue
+        diagnosis = final.get("diagnosis")
+        if diagnosis is not None:
+            print(f"  {DIM}confidence{RESET} {diagnosis.confidence.value}")
+        print(f"  {DIM}outcome{RESET}    {final.get('outcome')}")
+        for message in getattr(deps.slack, "messages", [])[before:]:
+            print(indent(message.text))
+
+
+def indent(text: str) -> str:
+    return "\n".join(f"  | {line}" for line in str(text).splitlines())
 
 
 if __name__ == "__main__":

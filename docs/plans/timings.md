@@ -162,3 +162,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 4.1 | make lint && make test | 9 |
 | 2026-08-25 | M8 4.2-4.3 | make lint && make test (899 passed) | 8 |
 | 2026-08-25 | M8 4.4 | make lint && make test (910 passed) | 10 |
+| 2026-08-25 | M8 4.5-4.6 | make lint && make test (921 passed) | 9 |
