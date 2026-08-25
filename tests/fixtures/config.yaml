@@ -58,6 +58,7 @@ thresholds:
   # F3 is proactive and noisier than F1, so it earns a higher bar.
   ticket_confidence:
     F1: medium
+    F2: medium
     F3: high
 
   # Re-alert Slack on an updated (deduplicated) ticket at this occurrence count,

@@ -24,8 +24,6 @@ incident that motivated all of this (a liveness probe shorter than the pod's own
 startup) shows up as many short cycles and never as one long one.
 """
 
-from __future__ import annotations
-
 from datetime import UTC, datetime, timedelta
 from typing import Any
 

@@ -1,4 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean deploy-check run-poller cron capture-datadog capture-errors
+.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean deploy-check run-poller cron run-errors capture-datadog capture-errors
 ANALYSIS_IMAGE ?= triage-analysis:dev
 
 help:
@@ -53,6 +53,9 @@ run-mapping: env ## Derive the service map from real Datadog events and print th
 
 run-poller: env ## Tick the alert poller by hand, as the Platform cron would (read-only Datadog)
 	uv run python -m scripts.run_poller $(ARGS)
+
+run-errors: env ## Tick the code-exception poller by hand, as the hourly cron would (read-only)
+	uv run python -m scripts.run_errors $(ARGS)
 
 cron: env ## Show, or with ARGS="--apply" create, the Platform cron that ticks the poller
 	uv run python -m scripts.apply_cron $(ARGS)

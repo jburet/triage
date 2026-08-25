@@ -8,6 +8,7 @@
     "analysis": "./src/triage/graphs/analysis.py:graph",
     "incident": "./src/triage/graphs/incident.py:graph",
     "alert_poller": "./src/triage/graphs/poller.py:graph",
+    "error_poller": "./src/triage/graphs/error_poller.py:graph",
     "service_mapping": "./src/triage/graphs/mapping.py:graph"
   },
   "env": ".env"

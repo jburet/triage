@@ -15,6 +15,7 @@ from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
 from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.errors import ErrorIssue, ErrorTrack, SkippedIssue
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
@@ -254,4 +255,27 @@ class PollerState(TypedDict, total=False):
     out_of_scope: list[UUID]
     unmapped: list[UUID]
     flapping: list[str]
+    skipped_span: str | None
+
+
+class ErrorPollerState(TypedDict, total=False):
+    """One tick of the hourly code-exception pass (ADR-0025).
+
+    Everything the tick decided is reported back rather than only logged. Most
+    ticks decide nothing — over the reference hour all fifteen occurring issues
+    were unchanged — so ``unchanged`` and ``issues_seen`` are the difference
+    between a pass that ran and found nothing and a pass that did not run.
+    """
+
+    now: datetime | None
+
+    window: TimeWindow
+    query: str
+    issues_seen: dict[ErrorTrack, int]
+
+    new: list[ErrorIssue]
+    regressed: list[ErrorIssue]
+    unchanged: int
+    skipped: list[SkippedIssue]
+    failures: list[str]
     skipped_span: str | None
