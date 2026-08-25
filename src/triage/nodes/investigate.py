@@ -176,6 +176,7 @@ async def _plan(state: AnalysisState, deps: Deps, hypothesis: Hypothesis) -> Inv
         base_commit=base_commit,
         commit_source=deployment.commit_source,
         mapping_source=deployment.mapping_source,
+        paths=list(hypothesis.paths),
         result=None,
     )
 

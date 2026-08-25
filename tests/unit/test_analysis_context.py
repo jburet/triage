@@ -260,3 +260,37 @@ def test_the_two_kinds_that_answer_a_question_select_differently_from_the_two_th
 
     assert ANALYSERS[AnalysisKind.SUMMARIZE_REPO].profile is APPLICATION
     assert ANALYSERS[AnalysisKind.CODE_ANALYSIS].profile is INVESTIGATION
+
+
+def test_a_named_package_path_finds_the_module_that_holds_it(tmp_path):
+    """F2 knows the package and not the module (M8 4.1).
+
+    Datadog names `zeenea.repository.orientdb.OdbClient.scala`, which becomes a
+    package-relative path; where that path sits under a module's own source root
+    is something only the tree knows.
+    """
+    a_scala_service(tmp_path)
+
+    context = gather(
+        tmp_path,
+        INVESTIGATION,
+        ContextBudget(max_files=1),
+        first=["com/zeenea/indexer/Store.scala"],
+    )
+
+    assert [f.path for f in context.files] == [
+        "indexer/src/main/scala/com/zeenea/indexer/Store.scala"
+    ]
+
+
+def test_a_package_path_two_modules_both_carry_is_read_in_both(tmp_path):
+    """Picking one of two identical package paths would be a guess; reading both is not."""
+    write(tmp_path, "core/src/main/scala/com/zeenea/Shared.scala", "object Shared\n")
+    write(tmp_path, "api/src/main/scala/com/zeenea/Shared.scala", "object Shared\n")
+
+    context = gather(tmp_path, INVESTIGATION, first=["com/zeenea/Shared.scala"])
+
+    assert {f.path for f in context.files} == {
+        "core/src/main/scala/com/zeenea/Shared.scala",
+        "api/src/main/scala/com/zeenea/Shared.scala",
+    }

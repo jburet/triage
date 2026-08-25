@@ -36,3 +36,10 @@ class Hypothesis(BaseModel):
     )
     description: Filled
     rank_score: float = Field(ge=0.0, le=1.0, description="Relative plausibility within the set.")
+    paths: list[str] = Field(
+        default_factory=list,
+        description="Repository-relative paths the analysis opens before the selection "
+        "profile's own globs. Filled by the calling feature from what it was told — F2's "
+        "issue names the file and the function — never by a model, which has no tree to "
+        "name one from.",
+    )
