@@ -51,9 +51,19 @@ spot. Jira becomes worth building when someone asks to keep one of these reports
   `notify_below_threshold` / `create_ticket` split becomes one renderer with two framings.
 - `docs/ticket-spec.md`'s nine sections become the spec for the **report**, not the issue.
   Nothing about what a developer needs in order to act changes because the destination did.
-- Deduplication and the recurrence escalation (ADR-0003) matter more, not less: without a
-  ticket to reopen, a repeating incident is a repeating message, and the thread is what
-  keeps that legible.
+- **Deduplication and the recurrence escalation (ADR-0003) do not run at all.** This
+  paragraph first claimed they "matter more, not less", which was wrong about the code:
+  `dedup_check` shortlists from `open_tickets_for_service`, and only `create_ticket` ever
+  writes that table. With nothing filed there is nothing to match, so every recurrence is a
+  fresh report — the third pod-down of a night reads exactly like the first, with no "this
+  is the 3rd time" and no thread continuity across cycles. Recurrence waits for Jira.
+
+  Making it work without Jira means persisting reports and deduplicating against those
+  instead, which is a second store of what was said, with its own staleness and its own
+  reopen semantics — the ticket queue, rebuilt in the database, for a release whose whole
+  argument is that it does not need one. The cheaper answer is that a team reading its own
+  alert channel already sees repetition: the alert fires again in the same channel, above
+  the report. Triage adds nothing to that today, and says nothing false about it either.
 - The Jira client, `compose_ticket` and `self_review` stay under test against fakes. They
   are not deleted, so the decision is reversible by configuration.
 - F3 and the ingress leave the critical path entirely. The ingress existed for the GitHub
@@ -61,6 +71,10 @@ spot. Jira becomes worth building when someone asks to keep one of these reports
   HTTP surface.
 
 ## What this costs
+
+Recurrence, most of all. A report that cannot say "again" is the weakest thing about this
+release, and the one an on-call reader will notice first — repetition is often the whole
+finding, and Triage will be silent about it while Datadog is not.
 
 The self-review loop is the quality gate that ADR-0002 built, and a Slack message that
 nobody must validate has a weaker one. The report is judged by whoever reads the channel,
@@ -72,5 +86,10 @@ which now has no Jira transition to learn from.
 
 Someone asks to keep a report — to assign it, schedule it, or track that it was fixed. That
 request is the evidence that the ticket path is worth the second queue, and the code to serve
-it is still in the tree. Revisit also if the channel becomes noise: that means the
+it is still in the tree.
+
+Sooner, and more likely: someone asks why the same incident was reported three times without
+Triage noticing. That is recurrence being wanted, and it brings Jira with it rather than a
+store built to avoid it — unless the ask is specifically for the *count* and not the queue,
+in which case persisting reports is the smaller answer after all. Revisit also if the channel becomes noise: that means the
 persistence gate or the recurrence rule is wrong, and a ticket would not have fixed it.

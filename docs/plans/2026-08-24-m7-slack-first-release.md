@@ -36,7 +36,7 @@ infra track, which this release is the first thing to actually need.
 
 - [x] 2.1 The report renders every section the diagnosis carries — symptom with numbers and window, impact, probable cause with confidence, evidence with links, location as repository/commit/paths, expected change, out of scope, ruled out, unknowns — and omits nothing silently: a section with no content says why.
 - [x] 2.2 The location names the repository, the deployed commit and the IaC path, and carries the mapping rung: an image-derived commit and a `serves`-pattern one must not read alike (ADR-0019, ADR-0020).
-- [x] 2.3 Every message about one incident lands in the thread opened by `open_incident`, including the recurrence escalations (ADR-0003).
+- [x] 2.3 Every message about one incident lands in the thread opened by `open_incident`. Not the recurrence escalations (ADR-0003): they never fire in this release, so a checkbox naming them would be claiming a verification nothing can perform — see ADR-0023's amended consequence.
 - [x] 2.4 A report longer than Slack accepts is split at a section boundary, never mid-evidence, and the split is stated.
 - [x] 2.5 The two causes ruled out at the 0.30 analysis floor and the six unknowns produced by the 2026-08-24 19:05 run all appear in the rendered report — the fixture is that run, so the thing this milestone exists to deliver is what the test asserts. (The plan said four ruled out; the 19:05 run's own output shows four *ranked* causes, of which two were ruled out at the floor. Corrected to what the run printed.)
 
@@ -127,6 +127,14 @@ name reaches `low` because nothing worth reading was opened. The fix belongs to
   signal, and that signal is whether these reports get read. Not before there are reports.
 
 ## Open risks
+
+- **Nothing says "again".** Recurrence and dedup do not run: `dedup_check` shortlists from
+  `open_tickets_for_service` and only `create_ticket` writes it, so the third pod-down of a
+  night reads exactly like the first. ADR-0023 is amended to say so out loud rather than to
+  claim, as it first did, that recurrence "matters more, not less" — it decides that
+  recurrence waits for Jira instead of building a second store of what was said. This is the
+  release's weakest point and the one an on-call reader meets first, so it is a risk and not
+  a closed question.
 
 - **The alert class can contradict its own reasoning, and the class is what routes.** On
   2026-08-24 at 19:05 the classifier returned `saturation` while its own `why` named
