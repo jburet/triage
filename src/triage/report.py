@@ -17,9 +17,12 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from triage.errors.paths import enclosing_function
+from triage.schemas.collection import CollectorStatus
 from triage.schemas.common import Confidence, is_unknown
 from triage.schemas.common import render as render_field
 from triage.schemas.diagnosis import Diagnosis, Location
+from triage.schemas.errors import CommitChoice, ErrorCollection, ErrorGroup
 from triage.schemas.system_map import CommitSource, MappingSource, WorkloadEntry
 from triage.schemas.ticket import TicketSection
 
@@ -318,6 +321,216 @@ def render_incident(
     return SlackReport(
         service=diagnosis.service,
         headline=headline,
+        sections=sections,
+        leads_with_cause=confident,
+    )
+
+
+# -- F2: one recurring code exception (M8 4.4) ---------------------------------
+
+DATADOG_APP = "https://app.datadoghq.eu"
+"""The org's Datadog. Its deep-link shape has never been opened from a report."""
+
+EXCEPTION_HEADING = "Exception"
+"""The tenth section, and the only one not in ``docs/ticket-spec.md``.
+
+The nine are about a symptom; an error group *is* an identity — a type, a
+message, a place in the code, a count and a set of tenants — and every one of
+those is a fact Datadog handed over rather than something the run inferred. A
+reader who has to reconstruct them from the symptom paragraph is reading a worse
+report than the one Triage was given."""
+
+
+def issue_url(issue_id: str) -> str:
+    return f"{DATADOG_APP}/apm/error-tracking/issue/{issue_id}"
+
+
+def _seen_in(group: ErrorGroup) -> str:
+    ordered = sorted(group.services.items(), key=lambda item: (-item[1], item[0]))
+    return " · ".join(f"`{service}` {count:,}" for service, count in ordered) or "_no service_"
+
+
+def _versions(group: ErrorGroup) -> str:
+    """Both versions, or the absence that is the normal case (measured, M8 phase 1)."""
+    first, last = group.first_seen_version, group.last_seen_version
+    if not first and not last:
+        return (
+            "Error Tracking recorded no application version for this exception, which is "
+            "the usual case in this org — so nothing here says which release it entered at."
+        )
+    return f"first seen on `{first or 'unrecorded'}`, last seen on `{last or 'unrecorded'}`"
+
+
+def _raised_at(group: ErrorGroup, source_caveat: str | None) -> str:
+    method = enclosing_function(group.function_name)
+    where = f"`{group.file_path}`"
+    if group.function_name:
+        where += f" in `{group.function_name}`"
+        if method and method != group.function_name:
+            where += f" — the method `{method}`"
+    return where + (f"\n_{source_caveat}_" if source_caveat else "")
+
+
+def _recurrence(group: ErrorGroup) -> str | None:
+    """Which report this is, when it is not the first (behaviour 2.5)."""
+    if group.analysis_count <= 1:
+        return None
+    ordinal = group.analysis_count
+    first = (
+        f" The first is {group.first_report_url}."
+        if group.first_report_url
+        else " The first is at the top of this thread."
+    )
+    return (
+        f"*Report {ordinal}* for this group — {group.cumulative_occurrences:,} occurrences "
+        f"across every tick that has seen it.{first}"
+    )
+
+
+def _exception_section(
+    group: ErrorGroup, collection: ErrorCollection, source_caveat: str | None
+) -> ReportSection:
+    window = collection.window
+    lines = [
+        f"*Type:* `{group.error_type}`",
+        f"*Message:* {group.sample_message or '_the issue carried none_'}",
+        f"*Raised at:* {_raised_at(group, source_caveat)}",
+        f"*Occurrences:* {group.occurrences:,} between {window.start:%Y-%m-%d %H:%M} and "
+        f"{window.end:%H:%M} UTC, across {len(group.services)} "
+        f"service{'' if len(group.services) == 1 else 's'} of the same repository",
+        f"*Seen in:* {_seen_in(group)}",
+        f"*Versions:* {_versions(group)}",
+        "*Issue:* " + ", ".join(issue_url(issue) for issue in group.issue_ids)
+        if group.issue_ids
+        else "*Issue:* _no Datadog issue id was recorded_",
+    ]
+    recurrence = _recurrence(group)
+    if recurrence:
+        lines.append(recurrence)
+    return ReportSection(EXCEPTION_HEADING, "\n".join(lines))
+
+
+def _telemetry(collection: ErrorCollection) -> list[str]:
+    """What each collector found, and — where it found nothing — which nothing.
+
+    ADR-0027: an absence Datadog is discarding is a finding, and it is the one
+    finding an F2 report in this org reliably has. It is listed beside the
+    evidence rather than instead of it, because a reader has to be able to tell
+    "nothing was looked for" from "everything was looked for and discarded".
+    """
+    return [
+        f"[{result.collector.value}] {result.status.value}"
+        + (f" — {result.detail}" if result.detail else "")
+        for result in collection.results
+        if result.status is not CollectorStatus.OK
+    ]
+
+
+def _exception_evidence(diagnosis: Diagnosis, collection: ErrorCollection) -> str:
+    body = _evidence(diagnosis)
+    gaps = _telemetry(collection)
+    if not gaps:
+        return body
+    return (
+        body
+        + "\n\n_What was searched for and not found:_\n"
+        + "\n".join(f"• {line}" for line in gaps)
+    )
+
+
+def _exception_location(
+    diagnosis: Diagnosis, workload: WorkloadEntry | None, commit: CommitChoice
+) -> str:
+    """As F1's, except the commit line is F2's own choice rather than the map's.
+
+    F1 reads whatever the workload is running because that is what alerted. F2
+    asks a different question — what did the code look like when this appeared —
+    so the rung has to be the one :mod:`triage.errors.versions` picked, and the
+    fallback has to read as one (ADR-0019, ADR-0020).
+    """
+    location = diagnosis.location
+    lines = [
+        _repository_line(location, workload),
+        f"*Commit:* {commit.commit or '_none could be resolved_'} — _{commit.rung}_",
+    ]
+    infrastructure = _infrastructure_line(workload)
+    if infrastructure:
+        lines.append(infrastructure)
+    lines.append(
+        "*Files:* " + (", ".join(f"`{path}`" for path in location.paths) or "_none suspected_")
+    )
+    return "\n".join(lines)
+
+
+def _exception_headline(
+    diagnosis: Diagnosis, group: ErrorGroup, *, threshold: Confidence, confident: bool
+) -> str:
+    level = CONFIDENCE_LABEL[diagnosis.confidence]
+    bar = CONFIDENCE_LABEL[threshold]
+    name = group.error_type.rsplit(".", 1)[-1]
+    where = group.repository or diagnosis.service
+    tenants = len(group.services)
+    if confident:
+        return (
+            f":dart: *{where}* — {_cause(diagnosis)}\n"
+            f"`{name}` {group.occurrences:,} times in {tenants} "
+            f"tenant{'' if tenants == 1 else 's'}. Confidence *{level}*, at or above the "
+            f"*{bar}* F2 needs to lead with a cause."
+        )
+    return (
+        f":bug: *{where}* — `{name}` raised {group.occurrences:,} times in {tenants} "
+        f"tenant{'' if tenants == 1 else 's'}, at {group.source_location}\n"
+        f"Confidence *{level}*, below the *{bar}* F2 needs to lead with a cause, so this "
+        f"is what is established. {_open_questions(diagnosis)}"
+    )
+
+
+def render_code_exception(
+    diagnosis: Diagnosis,
+    group: ErrorGroup,
+    workload: WorkloadEntry | None,
+    collection: ErrorCollection,
+    *,
+    commit: CommitChoice,
+    source_caveat: str | None = None,
+    threshold: Confidence,
+) -> SlackReport:
+    """The nine sections of the ticket spec, with the exception's identity in front.
+
+    Sibling of :func:`render_incident` and sharing every section helper with it,
+    because a report a developer reads twice a week must not have two layouts.
+    Three things differ, and each of them is a fact F1 does not have: the header,
+    the commit rung, and the telemetry that was searched for and discarded.
+    """
+    confident = diagnosis.confidence.at_least(threshold)
+    bodies: dict[TicketSection, str] = {
+        TicketSection.SYMPTOM: _symptom(diagnosis),
+        TicketSection.IMPACT: _impact(diagnosis),
+        TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
+        TicketSection.EVIDENCE: _exception_evidence(diagnosis, collection),
+        TicketSection.LOCATION: _exception_location(diagnosis, workload, commit),
+        TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
+        TicketSection.OUT_OF_SCOPE: _bullets(
+            diagnosis.out_of_scope,
+            empty="The diagnosis named nothing the fix must avoid.",
+        ),
+        TicketSection.RULED_OUT: _bullets(
+            [f"{item.hypothesis} — {item.why}" for item in diagnosis.ruled_out],
+            empty="The diagnosis eliminated no hypothesis, so nothing here has been "
+            "checked and dismissed for you.",
+        ),
+        TicketSection.UNKNOWNS: _bullets(
+            [f"{item.question} — {item.why_unresolved}" for item in diagnosis.unknowns],
+            empty="The diagnosis left no question open.",
+        ),
+    }
+    sections = (
+        _exception_section(group, collection, source_caveat),
+        *(ReportSection(section.heading, bodies[section]) for section in TicketSection),
+    )
+    return SlackReport(
+        service=group.repository or diagnosis.service,
+        headline=_exception_headline(diagnosis, group, threshold=threshold, confident=confident),
         sections=sections,
         leads_with_cause=confident,
     )
