@@ -214,6 +214,18 @@ def test_the_window_ignores_how_long_ago_the_defect_was_first_seen():
     assert collection_window(NOW, 60).start > a_group().first_seen
 
 
+def test_the_tick_the_count_was_taken_over_is_the_window_the_evidence_is_sought_in():
+    """Measured live: a 13-hour backfill counted a burst at 02:29 and then looked for
+    it between 08:41 and 09:41, where it was not. The window has to be the one the
+    occurrences were counted over, or the join has nothing to join."""
+    counted = TimeWindow(start=NOW - timedelta(hours=13), end=NOW)
+    assert collection_window(NOW, 60, counted) == counted
+
+
+def test_a_tick_that_carries_no_window_still_falls_back_to_the_lookback():
+    assert collection_window(NOW, 60, None).start == NOW - timedelta(minutes=60)
+
+
 # -- 3.2 / 3.5 what an empty collector means ------------------------------------
 
 

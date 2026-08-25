@@ -67,13 +67,23 @@ STACK_KEYS = ("stack", "stack_trace", "stacktrace")
 STACK_HINT = "\n\tat "
 
 
-def collection_window(now: datetime, lookback_minutes: int) -> TimeWindow:
-    """Back from the tick to the configured lookback, and no further (M8 3.4).
+def collection_window(
+    now: datetime, lookback_minutes: int, counted_over: TimeWindow | None = None
+) -> TimeWindow:
+    """The window this tick counted the occurrences over (M8 3.4, corrected).
 
     Not the group's ``first_seen``: a defect first seen in March would ask Datadog
     for five months of logs to describe an hour's worth of occurrences, and the
-    occurrences the gate counted are this tick's.
+    occurrences the gate counted are this tick's. But it must be *this tick's*, and
+    the configured lookback is only that on an hourly tick. A 13-hour backfill run
+    live on 2026-08-25 counted a burst between 02:29 and 03:12 and then looked for
+    its evidence between 08:41 and 09:41, where there was none: the query and the
+    count were about different hours, and the collector reported an absence that was
+    an artefact of the window. So the poll window is used when the group carries
+    one, and it is bounded by whatever the poller was allowed to catch up over.
     """
+    if counted_over is not None:
+        return counted_over
     return TimeWindow(start=now - timedelta(minutes=lookback_minutes), end=now)
 
 

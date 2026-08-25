@@ -7,9 +7,10 @@ there is nothing left to classify and the queries are arithmetic on fields
 Datadog returned (ADR-0016's "every fact comes from a call we made").
 
 What the node adds over :func:`triage.errors.sweep.collect_group` is the window
-and the budget: the window runs back from the tick rather than from the group's
-``first_seen``, and the whole payload is cut to ``collection.max_prompt_bytes``
-with every cut stated (M8 3.4).
+and the budget: the window is the one this tick counted the occurrences over —
+never the group's ``first_seen``, and never a fixed hour that a backfill tick
+would place somewhere the burst was not — and the whole payload is cut to
+``collection.max_prompt_bytes`` with every cut stated (M8 3.4).
 """
 
 from datetime import UTC, datetime
@@ -31,7 +32,7 @@ async def collect_exception(
     deps = deps_from_runnable_config(config)
     group = state["group"]
     window = state.get("window") or collection_window(
-        datetime.now(UTC), deps.config.errors.lookback_minutes
+        datetime.now(UTC), deps.config.errors.lookback_minutes, group.counted_over
     )
     collection = await collect_group(deps.datadog, group, window, deps.config.collection)
     log.info(

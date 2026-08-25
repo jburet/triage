@@ -171,3 +171,8 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 fixes | make lint && make test (935 tests) | 12 |
 | 2026-08-25 | M8 fixes | make run-errors ARGS="--hours 24" (read-only) | 2 |
 | 2026-08-25 | M8 fixes | make run-errors ARGS="--hours 24 --analyse" (3 groups) | 145 |
+| 2026-08-25 | M8 OTel correction | live probe: error issues + 4 span searches, read-only | 3 |
+| 2026-08-25 | M8 OTel correction | make capture-errors ARGS="--hours 24 --slug otel_stacks_20260825 --track trace" | 9 |
+| 2026-08-25 | M8 OTel correction 3.6 | pytest tests/unit/test_error_otel.py | 1 |
+| 2026-08-25 | M8 OTel correction 3.3/3.6 | pytest tests/unit/test_error_collection.py | 1 |
+| 2026-08-25 | M8 OTel correction | make lint && make test (955 passed) | 9 |
