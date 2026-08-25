@@ -38,12 +38,20 @@ from triage.report import NAMED_SERVICES
 from triage.runtime import DEPS_KEY, Deps, build_deps, build_github
 from triage.schemas.errors import ErrorGroup
 
+ANALYSIS_ENTRYPOINT = [sys.executable, "-m", "triage.analysis.entrypoint"]
+"""Run an analysis in this interpreter, as ``run_incident --local`` does."""
+
 BOLD, DIM, RESET = "\033[1m", "\033[2m", "\033[0m"
 
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", action="store_true", help="read and write Postgres")
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="run the analyses here, in a throwaway clone, instead of submitting Jobs",
+    )
     parser.add_argument(
         "--analyse",
         action="store_true",
@@ -134,6 +142,11 @@ async def main(argv: list[str]) -> int:
         deps = replace(deps, repo=SqlRepository(async_sessionmaker(engine, expire_on_commit=False)))
     else:
         print(f"{DIM}in-memory: no watermark survives this process (pass --db){RESET}")
+
+    if options.local:
+        from triage.analysis.runner import LocalAnalysisRunner
+
+        deps = replace(deps, runner=LocalAnalysisRunner(ANALYSIS_ENTRYPOINT))
 
     tick: dict[str, object] = {}
     if options.hours is not None:
