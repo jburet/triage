@@ -176,3 +176,8 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 OTel correction 3.6 | pytest tests/unit/test_error_otel.py | 1 |
 | 2026-08-25 | M8 OTel correction 3.3/3.6 | pytest tests/unit/test_error_collection.py | 1 |
 | 2026-08-25 | M8 OTel correction | make lint && make test (955 passed) | 9 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 24" (read-only) | 2 |
+| 2026-08-25 | M8 OTel correction | live collection-only render of one group, no model call | 1 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (1 group, real tiers) | 46 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (re-run after the window fix) | 55 |
+| 2026-08-25 | M8 OTel correction | make lint && make test (957 passed) | 9 |

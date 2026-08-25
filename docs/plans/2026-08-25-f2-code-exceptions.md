@@ -302,10 +302,32 @@ observed frames over ADR-0028's conversion, with the report saying which of the 
 `tests/fixtures/datadog/errors/synthetic_stack/` is deleted and replaced by
 `otel_stacks_20260825/`, a real capture, exactly as its own notes said to do.
 
+**One defect the correction exposed, and fixed.** The collection window ran back from the
+*tick* by `errors.lookback_minutes`, which is the poll window only on an hourly tick. The
+first live run after the join — `make run-errors ARGS="--hours 13 --analyse"` — counted a
+burst between 02:29 and 03:12 and then looked for its evidence between 08:41 and 09:41, found
+none, and reported `not_instrumented`: an absence that was an artefact of the window rather
+than of the telemetry. The window is now the one the occurrences were counted over
+(`ErrorGroup.counted_over`), which is what 3.4's own reasoning always said it should be. The
+re-run found the stack.
+
+**What a live F2 report carries now**, from `make run-errors ARGS="--hours 13 --analyse"` on
+2026-08-25: the exception header, the nine sections, and an Evidence section holding *One
+retained occurrence, with the stack it carried* — `plt-merck-dev` · `grpc.server.request` ·
+trace `132ed46a…`, then the verbatim stack down to `Caused by:
+zeenea.commons.exceptions.TooBusyIndexingException: 468 index event to process during the
+last 5s` and `LoadControl.scala:14`. Its Location section carries `*Stack frames:*` with
+seven observed `path:line` frames and the sentence saying they were read off the stack rather
+than converted. The analysis opened `zeenea/service/api/ScannerService.scala`,
+`zeenea/server/ZeeneaReferentielAppContext.scala` and
+`zeenea/datacatalog/loadcontrol/LoadControl.scala` — observed paths, `paths_observed=True`,
+for the first time.
+
 **What is unchanged.** The org's "Error Default" retention filter is still disabled and is
 still the one Zeenea-side switch that would move the mismatch column. `first_seen_version` is
 still blank on nearly every issue — 8 of 184 over 24 hours. And nothing has still ever opened
-one of these paths in a real tree.
+one of these paths in a real tree: the investigative kinds still have no image, so every
+analysis on that live run still came back a stated failure.
 
 ## Phase 4: where in the code, and the report
 
