@@ -144,3 +144,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M7 phase 5.1 | pytest tests/integration/test_registered_graphs.py | 1 |
 | 2026-08-24 | M7 phases 4-5 | make lint + make test (636 passed) | 6 |
 | 2026-08-25 | M7/4 gvisor | make lint + make test (638) + kubeconform | 5 |
+| 2026-08-25 | M7 merge | make lint + make test (698) on the four branches merged | 8 |
