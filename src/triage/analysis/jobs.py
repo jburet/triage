@@ -5,7 +5,7 @@ exactly the RBAC the Platform's ServiceAccount is granted. Deliberately not the
 read-only client M3 needs for events and pods: different verbs, different role,
 and one client for both would widen both.
 
-The manifest names the gVisor runtime class and the Secret the Job's credentials
+The manifest names the Secret the Job's credentials
 come from. Creating either, along with the NetworkPolicy and the narrow database
 role the Job writes its result with, is the infra track's work — this module
 submits, it does not own the cluster's policy.
@@ -29,6 +29,17 @@ from triage.schemas.analysis import AnalysisRequest
 JOB_TIMEOUT_SECONDS = 900.0
 """ADR-0009: long enough for a large repository, short enough that a wedged Job frees up."""
 
+JOB_DEADLINE_GRACE_SECONDS = 60.0
+"""How much longer the graph waits than the Job's own deadline.
+
+Waiting exactly as long as Kubernetes does is a race the graph loses: it reports
+"no result" a moment before the API server reports `DeadlineExceeded`, so every
+timed-out analysis reads as a hang of unknown cause instead of as the stated
+failure it is.
+"""
+
+JOB_WAIT_SECONDS = JOB_TIMEOUT_SECONDS + JOB_DEADLINE_GRACE_SECONDS
+
 REQUEST_ENV = "TRIAGE_ANALYSIS_REQUEST"
 JOB_NAME_ENV = "TRIAGE_ANALYSIS_JOB_NAME"
 
@@ -38,6 +49,12 @@ WORKSPACE_ENV = "TRIAGE_ANALYSIS_WORKSPACE"
 The image sets it, because nothing clones for a Job's container. The host runner
 leaves it unset, because it has already cloned (M7 3.2).
 """
+ANALYSIS_COMPONENT = "analysis"
+
+WORKSPACE = "/workspace"
+"""Where the clone goes: the only writable place, and the container's working directory."""
+
+_NOBODY = 65532
 
 _SERVICE_ACCOUNT = Path("/var/run/secrets/kubernetes.io/serviceaccount")
 _BATCH_API = "/apis/batch/v1"
@@ -53,6 +70,7 @@ class JobStatus:
     succeeded: int = 0
     failed: int = 0
     reason: str | None = None
+    message: str | None = None
 
 
 class JobApi(Protocol):
@@ -69,7 +87,14 @@ def job_name(request: AnalysisRequest) -> str:
 
 
 def job_manifest(request: AnalysisRequest, *, name: str, spec: AnalysisJobConfig) -> dict[str, Any]:
-    labels = {"app.kubernetes.io/part-of": "triage", "triage.zeenea.com/kind": request.kind.value}
+    labels = {
+        "app.kubernetes.io/part-of": "triage",
+        # What the sandbox's NetworkPolicy selects on: the Job's egress is far
+        # narrower than the rest of the namespace's, so it needs a label no other
+        # Triage pod carries (deploy/networkpolicy-analysis.yaml).
+        "app.kubernetes.io/component": ANALYSIS_COMPONENT,
+        "triage.zeenea.com/kind": request.kind.value,
+    }
     return {
         "apiVersion": "batch/v1",
         "kind": "Job",
@@ -82,18 +107,52 @@ def job_manifest(request: AnalysisRequest, *, name: str, spec: AnalysisJobConfig
             "template": {
                 "metadata": {"labels": labels},
                 "spec": {
-                    "runtimeClassName": spec.runtime_class,
+                    **({"runtimeClassName": spec.runtime_class} if spec.runtime_class else {}),
                     "restartPolicy": "Never",
+                    # An account with no permissions, and no token to use them
+                    # with: the analysis has no business with the Kubernetes API.
+                    "serviceAccountName": spec.service_account,
                     "automountServiceAccountToken": False,
+                    # What the namespace's `restricted` Pod Security admission
+                    # demands, and what the sandbox would want anyway: the Job
+                    # reads a tree it did not write and talks to two endpoints.
+                    "securityContext": {
+                        "runAsNonRoot": True,
+                        "runAsUser": _NOBODY,
+                        "runAsGroup": _NOBODY,
+                        "fsGroup": _NOBODY,
+                        "seccompProfile": {"type": "RuntimeDefault"},
+                    },
+                    "volumes": [
+                        {"name": "workspace", "emptyDir": {}},
+                        {"name": "tmp", "emptyDir": {}},
+                    ],
                     "containers": [
                         {
                             "name": "analysis",
                             "image": spec.image,
+                            "workingDir": WORKSPACE,
                             "env": [
                                 {"name": REQUEST_ENV, "value": request.model_dump_json()},
                                 {"name": JOB_NAME_ENV, "value": name},
+                                # git writes its config somewhere; a read-only
+                                # root means that somewhere has to be said.
+                                {"name": "HOME", "value": WORKSPACE},
                             ],
                             "envFrom": [{"secretRef": {"name": spec.secret_ref}}],
+                            "resources": {
+                                "requests": dict(spec.resources.requests),
+                                "limits": dict(spec.resources.limits),
+                            },
+                            "securityContext": {
+                                "allowPrivilegeEscalation": False,
+                                "readOnlyRootFilesystem": True,
+                                "capabilities": {"drop": ["ALL"]},
+                            },
+                            "volumeMounts": [
+                                {"name": "workspace", "mountPath": WORKSPACE},
+                                {"name": "tmp", "mountPath": "/tmp"},
+                            ],
                         }
                     ],
                 },
@@ -176,12 +235,13 @@ class KubernetesJobApi:
             raise JobApiError(f"{response.status_code}: {self._explain(response)}")
         status = response.json().get("status") or {}
         conditions = status.get("conditions") or []
-        reason = next((c.get("reason") for c in conditions if c.get("type") == "Failed"), None)
+        failure: dict[str, Any] = next((c for c in conditions if c.get("type") == "Failed"), {})
         return JobStatus(
             active=int(status.get("active") or 0),
             succeeded=int(status.get("succeeded") or 0),
             failed=int(status.get("failed") or 0),
-            reason=reason,
+            reason=failure.get("reason"),
+            message=failure.get("message"),
         )
 
     async def delete(self, name: str) -> None:

@@ -185,18 +185,42 @@ class CollectionConfig(BaseModel):
     max_prompt_bytes: int = Field(default=60_000, ge=1_000)
 
 
+class JobResources(BaseModel):
+    """What one analysis may consume before the kubelet stops it.
+
+    A ceiling is what turns "the Job never came back" into a failure with a
+    reason: without a memory limit an analysis that reads too much is an evicted
+    node, and without an ephemeral-storage limit a clone that is larger than
+    expected fills the disk under every other pod on it.
+    """
+
+    requests: dict[str, str] = Field(
+        default_factory=lambda: {"cpu": "250m", "memory": "512Mi", "ephemeral-storage": "1Gi"}
+    )
+    limits: dict[str, str] = Field(
+        default_factory=lambda: {"cpu": "1", "memory": "2Gi", "ephemeral-storage": "8Gi"}
+    )
+
+
 class AnalysisJobConfig(BaseModel):
     """Where one analysis runs (ADR-0009).
 
     The cluster objects these name — the runtime class, the Secret, the
-    NetworkPolicy, the narrow database role — belong to the infra track. Triage
-    only names them when it submits a Job.
+    NetworkPolicy, the narrow database role — belong to the infra track and live
+    as manifests under ``deploy/``. Triage only names them when it submits a Job.
     """
 
     namespace: str = "triage"
     image: str = ""
-    runtime_class: str = "gvisor"
+    runtime_class: str = ""
+    """Empty is no ``runtimeClassName`` at all — the node's own runtime (ADR-0024).
+
+    gVisor was chosen for a Job that ran an agent with tool use. ADR-0014 removed
+    the agent, and what is left never executes the code it reads. Set this the day
+    it does."""
     secret_ref: str = "triage-analysis"
+    service_account: str = "triage-analysis"
+    resources: JobResources = Field(default_factory=JobResources)
 
 
 class AnalysisConfig(BaseModel):

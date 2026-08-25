@@ -1,0 +1,209 @@
+# The sandbox's egress. Default-deny, then four destinations (architecture §7).
+#
+# This selects only the analysis Job — `app.kubernetes.io/component: analysis`, a
+# label `triage.analysis.jobs.job_manifest` puts on every Job it submits — because
+# the rest of the namespace legitimately talks to Datadog, Slack and Jira and the
+# Job may talk to none of them.
+#
+# What it does need, and the plan's "GitHub and the registry only" is not quite
+# the list:
+#
+#   * DNS, or nothing resolves.
+#   * GitHub, to clone the tree at the commit. Named as CIDRs because a
+#     NetworkPolicy cannot resolve a hostname; the ranges below are GitHub's own
+#     `git` and `api` blocks from https://api.github.com/meta, IPv4 only, read on
+#     2026-08-24. They move. Refresh with:
+#       curl -s https://api.github.com/meta | jq -r '(.git + .api)[] | select(test(":") | not)'
+#     If the cluster runs Cilium, replace that rule with a `toFQDNs` rule for
+#     github.com and codeload.github.com and the list stops rotting.
+#   * The LiteLLM proxy, in-cluster, because the analysis is one `analysis`-tier
+#     call (ADR-0014).
+#   * PostgreSQL, in-cluster, because the Job's only way to answer is one row in
+#     `triage.analysis_results` (ADR-0009), written as the insert-only role in
+#     deploy/postgres/analysis-writer-role.sql. If the database is RDS rather than
+#     in-cluster, replace that podSelector with the subnet's CIDR.
+#
+# The registry is *not* in this list: image pulls are the kubelet's traffic, not
+# the Pod's, and no NetworkPolicy governs them. The node's egress to the registry
+# belongs to platform-infra.
+#
+# Nothing else is allowed. Egress to 169.254.169.254 is refused along with
+# everything else, which is what stops a clone that runs code from reading the
+# node's instance credentials.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: triage-analysis-egress
+  namespace: triage
+  labels:
+    app.kubernetes.io/part-of: triage
+    app.kubernetes.io/component: analysis
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: triage
+      app.kubernetes.io/component: analysis
+  policyTypes:
+    - Ingress
+    - Egress
+  # No ingress at all: nothing has any reason to reach into an analysis.
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 4.208.26.197/32
+        - ipBlock:
+            cidr: 4.208.26.198/32
+        - ipBlock:
+            cidr: 4.208.26.200/32
+        - ipBlock:
+            cidr: 4.225.11.194/32
+        - ipBlock:
+            cidr: 4.225.11.200/32
+        - ipBlock:
+            cidr: 4.225.11.201/32
+        - ipBlock:
+            cidr: 4.228.31.145/32
+        - ipBlock:
+            cidr: 4.228.31.149/32
+        - ipBlock:
+            cidr: 4.228.31.150/32
+        - ipBlock:
+            cidr: 4.237.22.34/32
+        - ipBlock:
+            cidr: 4.237.22.38/32
+        - ipBlock:
+            cidr: 4.237.22.40/32
+        - ipBlock:
+            cidr: 4.249.131.163/32
+        - ipBlock:
+            cidr: 4.249.131.164/32
+        - ipBlock:
+            cidr: 4.249.131.166/32
+        - ipBlock:
+            cidr: 20.26.156.210/32
+        - ipBlock:
+            cidr: 20.26.156.214/32
+        - ipBlock:
+            cidr: 20.26.156.215/32
+        - ipBlock:
+            cidr: 20.27.177.113/32
+        - ipBlock:
+            cidr: 20.27.177.116/32
+        - ipBlock:
+            cidr: 20.27.177.118/32
+        - ipBlock:
+            cidr: 20.29.134.17/32
+        - ipBlock:
+            cidr: 20.29.134.19/32
+        - ipBlock:
+            cidr: 20.29.134.23/32
+        - ipBlock:
+            cidr: 20.87.245.0/32
+        - ipBlock:
+            cidr: 20.87.245.4/32
+        - ipBlock:
+            cidr: 20.87.245.6/32
+        - ipBlock:
+            cidr: 20.175.192.146/32
+        - ipBlock:
+            cidr: 20.175.192.147/32
+        - ipBlock:
+            cidr: 20.175.192.149/32
+        - ipBlock:
+            cidr: 20.199.39.227/32
+        - ipBlock:
+            cidr: 20.199.39.228/32
+        - ipBlock:
+            cidr: 20.199.39.232/32
+        - ipBlock:
+            cidr: 20.200.245.245/32
+        - ipBlock:
+            cidr: 20.200.245.247/32
+        - ipBlock:
+            cidr: 20.200.245.248/32
+        - ipBlock:
+            cidr: 20.201.28.148/32
+        - ipBlock:
+            cidr: 20.201.28.151/32
+        - ipBlock:
+            cidr: 20.201.28.152/32
+        - ipBlock:
+            cidr: 20.205.243.160/32
+        - ipBlock:
+            cidr: 20.205.243.166/32
+        - ipBlock:
+            cidr: 20.205.243.168/32
+        - ipBlock:
+            cidr: 20.207.73.82/32
+        - ipBlock:
+            cidr: 20.207.73.83/32
+        - ipBlock:
+            cidr: 20.207.73.85/32
+        - ipBlock:
+            cidr: 20.217.135.0/32
+        - ipBlock:
+            cidr: 20.217.135.4/32
+        - ipBlock:
+            cidr: 20.217.135.5/32
+        - ipBlock:
+            cidr: 20.233.83.145/32
+        - ipBlock:
+            cidr: 20.233.83.146/32
+        - ipBlock:
+            cidr: 20.233.83.149/32
+        - ipBlock:
+            cidr: 48.202.248.38/32
+        - ipBlock:
+            cidr: 48.202.248.39/32
+        - ipBlock:
+            cidr: 48.202.248.40/32
+        - ipBlock:
+            cidr: 48.204.201.2/32
+        - ipBlock:
+            cidr: 48.204.201.5/32
+        - ipBlock:
+            cidr: 48.204.201.6/32
+        - ipBlock:
+            cidr: 140.82.112.0/20
+        - ipBlock:
+            cidr: 143.55.64.0/20
+        - ipBlock:
+            cidr: 172.182.252.133/32
+        - ipBlock:
+            cidr: 172.182.252.135/32
+        - ipBlock:
+            cidr: 172.182.252.137/32
+        - ipBlock:
+            cidr: 185.199.108.0/22
+        - ipBlock:
+            cidr: 192.30.252.0/22
+      ports:
+        - protocol: TCP
+          port: 443
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: litellm
+      ports:
+        - protocol: TCP
+          port: 4000
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432

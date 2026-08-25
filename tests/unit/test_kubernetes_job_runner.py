@@ -11,16 +11,22 @@ whole run.
 import pytest
 
 from tests.conftest import a_repo_summary, an_analysis_request, some_findings
-from triage.analysis.jobs import FakeJobApi, JobApiError, JobStatus, job_name
+from triage.analysis.jobs import (
+    JOB_TIMEOUT_SECONDS,
+    WORKSPACE,
+    FakeJobApi,
+    JobApiError,
+    JobStatus,
+    job_manifest,
+    job_name,
+)
 from triage.analysis.runner import KubernetesJobRunner
 from triage.config import AnalysisJobConfig
 from triage.db.repo import InMemoryRepository
 from triage.schemas.analysis import AnalysisKind, AnalysisStatus
 from triage.schemas.system_map import RepoSummary
 
-SPEC = AnalysisJobConfig(
-    namespace="triage", image="registry.invalid/triage-analysis:1", runtime_class="gvisor"
-)
+SPEC = AnalysisJobConfig(namespace="triage", image="registry.invalid/triage-analysis:1")
 
 
 class Clock:
@@ -103,8 +109,8 @@ async def test_a_wedged_job_is_a_failed_result_not_an_exception():
     result = await a_runner(jobs, repo, clock).run(request)
 
     assert result.status is AnalysisStatus.FAILED
-    assert "900" in (result.error or "")
-    assert clock.now >= 900.0
+    assert "960" in (result.error or "")
+    assert clock.now > JOB_TIMEOUT_SECONDS
     assert jobs.deleted == [job_name(request)]
 
 
@@ -213,9 +219,101 @@ async def test_the_manifest_names_the_sandbox_and_carries_the_request():
 
     spec = jobs.created[0]["spec"]
     pod = spec["template"]["spec"]
-    assert pod["runtimeClassName"] == "gvisor"
+    assert "runtimeClassName" not in pod
     assert spec["backoffLimit"] == 0
     assert spec["activeDeadlineSeconds"] == 900
     env = {item["name"]: item["value"] for item in pod["containers"][0]["env"]}
     assert env["TRIAGE_ANALYSIS_JOB_NAME"] == job_name(request)
     assert request.commit in env["TRIAGE_ANALYSIS_REQUEST"]
+
+
+async def test_the_manifest_gives_the_sandbox_the_limits_it_may_not_exceed():
+    """A memory limit the Job can be killed for has to be in the manifest to exist."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(statuses=[JobStatus(failed=1)])
+    await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    resources = jobs.created[0]["spec"]["template"]["spec"]["containers"][0]["resources"]
+    assert resources["limits"]["memory"] == SPEC.resources.limits["memory"]
+    assert resources["limits"]["cpu"] == SPEC.resources.limits["cpu"]
+    assert resources["requests"]["memory"] == SPEC.resources.requests["memory"]
+
+
+async def test_the_wait_outlasts_the_job_deadline_so_kubernetes_reports_it_first():
+    """Give up at the Job's own deadline and every deadline failure reads as a hang."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    repo = InMemoryRepository()
+    clock = Clock()
+    polls = int(JOB_TIMEOUT_SECONDS // 5.0) + 1
+    jobs = FakeJobApi(
+        statuses=[
+            *([JobStatus(active=1)] * polls),
+            JobStatus(
+                failed=1,
+                reason="DeadlineExceeded",
+                message="Job was active longer than specified deadline",
+            ),
+        ]
+    )
+
+    result = await KubernetesJobRunner(
+        jobs, repo, SPEC, sleep=clock.sleep, clock=clock, poll_interval=5.0
+    ).run(request)
+
+    assert clock.now > JOB_TIMEOUT_SECONDS
+    assert "DeadlineExceeded" in (result.error or "")
+    assert "longer than specified deadline" in (result.error or "")
+
+
+async def test_a_job_killed_for_its_memory_says_which_limits_it_was_given():
+    """`BackoffLimitExceeded` alone does not tell a reader what ceiling was hit."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(
+        statuses=[
+            JobStatus(
+                failed=1,
+                reason="BackoffLimitExceeded",
+                message="Job has reached the specified backoff limit",
+            )
+        ]
+    )
+
+    result = await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    assert result.status is AnalysisStatus.FAILED
+    error = result.error or ""
+    assert "BackoffLimitExceeded" in error
+    assert f"memory={SPEC.resources.limits['memory']}" in error
+    assert f"deadline={int(JOB_TIMEOUT_SECONDS)}s" in error
+
+
+async def test_the_pod_is_unprivileged_with_a_read_only_root_and_a_writable_workspace():
+    """A sandbox the namespace's `restricted` policy would refuse is not a sandbox."""
+    request = an_analysis_request(AnalysisKind.CODE_ANALYSIS)
+    jobs = FakeJobApi(statuses=[JobStatus(failed=1)])
+    await a_runner(jobs, InMemoryRepository(), Clock()).run(request)
+
+    pod = jobs.created[0]["spec"]["template"]["spec"]
+    container = pod["containers"][0]
+    assert pod["securityContext"]["runAsNonRoot"] is True
+    assert pod["securityContext"]["seccompProfile"]["type"] == "RuntimeDefault"
+    assert container["securityContext"]["allowPrivilegeEscalation"] is False
+    assert container["securityContext"]["capabilities"]["drop"] == ["ALL"]
+    assert container["securityContext"]["readOnlyRootFilesystem"] is True
+    assert container["workingDir"] == WORKSPACE
+    mounts = {mount["name"]: mount["mountPath"] for mount in container["volumeMounts"]}
+    assert mounts == {"workspace": WORKSPACE, "tmp": "/tmp"}
+    assert all("emptyDir" in volume for volume in pod["volumes"])
+
+
+def test_a_runtime_class_is_named_only_when_one_is_configured():
+    """The path stays, gated by configuration: the conditions that bring a kernel
+    boundary back are written down, and the day one is met this is a config line
+    rather than a rewrite (ADR-0024)."""
+    spec = SPEC.model_copy(update={"runtime_class": "gvisor"})
+
+    request = an_analysis_request(AnalysisKind.SUMMARIZE_REPO)
+    manifest = job_manifest(request, name="triage-analysis-1", spec=spec)
+    pod = manifest["spec"]["template"]["spec"]
+
+    assert pod["runtimeClassName"] == "gvisor"

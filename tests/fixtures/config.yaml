@@ -90,7 +90,7 @@ analysis:
   job:
     namespace: triage
     image: ""
-    runtime_class: gvisor
+    runtime_class: ""
     secret_ref: triage-analysis
 
 # Caps on one F1 collection (ADR-0016). Reduction happens before the model, not

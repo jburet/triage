@@ -164,7 +164,10 @@ async def test_a_failed_analysis_becomes_an_unknown_and_caps_confidence(config: 
         runner=FakeAnalysisRunner(
             results={
                 AnalysisKind.CODE_ANALYSIS: AnalysisResult.failed(
-                    AnalysisKind.CODE_ANALYSIS, "the Job reported no result within 900s"
+                    AnalysisKind.CODE_ANALYSIS,
+                    "Job triage-code-analysis-0e1f failed: DeadlineExceeded: Job was active "
+                    "longer than specified deadline (limits: cpu=1, memory=2Gi, "
+                    "ephemeral-storage=8Gi, deadline=900s)",
                 )
             }
         ),
@@ -178,7 +181,8 @@ async def test_a_failed_analysis_becomes_an_unknown_and_caps_confidence(config: 
     assert diagnosis.confidence is Confidence.MEDIUM
     unknown = diagnosis.unknowns[0]
     assert "Unbounded cache." in unknown.question
-    assert "no result within 900s" in unknown.why_unresolved
+    assert "DeadlineExceeded" in unknown.why_unresolved
+    assert "memory=2Gi" in unknown.why_unresolved
 
 
 async def test_a_service_outside_the_system_map_fails_that_analysis_only(config: Config):

@@ -1,5 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean
-
+.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean deploy-check run-poller cron
 ANALYSIS_IMAGE ?= triage-analysis:dev
 
 help:
@@ -40,6 +39,9 @@ lint: ## ruff + mypy
 test: ## Run the test suite (no network, no spend)
 	uv run pytest -q
 
+deploy-check: ## Validate the cluster manifests offline (needs kubeconform)
+	kubeconform -strict -summary -kubernetes-version 1.31.0 deploy/*.yaml
+
 run-fixture: env ## Run the ticket pipeline on a fixture diagnosis in dry-run mode
 	uv run python -m scripts.run_fixture $(FIXTURE)
 
@@ -48,6 +50,12 @@ run-cartography: env ## Run the cartography graph over config.yaml in dry-run mo
 
 run-mapping: env ## Derive the service map from real Datadog events and print the report (read-only)
 	uv run python -m scripts.run_mapping $(ARGS)
+
+run-poller: env ## Tick the alert poller by hand, as the Platform cron would (read-only Datadog)
+	uv run python -m scripts.run_poller $(ARGS)
+
+cron: env ## Show, or with ARGS="--apply" create, the Platform cron that ticks the poller
+	uv run python -m scripts.apply_cron $(ARGS)
 
 run-incident: env ## Run F1 end to end on one real alert: read-only Datadog, real models, fake Jira/Slack
 	uv run python -m scripts.run_incident $(ARGS)

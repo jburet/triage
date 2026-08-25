@@ -134,3 +134,13 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M7 phase 3.3 | docker run, iac_analysis on platform-infra, 1 live analysis call | 18 |
 | 2026-08-24 | M7 phase 3.3 | docker run, code_analysis on datacatalog, 1 live analysis call | 26 |
 | 2026-08-24 | M7 phase 3.3 | gather probe on a real datacatalog clone (no model call) | 5 |
+| 2026-08-24 | M7 phase 4.3 | pytest tests/unit/test_kubernetes_job_runner.py (red, then green) | 10 |
+| 2026-08-24 | M7 phase 4.3 | make lint + make test (615 passed) | 8 |
+| 2026-08-24 | M7 phase 4.1 | kubeconform -strict deploy/*.yaml (10 resources) | 1 |
+| 2026-08-24 | M7 phase 4.1 | make lint + make test (622 passed) | 5 |
+| 2026-08-24 | M7 phase 5.3 | pytest tests/integration/test_poller.py (red, then green) | 2 |
+| 2026-08-24 | M7 phase 5.2 | make lint + make test (628 passed) | 6 |
+| 2026-08-24 | M7 phase 5.2 | live poller tick, real Datadog, 25-minute window, 20 events | 2 |
+| 2026-08-24 | M7 phase 5.1 | pytest tests/integration/test_registered_graphs.py | 1 |
+| 2026-08-24 | M7 phases 4-5 | make lint + make test (636 passed) | 6 |
+| 2026-08-25 | M7/4 gvisor | make lint + make test (638) + kubeconform | 5 |
