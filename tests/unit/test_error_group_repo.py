@@ -147,6 +147,59 @@ class TestTheLifecycleIsNotOverwritten:
         assert stored.status is ErrorGroupStatus.UNMAPPED
 
 
+class TestSeenAgainWithoutBeingNew:
+    """What feeds the escalation, once Datadog will never call the issue new again (ADR-0030).
+
+    An observation the tick made of a group it did not see arrive. It may move
+    the total and nothing else — above all it may not bring a group into
+    existence, because every issue the org has ever raised goes on occurring and
+    a tick that created a row for each of them would report the past for ever.
+    """
+
+    async def test_a_group_nothing_knows_is_not_created(self, repo: InMemoryRepository) -> None:
+        again = await repo.refresh_error_group(a_tick(6000, novelty=Novelty.CONTINUING))
+
+        assert again is None
+        assert await repo.error_group(KEY) is None
+
+    async def test_a_group_already_known_has_the_count_added(
+        self, repo: InMemoryRepository
+    ) -> None:
+        await repo.upsert_error_group(a_tick(4))
+
+        again = await repo.refresh_error_group(a_tick(4, novelty=Novelty.CONTINUING))
+
+        assert again is not None
+        assert again.cumulative_occurrences == 8
+        assert again.novelty is Novelty.CONTINUING
+        assert (await repo.error_group(KEY)).cumulative_occurrences == 8  # type: ignore[union-attr]
+
+    async def test_and_the_lifecycle_of_a_reported_group_untouched(
+        self, repo: InMemoryRepository
+    ) -> None:
+        first = await repo.upsert_error_group(a_tick(4))
+        await repo.upsert_error_group(
+            first.model_copy(
+                update={
+                    "status": ErrorGroupStatus.REPORTED,
+                    "analysis_count": 1,
+                    "analysed_at_cumulative": 4,
+                    "last_analysed_at": NOW,
+                    "thread_ts": "1756100000.000100",
+                }
+            )
+        )
+
+        again = await repo.refresh_error_group(a_tick(50, novelty=Novelty.CONTINUING))
+
+        assert again is not None
+        assert again.status is ErrorGroupStatus.REPORTED
+        assert again.analysis_count == 1
+        assert again.analysed_at_cumulative == 4
+        assert again.thread_ts == "1756100000.000100"
+        assert again.cumulative_occurrences == 54
+
+
 class TestWhatIsStillOpen:
     async def test_open_and_analysing_are_open_settled_states_are_not(
         self, repo: InMemoryRepository

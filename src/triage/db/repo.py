@@ -179,6 +179,8 @@ class TriageRepository(Protocol):
 
     async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup: ...
 
+    async def refresh_error_group(self, observation: ErrorGroup) -> ErrorGroup | None: ...
+
     async def error_group(self, key: str) -> ErrorGroup | None: ...
 
     async def error_groups_open(self) -> list[ErrorGroup]: ...
@@ -499,6 +501,19 @@ class SqlRepository:
             await session.flush()
         return merged
 
+    async def refresh_error_group(self, observation: ErrorGroup) -> ErrorGroup | None:
+        async with self._sessionmaker() as session, session.begin():
+            row = await session.scalar(
+                select(ErrorGroupRow).where(ErrorGroupRow.group_key == observation.key)
+            )
+            if row is None:
+                return None
+            merged = merged_error_group(ErrorGroup.model_validate(row.payload), observation)
+            for column, value in _error_group_columns(merged).items():
+                setattr(row, column, value)
+            await session.flush()
+        return merged
+
     async def error_group(self, key: str) -> ErrorGroup | None:
         async with self._sessionmaker() as session:
             row = await session.scalar(select(ErrorGroupRow).where(ErrorGroupRow.group_key == key))
@@ -526,12 +541,20 @@ def merged_error_group(stored: ErrorGroup | None, incoming: ErrorGroup) -> Error
     group that arrives carrying a total is one that was read back and changed,
     and is written as it stands.
 
+    Which novelty the observation carries makes no difference to the arithmetic
+    and every difference to the gate: a ``continuing`` observation (ADR-0030) is
+    the same shape — one window's count, no total — and is added the same way,
+    but it says the tick did not see the group *arrive*, and the stored group
+    says so afterwards.
+
     The counting is knowingly generous by a few percent: the poller reads back
-    past its watermark by five minutes, so an issue first seen inside that sliver
-    is counted by two consecutive ticks. The error is bounded by the overlap over
-    the hour and it escalates slightly sooner rather than slightly later, which is
-    the direction to be wrong in; a ledger of what was already counted would cost
-    more than it saves.
+    past its watermark by five minutes, so occurrences inside that sliver are
+    counted by two consecutive ticks. Every count added here is a count *for one
+    window* — Error Tracking's ``total_count`` is per search, not a lifetime — so
+    consecutive windows add up rather than double, and the overlap is the whole
+    of the error. It escalates slightly sooner rather than slightly later, which
+    is the direction to be wrong in; a ledger of what was already counted would
+    cost more than it saves.
     """
     merged = incoming.model_copy(deep=True)
     if stored is None:
@@ -791,6 +814,14 @@ class InMemoryRepository:
 
     async def upsert_error_group(self, group: ErrorGroup) -> ErrorGroup:
         merged = merged_error_group(self.error_groups.get(group.key), group)
+        self.error_groups[merged.key] = merged
+        return merged
+
+    async def refresh_error_group(self, observation: ErrorGroup) -> ErrorGroup | None:
+        stored = self.error_groups.get(observation.key)
+        if stored is None:
+            return None
+        merged = merged_error_group(stored, observation)
         self.error_groups[merged.key] = merged
         return merged
 
