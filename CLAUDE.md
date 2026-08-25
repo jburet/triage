@@ -10,14 +10,22 @@ system, writes only to Slack and Jira, and never invents** — an unfillable fie
 `Unknown` with a reason, enforced by the Pydantic schemas rather than by prompt text.
 
 Current state (see `docs/architecture.md` §10): **M1 (ticket pipeline), M2 (F0 cartography),
-M3 (Analysis sub-graph, F1 incidents, Datadog collection, alert poller) and M6 (the service
-map: workload → repository → deployed commit → chart path)** exist in code. Only Datadog has
-ever been read live — `make run-mapping` and `make run-incident` against the real org; Jira,
-GitHub and Kubernetes have never been spoken to, and every test replays a fixture. Against
-the shipped example `config.yaml` the mapping resolves a repository and no commit, because
-no real Zeenea repository is declared: declaring them is the prerequisite for M6 being worth
-running. F3 (daily DB review), the FastAPI ingress, the analysis Job image for the
-investigative kinds, and the whole infra track are not built.
+M3 (Analysis sub-graph, F1 incidents, Datadog collection, alert poller), M6 (the service
+map: workload → repository → deployed commit → chart path) and M8 (F2, a recurring code
+exception becomes a threaded report)** exist in code. Only Datadog has ever been read live —
+`make run-mapping`, `make run-incident` and `make run-errors` against the real org; Jira,
+GitHub, Slack and Kubernetes have never been spoken to, and every test replays a fixture.
+Against the shipped example `config.yaml` the mapping resolves a repository and no commit,
+because no real Zeenea repository is declared: declaring them is the prerequisite for M6
+being worth running. **No analysis has ever read a repository** — the investigative kinds
+have no deployed image (M7 3.4) — so every F1 and F2 report today is honest about having
+read no code, and the paths F2 hands it are proven against fixtures and unobserved against a
+tree. F2 *does* now carry real evidence where the sampler kept some: the exception, its
+message and its whole stack live inside the OpenTelemetry span events, so
+`service:<svc> status:error` finds occurrences that `@error.type` never could
+(ADR-0029, superseding ADR-0027 the day it was written).
+F3 (daily DB review), the FastAPI ingress, the analysis Job image, and the whole infra track
+are not built.
 Design docs: `docs/roadmap.md` (product), `docs/architecture.md` (system),
 `docs/ticket-spec.md` (what a finished report must contain), `docs/adr/` (decisions, each
 with the condition that would make it wrong — add an ADR when changing one).
@@ -37,6 +45,10 @@ uv run ruff format src tests evals scripts                          # apply form
 make run-fixture [FIXTURE=tests/fixtures/diagnoses/<name>.json]     # run pipeline on a fixture; calls real model tiers via LiteLLM, Jira/Slack faked
 make run-mapping [ARGS="--days 14 --db plt-hcl-software-uat"]   # derive the service map from
                          # real Datadog events and print the pass's report; read-only, no model call
+make run-errors [ARGS="--hours 72 --analyse"]   # tick the hourly F2 poller by hand; the tick
+                         # is read-only Datadog and costs nothing, `--analyse` drives every gated
+                         # group through the code_exception graph and calls the real tiers
+make capture-errors      # capture one hour of the org's Error Tracking issues as fixtures
 make repository-map      # regenerate config/repository-map.yaml from the architecture document
 make capture-datadog ARGS="find 'pod down'"   # then `triggers <id>`, then
                          # `capture <id> <iso-time> --slug <name> --scope service:<x>`; read-only,
@@ -56,13 +68,23 @@ in-memory. Secrets come from `.env` with the `TRIAGE_` prefix (`src/triage/confi
 
 **Graph wiring** — one `StateGraph` per graph in `src/triage/graphs/`, one state TypedDict
 each in `graphs/state.py` (all `total=False`), one module per node under `src/triage/nodes/`,
-routing functions in the graph module. `langgraph.json` registers six:
+routing functions in the graph module. `langgraph.json` registers eight:
 
 - `ticket_pipeline` — `record_diagnosis → dedup_check → (update_existing_ticket | confidence_gate) → (notify_below_threshold | compose_ticket → self_review → create_ticket | retry | notify_review_exhausted)`. The retry budget counts composes (`thresholds.max_compose_attempts`).
 - `cartography` — F0; see ADR-0006, ADR-0015.
 - `analysis` — `select_hypotheses → run_analyses → diagnose`. Shared by F1 and F3.
 - `incident` — F1: `open_incident → classify_alert → collect → follow_up ⟲ → qualify → [analysis] → [ticket_pipeline] → draft_postmortem? → settle_signal`. `IncidentState` inherits `AnalysisState` and `TicketPipelineState` so both compiled sub-graphs can be added as nodes.
+- `code_exception` — M8/F2: `open_group → collect_exception → qualify_exception → [analysis] → [ticket_pipeline] → settle_group`. `CodeExceptionState` inherits both sub-graph states, as `IncidentState` does. No `classify_alert` — the issue already names its type and its source location — and no post-mortem, which is an incident's write-up.
 - `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
+- `error_poller` — M8/F2: `poll_error_issues → group_error_issues`, hourly. Reads Datadog
+  Error Tracking, reports only what was first seen or regressed in the window, then collapses
+  those into groups and gates them on volume; see ADR-0025, ADR-0026. An issue that is neither
+  is kept too and does exactly one thing: it adds its count to a group already known, which is
+  the only material the cumulative escalation has (ADR-0030) — it creates no group and clears
+  no floor. No model call anywhere
+  on it. A node module must **not** carry `from __future__ import annotations` — it
+  stringifies the `config` annotation, LangGraph then passes no config, and every node
+  silently falls back to `build_deps()`.
 - `service_mapping` — M6: `select_services → derive_workloads → persist_workloads → report_mapping`. No model call anywhere on it; see ADR-0019, ADR-0020.
 
 **Dependency injection** — nodes are plain async functions; collaborators arrive as a
@@ -95,6 +117,12 @@ placeholders like "N/A", "TBD", "unknown") and `Unknown{reason}`; `MaybeUnknown 
 `TicketDraft` mirrors the nine sections of `docs/ticket-spec.md`. `Confidence` is a
 three-level enum, deliberately not a number (ADR-0002).
 
+**The reports** — `src/triage/report.py` is the delivery (ADR-0023) and is a rule, not a
+model call. `render_incident` is F1's; `render_code_exception` is F2's sibling and shares
+every section helper with it, adding an exception header, a commit line that is F2's own
+choice rather than the map's, and the telemetry that was searched for and discarded.
+`publish_report` picks between them on what the calling feature left in the state.
+
 **Integrations** — `integrations/base.py` holds the `JiraClient`/`SlackClient` protocols and
 their recording fakes; `jira.py` (REST v3 over httpx, basic auth email+token, ADR-0013),
 `slack.py` (every notice about one incident carries `thread_ts`), `adf.py`, `github.py`,
@@ -124,10 +152,33 @@ sweep, the emptiness widening, the bounded follow-up loop), `budget.py` (fit to
 a team by glob pattern and to an environment through the cluster map — never from an `env:`
 tag, which no alert carries usefully (ADR-0017).
 
+**F2 code exceptions** — `src/triage/errors/` is pure functions over Error Tracking, the
+same shape as `triage.collect`: `issues.py` (parse the envelope, the code-exception rule,
+new-or-regressed), `grouping.py` (the group key — exception type, source location and **the
+repository the mono-tenancy rule resolves**, never the message, ADR-0026), `gate.py` (the
+per-tick floor — measured over 24 live hourly ticks, not over one hour's occurring issues —
+the cumulative escalation the continuing counts feed, the per-tick cap, and the
+`reanalyse_after` cooldown that keeps a 10,000-an-hour group from being reposted every tick), `sweep.py` (the
+three collectors, the join, and which kind of nothing each found — ADR-0029), `otel.py` (the
+exception and its stack out of the JSON string Datadog calls `custom.events`, and the
+application frames out of the stack), `paths.py` (a real frame beats a guess: the stack's
+`File.scala:line` frames are the paths when there is a stack, and Datadog's
+`file_path` — a fully-qualified class name — is converted by convention when there is not,
+with the report saying which it had — ADR-0028, ADR-0029), `versions.py` (the commit
+the version an exception was first seen on names, the fallback when nothing claims it, and
+the release-boundary hypothesis). Every one of these is a rule; nothing here asks a model
+anything. The one tier call on the F2 path is `qualify_exception`, which fills the
+*existing* `Qualification` so the Analysis sub-graph is untouched.
+
 **Persistence** — nodes depend on the `TriageRepository` protocol (`db/repo.py`), never on
 the ORM; a `workloads` row is one running service joined to the repository whose code it
-runs (M6); a `signals` row is one alert *cycle* (monitor, firing group, duration, recovery) and
-its status carries the persistence gate — `received → waiting → analysing → diagnosed →
+runs (M6); an `error_groups` row is one code-exception defect across every tenant that raises it, keyed
+on the grouping rule's own output so a later tick finds it by recomputing the key, and
+carrying the cumulative count the escalation reads — moved by every tick that sees the group,
+not only by the one that saw it arrive — and the Slack thread every message about
+it replies under (M8, ADR-0026: `open → analysing → reported`, plus `unmapped` for a service
+no repository claims); a `signals` row is one alert *cycle* (monitor, firing group, duration,
+recovery) and its status carries the persistence gate — `received → waiting → analysing → diagnosed →
 ticketed|discarded`, with the terminal `self_recovered` and `out_of_scope` (ADR-0018); `InMemoryRepository` is used in tests and dry-run, `SqlRepository` otherwise.
 Tables live in a dedicated `triage` Postgres schema (shared DB with LangGraph Platform
 checkpoints, which Triage never touches). Migrations under `db/migrations/` must stay

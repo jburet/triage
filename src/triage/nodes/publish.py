@@ -3,7 +3,7 @@
 from langchain_core.runnables import RunnableConfig
 
 from triage.graphs.state import TicketPipelineState
-from triage.report import CONFIDENCE_LABEL, render_incident
+from triage.report import CONFIDENCE_LABEL, SlackReport, render_code_exception, render_incident
 from triage.runtime import Deps, deps_from_runnable_config
 from triage.schemas.common import render as render_field
 from triage.schemas.ticket import PipelineOutcome
@@ -24,6 +24,30 @@ def _channel(deps: Deps, team: str) -> str:
     return deps.config.team(team).slack_channel
 
 
+async def _report(state: TicketPipelineState, deps: Deps) -> SlackReport:
+    """Which report this is. The calling feature says, by what it put in the state.
+
+    F2 hands over the group and its collection because an error group has an
+    identity — a type, a place in the code, a set of tenants — that a diagnosis
+    of a symptom has nowhere to put (M8 4.4). Anything else is an incident.
+    """
+    diagnosis = state["diagnosis"]
+    workload = await deps.repo.workload_for_service(diagnosis.service)
+    threshold = deps.config.confidence_threshold(diagnosis.feature)
+    exception = state.get("exception")
+    if exception is not None:
+        return render_code_exception(
+            diagnosis,
+            exception.group,
+            workload,
+            exception.collection,
+            commit=exception.commit,
+            source_caveat=exception.source_caveat,
+            threshold=threshold,
+        )
+    return render_incident(diagnosis, workload, threshold=threshold)
+
+
 async def publish_report(
     state: TicketPipelineState, config: RunnableConfig | None = None
 ) -> TicketPipelineState:
@@ -35,11 +59,7 @@ async def publish_report(
     """
     deps = deps_from_runnable_config(config)
     diagnosis = state["diagnosis"]
-    report = render_incident(
-        diagnosis,
-        await deps.repo.workload_for_service(diagnosis.service),
-        threshold=deps.config.confidence_threshold(diagnosis.feature),
-    )
+    report = await _report(state, deps)
     for message in report.messages:
         await deps.slack.post(
             channel=_channel(deps, diagnosis.team),

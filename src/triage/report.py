@@ -17,9 +17,12 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from triage.errors.paths import enclosing_function
+from triage.schemas.collection import CollectorStatus
 from triage.schemas.common import Confidence, is_unknown
 from triage.schemas.common import render as render_field
 from triage.schemas.diagnosis import Diagnosis, Location
+from triage.schemas.errors import CommitChoice, ErrorCollection, ErrorGroup
 from triage.schemas.system_map import CommitSource, MappingSource, WorkloadEntry
 from triage.schemas.ticket import TicketSection
 
@@ -318,6 +321,360 @@ def render_incident(
     return SlackReport(
         service=diagnosis.service,
         headline=headline,
+        sections=sections,
+        leads_with_cause=confident,
+    )
+
+
+# -- F2: one recurring code exception (M8 4.4) ---------------------------------
+
+DATADOG_APP = "https://app.datadoghq.eu"
+"""The org's Datadog. Its deep-link shape has never been opened from a report."""
+
+EXCEPTION_HEADING = "Exception"
+"""The tenth section, and the only one not in ``docs/ticket-spec.md``.
+
+The nine are about a symptom; an error group *is* an identity — a type, a
+message, a place in the code, a count and a set of tenants — and every one of
+those is a fact Datadog handed over rather than something the run inferred. A
+reader who has to reconstruct them from the symptom paragraph is reading a worse
+report than the one Triage was given."""
+
+
+def issue_url(issue_id: str) -> str:
+    return f"{DATADOG_APP}/apm/error-tracking/issue/{issue_id}"
+
+
+NAMED_SERVICES = 10
+"""How many tenants a report names before it starts counting them.
+
+One PSQLException grouped 66 tenants on 2026-08-25. Every one of them inline is
+a wall nobody reads; ten of them with the other fifty-six dropped is the failure
+the per-service counts exist to prevent (ADR-0026). So the tail is summed.
+"""
+
+
+def _seen_in(group: ErrorGroup) -> str:
+    ordered = sorted(group.services.items(), key=lambda item: (-item[1], item[0]))
+    if not ordered:
+        return "_no service_"
+    named, tail = ordered[:NAMED_SERVICES], ordered[NAMED_SERVICES:]
+    seen = " · ".join(f"`{service}` {count:,}" for service, count in named)
+    if not tail:
+        return seen
+    return (
+        f"{seen} · _and {len(tail)} more "
+        f"tenant{'' if len(tail) == 1 else 's'}, "
+        f"{sum(count for _, count in tail):,} occurrences between them_"
+    )
+
+
+def _versions(group: ErrorGroup) -> str:
+    """Both versions, or the absence that is the normal case (measured, M8 phase 1)."""
+    first, last = group.first_seen_version, group.last_seen_version
+    if not first and not last:
+        return (
+            "Error Tracking recorded no application version for this exception, which is "
+            "the usual case in this org — so nothing here says which release it entered at."
+        )
+    return f"first seen on `{first or 'unrecorded'}`, last seen on `{last or 'unrecorded'}`"
+
+
+def _raised_at(group: ErrorGroup, source_caveat: str | None) -> str:
+    method = enclosing_function(group.function_name)
+    where = f"`{group.file_path}`"
+    if group.function_name:
+        where += f" in `{group.function_name}`"
+        if method and method != group.function_name:
+            where += f" — the method `{method}`"
+    return where + (f"\n_{source_caveat}_" if source_caveat else "")
+
+
+def _recurrence(group: ErrorGroup) -> str | None:
+    """Which report this is, when it is not the first (behaviour 2.5)."""
+    if group.analysis_count <= 1:
+        return None
+    ordinal = group.analysis_count
+    first = (
+        f" The first is {group.first_report_url}."
+        if group.first_report_url
+        else " The first is at the top of this thread."
+    )
+    return (
+        f"*Report {ordinal}* for this group — {group.cumulative_occurrences:,} occurrences "
+        f"across every tick that has seen it.{first}"
+    )
+
+
+def _counted_over(group: ErrorGroup) -> str:
+    """The clock this tick's count was measured on, or that it has none.
+
+    The end carries its own date whenever the window crosses midnight: a
+    backfill over a day rendered "between 2026-08-24 07:33 and 07:33 UTC",
+    which reads as no window at all.
+    """
+    window = group.counted_over
+    if window is None:
+        return "in this tick"
+    end = "%H:%M" if window.start.date() == window.end.date() else "%Y-%m-%d %H:%M"
+    return f"between {window.start:%Y-%m-%d %H:%M} and {window.end:{end}} UTC"
+
+
+def _exception_section(group: ErrorGroup, source_caveat: str | None) -> ReportSection:
+    """The exception's own identity (behaviour 4.4).
+
+    The occurrence span is the group's own ``first_seen``/``last_seen``, never
+    the collection's window: a tick replaying six hours collects over the last
+    one, and reading the count of the first against the clock of the second
+    dates a burst to an hour it did not happen in.
+    """
+    lines = [
+        f"*Type:* `{group.error_type}`",
+        f"*Message:* {group.sample_message or '_the issue carried none_'}",
+        f"*Raised at:* {_raised_at(group, source_caveat)}",
+        f"*Occurrences:* {group.occurrences:,} {_counted_over(group)}, across "
+        f"{len(group.services)} "
+        f"service{'' if len(group.services) == 1 else 's'} of the same repository",
+        f"*Seen in:* {_seen_in(group)}",
+        f"*Versions:* {_versions(group)}",
+        "*Issue:* " + ", ".join(issue_url(issue) for issue in group.issue_ids)
+        if group.issue_ids
+        else "*Issue:* _no Datadog issue id was recorded_",
+    ]
+    recurrence = _recurrence(group)
+    if recurrence:
+        lines.append(recurrence)
+    return ReportSection(EXCEPTION_HEADING, "\n".join(lines))
+
+
+def _telemetry(collection: ErrorCollection) -> list[str]:
+    """What each collector found, and — where it found nothing — which nothing.
+
+    ADR-0027 as amended by ADR-0029: an absence Datadog is discarding is still a
+    finding, and it is listed beside the evidence rather than instead of it,
+    because a reader has to be able to tell "nothing was looked for" from
+    "everything was looked for and this defect's share was discarded".
+    """
+    return [
+        f"[{result.collector.value}] {result.status.value}"
+        + (f" — {result.detail}" if result.detail else "")
+        for result in collection.results
+        if result.status is not CollectorStatus.OK
+    ]
+
+
+STACK_FRAMES_PER_CHAPTER = 6
+"""How much of each `Caused by:` chapter of a stack a Slack message carries.
+
+Per chapter rather than per stack, because the cause is the half a developer acts
+on and a head-and-tail cut would show six frames of the OpenTelemetry agent and
+none of `LoadControl.scala:14`. Every chapter keeps its own header — the
+exception line — so the chain reads whole even where the frames do not."""
+
+
+def _stack_excerpt(stack: str) -> str:
+    """The stack, short enough for one message, cut where a reader can see the cut."""
+    kept: list[str] = []
+    chapter: list[str] = []
+    for line in stack.splitlines():
+        if line.startswith("Caused by:") and chapter:
+            kept.extend(_chapter(chapter))
+            chapter = []
+        chapter.append(line)
+    kept.extend(_chapter(chapter))
+    return "\n".join(kept)
+
+
+def _chapter(lines: list[str]) -> list[str]:
+    head, frames = lines[0], lines[1:]
+    if len(frames) <= STACK_FRAMES_PER_CHAPTER:
+        return [head, *frames]
+    dropped = len(frames) - STACK_FRAMES_PER_CHAPTER
+    return [
+        head,
+        *frames[:STACK_FRAMES_PER_CHAPTER],
+        f"\t… {dropped} more frame{'' if dropped == 1 else 's'}",
+    ]
+
+
+def _occurrence(collection: ErrorCollection) -> str | None:
+    """One real occurrence and its stack, when a retained span carried one (ADR-0029)."""
+    exemplar = collection.exemplar
+    if exemplar is None:
+        return None
+    naming = " · ".join(
+        part
+        for part in (
+            f"`{exemplar.service}`" if exemplar.service else "",
+            f"`{exemplar.operation}`" if exemplar.operation else "",
+            f"trace `{exemplar.trace_id}`" if exemplar.trace_id else "",
+            exemplar.at or "",
+        )
+        if part
+    )
+    lines = ["_One retained occurrence, with the stack it carried:_"]
+    if naming:
+        lines.append(naming)
+    lines.append(f"```\n{_stack_excerpt(exemplar.stack)}\n```")
+    return "\n".join(lines)
+
+
+def _exception_evidence(diagnosis: Diagnosis, collection: ErrorCollection) -> str:
+    occurrence = _occurrence(collection)
+    blocks = [
+        _evidence(diagnosis)
+        if diagnosis.evidence or occurrence is None
+        else "_The analysis produced no checkable evidence of its own; what Datadog "
+        "retained is below._"
+    ]
+    if occurrence:
+        blocks.append(occurrence)
+    gaps = _telemetry(collection)
+    if gaps:
+        blocks.append(
+            "_What was searched for and not found:_\n" + "\n".join(f"• {line}" for line in gaps)
+        )
+    return "\n\n".join(blocks)
+
+
+def _exception_repository(
+    diagnosis: Diagnosis, group: ErrorGroup, workload: WorkloadEntry | None
+) -> str:
+    """The repository, which F2 always knows even when no analysis selected one.
+
+    The diagnosis states where the analysis *read*, and an F2 run whose analyses
+    all failed states nothing. But the grouping rule already resolved these
+    tenants to one repository — that is what made them one group (ADR-0026) — and
+    a report that says "Unknown" about the one thing it is certain of teaches a
+    reader to stop believing the sections that are filled."""
+    stated = _repository_line(diagnosis.location, workload)
+    if not is_unknown(diagnosis.location.repo) or not group.repo_url:
+        return stated
+    return (
+        f"*Repository:* `{group.repo_url}`\n_The tenants raising this exception all run "
+        f"that repository, which is what made them one group; no analysis selected a "
+        f"location of its own, so nothing narrower than the repository is established._"
+    )
+
+
+MAX_REPORTED_FRAMES = 6
+
+FRAMES_ARE_OBSERVED = (
+    "_Read off the stack Datadog retained: the file and the line are observed, not "
+    "converted from the class name the issue reported._"
+)
+"""Why the frames get a line of their own rather than joining `*Files:*`.
+
+`*Files:*` is what the analysis chose to open, and until ADR-0029 everything in
+it was manufactured from a class name (ADR-0028). A path that was read off a real
+stack is a different kind of claim and must not be able to read like the other
+one — the same separation ADR-0019 and ADR-0020 make for a commit."""
+
+
+def _exception_location(
+    diagnosis: Diagnosis,
+    group: ErrorGroup,
+    workload: WorkloadEntry | None,
+    commit: CommitChoice,
+    collection: ErrorCollection,
+) -> str:
+    """As F1's, except the commit line is F2's own choice rather than the map's.
+
+    F1 reads whatever the workload is running because that is what alerted. F2
+    asks a different question — what did the code look like when this appeared —
+    so the rung has to be the one :mod:`triage.errors.versions` picked, and the
+    fallback has to read as one (ADR-0019, ADR-0020).
+    """
+    location = diagnosis.location
+    lines = [
+        _exception_repository(diagnosis, group, workload),
+        f"*Commit:* {commit.commit or '_none could be resolved_'} — _{commit.rung}_",
+    ]
+    infrastructure = _infrastructure_line(workload)
+    if infrastructure:
+        lines.append(infrastructure)
+    lines.append(
+        "*Files:* " + (", ".join(f"`{path}`" for path in location.paths) or "_none suspected_")
+    )
+    frames = collection.exemplar.frames if collection.exemplar else []
+    if frames:
+        named = " → ".join(f"`{frame}`" for frame in frames[:MAX_REPORTED_FRAMES])
+        rest = len(frames) - MAX_REPORTED_FRAMES
+        if rest > 0:
+            named += f" (+{rest} more)"
+        lines.append(f"*Stack frames:* {named}\n{FRAMES_ARE_OBSERVED}")
+    return "\n".join(lines)
+
+
+def _exception_headline(
+    diagnosis: Diagnosis, group: ErrorGroup, *, threshold: Confidence, confident: bool
+) -> str:
+    level = CONFIDENCE_LABEL[diagnosis.confidence]
+    bar = CONFIDENCE_LABEL[threshold]
+    name = group.error_type.rsplit(".", 1)[-1]
+    where = group.repository or diagnosis.service
+    tenants = len(group.services)
+    if confident:
+        return (
+            f":dart: *{where}* — {_cause(diagnosis)}\n"
+            f"`{name}` {group.occurrences:,} times in {tenants} "
+            f"tenant{'' if tenants == 1 else 's'}. Confidence *{level}*, at or above the "
+            f"*{bar}* F2 needs to lead with a cause."
+        )
+    return (
+        f":bug: *{where}* — `{name}` raised {group.occurrences:,} times in {tenants} "
+        f"tenant{'' if tenants == 1 else 's'}, at {group.source_location}\n"
+        f"Confidence *{level}*, below the *{bar}* F2 needs to lead with a cause, so this "
+        f"is what is established. {_open_questions(diagnosis)}"
+    )
+
+
+def render_code_exception(
+    diagnosis: Diagnosis,
+    group: ErrorGroup,
+    workload: WorkloadEntry | None,
+    collection: ErrorCollection,
+    *,
+    commit: CommitChoice,
+    source_caveat: str | None = None,
+    threshold: Confidence,
+) -> SlackReport:
+    """The nine sections of the ticket spec, with the exception's identity in front.
+
+    Sibling of :func:`render_incident` and sharing every section helper with it,
+    because a report a developer reads twice a week must not have two layouts.
+    Three things differ, and each of them is a fact F1 does not have: the header,
+    the commit rung, and the telemetry that was searched for and discarded.
+    """
+    confident = diagnosis.confidence.at_least(threshold)
+    bodies: dict[TicketSection, str] = {
+        TicketSection.SYMPTOM: _symptom(diagnosis),
+        TicketSection.IMPACT: _impact(diagnosis),
+        TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
+        TicketSection.EVIDENCE: _exception_evidence(diagnosis, collection),
+        TicketSection.LOCATION: _exception_location(diagnosis, group, workload, commit, collection),
+        TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
+        TicketSection.OUT_OF_SCOPE: _bullets(
+            diagnosis.out_of_scope,
+            empty="The diagnosis named nothing the fix must avoid.",
+        ),
+        TicketSection.RULED_OUT: _bullets(
+            [f"{item.hypothesis} — {item.why}" for item in diagnosis.ruled_out],
+            empty="The diagnosis eliminated no hypothesis, so nothing here has been "
+            "checked and dismissed for you.",
+        ),
+        TicketSection.UNKNOWNS: _bullets(
+            [f"{item.question} — {item.why_unresolved}" for item in diagnosis.unknowns],
+            empty="The diagnosis left no question open.",
+        ),
+    }
+    sections = (
+        _exception_section(group, source_caveat),
+        *(ReportSection(section.heading, bodies[section]) for section in TicketSection),
+    )
+    return SlackReport(
+        service=group.repository or diagnosis.service,
+        headline=_exception_headline(diagnosis, group, threshold=threshold, confident=confident),
         sections=sections,
         leads_with_cause=confident,
     )

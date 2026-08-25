@@ -1,4 +1,4 @@
-.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean deploy-check run-poller cron
+.PHONY: help install env dev db proxy proxy-down analysis-image migrate lint test run-fixture run-cartography run-mapping run-incident repository-map evals evals-cartography evals-incident clean deploy-check run-poller cron run-errors capture-datadog capture-errors
 ANALYSIS_IMAGE ?= triage-analysis:dev
 
 help:
@@ -54,6 +54,9 @@ run-mapping: env ## Derive the service map from real Datadog events and print th
 run-poller: env ## Tick the alert poller by hand, as the Platform cron would (read-only Datadog)
 	uv run python -m scripts.run_poller $(ARGS)
 
+run-errors: env ## Tick the code-exception poller by hand (read-only; ARGS="--analyse" spends)
+	uv run python -m scripts.run_errors $(ARGS)
+
 cron: env ## Show, or with ARGS="--apply" create, the Platform cron that ticks the poller
 	uv run python -m scripts.apply_cron $(ARGS)
 
@@ -65,6 +68,9 @@ repository-map: ## Regenerate config/repository-map.yaml from the architecture d
 
 capture-datadog: ## Capture a real alert's telemetry as fixtures (read-only, needs a Datadog key)
 	uv run python -m scripts.capture_datadog $(ARGS)
+
+capture-errors: ## Capture one hour of the org's Error Tracking issues as fixtures (read-only)
+	uv run python -m scripts.capture_errors $(ARGS)
 
 evals: ## Score the fixture suite against the real models (spends money)
 	uv run python -m evals.run

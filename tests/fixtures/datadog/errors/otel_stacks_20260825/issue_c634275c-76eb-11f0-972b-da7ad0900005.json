@@ -1,0 +1,23 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "Error in query \u00abload_property_by_id\u00bb with (id -> property:16e8a6e4-1a60-44ff-8531-65defaccbab6) : Not found",
+      "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+      "file_path": "zeenea.repository.orientdb.mapping.Query.scala",
+      "first_seen": 1754941544577,
+      "first_seen_version": "",
+      "function_name": "load",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787640228517,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "service": "plt-autostrade",
+      "state": "ACKNOWLEDGED"
+    },
+    "id": "c634275c-76eb-11f0-972b-da7ad0900005",
+    "type": "issue"
+  }
+}

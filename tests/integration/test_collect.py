@@ -286,6 +286,37 @@ async def test_a_collector_triage_does_not_have_is_discarded_and_kept(config: Co
     assert "'grafana_dashboards' is not a collector" in result["collection"].refused[0]
 
 
+async def test_another_features_collector_is_refused_rather_than_run_unscoped(config: Config):
+    """``Collector`` also holds F2's three, and they have no alert scope to run in.
+
+    Left to fall through they would be run as an unscoped event search, which
+    answers a question about the whole org and looks like an answer about this
+    incident.
+    """
+    deps = build_deps(
+        config,
+        datadog=fake_datadog(),
+        follow_ups=[
+            a_follow_up(
+                {
+                    "collector": "error_logs",
+                    "query": "service:plt-hcl-software-uat",
+                    "why": "The exception's own logs would say more.",
+                }
+            )
+        ],
+    )
+    collection = await swept(deps)
+
+    result = await follow_up(
+        {"alert": pod_down_alert(), "collection": collection, "window": collection.window},
+        run_config(deps),
+    )
+
+    assert result["collection"].followup_calls == 0
+    assert "another feature's collector" in result["collection"].refused[0]
+
+
 async def test_a_plan_that_will_not_take_shape_is_recorded_and_not_read_as_enough(
     config: Config,
 ):

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "Error in query \u00abload_inventory_item_by_path\u00bb with (id -> connection:01a69005-bafd-43d7-8f15-9832d4439c0d, path -> ********************************************************************************************************************) : Not found",
+      "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+      "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+      "first_seen": 1754952460884,
+      "first_seen_version": "",
+      "function_name": "$anonfun$load$6",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787645592722,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "service": "plt-merck",
+      "state": "ACKNOWLEDGED"
+    },
+    "id": "30016244-7705-11f0-af9e-da7ad0900005",
+    "type": "issue"
+  }
+}

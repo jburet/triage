@@ -69,6 +69,7 @@ thresholds:
   # F3 is proactive and noisier than F1, so it earns a higher bar.
   ticket_confidence:
     F1: medium
+    F2: medium
     F3: high
 
   # Re-alert Slack on an updated (deduplicated) ticket at this occurrence count,
@@ -119,3 +120,56 @@ collection:
   max_timeseries_series: 6
   max_timeseries_points: 60
   max_prompt_bytes: 60000
+
+# The hourly code-exception pass (F2, ADR-0025, ADR-0026). Read-only on Datadog
+# Error Tracking; the environments it watches come from the teams above and go
+# into the query, so an issue from an environment nobody configured is never
+# returned rather than returned and dropped.
+errors:
+  # One search per track. The org's `logs` track answered empty at every window
+  # and persona tried on 2026-08-25 — its Error Tracking is fed by APM spans
+  # alone — and it is asked anyway, for eleven bytes an hour, because an empty
+  # answer is evidence and a track nobody asks is not.
+  tracks: [trace, logs]
+  persona: BACKEND
+
+  # The volume gate, corrected on 2026-08-25 against 24 consecutive hourly ticks
+  # run live on the org. That is the first distribution it has been measured
+  # against that is the one it operates on: per *group*, per *tick*, and over
+  # issues that were new or regressed. (The counts it was originally set from —
+  # 6344, 5869, 4009, ... — were per issue, over every issue *occurring* in one
+  # hour, which is a different population and a much louder one.)
+  #
+  # Eleven groups arrived in the day. Their occurrences in the tick each arrived
+  # in: 1, 1, 1, 2, 3, 4, 5, 30, 189, 7758, 37691. Nothing lands between 6 and
+  # 29, so every floor from 6 to 29 behaves identically; ten reports four groups
+  # on arrival and holds seven back. Eighteen of the 24 ticks brought no group at
+  # all. The busiest brought five — a wave of ~90 new-or-regressed issues in one
+  # hour, which is one defect arriving across dozens of tenants at once — and
+  # that is the tick `max_groups_per_tick: 5` is sized for; nothing else in the
+  # day came close to it.
+  #
+  # The floor is no longer a cliff. Now that the escalation is fed by the
+  # occurrences that go on happening (ADR-0030), what the floor holds back is
+  # delayed rather than lost: replayed over the same day, every floor from 5 to
+  # 200 produces the same five reports, and only the hour they land in moves. A
+  # floor of 1 produces seven, five of them inside that one wave tick — the error
+  # stream ADR-0023 says to watch for. Ten is kept because it is the middle of
+  # the range that behaves identically, not because the data singled it out.
+  #
+  # This is one day, and an unusual one: it contained that wave. A quieter day is
+  # what its first ten ticks were — eight hours with nothing new at all, two or
+  # three known groups re-counted per tick, and no report.
+  min_occurrences: 10
+  cumulative_occurrences: 100
+  max_groups_per_tick: 5
+
+  # The first tick has no watermark, and every collection runs back this far.
+  lookback_minutes: 60
+
+  # Hours before a group already reported is looked at again. It gates the
+  # cumulative escalation too, and that is measured: the loudest group of the
+  # reference hour did 10,763 occurrences in it, so it crosses any 100-occurrence
+  # interval every tick for ever. A regression bypasses this — a fix that did not
+  # hold is news the moment it happens (ADR-0025).
+  reanalyse_after: 168

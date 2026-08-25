@@ -19,7 +19,8 @@ be developed — `make run-errors` ticks it by hand, as `make run-poller` does f
 
 ## Decisions this plan needs recorded first
 
-Two ADRs, written before Phase 2 (`/adr`):
+Two ADRs, written before Phase 2 (`/adr`). **Both written 2026-08-25**, against what the
+capture showed rather than what the plan assumed:
 
 - **ADR-0025 — code exceptions are polled hourly and gated by volume.** ADR-0018's gate is
   duration, which an error issue has no equivalent of. The gate here is occurrences: a floor
@@ -58,76 +59,393 @@ should be revisited against it rather than against Jira.
   [ticket_pipeline] → settle_group`). `prompts/qualify_exception.md` produces the existing
   `Qualification`, so the Analysis sub-graph is untouched.
 - `triage.report.render_code_exception(diagnosis, group, workload, collection) -> SlackReport`.
-- `make run-errors`, `make capture-errors`, `deploy/platform/cron-error-poller.yaml` (hourly).
+  **Built with two keyword arguments more**: `commit` (the `CommitChoice` 4.2 resolves) and
+  `source_caveat` (how 4.1 derived the paths). Both are facts F1 has no equivalent of and
+  neither can be recovered from the four positional ones.
+- `make run-errors` (`ARGS="--analyse"` drives every gated group end to end),
+  `make capture-errors`, `deploy/platform/cron-error-poller.yaml` (hourly).
 
 ## Phase 1: the input exists, and says what we think it says
 
-- [ ] 1.1 One real hour of the org's Error Tracking issues is captured under
+- [x] 1.1 One real hour of the org's Error Tracking issues is captured under
       `tests/fixtures/datadog/errors/<slug>/` by `make capture-errors`, and the capture states how
       many issues came back per track and how many of them name a file and a function. Everything
       after this phase is written against that capture, not against the OpenAPI spec.
-- [ ] 1.2 A tick asks for the `trace` and `logs` tracks with the `BACKEND` persona over one hour, in
+- [x] 1.2 A tick asks for the `trace` and `logs` tracks with the `BACKEND` persona over one hour, in
       one call per track, and gets back each issue's counts and its attributes together.
-- [ ] 1.3 The environments Triage watches are a filter in the query — an issue from an environment no
+- [x] 1.3 The environments Triage watches are a filter in the query — an issue from an environment no
       team configured is never returned, rather than returned and dropped.
-- [ ] 1.4 An issue that names an exception type *and* a source location is a code exception; one that
+- [x] 1.4 An issue that names an exception type *and* a source location is a code exception; one that
       names neither is recorded as skipped, with that as the reason, and never analysed.
-- [ ] 1.5 An issue whose `first_seen` falls in the tick window is new, and one whose regression
+- [x] 1.5 An issue whose `first_seen` falls in the tick window is new, and one whose regression
       reopened it in the window is new too — and the two are told apart, because a fix that did not
       hold is a different report from a defect nobody has seen before.
-- [ ] 1.6 An issue first seen before the window and not regressed produces nothing.
-- [ ] 1.7 A tick reads from its watermark minus an overlap; a poller that was down longer than the
+- [x] 1.6 An issue first seen before the window and not regressed produces nothing.
+- [x] 1.7 A tick reads from its watermark minus an overlap; a poller that was down longer than the
       catch-up limit replays only the limit and says in the platform channel what it skipped.
+
+## What Phase 1 measured, and what it changes
+
+Done 2026-08-25 against the real org; the capture is
+`tests/fixtures/datadog/errors/org_20260825_1h/`, and its `NOTES.md` is the record. Four
+findings change what comes next.
+
+- **Error Tracking is populated and names the code.** 15 issues in the reference hour, 202
+  over seven days, and *every one of them* names both a file and a function. The plan's
+  first open risk is closed and F2 has the input it was built on. The paths are
+  fully-qualified Scala class names (`zeenea.repository.orientdb.OdbClient.scala`,
+  `$anonfun$load$6`), not repository-relative paths, so 4.1 must map one to the other before
+  `AnalysisRequest.paths` gets them.
+- **The `logs` track is empty at every window and persona.** The org's issues come from APM
+  spans alone. Nothing downstream should be surprised by an empty track.
+- **`first_seen_version` is almost always blank** — 0 of 15 in the hour, 16 of 202 over a
+  week, 47 of 320 over a month. Behaviours 4.2 and 4.3 are built on that field, so they are
+  the minority path, not the normal one.
+- **Phase 3 does not work as written, and this is measured, not suspected.** A query rebuilt
+  from an issue's own fields (`service:X @error.type:"Y"`) returns **zero spans and zero
+  logs** against an issue claiming 6,344 occurrences in the same hour. `service:X` alone
+  returns 211,158 spans, so the service is instrumented; `status:error` and `@error.type:*`
+  both return nothing, because the error spans are not retained and the aggregate answers
+  `traffic_type: sampled`. Logs are barely shipped: 11 events for that service in the hour.
+  **Phase 3 should be re-planned before it is built** — either it states the absence the way
+  `not_instrumented` already does, or it finds another source. The issue's own sample event,
+  if Error Tracking exposes one, is the obvious unprobed candidate.
+
+Two numbers Phase 2 wants: 202 issues across 99 services collapse to **35** distinct (type,
+file, function) triples, 5.8 to one — ADR-0026's case, larger than guessed. And occurrences
+per issue in one hour ran 6344, 5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2, 2, 1,
+which is where `min_occurrences: 10` comes from.
 
 ## Phase 2: one exception, however many tenants
 
-- [ ] 2.1 Two issues with the same exception type, message shape and source location, seen in
+- [x] 2.1 Two issues with the same exception type, message shape and source location, seen in
       different `plt-*` services, are one group — because the mono-tenancy rule resolves both to the
       same repository — and the group names every service it was seen in and the count in each.
-- [ ] 2.2 Two issues that look alike but resolve to different repositories stay two groups, and a
+- [x] 2.2 Two issues that look alike but resolve to different repositories stay two groups, and a
       service that resolves to no repository is its own group, reported and never analysed.
-- [ ] 2.3 A group whose occurrences this tick are below the floor is persisted with its count and
+- [x] 2.3 A group whose occurrences this tick are below the floor is persisted with its count and
       analysed nothing; the tick reports how many it held back.
-- [ ] 2.4 A group that stays below the floor tick after tick is analysed once its cumulative count
-      crosses the escalation threshold — the slow bleed, made visible.
-- [ ] 2.5 A group already analysed is not analysed again until it regresses or crosses the next
+- [x] 2.4 A group that stays below the floor tick after tick is analysed once its cumulative count
+      crosses the escalation threshold — the slow bleed, made visible. **Built unable to fire,
+      and made true on 2026-08-25** (ADR-0030): see "What the gate measured over a day".
+- [x] 2.5 A group already analysed is not analysed again until it regresses or crosses the next
       escalation interval, and the second report says which occurrence it is and links the first.
-- [ ] 2.6 A tick analyses at most `max_groups_per_tick` groups, ordered by occurrences, and names the
+- [x] 2.6 A tick analyses at most `max_groups_per_tick` groups, ordered by occurrences, and names the
       groups it deferred rather than dropping them silently.
+
+## What Phase 2 measured, and what it changes
+
+Done 2026-08-25. Three findings.
+
+- **The group key is the ADR's, not the behaviour's.** Behaviour 2.1 says "same exception
+  type, message shape and source location"; [ADR-0026](../adr/0026-one-exception-across-tenants-is-one-finding.md)
+  says type, source location and repository, with the message named as the finer key to reach
+  for only if a group is ever shown to have merged two defects. The ADR is right and it is
+  measured: the captured hour's six-tenant `EntityNotFoundException` group carries six
+  different queried entities — `load_contact_by_id`, `load_inventory_item_by_path`,
+  `load_user_by_email_read` — inside one message shape. Keying on the raw message collapses
+  nothing at all (15 issues to 15 groups); keying on a normalised shape gives 12. The ADR's
+  key gives **7**, which is the 6-tenant group the ADR argues from. The message is out.
+- **The reference hour's own collapse is 2.1 to one, not 5.8.** 15 issues to 7 groups. The
+  5.8 in Phase 1's notes is over seven days, where 202 issues span 99 services; one hour
+  spans twelve. The hour reproduces the ADR's headline case exactly — `OdbClient.scala:
+  $anonfun$load$6` in six tenants, one group, 10,763 occurrences — which is the check that
+  can be made against a fixture at all.
+- **The cumulative escalation needs the cooldown, or it is an error stream.** ADR-0025 sets
+  the escalation at 100 cumulative occurrences. The loudest group of the reference hour does
+  **10,763 an hour**, so it crosses the next escalation interval on every single tick, for
+  ever. A re-analysis rule that only counted would repost the same defect hourly — precisely
+  the failure ADR-0023 says to watch for. So `errors.reanalyse_after` gates the escalation
+  path for a group that has already been reported: the escalation says *whether* there is
+  more to say, the cooldown says *when* it may be said, and a **regression bypasses both**
+  because a fix that did not hold is news the moment it happens. The first analysis of a
+  group is untouched — a slow bleed still escalates at 100 with no wait.
+- **Read the day's measurement below with this section.** Two of the three findings here are
+  about a threshold that, as Phase 2 left it, no group's total could ever reach: the
+  escalation was fed only by issues that were new or regressed, and Datadog marks an issue new
+  exactly once. ADR-0030 fixes what feeds it; the cooldown reasoning above is unchanged.
 
 ## Phase 3: the log, the trace, and the window
 
-- [ ] 3.1 A gated group collects a bounded sample of the error logs behind it, reduced to templates
+- [x] 3.1 A gated group collects a bounded sample of the error logs behind it, reduced to templates
       and counts, and the sample keeps at least one complete stack trace — the stack is the whole
       point, and the template reduction must not eat it.
-- [ ] 3.2 It collects the error spans behind it, so the report can name the operation and one trace
+- [x] 3.2 It collects the error spans behind it, so the report can name the operation and one trace
       to open. A service with no APM instrumentation is `not_instrumented`, not empty — the
-      distinction the collection schema already draws.
-- [ ] 3.3 The occurrences are re-found by a query built from the group's own fields, and the
+      distinction the collection schema already draws. **Amended:** a third outcome,
+      `sampled_away`, for evidence Datadog counted and discarded (ADR-0027) —
+      **re-derived** by the OTel correction into four outcomes (ADR-0029).
+- [x] 3.3 The occurrences are re-found by a query built from the group's own fields, and the
       collection states that query verbatim, because it is a reconstruction and not the issue's own
       identity (see Open risks).
-- [ ] 3.4 The collection window runs back from the tick to the configured lookback, and the whole
+- [x] 3.4 The collection window runs back from the tick to the configured lookback, and the whole
       payload fits `collection.max_prompt_bytes`, stating every cut.
-- [ ] 3.5 A collector Datadog refuses is a stated failure and the run continues, exactly as F1's does.
+- [x] 3.5 A collector Datadog refuses is a stated failure and the run continues, exactly as F1's does.
+- [x] 3.6 **Added by the OTel correction.** The exception, its message and its whole stack —
+      `Caused by:` chain included — are read out of the JSON string Datadog calls
+      `custom.events`, and the group is joined to its occurrences by `exception.type` inside
+      it. A span with no events, or with malformed JSON, is skipped and never raises.
+- [x] 3.7 **Added by the OTel correction.** The stack's frames become repository-relative
+      `path:line`, filtered to the application's own code, and they are what the analysis
+      opens — ahead of 4.1's conversion, which stays as the fallback and reads differently.
+
+## What Phase 3 measured, and what it changes
+
+Done 2026-08-25. The phase opened with an investigation rather than code, because Phase 1
+had measured its premise broken. Everything below was probed by hand against the live org,
+read-only, over the reference window `2026-08-25T04:35Z`–`05:35Z`. The decision it produced
+is [ADR-0027](../adr/0027-an-absence-datadog-discards-is-a-finding.md).
+
+**There is no route to the occurrence-level evidence, and that is now measured rather than
+assumed.** Four candidate routes, all dead:
+
+1. *The issue's own sample event.* Nine endpoint shapes probed — `…/issues/{id}/events`,
+   `/latest-event`, `/sample-event`, `/sample`, `/occurrences` — all **404**. Four `include`
+   values — `sample_event`, `latest_event`, `event`, `issue,sample_event` — all **400
+   `invalid include`**. Datadog's own v2 spec allows exactly `issue`, `issue.assignee`,
+   `issue.case`, `issue.team_owners`, and `IssueAttributes` carries no stack, no `trace_id`
+   and no `span_id`. The plan's "obvious unprobed candidate" does not exist.
+2. *The stack already in the captured attributes.* Re-read in full: the detail payload is
+   `error_message`, `error_type`, `file_path`, `first_seen`, `first_seen_version`,
+   `function_name`, `is_crash`, `languages`, `last_seen`, `last_seen_version`, `platform`,
+   `service`, `state`, plus `relationships.case`. `file_path` + `function_name` is the top
+   frame and nothing more.
+3. *A different query shape.* `service:plt-systeme-u-rec` returns **211,179** spans in the
+   hour and **3,576,641** over seven days. `status:error` returns **0** in the hour and
+   **48** over seven days — and those 48 are OTel `503`s on `POST /agent/register`, carrying
+   no `@error.type`. `@error.type:*` returns **0** over both windows; the exact type returns
+   **0**; `@error.message:*load_contact_by_id*` returns **0**. `@error.stack:*` returns
+   **zero spans across the whole org**. Four issue-id join facets
+   (`@error.tracking.issue.id`, `@issue.id`, `@error.fingerprint`, `issue_id`) return zero
+   over seven days, and Datadog documents none of them — the only join key is
+   `error.fingerprint`, which the *application* sets and Datadog never echoes back.
+4. *A pre-sampling metric route.* `sum:trace.services_by_operation.hits{service:plt-systeme-u-rec}`
+   = **921,775** in the hour; every `.errors` metric for that service = **0**. The exceptions
+   are not flagged as span errors even in the metric stream, because the platform runs the
+   **OpenTelemetry** Java agent (`io.opentelemetry.pekko-http-1.0`), where Datadog's
+   100%-of-traffic guarantee for trace metrics does not hold.
+
+**The disjointness is total, and it is the finding.** Three services *do* have retained error
+spans in the reference hour — `gateway` (1,328), `scim-api` (836), `studio` (4) — and Error
+Tracking has **no issues at all** for any of them, at either persona. The twelve services
+that *do* have issues have no retained error spans. The two sets do not intersect.
+
+**And the switch is one line of Datadog configuration, on Zeenea's side.**
+`GET /api/v2/apm/config/retention-filters` says the org's **"Error Default" filter
+(`spans-errors-sampling-processor`, `status:error`, rate 1) is `enabled: false`**. Datadog
+documents the consequence exactly: *"Spans associated with the error need to be retained with
+a custom retention filter in order for samples of that error to show up."* Enabling it is
+what makes 3.1–3.3 return real evidence. Nothing in Triage can substitute for it.
+
+**So Phase 3 is built honest rather than built differently.** The collectors exist, run, and
+name which kind of nothing they found: `not_instrumented` when the control query is dead too,
+and a new `sampled_away` when the control is alive and the issue counted occurrences — a team
+can turn a retention filter on, and nobody turns one on for a report that only said "empty".
+The reconstruction is layered (`@error.type` → `status:error` → the control) because the
+layering is measured, and all three queries are stated verbatim beside the count the issue
+claims. The stack-preserving rule is tested against
+`tests/fixtures/datadog/errors/synthetic_stack/`, which is hand-written and labelled as such,
+because no real one can be captured today.
+
+**What an F2 report will contain in this org, today:** the exception type, its message, the
+file and function, the count over the window, the tenants it was seen in, the Datadog issue
+link — and a stated absence of logs and spans reading *"this query returned nothing, the
+issue counts 5,869 occurrences in the same window, and the same services returned 211,179
+spans with the error predicate dropped"*. Phase 4's report has to read well in that shape,
+because that is the shape it will have.
+
+One incidental fix: `Collector` now holds F2's three as well as F1's, so F1's follow-up loop
+refuses them by name. Left to fall through they would have run as an unscoped event search —
+an answer about the whole org, shaped like an answer about the incident.
+
+## What the OTel correction measured, and what it overturns
+
+Done 2026-08-25, hours after Phase 4. Everything above under "What Phase 3 measured" was
+measured correctly and concluded wrongly, and this section is the correction. The decision
+is [ADR-0029](../adr/0029-the-exception-is-in-the-otel-span-events.md), which supersedes
+ADR-0027 in its central claim.
+
+**The route exists. It is not `@error.type`, it is the OpenTelemetry span events.** The
+platform runs the OTel Java agent, not Datadog's tracer, so Datadog's own `error.*`
+attributes are never set — which is why `@error.type:"<fqcn>"` matched nothing and
+`@error.stack:*` returned zero spans org-wide. The exception is a **span event**, and
+Datadog surfaces span events as a JSON-encoded string in the span attribute
+`custom.events`. Inside it: `exception.type`, `exception.message` and
+`exception.stacktrace` — the full stack, `Caused by:` chain and all, with real files and
+real line numbers. Phase 3 read "zero results" as a fact about retention. It was a fact
+about which agent is running.
+
+**The query that works is `service:<svc> status:error` over raw spans.** Measured over 24
+hours at `limit=20`:
+
+| service | error spans | with an OTel stack | matching the issue's own type |
+|---|---|---|---|
+| `plt-merck-qa` | 20 | 20 | 0 |
+| `plt-merck` | 20 | 20 | 0 |
+| `plt-merck-dev` | 20 | 20 | 0 |
+| `plt-autostrade` | 20 | 6 | 0 |
+| `plt-bred` | 20 | 7 | 5 |
+| `plt-gema-uat` | 8 | 7 | 0 |
+
+66 of the capture's 80 spans carry a complete stack. The reference one is 2,334 bytes, six
+frames plus a twelve-frame `Caused by: TooBusyIndexingException` chain naming
+`ScannerService.scala:124`, `ScannerService.scala:194` and `LoadControl.scala:14`.
+
+**And "unrelated noise" was never unrelated.** Phase 4's report said the collectors
+"returned unrelated noise (profiler rate-limit errors, http.client spans)". Nothing was
+matching them against the group, because the matching attribute was wrong. Matched properly,
+they are the finding that separates *this defect's occurrences were discarded* from *nothing
+is collected here*.
+
+**What changed in code.** `errors/otel.py` parses the events and the frames; the
+reconstruction is one query plus a stated match instead of a narrow-then-broad layering that
+could never have answered; the four statuses are re-derived from what was retained rather
+than from a query that could not match; `ErrorCollection` carries an `ExceptionExemplar` —
+stack, frames, trace id, operation — and the report shows it, cut per `Caused by:` chapter so
+Slack's four-thousand characters cannot eat the cause; and `AnalysisRequest.paths` prefers
+observed frames over ADR-0028's conversion, with the report saying which of the two it had.
+`tests/fixtures/datadog/errors/synthetic_stack/` is deleted and replaced by
+`otel_stacks_20260825/`, a real capture, exactly as its own notes said to do.
+
+**One defect the correction exposed, and fixed.** The collection window ran back from the
+*tick* by `errors.lookback_minutes`, which is the poll window only on an hourly tick. The
+first live run after the join — `make run-errors ARGS="--hours 13 --analyse"` — counted a
+burst between 02:29 and 03:12 and then looked for its evidence between 08:41 and 09:41, found
+none, and reported `not_instrumented`: an absence that was an artefact of the window rather
+than of the telemetry. The window is now the one the occurrences were counted over
+(`ErrorGroup.counted_over`), which is what 3.4's own reasoning always said it should be. The
+re-run found the stack.
+
+**What a live F2 report carries now**, from `make run-errors ARGS="--hours 13 --analyse"` on
+2026-08-25: the exception header, the nine sections, and an Evidence section holding *One
+retained occurrence, with the stack it carried* — `plt-merck-dev` · `grpc.server.request` ·
+trace `132ed46a…`, then the verbatim stack down to `Caused by:
+zeenea.commons.exceptions.TooBusyIndexingException: 468 index event to process during the
+last 5s` and `LoadControl.scala:14`. Its Location section carries `*Stack frames:*` with
+seven observed `path:line` frames and the sentence saying they were read off the stack rather
+than converted. The analysis opened `zeenea/service/api/ScannerService.scala`,
+`zeenea/server/ZeeneaReferentielAppContext.scala` and
+`zeenea/datacatalog/loadcontrol/LoadControl.scala` — observed paths, `paths_observed=True`,
+for the first time.
+
+**What is unchanged.** The org's "Error Default" retention filter is still disabled and is
+still the one Zeenea-side switch that would move the mismatch column. `first_seen_version` is
+still blank on nearly every issue — 8 of 184 over 24 hours. And nothing has still ever opened
+one of these paths in a real tree: the investigative kinds still have no image, so every
+analysis on that live run still came back a stated failure.
 
 ## Phase 4: where in the code, and the report
 
-- [ ] 4.1 The `code_analysis` reads the file and the function the issue named, ahead of the selection
+- [x] 4.1 The `code_analysis` reads the file and the function the issue named, ahead of the selection
       profile's own globs — the fix for what M7 3.3 measured.
-- [ ] 4.2 When a repository claims the version the exception was first seen on, that is the commit
+- [x] 4.2 When a repository claims the version the exception was first seen on, that is the commit
       the analysis reads; when nothing claims it, the commit falls back and the report says which of
       the two it got (ADR-0019, ADR-0020 — an observed version and a fallback must not read alike).
-- [ ] 4.3 A group whose exception first appears at a version later than the previous one produces a
+- [x] 4.3 A group whose exception first appears at a version later than the previous one produces a
       `deployment` hypothesis naming both versions; with no `diff_analysis` entrypoint it comes back
       as a stated failure and lands in the report as an unknown, never as silence (ADR-0014).
-- [ ] 4.4 The report carries the nine sections of `docs/ticket-spec.md` plus an exception header: the
+- [x] 4.4 The report carries the nine sections of `docs/ticket-spec.md` plus an exception header: the
       type, the message, the count over the window, the services it was seen in, the versions it was
       first and last seen on, and a link to the Datadog issue.
-- [ ] 4.5 Every message about one group lands in one Slack thread, across ticks — the group row holds
+- [x] 4.5 Every message about one group lands in one Slack thread, across ticks — the group row holds
       the thread, so the fourth occurrence replies under the first report rather than starting a
       fifth conversation.
-- [ ] 4.6 A group settles as `reported` on its own row, and a run that dies leaves it recoverable
+- [x] 4.6 A group settles as `reported` on its own row, and a run that dies leaves it recoverable
       rather than stuck mid-analysis, as `run_incident` does for a signal.
+
+## What Phase 4 measured, and what it changes
+
+Done 2026-08-25. The `code_exception` graph is registered, and one real group was driven
+through it end to end — `make run-errors ARGS="--hours 72 --analyse"` against the live org,
+read-only on Datadog, real model tiers, Jira and Slack recorded rather than sent. Four
+findings, two of which were defects the fixtures could not have shown.
+
+- **The path conversion is the phase, and it is a convention.** Datadog names
+  `zeenea.service.api.ScannerService.scala` and `$anonfun$applyOrElse$3`; the analysis was
+  pointed at `src/main/scala/zeenea/service/api/ScannerService.scala` and at the
+  package-relative path, with the tree free to resolve either by suffix, and the method
+  printed as `applyOrElse`. [ADR-0028](../adr/0028-a-class-name-is-not-a-path.md) records
+  it, including the part that is not yet true: **no analysis has ever opened one of these
+  paths**, because the investigative kinds still have no image (M7 3.4). The conversion is
+  proven against fixtures and unobserved against a repository.
+- **`first_seen_version` was blank on the group that ran, as Phase 1 said it would be.**
+  The report read `Error Tracking recorded no application version for this exception, which
+  is the usual case in this org`, and the commit line said the fallback was a fallback. The
+  version path (4.2, 4.3) is built and tested and has never fired on real data — 4.3's
+  deployment hypothesis has only ever been produced from a fixture.
+- **A deployment hypothesis was diffing the wrong way round.** `run_analyses` filled a
+  missing `base_commit` from the service map, which holds what the workload is running
+  *now* — later than the version an exception first appeared on, not earlier. F1 never hit
+  it because its two commits are the same one; F2 is the first caller to name a commit of
+  its own. The rule is now: the map stands in for "what was deployed before" only when the
+  hypothesis named no commit itself.
+- **Two things the report said Unknown about, it knew.** The live run's every analysis
+  failed, so `Location` said the repository was unknown — when the grouping rule had
+  resolved these tenants to one repository, which is what made them a group at all
+  (ADR-0026). And a fallback commit lookup that itself came up empty printed a sentence
+  explaining which commit had been read. Both are now stated for what they are. Neither
+  would have appeared in a test whose analyses succeed, which is what the live run bought.
+
+**What an F2 report is today**, from that run: an exception header (type, the full message,
+the source location with its derivation stated, 126 occurrences over the window, the tenant
+and its count, "no application version recorded", the Datadog issue link), the nine sections,
+four Slack parts. Its Evidence section carries one real fact and, under *What was searched
+for and not found*, three collectors saying `sampled_away` and `not_instrumented` with the
+control counts beside them (ADR-0027). Its Unknowns section carries seven questions, every
+one of them naming the analysis that failed and why. That is a report that is honest about
+having read no code — which is what it did, because nothing clones a repository yet.
+
+**Not built, and not pretended:** `first_report_url` stays empty. Slack's `chat.postMessage`
+returns a timestamp and not a permalink, and nothing has spoken to Slack live, so behaviour
+2.5's "links the first" is served by the thread rather than by a URL. The Datadog issue
+deep-link shape has never been opened either.
+
+## What the gate measured over a day
+
+Done 2026-08-25, after Phase 4. 24 consecutive hourly ticks against the live org, through the
+real pipeline — `parse_issues` → `novelty` → `not_a_code_exception` → `group_issues` → the
+gate — with an in-memory table, so the day starts from nothing exactly as the first day of the
+feature would. Read-only, no model call. This is the first distribution the gate has been
+measured against that is *the one it operates on*: per group, per tick.
+
+- **The floor's justification was wrong and its value was right by luck.** `config.yaml`
+  argued from 6344, 5869, 4009, … — occurrences per *issue*, over every issue *occurring* in
+  one hour. The gate applies to occurrences per *group*, over issues that were *new or
+  regressed*, which is a far quieter population. The eleven groups of the measured day arrived
+  at **1, 1, 1, 2, 3, 4, 5, 30, 189, 7758, 37691**. Nothing lands between 6 and 29, so every
+  floor in that range decides the day identically. `min_occurrences: 10` and
+  `max_groups_per_tick: 5` are kept; their reasoning is replaced.
+- **Eighteen of the 24 ticks brought no group at all, and the busiest brought five** — a wave
+  of some ninety new-or-regressed issues in one hour, one defect arriving across dozens of
+  tenants at once. That is the tick the cap is sized for, and nothing else in the day came
+  near it.
+- **Behaviour 2.4 could not fire, and that was the real defect.** A group is only built from
+  issues `novelty()` calls new or regressed; Datadog marks an issue new exactly once; so a
+  group held back below the floor was never observed again and its cumulative total never
+  moved. The integration test that appeared to prove 2.4 moved every issue's `first_seen` into
+  every tick's window — it was testing a defect that goes new hourly, which does not happen.
+  The day names the cost: `EntityNotFoundException` at `OdbClient.scala:$anonfun$load$6`
+  arrived with **4 occurrences**, was held back, did **1,517 the next hour** and **186,242
+  over the day**, and was never new again. It would have been reported never.
+- **The fix is [ADR-0030](../adr/0030-the-escalation-counts-what-goes-on-happening.md):** a
+  tick keeps the issues that are neither new nor regressed and uses them for one thing —
+  adding their count to a group it already knows. Such an issue creates no group (a key
+  nothing knows is dropped, or a tick would persist the org's whole past and then escalate
+  it), and clears no floor (refreshing a count is not reporting, which is ADR-0025's rule
+  kept). Only the escalation may promote it, and `reanalyse_after` still gates a group already
+  reported. With it, that group was reported one hour after it started.
+- **The floor is now a delay rather than a cliff, and the sensitivity says so.** Replayed over
+  the same day, **every floor from 5 to 200 produces the same five reports** — only the hour
+  each lands in moves. A floor of **1** produces seven, five of them inside the wave tick,
+  which is ADR-0023's error stream. That is the argument for keeping ten: on this data it
+  decides *when*, not *whether*.
+- **What a corrected day costs a channel:** five reports in 24 hours, at most two in any one
+  tick, and nothing at all in 20 of the 24. Four came by the floor, one by the escalation.
+  One day, and an unusual one — it held that wave; the first ten ticks are what a quiet day
+  looks like, eight hours with nothing new and two or three known groups re-counted per tick.
+- **Not measured:** whether any of the five reports was worth a developer's time. The gate's
+  volumes are now measured; its *outcomes* still are not, and that stays the first week's
+  question.
 
 ## Out of scope
 
@@ -145,25 +463,33 @@ should be revisited against it rather than against Jira.
 
 ## Open risks
 
-- **Nothing here has ever been read from the real org, and Error Tracking may not be
-  populated at all.** It requires `error.stack` on spans or logs; if the Scala platform's
-  exceptions do not carry one, the hourly pass returns nothing forever. Behaviour 1.1 exists
-  to find that out before anything else is built, and it is cheap. If the capture comes back
-  empty, this plan stops there.
-- **An occurrence cannot be traced back to its issue by identity.** Datadog documents no
-  attribute linking a log or span to the issue id it was grouped into, so Phase 3 rebuilds
-  the query from the issue's own fields (`service`, `@error.type`, message shape). That can
-  over-match — a different exception with the same type — and under-match, if Datadog's
-  fingerprint splits on stack frames the query cannot see. The capture in 1.1 is also the
-  test of this: compare what the reconstructed query returns against the issue's own count.
-- **The volume floor is a guess until there are numbers.** F1's 15 minutes came from 961
-  measured cycles. Nothing equivalent has been measured for exceptions, so the first floor is
-  arbitrary and the first week's job is to correct it. A floor set too low turns the team's
-  channel into an error stream, which is the failure mode ADR-0023 says to watch for.
+- ~~**Nothing here has ever been read from the real org, and Error Tracking may not be
+  populated at all.**~~ **Closed by 1.1.** It is populated, and every issue names its file
+  and function.
+- ~~**An occurrence cannot be traced back to its issue by identity.**~~ **Closed by a
+  join, not by a caveat.** Phase 3 concluded there was no route and ADR-0027 recorded it;
+  both were wrong. The exception type is inside each span's OpenTelemetry events, and
+  matching on it joins a `service:<svc> status:error` search back to the group — see "What
+  the OTel correction measured" and
+  [ADR-0029](../adr/0029-the-exception-is-in-the-otel-span-events.md). What remains is not a
+  risk about identity but a measured hit rate: the sampler often keeps error spans that are
+  not this defect's, and F2 says so.
+- ~~**The volume floor is a guess until there are numbers.**~~ **Corrected against 24 live
+  ticks on 2026-08-25** — see "What the gate measured over a day". The floor and the cap
+  survive with new reasoning, and the cumulative escalation was found unable to fire and
+  repaired (ADR-0030). What is still not measured is any *outcome*: whether ten occurrences
+  an hour is worth a developer's attention remains the first week's question, and a floor set
+  too low is still ADR-0023's error stream.
 - **Grouping across tenants can hide a tenant-specific defect.** An exception that only ever
   happens for one customer is a fact about that customer's data or configuration, and a group
   that reports "seen in 6 services" flattens it. The per-service counts in 2.1 are the
   mitigation; whether they are enough is unknown until a real group exists.
-- **`strict` still does not reach production** until LiteLLM is past v1.98.0 (ADR-0022), so
-  `qualify_exception` will fail about half of its calls and lean on the retry budget, exactly
-  as `qualify` does.
+- ~~**`strict` still does not reach production**~~ **Confirmed on the live run of
+  2026-08-25**: the first `qualify_exception` call came back
+  `tools.0.custom.strict: Extra inputs are not permitted`, the retry answered, and four
+  causes arrived. Exactly as `qualify` does, and no change is warranted until LiteLLM is past
+  v1.98.0 (ADR-0022).
+- **Nothing has read a repository.** `AnalysisRequest.paths` now carries a real address for
+  the first time and the investigative kinds still have no deployed image (M7 3.4), so every
+  F2 analysis comes back a stated failure and every F2 report is honest about having read no
+  code. That is the largest gap between what F2 computes and what it is worth.

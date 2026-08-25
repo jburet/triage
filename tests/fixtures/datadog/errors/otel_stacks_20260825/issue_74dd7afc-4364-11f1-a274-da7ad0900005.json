@@ -1,0 +1,23 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 145 index event to process during the last 5s",
+      "error_type": "zeenea.service.api.ScannerUpsertItemException",
+      "file_path": "zeenea.service.api.ScannerService.scala",
+      "first_seen": 1777423414862,
+      "first_seen_version": "",
+      "function_name": "$anonfun$applyOrElse$3",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787628796061,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "service": "plt-merck-qa",
+      "state": "ACKNOWLEDGED"
+    },
+    "id": "74dd7afc-4364-11f1-a274-da7ad0900005",
+    "type": "issue"
+  }
+}

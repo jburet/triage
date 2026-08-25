@@ -1,0 +1,23 @@
+[
+  {
+    "claimed": 6344,
+    "issue_id": "482cc960-76ee-11f0-965e-da7ad0900005",
+    "logs": null,
+    "query": "service:plt-systeme-u @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  },
+  {
+    "claimed": 5869,
+    "issue_id": "395eb060-7739-11f0-807a-da7ad0900005",
+    "logs": null,
+    "query": "service:plt-systeme-u-rec @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  },
+  {
+    "claimed": 4009,
+    "issue_id": "3764445e-7758-11f0-a541-da7ad0900005",
+    "logs": null,
+    "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  }
+]

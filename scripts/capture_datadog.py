@@ -74,7 +74,9 @@ class Session:
             response = self.client.request(method, path, **kwargs)
         elapsed = round(monotonic() - started, 3)
         content_type = response.headers.get("content-type", "")
-        body = response.json() if content_type.startswith("application/json") else {}
+        # Substring, not prefix: Error Tracking answers `application/vnd.api+json`,
+        # and a prefix test silently captured a 12 KB payload as `{}`.
+        body = response.json() if "json" in content_type else {}
         self.calls.append(
             {
                 "name": name,

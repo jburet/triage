@@ -1,0 +1,23 @@
+[
+  {
+    "claimed": 199529,
+    "issue_id": "7053abaa-7704-11f0-9929-da7ad0900005",
+    "logs": null,
+    "query": "service:plt-merck-qa @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  },
+  {
+    "claimed": 198360,
+    "issue_id": "c634275c-76eb-11f0-972b-da7ad0900005",
+    "logs": null,
+    "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  },
+  {
+    "claimed": 119550,
+    "issue_id": "30016244-7705-11f0-af9e-da7ad0900005",
+    "logs": 6,
+    "query": "service:plt-merck @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+    "spans": null
+  }
+]

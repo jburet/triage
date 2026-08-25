@@ -37,7 +37,12 @@ from typing import Any
 import structlog
 
 from triage.collect import reduce as reducers
-from triage.collect.recipes import RECIPES, metric_queries, monitor_query_plan
+from triage.collect.recipes import (
+    F1_COLLECTORS,
+    RECIPES,
+    metric_queries,
+    monitor_query_plan,
+)
 from triage.config import CollectionConfig
 from triage.integrations.datadog import DatadogClient, DatadogError
 from triage.schemas.alert import Alert
@@ -309,6 +314,12 @@ async def follow_up(
             refused.append(
                 f"{request.collector!r} is not a collector Triage has; the request "
                 f"(`{request.query}`) was discarded"
+            )
+            continue
+        if collector not in F1_COLLECTORS:
+            refused.append(
+                f"{request.collector!r} is another feature's collector and has no alert "
+                f"scope to run in; the request (`{request.query}`) was discarded"
             )
             continue
         spent += 1

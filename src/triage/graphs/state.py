@@ -9,12 +9,21 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from triage.config import RepoKind
+from triage.errors.gate import GateDecision
 from triage.mapping.report import MappingReport
 from triage.schemas.alert import Alert
 from triage.schemas.analysis import AnalysisFindings, AnalysisResult
 from triage.schemas.collection import AlertClassification, Collection, Qualification
 from triage.schemas.common import Feature, Filled, TimeWindow
 from triage.schemas.diagnosis import Diagnosis
+from triage.schemas.errors import (
+    CodeExceptionContext,
+    ErrorCollection,
+    ErrorGroup,
+    ErrorIssue,
+    ErrorTrack,
+    SkippedIssue,
+)
 from triage.schemas.hypothesis import Hypothesis
 from triage.schemas.signal import Signal
 from triage.schemas.system_map import (
@@ -47,6 +56,13 @@ class TicketPipelineState(TypedDict, total=False):
     # The Slack thread the calling feature opened, if any: every notice about one
     # incident belongs under the message that announced it.
     thread_ts: str | None
+
+    # What F2 is reporting about, when the caller is F2 (M8 4.4). A compiled
+    # sub-graph is invoked with the parent state filtered to its own schema, so a
+    # group and its collection reach the terminal node only by being declared
+    # here — and they are declared as one typed carrier rather than as three keys
+    # the pipeline would have to know the meaning of.
+    exception: CodeExceptionContext | None
 
     # Monotonic clock reading taken at entry, for the time-to-ticket metric.
     started_at: float
@@ -237,6 +253,21 @@ class IncidentState(AnalysisState, TicketPipelineState, total=False):
     postmortem: str
 
 
+class CodeExceptionState(AnalysisState, TicketPipelineState, total=False):
+    """F2, from one gated error group to a report (M8, ADR-0025, ADR-0026).
+
+    The input is an ``ErrorGroup`` the tick already persisted and the gate already
+    took up. It inherits both sub-graph states for the same reason
+    :class:`IncidentState` does — the compiled ``analysis`` and ``ticket_pipeline``
+    graphs are added as nodes and read their own keys.
+    """
+
+    group: ErrorGroup
+    window: TimeWindow
+    collection: ErrorCollection
+    qualification: Qualification
+
+
 class PollerState(TypedDict, total=False):
     """One tick of the alert poller (ADR-0017).
 
@@ -255,3 +286,44 @@ class PollerState(TypedDict, total=False):
     unmapped: list[UUID]
     flapping: list[str]
     skipped_span: str | None
+
+
+class ErrorPollerState(TypedDict, total=False):
+    """One tick of the hourly code-exception pass (ADR-0025).
+
+    Everything the tick decided is reported back rather than only logged. Most
+    ticks decide nothing — over the reference hour all fifteen occurring issues
+    were unchanged — so ``unchanged`` and ``issues_seen`` are the difference
+    between a pass that ran and found nothing and a pass that did not run.
+    """
+
+    now: datetime | None
+    since: datetime | None
+    """An operator naming the window, bypassing the watermark and the catch-up clamp."""
+
+    window: TimeWindow
+    query: str
+    issues_seen: dict[ErrorTrack, int]
+
+    new: list[ErrorIssue]
+    regressed: list[ErrorIssue]
+    occurring: list[ErrorIssue]
+    """Neither new nor regressed, and kept anyway: the only material the
+    cumulative escalation has, since Datadog calls an issue new once (ADR-0030)."""
+    unchanged: int
+    skipped: list[SkippedIssue]
+    failures: list[str]
+    skipped_span: str | None
+
+    # What the tick made of what it found (M8 phase 2). Every one of these is
+    # reported rather than only logged: a tick that held four groups back and
+    # deferred two looks exactly like a tick that found nothing, until the
+    # numbers are said out loud.
+    groups: list[ErrorGroup]
+    decisions: list[GateDecision]
+    analysing: list[ErrorGroup]
+    seen_again: int
+    """Groups whose total this tick moved without seeing them arrive."""
+    held_back: int
+    deferred: list[str]
+    unmapped: list[str]

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "attributes": {
+      "error_message": "Error in query \u00abload_user_by_email_read\u00bb with (email -> **************************) : Not found",
+      "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+      "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+      "first_seen": 1754644517912,
+      "first_seen_version": "",
+      "function_name": "$anonfun$load$6",
+      "is_crash": false,
+      "languages": [
+        "JAVA"
+      ],
+      "last_seen": 1787635706397,
+      "last_seen_version": "",
+      "platform": "BACKEND",
+      "service": "plt-systeme-u",
+      "state": "ACKNOWLEDGED"
+    },
+    "id": "35d1e5c4-7438-11f0-8ef6-da7ad0900005",
+    "type": "issue"
+  }
+}

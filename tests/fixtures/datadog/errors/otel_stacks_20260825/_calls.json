@@ -1,0 +1,398 @@
+[
+  {
+    "bytes": 158132,
+    "json": {
+      "data": {
+        "attributes": {
+          "from": 1787559834763,
+          "persona": "BACKEND",
+          "query": "env:prod",
+          "to": 1787646234763,
+          "track": "trace"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "error_issues.trace",
+    "params": {
+      "include": "issue"
+    },
+    "path": "/api/v2/error-tracking/issues/search",
+    "ratelimit": {},
+    "seconds": 0.229,
+    "status": 200
+  },
+  {
+    "bytes": 649,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/7053abaa-7704-11f0-9929-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.054,
+    "status": 200
+  },
+  {
+    "bytes": 575,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/c634275c-76eb-11f0-972b-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.054,
+    "status": 200
+  },
+  {
+    "bytes": 718,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/30016244-7705-11f0-af9e-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.065,
+    "status": 200
+  },
+  {
+    "bytes": 579,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/2c7cdbde-76ed-11f0-9837-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.051,
+    "status": 200
+  },
+  {
+    "bytes": 592,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/74dd7afc-4364-11f1-a274-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.053,
+    "status": 200
+  },
+  {
+    "bytes": 191,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-merck-qa @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "4",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.161,
+    "status": 200
+  },
+  {
+    "bytes": 179,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787559834763,
+        "query": "service:plt-merck-qa @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787646234763
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.19,
+    "status": 200
+  },
+  {
+    "bytes": 192,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "3",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.158,
+    "status": 200
+  },
+  {
+    "bytes": 178,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787559834763,
+        "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787646234763
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "0",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.757,
+    "status": 200
+  },
+  {
+    "bytes": 191,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-merck @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "2",
+      "x-ratelimit-reset": "4"
+    },
+    "seconds": 0.336,
+    "status": 200
+  },
+  {
+    "bytes": 206,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787559834763,
+        "query": "service:plt-merck @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787646234763
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "8"
+    },
+    "seconds": 5.242,
+    "status": 200
+  },
+  {
+    "bytes": 112371,
+    "json": {
+      "data": {
+        "attributes": {
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-merck-qa status:error",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          },
+          "page": {
+            "limit": 20
+          },
+          "sort": "-timestamp"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.plt-merck-qa",
+    "params": null,
+    "path": "/api/v2/spans/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "4",
+      "x-ratelimit-reset": "58"
+    },
+    "seconds": 0.143,
+    "status": 200
+  },
+  {
+    "bytes": 77525,
+    "json": {
+      "data": {
+        "attributes": {
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-autostrade status:error",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          },
+          "page": {
+            "limit": 20
+          },
+          "sort": "-timestamp"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.plt-autostrade",
+    "params": null,
+    "path": "/api/v2/spans/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "3",
+      "x-ratelimit-reset": "58"
+    },
+    "seconds": 0.119,
+    "status": 200
+  },
+  {
+    "bytes": 103269,
+    "json": {
+      "data": {
+        "attributes": {
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-merck status:error",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          },
+          "page": {
+            "limit": 20
+          },
+          "sort": "-timestamp"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.plt-merck",
+    "params": null,
+    "path": "/api/v2/spans/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "2",
+      "x-ratelimit-reset": "58"
+    },
+    "seconds": 0.146,
+    "status": 200
+  },
+  {
+    "bytes": 115589,
+    "json": {
+      "data": {
+        "attributes": {
+          "filter": {
+            "from": "2026-08-24T08:23:54.763831+00:00",
+            "query": "service:plt-merck-dev status:error",
+            "to": "2026-08-25T08:23:54.763831+00:00"
+          },
+          "page": {
+            "limit": 20
+          },
+          "sort": "-timestamp"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.plt-merck-dev",
+    "params": null,
+    "path": "/api/v2/spans/events/search",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "58"
+    },
+    "seconds": 0.173,
+    "status": 200
+  }
+]

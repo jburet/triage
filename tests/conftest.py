@@ -48,6 +48,7 @@ from triage.schemas.postmortem import Postmortem
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "diagnoses"
 DATADOG_DIR = Path(__file__).parent / "fixtures" / "datadog"
 CAPTURE = "hcl_software_uat_20260822"
+ERROR_CAPTURE = "org_20260825_1h"
 TENANT = "plt-hcl-software-uat"
 CAPTURED_DIGEST = "sha256:2e15f697553acdbdd13ec687080f1b600d531b504b73603dede0bda606d1d87b"
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -392,6 +393,28 @@ def a_synthesis(**overrides: object) -> DiagnosisDraft:
 def captured(name: str, slug: str = CAPTURE) -> dict:
     """One response from the Datadog capture, verbatim as the API returned it."""
     return json.loads((DATADOG_DIR / slug / f"{name}.json").read_text())
+
+
+def captured_errors(name: str, slug: str = ERROR_CAPTURE) -> dict:
+    """One response from the Error Tracking capture, verbatim (M8 1.1)."""
+    return json.loads((DATADOG_DIR / "errors" / slug / f"{name}.json").read_text())
+
+
+def fake_error_datadog(slug: str = ERROR_CAPTURE, **overrides: object) -> FakeDatadogClient:
+    """A client replaying the captured hour, keyed by track.
+
+    Both tracks are declared, and the `logs` one answers empty, because that is
+    what the org answered at every window and persona tried — a fake that omitted
+    it would hide the case every tick actually meets.
+    """
+    responses: dict[str, dict[str, object]] = {
+        "error_issues": {
+            "track:trace": captured_errors("search_trace", slug),
+            "track:logs": captured_errors("search_logs", slug),
+        }
+    }
+    responses.update(overrides)  # type: ignore[arg-type]
+    return FakeDatadogClient(responses=responses)
 
 
 def captured_alert(slug: str = CAPTURE) -> Alert:

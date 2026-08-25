@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from triage.schemas.common import Confidence, Feature
+from triage.schemas.errors import ErrorPersona, ErrorTrack
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.yaml"
 
@@ -130,6 +131,11 @@ class Repo(BaseModel):
             )
         return value
 
+    @property
+    def name(self) -> str:
+        """What an image, the seed and a workload all call this repository."""
+        return self.image_name or _url_name(self.url)
+
     def declared_paths(self, repository: str) -> list[str]:
         """Where this IaC repository says the named workload is defined, if it says."""
         return self.defines.get(repository, [])
@@ -183,6 +189,43 @@ class CollectionConfig(BaseModel):
     max_timeseries_series: int = Field(default=6, ge=1)
     max_timeseries_points: int = Field(default=60, ge=2)
     max_prompt_bytes: int = Field(default=60_000, ge=1_000)
+
+
+class ErrorsConfig(BaseModel):
+    """The hourly code-exception pass, and what it refuses to look at (ADR-0025).
+
+    ``min_occurrences`` is a floor per tick and ``cumulative_occurrences`` the
+    escalation that keeps a slow bleed from being invisible forever. Both were
+    corrected on 2026-08-25 against 24 consecutive hourly ticks run live — the
+    first measurement of the population the gate actually sees, which is one
+    count per *group* per *tick* over issues that were new or regressed. Eleven
+    groups arrived in the day, at 1, 1, 1, 2, 3, 4, 5, 30, 189, 7758 and 37691
+    occurrences; nothing lands between 6 and 29, so every floor in that range
+    behaves the same and ten reports four of the eleven on arrival.
+
+    Since the escalation is fed by the occurrences that go on happening
+    (ADR-0030), the floor delays rather than drops: over that day every floor
+    from 5 to 200 produced the same five reports. A floor of 1 produced seven,
+    five of them in one wave — the error stream ADR-0023 says to watch for.
+    """
+
+    tracks: list[ErrorTrack] = Field(
+        default_factory=lambda: [ErrorTrack.TRACE, ErrorTrack.LOGS],
+        description=(
+            "One search per track. The org's `logs` track answered empty at every "
+            "window and persona tried on 2026-08-25 — its Error Tracking is fed by "
+            "APM spans alone — and it is asked anyway, for eleven bytes an hour, "
+            "because an empty answer is evidence and a track nobody asks about is not."
+        ),
+    )
+    persona: ErrorPersona = ErrorPersona.BACKEND
+    min_occurrences: int = Field(default=10, ge=1)
+    cumulative_occurrences: int = Field(default=100, ge=1)
+    max_groups_per_tick: int = Field(default=5, ge=1)
+    lookback_minutes: int = Field(default=60, ge=1)
+    reanalyse_after: int = Field(
+        default=168, ge=1, description="Hours before an already-reported group is looked at again."
+    )
 
 
 class JobResources(BaseModel):
@@ -244,6 +287,7 @@ class Config(BaseModel):
     thresholds: Thresholds
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     collection: CollectionConfig = Field(default_factory=CollectionConfig)
+    errors: ErrorsConfig = Field(default_factory=ErrorsConfig)
 
     @property
     def files_tickets(self) -> bool:
@@ -273,9 +317,11 @@ class Config(BaseModel):
         rather than adding to it: a repository that says it is called `platform`
         is not also answering to `datacatalog`.
         """
-        return next(
-            (repo for repo in self.repos if (repo.image_name or _url_name(repo.url)) == name), None
-        )
+        return next((repo for repo in self.repos if repo.name == name), None)
+
+    def repo_by_url(self, url: str) -> Repo | None:
+        """The declared repository at this remote. The join back from a resolved deployment."""
+        return next((repo for repo in self.repos if repo.url == url), None)
 
     def environment_of(self, cluster: str | None) -> str | None:
         """The environment a cluster runs, or None — never a guess (ADR-0017)."""

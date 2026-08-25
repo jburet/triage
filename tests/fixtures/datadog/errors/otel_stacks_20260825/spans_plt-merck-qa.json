@@ -1,0 +1,2198 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 21547758,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628795979131420,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628795988300377,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "3a83b9a36ce25524334abbbb39f0072a"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:15.988Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "12653801053701265157",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "2379591844946241101",
+        "start_timestamp": "2026-08-25T03:33:15.967Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "3a83b9a36ce25524334abbbb39f0072a",
+        "type": "web"
+      },
+      "id": "AaA2-rpOAAAReVwHq-Lve0oz",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 8754134,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628795913692237,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628795922210821,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "9df970f279a8dd8fca4eacfcf8f7f150"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:15.922Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "5872926471832448711",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "14223128694388523717",
+        "start_timestamp": "2026-08-25T03:33:15.914Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "9df970f279a8dd8fca4eacfcf8f7f150",
+        "type": "web"
+      },
+      "id": "AaA2-rpOAAAo6eg5hrr0LU7K",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 111281892,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628795375571970,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628795388034632,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "265db803db47beec0241adcefe8898c5"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:15.388Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "206744372109375202",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "1411381380110652252",
+        "start_timestamp": "2026-08-25T03:33:15.277Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "265db803db47beec0241adcefe8898c5",
+        "type": "web"
+      },
+      "id": "AaA2-rhoAABYy9tBChGu7kEC",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 24066954,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628795174436409,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628795185962546,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "5e9631db23bc75f0dfbef80e4be4e59b"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:15.185Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "810893161081559750",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "2488269807723215243",
+        "start_timestamp": "2026-08-25T03:33:15.161Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "5e9631db23bc75f0dfbef80e4be4e59b",
+        "type": "web"
+      },
+      "id": "AaA2-rhoAAB0nopnm5bizb7f",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 95856766,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628794595933467,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628794606817532,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "dcc5874dc4c4931f40f1b8f8fc41b7ae"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:14.606Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "6940369299438198982",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "13715782473379960693",
+        "start_timestamp": "2026-08-25T03:33:14.511Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "dcc5874dc4c4931f40f1b8f8fc41b7ae",
+        "type": "web"
+      },
+      "id": "AaA2-rZHAABiION8N7h5EvFA",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 72509595,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628794409422824,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628794420381387,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "1d1791f85f8ff80a6390242371916843"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:14.42Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "9482594259810807110",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "14415655241869155173",
+        "start_timestamp": "2026-08-25T03:33:14.348Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "1d1791f85f8ff80a6390242371916843",
+        "type": "web"
+      },
+      "id": "AaA2-rLNAAAEkDMCPD6lZ5Bj",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 58120083,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628793726794070,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628793736291804,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "d6e38a9bf7de502ffb2d071f520731ba"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:13.736Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "2359754545711016791",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "2059371164308326523",
+        "start_timestamp": "2026-08-25T03:33:13.678Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "d6e38a9bf7de502ffb2d071f520731ba",
+        "type": "web"
+      },
+      "id": "AaA2-rLNAACJ7nM85nM_Yi37",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 8745753,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628793648250042,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628793656743686,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "5f4c7d7d7c9df08ee2217591b89d2227"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:13.656Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "144612389572422377",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "577583598208067025",
+        "start_timestamp": "2026-08-25T03:33:13.648Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "5f4c7d7d7c9df08ee2217591b89d2227",
+        "type": "web"
+      },
+      "id": "AaA2-rCVAABYFjPimCFsySHi",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 197105790,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628793421332908,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628793434499221,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "a436357f1196da1b0f1794d5a9db9b06"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:13.434Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "11615558875621646160",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "9817991234885081770",
+        "start_timestamp": "2026-08-25T03:33:13.237Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "a436357f1196da1b0f1794d5a9db9b06",
+        "type": "web"
+      },
+      "id": "AaA2-rCVAADcG00Lbl-MExcP",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 109150767,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628792719169723,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628792731488613,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "cdc1ad59de143d0efd142a4cacb327d2"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:12.731Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "11382976930506667694",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "12933186950272033006",
+        "start_timestamp": "2026-08-25T03:33:12.622Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "cdc1ad59de143d0efd142a4cacb327d2",
+        "type": "web"
+      },
+      "id": "AaA2-q0AAAAWDYOgsI79ThT9",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 94733504,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628792470222402,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628792480782921,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "03b4da9397b53590bef3aef6d64d84da"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:12.48Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "15280658962979049201",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "1850581607122389254",
+        "start_timestamp": "2026-08-25T03:33:12.386Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "03b4da9397b53590bef3aef6d64d84da",
+        "type": "web"
+      },
+      "id": "AaA2-q0AAAB1YuK2nZ7SlPO-",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 8689443,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628792128491759,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628792137018939,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "864c380bf04c769e3870ff2e012edf78"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:12.137Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "12201996919873331944",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "8511462652884689036",
+        "start_timestamp": "2026-08-25T03:33:12.129Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "864c380bf04c769e3870ff2e012edf78",
+        "type": "web"
+      },
+      "id": "AaA2-qoSAAC3OrcNal8LWHA4",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 95212171,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628791726741680,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628791737917976,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "eec44f861ba47dec07b29c1be1a72be3"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:11.737Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "2513885768054607931",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "16257868000620456632",
+        "start_timestamp": "2026-08-25T03:33:11.642Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "eec44f861ba47dec07b29c1be1a72be3",
+        "type": "web"
+      },
+      "id": "AaA2-qoSAADItqJKxf5lAbIH",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 71608798,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628791556139863,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628791566860436,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1025 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "a434446bee33f5438e3d69eff516ff6d"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28880,
+            "name": "grpc-default-executor-46"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:33:11.566Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "13395373647200229088",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "9264932853479911302",
+        "start_timestamp": "2026-08-25T03:33:11.495Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "a434446bee33f5438e3d69eff516ff6d",
+        "type": "web"
+      },
+      "id": "AaA2-qgfAAAuHz6vUssAfz2O",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 9092577,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628587192396626,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628587201217626,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "3c66d6e519078a6653ddfb5530ac5f56"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:47.201Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "12112826056329762230",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "18166652577350622022",
+        "start_timestamp": "2026-08-25T03:29:47.192Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "3c66d6e519078a6653ddfb5530ac5f56",
+        "type": "web"
+      },
+      "id": "AaA294qAAAAfF8OfK8CPHN1T",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 58168650,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628587009687798,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628587019711981,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "3a881ab96c809998bc9b434f98671853"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:47.019Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "3318907533448044314",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "812559103058655649",
+        "start_timestamp": "2026-08-25T03:29:46.961Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "3a881ab96c809998bc9b434f98671853",
+        "type": "web"
+      },
+      "id": "AaA294qAAABP-jgmNnKRYZu8",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 46541544,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628586613480869,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628586623339093,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "e8f8cf0aa5429999076a6cef2709fbe3"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "retention_reason": "trace",
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:46.623Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "2485242525514910820",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "flat_sampled",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "18336772923235923915",
+        "start_timestamp": "2026-08-25T03:29:46.577Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "e8f8cf0aa5429999076a6cef2709fbe3",
+        "type": "web"
+      },
+      "id": "AaA294hfAACM7V1xvtfpMGoH",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 34712249,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628586505650822,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628586515345497,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "7ac63cf4e66d35630d9670db850f216a"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:46.515Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "949615827759350501",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "17204324631553147955",
+        "start_timestamp": "2026-08-25T03:29:46.481Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "7ac63cf4e66d35630d9670db850f216a",
+        "type": "web"
+      },
+      "id": "AaA294hfAAA5hBCzogGIoJYN",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 9293016,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628586333605980,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628586342617163,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 33674
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "fadfbafcab9db5a01772bf2e825ad586"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "retention_reason": "trace",
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:46.342Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "10879757528256526634",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "flat_sampled",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "1854511613234603717",
+        "start_timestamp": "2026-08-25T03:29:46.333Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "fadfbafcab9db5a01772bf2e825ad586",
+        "type": "web"
+      },
+      "id": "AaA294hfAAAGzp8YZx5Zi3IX",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 83304966,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787628586250255075,\"name\":\"message\",\"attributes\":{\"message.id\":1,\"message.type\":\"RECEIVED\"}},{\"time_unix_nano\":1787628586260962669,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\",\"exception.stacktrace\":\"zeenea.service.api.ScannerUpsertItemException: TooBusyIndexingException on item upsert with connector code=safyr-sap-bw, cause: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService$$anonfun$upsertItem$9.$anonfun$applyOrElse$3(ScannerService.scala:124)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\nCaused by: zeenea.commons.exceptions.TooBusyIndexingException: 1024 index event to process during the last 5s\\n\\tat zeenea.service.api.ScannerService.$anonfun$overloadedResponseToError$1(ScannerService.scala:194)\\n\\tat scala.Function1.$anonfun$andThen$1(Function1.scala:87)\\n\\tat scala.Option.fold(Option.scala:263)\\n\\tat zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$8(ScannerService.scala:153)\\n\\tat map @ zeenea.datacatalog.loadcontrol.LoadControl.isOverloaded(LoadControl.scala:14)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$7(ScannerService.scala:149)\\n\\tat flatMap @ zeenea.service.api.ScannerService.$anonfun$manageScannerStatus$4(ScannerService.scala:146)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"zeenea.service.api.ScannerUpsertItemException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-merck-qa-0"
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.merck-qa",
+              "port": 8071
+            },
+            "sock": {
+              "peer": {
+                "addr": "10.34.5.215",
+                "name": "10.34.5.215",
+                "port": 58038
+              }
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.grpc-1.6",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "4152ccbd4eb57fbbdbad82506788d40e"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "rpc": {
+            "grpc": {
+              "status_code": 13
+            },
+            "method": "UpsertItem",
+            "service": "zeenea.scanner.api.grpc.ScannerService",
+            "system": "grpc"
+          },
+          "service": {
+            "instance": {
+              "id": "4528ca23-2f3f-4bf8-86ae-5161d86dfcac"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "span_events": "2",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 28804,
+            "name": "grpc-default-executor-45"
+          }
+        },
+        "end_timestamp": "2026-08-25T03:29:46.26Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-merck-qa-0",
+        "ingestion_reason": "",
+        "operation_name": "grpc.server.request",
+        "parent_id": "13636239505410519064",
+        "resource_hash": "9adcd39ef0ea4112",
+        "resource_name": "UpsertItem zeenea.scanner.api.grpc.ScannerService",
+        "retained_by": "diversity_sampling",
+        "service": "plt-merck-qa",
+        "single_span": false,
+        "span_id": "9244599039662760509",
+        "start_timestamp": "2026-08-25T03:29:46.177Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "4152ccbd4eb57fbbdbad82506788d40e",
+        "type": "web"
+      },
+      "id": "AaA294hfAADtdM34t9-SAq3b",
+      "type": "spans"
+    }
+  ],
+  "links": {
+    "next": "https://api.datadoghq.eu/api/v2/spans/events?filter%5Bfrom%5D=1787559834763&filter%5Bquery%5D=service%3Aplt-merck-qa+status%3Aerror&filter%5Bto%5D=1787646234763&page%5Bcursor%5D=eyJhZnRlciI6IkF3QUFBYUEyOTRVVXhRNndZQUFBQUJoQllVRXlPVFJvWmtGQlJIUmtUVE0wZERrdFUwRnhNMklBQUFBa01URmhNRE0zTURrdE4yWTBOaTAwTVRjNExXSmlOR0l0TkRVMU1qWTJOVFUwTnpneEFBVGFqQSIsInZhbHVlcyI6WyIyMDI2LTA4LTI1VDAzOjI5OjQ2LjI2MFoiLC05ODg4OTMwODhdfQ%3D%3D&page%5Blimit%5D=20&sort=-timestamp"
+  },
+  "meta": {
+    "elapsed": 74,
+    "page": {
+      "after": "eyJhZnRlciI6IkF3QUFBYUEyOTRVVXhRNndZQUFBQUJoQllVRXlPVFJvWmtGQlJIUmtUVE0wZERrdFUwRnhNMklBQUFBa01URmhNRE0zTURrdE4yWTBOaTAwTVRjNExXSmlOR0l0TkRVMU1qWTJOVFUwTnpneEFBVGFqQSIsInZhbHVlcyI6WyIyMDI2LTA4LTI1VDAzOjI5OjQ2LjI2MFoiLC05ODg4OTMwODhdfQ=="
+    },
+    "request_id": "pddv1ChZ0RVBHY09hRVNWLTNKMWRJNGpHSm9nIi0KHXx9EgtH13OhXQsrD-tdtFyqyl04l0u2OMgg42yfEgzaAYMtMF6TufFeCi0",
+    "status": "done",
+    "traffic_type": "sampled"
+  }
+}

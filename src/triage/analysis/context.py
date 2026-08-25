@@ -393,6 +393,29 @@ def _read_text(path: Path, limit: int) -> tuple[str, bool] | None:
     return raw[:limit].decode("utf-8", errors="replace"), truncated
 
 
+MAX_NAMED_MATCHES = 3
+"""How many trees paths one named path may resolve to before the rest are dropped.
+
+A package path several modules carry is read in all of them, because picking one
+would be a guess; a name so common that a dozen match is a selection, not a
+location, and spending the whole budget on it loses the answer."""
+
+
+def _ending_with(named: PurePosixPath, everything: list[PurePosixPath]) -> list[PurePosixPath]:
+    """Tree paths this one is a tail of — the module a package path lives under.
+
+    F2 derives ``com/zeenea/repository/OdbClient.scala`` from a fully-qualified
+    class name and cannot know whether the build puts it under ``core/src/main/
+    scala`` or nowhere (M8 4.1). The suffix is what it does know.
+    """
+    parts = named.parts
+    return [
+        path
+        for path in everything
+        if len(path.parts) > len(parts) and path.parts[-len(parts) :] == parts
+    ][:MAX_NAMED_MATCHES]
+
+
 def _named_first(
     everything: list[PurePosixPath], first: Sequence[str], profile: SelectionProfile
 ) -> tuple[list[PurePosixPath], list[PurePosixPath]]:
@@ -400,12 +423,20 @@ def _named_first(
 
     The mapping knows which chart defines this workload and a glob does not, so
     a budget spent on the repository's other modules is the answer lost (M6 3.2).
+    A named path the tree does not carry outright is looked for as a suffix
+    before it is called missing.
     """
-    named = [PurePosixPath(path) for path in dict.fromkeys(first)]
     here = set(everything)
-    present = [path for path in named if path in here]
+    present: list[PurePosixPath] = []
+    missing: list[PurePosixPath] = []
+    for path in dict.fromkeys(PurePosixPath(name) for name in first):
+        found = [path] if path in here else _ending_with(path, everything)
+        if found:
+            present.extend(item for item in found if item not in present)
+        else:
+            missing.append(path)
     rest = [path for path in _in_priority_order(everything, profile) if path not in set(present)]
-    return present + rest, [path for path in named if path not in here]
+    return present + rest, missing
 
 
 def gather(

@@ -11,6 +11,7 @@ from tests.conftest import (
     a_service_entry,
     a_synthesis,
     a_workload,
+    an_analysis_result,
     build_deps,
     mapped,
     run_config,
@@ -529,3 +530,23 @@ async def test_a_deployment_hypothesis_is_an_unknown_because_diff_analysis_has_n
 
     assert diagnosis.confidence is Confidence.MEDIUM
     assert "diff_analysis" in diagnosis.unknowns[0].why_unresolved
+
+
+async def test_the_paths_a_hypothesis_names_reach_the_analysis_request(config: Config):
+    """M8 4.1: F2 is told the file, and the code_analysis must be told it too."""
+    runner = FakeAnalysisRunner(
+        results={AnalysisKind.CODE_ANALYSIS: an_analysis_result(AnalysisKind.CODE_ANALYSIS)}
+    )
+    deps = build_deps(config, repo=mapped(a_service_entry()), runner=runner)
+
+    await run(
+        deps,
+        hypotheses=[
+            a_hypothesis(
+                commit="deadbee",
+                paths=["src/main/scala/zeenea/repository/orientdb/OdbClient.scala"],
+            )
+        ],
+    )
+
+    assert runner.requests[0].paths == ["src/main/scala/zeenea/repository/orientdb/OdbClient.scala"]

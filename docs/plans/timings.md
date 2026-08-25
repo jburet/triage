@@ -145,3 +145,45 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | M7 phases 4-5 | make lint + make test (636 passed) | 6 |
 | 2026-08-25 | M7/4 gvisor | make lint + make test (638) + kubeconform | 5 |
 | 2026-08-25 | M7 merge | make lint + make test (698) on the four branches merged | 8 |
+| 2026-08-25 | M8 phase 1.1 | make capture-errors (13 live read-only calls, 1 throttle) | 8 |
+| 2026-08-25 | M8 phase 1.1 | make lint + make test (698 passed) | 15 |
+| 2026-08-25 | M8 phases 1.2/1.4/1.5/1.6 | make lint + make test (725 passed) | 14 |
+| 2026-08-25 | M8 phases 1.3/1.7 | make lint + make test (762 passed) | 14 |
+| 2026-08-25 | M8 phase 1.7 | make run-errors, live hourly tick (17 issues, none new) | 1 |
+| 2026-08-25 | M8 phase 1.7 | make run-errors ARGS="--hours 168", catch-up clamped to 6 h | 1 |
+| 2026-08-25 | M8 phase 1 (close) | make lint + make test (762 passed) | 8 |
+| 2026-08-25 | M8 phases 2.1/2.2 | make lint + make test (777 passed) | 10 |
+| 2026-08-25 | M8 phase 2.3 | pytest tests/unit/test_error_gate.py (red, then green) | 1 |
+| 2026-08-25 | M8 phases 2.3-2.6 | pytest tests/integration/test_error_groups.py | 1 |
+| 2026-08-25 | M8 phases 2.3-2.6 | make lint + make test (854 passed) | 9 |
+| 2026-08-25 | M8 phase 3 (probe) | hand-run Datadog probes: exemplar/join/spans/logs/metrics/retention, 45 live read-only calls | 320 |
+| 2026-08-25 | M8 phase 3 | pytest tests/unit/test_error_collection.py | 1 |
+| 2026-08-25 | M8 phases 3.1-3.5 | make lint + make test (875 passed) | 10 |
+| 2026-08-25 | M8 4.1 | make lint && make test | 9 |
+| 2026-08-25 | M8 4.2-4.3 | make lint && make test (899 passed) | 8 |
+| 2026-08-25 | M8 4.4 | make lint && make test (910 passed) | 10 |
+| 2026-08-25 | M8 4.5-4.6 | make lint && make test (921 passed) | 9 |
+| 2026-08-25 | M8 phase 4 | make run-errors (live, read-only, no model call) | 2 |
+| 2026-08-25 | M8 phase 4 | make run-errors ARGS="--hours 72 --analyse" (live, real tiers) | 56 |
+| 2026-08-25 | M8 phase 4 | make lint && make test (924 passed) | 8 |
+| 2026-08-25 | M8 phase 4 close-out | make lint && make test (924 passed) | 8 |
+| 2026-08-25 | M8 fixes | live probe: error issues across 1/6/13/24h windows | 9 |
+| 2026-08-25 | M8 fixes | make lint && make test (935 tests) | 12 |
+| 2026-08-25 | M8 fixes | make run-errors ARGS="--hours 24" (read-only) | 2 |
+| 2026-08-25 | M8 fixes | make run-errors ARGS="--hours 24 --analyse" (3 groups) | 145 |
+| 2026-08-25 | M8 OTel correction | live probe: error issues + 4 span searches, read-only | 3 |
+| 2026-08-25 | M8 OTel correction | make capture-errors ARGS="--hours 24 --slug otel_stacks_20260825 --track trace" | 9 |
+| 2026-08-25 | M8 OTel correction 3.6 | pytest tests/unit/test_error_otel.py | 1 |
+| 2026-08-25 | M8 OTel correction 3.3/3.6 | pytest tests/unit/test_error_collection.py | 1 |
+| 2026-08-25 | M8 OTel correction | make lint && make test (955 passed) | 9 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 24" (read-only) | 2 |
+| 2026-08-25 | M8 OTel correction | live collection-only render of one group, no model call | 1 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (1 group, real tiers) | 46 |
+| 2026-08-25 | M8 OTel correction | make run-errors ARGS="--hours 13 --analyse" (re-run after the window fix) | 55 |
+| 2026-08-25 | M8 OTel correction | make lint && make test (957 passed) | 9 |
+| 2026-08-25 | M8 gate correction | uv run pytest tests/unit/test_error_gate.py | 1 |
+| 2026-08-25 | M8 gate correction | uv run pytest tests/integration/test_error_groups.py | 1 |
+| 2026-08-25 | M8 gate correction | make lint | 2 |
+| 2026-08-25 | M8 gate correction | make test (967 passed) | 7 |
+| 2026-08-25 | M8 gate correction | 24 live hourly ticks replayed, read-only, no model call | 8 |
+| 2026-08-25 | M8 gate correction | the same day at six floors (1, 5, 10, 25, 50, 200) | 37 |

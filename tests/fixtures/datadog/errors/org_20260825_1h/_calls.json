@@ -1,0 +1,294 @@
+[
+  {
+    "bytes": 12443,
+    "json": {
+      "data": {
+        "attributes": {
+          "from": 1787632524520,
+          "persona": "BACKEND",
+          "query": "env:prod",
+          "to": 1787636124520,
+          "track": "trace"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "error_issues.trace",
+    "params": {
+      "include": "issue"
+    },
+    "path": "/api/v2/error-tracking/issues/search",
+    "ratelimit": {},
+    "seconds": 0.188,
+    "status": 200
+  },
+  {
+    "bytes": 11,
+    "json": {
+      "data": {
+        "attributes": {
+          "from": 1787632524520,
+          "persona": "BACKEND",
+          "query": "env:prod",
+          "to": 1787636124520,
+          "track": "logs"
+        },
+        "type": "search_request"
+      }
+    },
+    "method": "POST",
+    "name": "error_issues.logs",
+    "params": {
+      "include": "issue"
+    },
+    "path": "/api/v2/error-tracking/issues/search",
+    "ratelimit": {},
+    "seconds": 0.076,
+    "status": 200
+  },
+  {
+    "bytes": 574,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/482cc960-76ee-11f0-965e-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.058,
+    "status": 200
+  },
+  {
+    "bytes": 672,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/395eb060-7739-11f0-807a-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.059,
+    "status": 200
+  },
+  {
+    "bytes": 721,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/3764445e-7758-11f0-a541-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.05,
+    "status": 200
+  },
+  {
+    "bytes": 569,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/35d1e5c4-7438-11f0-8ef6-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.055,
+    "status": 200
+  },
+  {
+    "bytes": 703,
+    "json": null,
+    "method": "GET",
+    "name": "error_issue.trace",
+    "params": null,
+    "path": "/api/v2/error-tracking/issues/e13bcc3e-7a33-11f1-baa2-da7ad0900005",
+    "ratelimit": {},
+    "seconds": 0.049,
+    "status": 200
+  },
+  {
+    "bytes": 192,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-25T04:35:24.520177+00:00",
+            "query": "service:plt-systeme-u @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T05:35:24.520177+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "4",
+      "x-ratelimit-reset": "35"
+    },
+    "seconds": 0.174,
+    "status": 200
+  },
+  {
+    "bytes": 178,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787632524520,
+        "query": "service:plt-systeme-u @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787636124520
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.22,
+    "status": 200
+  },
+  {
+    "bytes": 191,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-25T04:35:24.520177+00:00",
+            "query": "service:plt-systeme-u-rec @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T05:35:24.520177+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "3",
+      "x-ratelimit-reset": "35"
+    },
+    "seconds": 0.094,
+    "status": 200
+  },
+  {
+    "bytes": 178,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787632524520,
+        "query": "service:plt-systeme-u-rec @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787636124520
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "0",
+      "x-ratelimit-reset": "5"
+    },
+    "seconds": 0.124,
+    "status": 200
+  },
+  {
+    "bytes": 191,
+    "json": {
+      "data": {
+        "attributes": {
+          "compute": [
+            {
+              "aggregation": "count",
+              "type": "total"
+            }
+          ],
+          "filter": {
+            "from": "2026-08-25T04:35:24.520177+00:00",
+            "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+            "to": "2026-08-25T05:35:24.520177+00:00"
+          }
+        },
+        "type": "aggregate_request"
+      }
+    },
+    "method": "POST",
+    "name": "spans.reconstruct",
+    "params": null,
+    "path": "/api/v2/spans/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "5",
+      "x-ratelimit-name": "spans_public_api",
+      "x-ratelimit-period": "60",
+      "x-ratelimit-remaining": "2",
+      "x-ratelimit-reset": "35"
+    },
+    "seconds": 0.099,
+    "status": 200
+  },
+  {
+    "bytes": 178,
+    "json": {
+      "compute": [
+        {
+          "aggregation": "count",
+          "type": "total"
+        }
+      ],
+      "filter": {
+        "from": 1787632524520,
+        "query": "service:plt-autostrade @error.type:\"zeenea.commons.exceptions.EntityNotFoundException\"",
+        "to": 1787636124520
+      }
+    },
+    "method": "POST",
+    "name": "logs.reconstruct",
+    "params": null,
+    "path": "/api/v2/logs/analytics/aggregate",
+    "ratelimit": {
+      "x-ratelimit-limit": "2",
+      "x-ratelimit-name": "logs_public_analytics_aggregate",
+      "x-ratelimit-period": "10",
+      "x-ratelimit-remaining": "1",
+      "x-ratelimit-reset": "9"
+    },
+    "seconds": 6.243,
+    "status": 200
+  }
+]

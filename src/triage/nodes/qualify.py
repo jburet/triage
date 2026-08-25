@@ -60,8 +60,11 @@ every failure, and the notice already covers what gets through.
 """
 
 
-async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
+async def qualified(deps: Deps, prompt: str, sections: dict[str, object]) -> Qualification:
     """Ask, and ask again with the shape, up to ``ATTEMPTS`` times.
+
+    Shared with F2, which asks a different prompt for the same schema: the retry
+    discipline is about ADR-0022's missing ``strict``, not about alerts.
 
     Everything downstream is built from the causes, so an answer that does not
     parse costs the collection that produced it.
@@ -74,7 +77,7 @@ async def _qualified(deps: Deps, sections: dict[str, object]) -> Qualification:
     """
     for attempt in range(ATTEMPTS):
         try:
-            return await deps.llm.call("analysis", render("qualify", **sections), Qualification)
+            return await deps.llm.call("analysis", render(prompt, **sections), Qualification)
         except (StructuredOutputError, ValidationError) as exc:
             log.warning("qualification_rejected", attempt=attempt + 1, error=str(exc))
             if attempt == ATTEMPTS - 1:
@@ -140,7 +143,7 @@ async def qualify(state: IncidentState, config: RunnableConfig | None = None) ->
         ),
     }
     try:
-        qualification = await _qualified(deps, sections)
+        qualification = await qualified(deps, "qualify", sections)
     except (StructuredOutputError, ValidationError) as exc:
         await _hand_to_the_team(deps, state, service, exc)
         raise

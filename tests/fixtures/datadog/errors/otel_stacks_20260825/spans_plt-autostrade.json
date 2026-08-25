@@ -1,0 +1,2807 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 8138247,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "3.64.128.31",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "3.64.0.0/12",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "3.64.128.31",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "6b3d96e5341c7a7f2b09ff6f0dc3a26d"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 88,
+            "name": "scala-execution-context-global-88"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:30:06.8Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "12627565626039746677",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "4425250148224770380",
+        "start_timestamp": "2026-08-24T18:30:06.792Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "6b3d96e5341c7a7f2b09ff6f0dc3a26d",
+        "type": "web"
+      },
+      "id": "AaA1CXO4AAAC4hyu2kbJNgkr",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6514829,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "57122519a1d29238bc86b76ef18ad549"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:29:06.728Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "17536969732931785593",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "2601679468183206311",
+        "start_timestamp": "2026-08-24T18:29:06.722Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "57122519a1d29238bc86b76ef18ad549",
+        "type": "web"
+      },
+      "id": "AaA1CIjJAAAOyRy5xwJCHIa8",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 5807232,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "d436a0a4e58101a2294a87eb428861f9"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 21,
+            "name": "scala-execution-context-global-21"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:28:06.66Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "13418752670506088664",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "7336860813033198360",
+        "start_timestamp": "2026-08-24T18:28:06.655Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "d436a0a4e58101a2294a87eb428861f9",
+        "type": "web"
+      },
+      "id": "AaA1B560AADKaPQMyKPyd0op",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 5486385,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "e56bbf2cbdd6d4197ebcb7561c052a5b"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:27:06.595Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "3116343431477041215",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "9181993840885240273",
+        "start_timestamp": "2026-08-24T18:27:06.59Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "e56bbf2cbdd6d4197ebcb7561c052a5b",
+        "type": "web"
+      },
+      "id": "AaA1BrQdAAB3jAYmSM_WnLx-",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 5471784,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "3.64.128.31",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "3.64.0.0/12",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "3.64.128.31",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "f9bda3b3194ba2ded7ce61316223b7af"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 88,
+            "name": "scala-execution-context-global-88"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:26:06.516Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "10864400662292613913",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "16103564067184201611",
+        "start_timestamp": "2026-08-24T18:26:06.511Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "f9bda3b3194ba2ded7ce61316223b7af",
+        "type": "web"
+      },
+      "id": "AaA1BcmKAADbTpGn44pk487X",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6499088,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "3.64.128.31",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "3.64.0.0/12",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "3.64.128.31",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "f157f34ca2757426dd1a36af0cdd7682"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:25:06.457Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "2774773251536054882",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "1515986602435504127",
+        "start_timestamp": "2026-08-24T18:25:06.451Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "f157f34ca2757426dd1a36af0cdd7682",
+        "type": "web"
+      },
+      "id": "AaA1BN84AABTl5bZpE4dpBrd",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 5541108,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "8580f3bb9c3c72be4a5272d55f940da3"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 21,
+            "name": "scala-execution-context-global-21"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:24:06.385Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "4167777624130797748",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "3649722968228664939",
+        "start_timestamp": "2026-08-24T18:24:06.38Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "8580f3bb9c3c72be4a5272d55f940da3",
+        "type": "web"
+      },
+      "id": "AaA1A_SFAABfFBgpjk8MnlJK",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6429139,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "3.64.128.31",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "3.64.0.0/12",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "3.64.128.31",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "356460b28f2135596f182d3bb274a576"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 88,
+            "name": "scala-execution-context-global-88"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:23:06.312Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "4654123118141782510",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "11198018107742488935",
+        "start_timestamp": "2026-08-24T18:23:06.306Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "356460b28f2135596f182d3bb274a576",
+        "type": "web"
+      },
+      "id": "AaA1AwmdAABKpPuBBoXrcBhv",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6325044,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "be6e7566874018dd65f2040b875d52fe"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 21,
+            "name": "scala-execution-context-global-21"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:22:06.253Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "6022049504374389142",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "7592238224850935376",
+        "start_timestamp": "2026-08-24T18:22:06.247Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "be6e7566874018dd65f2040b875d52fe",
+        "type": "web"
+      },
+      "id": "AaA1Ah67AACVau1o_lor3_Jl",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6472218,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "3.64.128.31",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "3.64.0.0/12",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "3.64.128.31",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "369a1c3b0ff408d8bb09669a8caad01f"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:21:06.194Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "11501513849673790152",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "18057647140967528695",
+        "start_timestamp": "2026-08-24T18:21:06.188Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "369a1c3b0ff408d8bb09669a8caad01f",
+        "type": "web"
+      },
+      "id": "AaA1ATO1AADFm13tG-JL_wm7",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "api": {
+            "security": {
+              "is_public": "true"
+            }
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 99592382,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "client_ip": "18.158.149.33",
+            "client_ip_details": {
+              "as": {
+                "domain": "amazon.com",
+                "name": "Amazon.com, Inc.",
+                "number": "AS16509",
+                "route": "18.156.0.0/14",
+                "type": "hosting"
+              },
+              "city": {
+                "name": "Frankfurt am Main"
+              },
+              "continent": {
+                "code": "EU",
+                "name": "Europe"
+              },
+              "country": {
+                "iso_code": "DE",
+                "name": "Germany"
+              },
+              "ipAddress": "18.158.149.33",
+              "location": {
+                "latitude": 50.11552,
+                "longitude": 8.68417
+              },
+              "subdivision": {
+                "iso_code": "DE-HE",
+                "name": "Hesse"
+              },
+              "timezone": "Europe/Berlin",
+              "type": "public"
+            },
+            "method": "POST",
+            "request": {
+              "headers": {
+                "user-agent": "AHC/2.1"
+              }
+            },
+            "route": "/agent/register",
+            "scheme": "https",
+            "status_code": "503",
+            "target": "/agent/register",
+            "useragent": "AHC/2.1",
+            "useragent_details": {
+              "browser": {
+                "family": "AHC",
+                "major": "2",
+                "minor": "1"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "autostrade.zeenea.app"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "36875f6db1ba6739d7818e4f53336863"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 46,
+            "name": "scala-execution-context-global-46"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:20:06.099Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "8450656033577261334",
+        "resource_hash": "9b396a53768b484f",
+        "resource_name": "POST /agent/register",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "6489048808129939104",
+        "start_timestamp": "2026-08-24T18:20:06Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "36875f6db1ba6739d7818e4f53336863",
+        "type": "web"
+      },
+      "id": "AaA1AEoaAADaKc34LP8eroHX",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 4078773,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595555248010887,\"name\":\"exception\",\"attributes\":{\"exception.stacktrace\":\"java.net.ConnectException\\n\\tat java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1107)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:203)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:238)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:214)\\n\\tat java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)\\n\\tat java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)\\n\\tat java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760)\\n\\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)\\n\\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)\\n\\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)\\nCaused by: java.nio.channels.ClosedChannelException\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:195)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:760)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:848)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$0(PlainHttpConnection.java:187)\\n\\tat java.base/java.security.AccessController.doPrivileged(AccessController.java:569)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:189)\\n\\t... 12 more\\n\",\"exception.type\":\"java.net.ConnectException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "host": "plt.autostrade",
+            "method": "GET",
+            "path_group": "/health",
+            "url": "http://plt.autostrade:80/health",
+            "url_details": {
+              "host": "plt.autostrade",
+              "path": "/health",
+              "port": "80",
+              "scheme": "http"
+            }
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "plt.autostrade",
+              "port": 80
+            },
+            "protocol": {
+              "name": "http"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.java-http-client",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786"
+          },
+          "peer": {
+            "hostname": "plt.autostrade",
+            "service": "plt-autostrade"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:19:15.248Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.client.request",
+        "parent_id": "10333174770649221771",
+        "resource_hash": "a509a3c69ad1028d",
+        "resource_name": "GET",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "10029887074672386786",
+        "start_timestamp": "2026-08-24T18:19:15.244Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786",
+        "type": "http"
+      },
+      "id": "AaA0_6diAACLnRd5MPqAHqyp",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 4130600,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595525242077889,\"name\":\"exception\",\"attributes\":{\"exception.stacktrace\":\"java.net.ConnectException\\n\\tat java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1107)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:203)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:238)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:214)\\n\\tat java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)\\n\\tat java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)\\n\\tat java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760)\\n\\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)\\n\\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)\\n\\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)\\nCaused by: java.nio.channels.ClosedChannelException\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:195)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:760)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:848)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$0(PlainHttpConnection.java:187)\\n\\tat java.base/java.security.AccessController.doPrivileged(AccessController.java:569)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:189)\\n\\t... 12 more\\n\",\"exception.type\":\"java.net.ConnectException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "host": "plt.autostrade",
+            "method": "GET",
+            "path_group": "/health",
+            "url": "http://plt.autostrade:80/health",
+            "url_details": {
+              "host": "plt.autostrade",
+              "path": "/health",
+              "port": "80",
+              "scheme": "http"
+            }
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "plt.autostrade",
+              "port": 80
+            },
+            "protocol": {
+              "name": "http"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.java-http-client",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786"
+          },
+          "peer": {
+            "hostname": "plt.autostrade",
+            "service": "plt-autostrade"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 21,
+            "name": "scala-execution-context-global-21"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:18:45.242Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.client.request",
+        "parent_id": "10333174770649221771",
+        "resource_hash": "a509a3c69ad1028d",
+        "resource_name": "GET",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "6056202327717387178",
+        "start_timestamp": "2026-08-24T18:18:45.238Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786",
+        "type": "http"
+      },
+      "id": "AaA0_zIvAAB441393Fjyrqyp",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 4545350,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595495235751838,\"name\":\"exception\",\"attributes\":{\"exception.stacktrace\":\"java.net.ConnectException\\n\\tat java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1107)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:203)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:238)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:214)\\n\\tat java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)\\n\\tat java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)\\n\\tat java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760)\\n\\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)\\n\\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)\\n\\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)\\nCaused by: java.nio.channels.ClosedChannelException\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:195)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:760)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:848)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$0(PlainHttpConnection.java:187)\\n\\tat java.base/java.security.AccessController.doPrivileged(AccessController.java:569)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:189)\\n\\t... 12 more\\n\",\"exception.type\":\"java.net.ConnectException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "host": "plt.autostrade",
+            "method": "GET",
+            "path_group": "/health",
+            "url": "http://plt.autostrade:80/health",
+            "url_details": {
+              "host": "plt.autostrade",
+              "path": "/health",
+              "port": "80",
+              "scheme": "http"
+            }
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "plt.autostrade",
+              "port": 80
+            },
+            "protocol": {
+              "name": "http"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.java-http-client",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786"
+          },
+          "peer": {
+            "hostname": "plt.autostrade",
+            "service": "plt-autostrade"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 46,
+            "name": "scala-execution-context-global-46"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:18:15.235Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.client.request",
+        "parent_id": "10333174770649221771",
+        "resource_hash": "a509a3c69ad1028d",
+        "resource_name": "GET",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "13457974960692124485",
+        "start_timestamp": "2026-08-24T18:18:15.231Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786",
+        "type": "http"
+      },
+      "id": "AaA0_qLVAADV1dk5xB5zwayp",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 54718843,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595465224962675,\"name\":\"exception\",\"attributes\":{\"exception.stacktrace\":\"java.net.ConnectException\\n\\tat java.net.http/jdk.internal.net.http.common.Utils.toConnectException(Utils.java:1107)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:203)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.checkRetryConnect(PlainHttpConnection.java:238)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$1(PlainHttpConnection.java:214)\\n\\tat java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934)\\n\\tat java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911)\\n\\tat java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1773)\\n\\tat java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1760)\\n\\tat java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)\\n\\tat java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)\\n\\tat java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)\\n\\tat java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)\\nCaused by: java.nio.channels.ClosedChannelException\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.ensureOpen(SocketChannelImpl.java:195)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.beginConnect(SocketChannelImpl.java:760)\\n\\tat java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:848)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.lambda$connectAsync$0(PlainHttpConnection.java:187)\\n\\tat java.base/java.security.AccessController.doPrivileged(AccessController.java:569)\\n\\tat java.net.http/jdk.internal.net.http.PlainHttpConnection.connectAsync(PlainHttpConnection.java:189)\\n\\t... 12 more\\n\",\"exception.type\":\"java.net.ConnectException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "host": "plt.autostrade",
+            "method": "GET",
+            "path_group": "/health",
+            "url": "http://plt.autostrade:80/health",
+            "url_details": {
+              "host": "plt.autostrade",
+              "path": "/health",
+              "port": "80",
+              "scheme": "http"
+            }
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "plt.autostrade",
+              "port": 80
+            },
+            "protocol": {
+              "name": "http"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.java-http-client",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786"
+          },
+          "peer": {
+            "hostname": "plt.autostrade",
+            "service": "plt-autostrade"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 82,
+            "name": "scala-execution-context-global-82"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:17:45.225Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.client.request",
+        "parent_id": "10333174770649221771",
+        "resource_hash": "a509a3c69ad1028d",
+        "resource_name": "GET",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "8907184616753036175",
+        "start_timestamp": "2026-08-24T18:17:45.171Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "fec96471c3c2d5b2a9ac912ee3f01786",
+        "type": "http"
+      },
+      "id": "AaA0_jdyAACsSascvXYIA6yp",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "db": {
+            "connection_string": "postgresql://platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com:5432",
+            "instance": "autostrade",
+            "operation": "INSERT",
+            "sql": {
+              "table": "user"
+            },
+            "statement": "INSERT INTO \"user\" ( id, email, iemail, first_name, last_name, name, phone, created_at, contact_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ",
+            "system": "postgresql",
+            "user": "autostrade"
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 2042017,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595459997317609,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"ERROR: duplicate key value violates unique constraint \\\"user_pkey\\\"\\n  Detail: Key (id)=(7880c94a-98b6-48fb-b85c-5e8345644b46) already exists.\",\"exception.stacktrace\":\"org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint \\\"user_pkey\\\"\\n  Detail: Key (id)=(7880c94a-98b6-48fb-b85c-5e8345644b46) already exists.\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2725)\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2412)\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:371)\\n\\tat org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:502)\\n\\tat org.postgresql.jdbc.PgStatement.execute(PgStatement.java:419)\\n\\tat org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:194)\\n\\tat org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:155)\\n\\tat com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)\\n\\tat com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)\\n\\tat io.opentelemetry.instrumentation.jdbc.internal.OpenTelemetryStatement.wrapCall(OpenTelemetryStatement.java:288)\\n\\tat io.opentelemetry.instrumentation.jdbc.internal.OpenTelemetryPreparedStatement.executeUpdate(OpenTelemetryPreparedStatement.java:65)\\n\\tat scalikejdbc.DBConnectionAttributesWiredPreparedStatement.executeUpdate(DBConnectionAttributesWiredPreparedStatement.scala:142)\\n\\tat scalikejdbc.StatementExecutor.$anonfun$executeUpdate$1(StatementExecutor.scala:519)\\n\\tat void @ zeenea.batch.ObservableSchedule$StartBatch.$anonfun$startBatchAndForget$4(ObservableSchedule.scala:54)\\n\\tat flatMap @ zeenea.datacatalog.user.UserPostgresqlRepository.create(UserPostgresqlRepository.scala:74)\\n\\tat flatMap @ zeenea.runtime.migration.UserMigration.$anonfun$createUser$2(UserMigration.scala:139)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\",\"exception.type\":\"org.postgresql.util.PSQLException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com",
+              "port": 5432
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.jdbc",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "1224654f96ed352f7411d7b76bf31a40"
+          },
+          "peer": {
+            "db": {
+              "name": "autostrade",
+              "system": "postgresql"
+            },
+            "hostname": "platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "sql": {
+            "query": "INSERT INTO user ( id, email, iemail, first_name, last_name, name, phone, created_at, contact_id ) VALUES ( ? )"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 88,
+            "name": "scala-execution-context-global-88"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:17:39.997Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "postgresql.query",
+        "parent_id": "13338891786349825980",
+        "resource_hash": "6bcbe99c68e6f3a5",
+        "resource_name": "INSERT INTO user ( id, email, iemail, first_name, last_name, name, phone, created_at, contact_id ) VALUES ( ? )",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "8419238600957113752",
+        "start_timestamp": "2026-08-24T18:17:39.995Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "1224654f96ed352f7411d7b76bf31a40",
+        "type": "sql"
+      },
+      "id": "AaA0_hKZAACMcAIMVDAC8hF0",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "db": {
+            "connection_string": "postgresql://platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com:5432",
+            "instance": "autostrade",
+            "operation": "INSERT",
+            "sql": {
+              "table": "curator_link"
+            },
+            "statement": "INSERT INTO curator_link(user_id, asset_id) VALUES (?, ?)",
+            "system": "postgresql",
+            "user": "autostrade"
+          },
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 6064278,
+          "env": "prod",
+          "events": "[{\"time_unix_nano\":1787595459824116832,\"name\":\"exception\",\"attributes\":{\"exception.message\":\"ERROR: duplicate key value violates unique constraint \\\"unique_asset_curator\\\"\\n  Detail: Key (asset_id, user_id)=(db74b289-b3d2-4706-b3c9-f1d3c1c7c1de, 7880c94a-98b6-48fb-b85c-5e8345644b46) already exists.\",\"exception.stacktrace\":\"org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint \\\"unique_asset_curator\\\"\\n  Detail: Key (asset_id, user_id)=(db74b289-b3d2-4706-b3c9-f1d3c1c7c1de, 7880c94a-98b6-48fb-b85c-5e8345644b46) already exists.\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2725)\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2412)\\n\\tat org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:371)\\n\\tat org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:502)\\n\\tat org.postgresql.jdbc.PgStatement.execute(PgStatement.java:419)\\n\\tat org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:194)\\n\\tat org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:155)\\n\\tat com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)\\n\\tat com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)\\n\\tat io.opentelemetry.instrumentation.jdbc.internal.OpenTelemetryStatement.wrapCall(OpenTelemetryStatement.java:288)\\n\\tat io.opentelemetry.instrumentation.jdbc.internal.OpenTelemetryPreparedStatement.executeUpdate(OpenTelemetryPreparedStatement.java:65)\\n\\tat scalikejdbc.DBConnectionAttributesWiredPreparedStatement.executeUpdate(DBConnectionAttributesWiredPreparedStatement.scala:142)\\n\\tat scalikejdbc.StatementExecutor.$anonfun$executeUpdate$1(StatementExecutor.scala:519)\\n\\tat void @ zeenea.batch.ObservableSchedule$StartBatch.$anonfun$startBatchAndForget$4(ObservableSchedule.scala:54)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat doOnFinish @ zeenea.server.ZeeneaReferentielAppContext$.$anonfun$create$8(ZeeneaReferentielAppContext.scala:162)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\\tat $anonfun$restartAsync$1 @ io.opentelemetry.javaagent.bootstrap.executors.ContextPropagatingRunnable.run(ContextPropagatingRunnable.java:37)\\n\",\"exception.type\":\"org.postgresql.util.PSQLException\"}}]",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "language": "java",
+          "net": {
+            "peer": {
+              "name": "platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com",
+              "port": 5432
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.jdbc",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "1224654f96ed352f7411d7b76bf31a40"
+          },
+          "peer": {
+            "db": {
+              "name": "autostrade",
+              "system": "postgresql"
+            },
+            "hostname": "platformsdbb-prod-euw3-db.cluster-cr8iuepvziws.eu-west-3.rds.amazonaws.com"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "eaf58b8a-d313-425e-82b8-399a87b594b8"
+            }
+          },
+          "span": {
+            "kind": "client"
+          },
+          "span_events": "1",
+          "sql": {
+            "query": "INSERT INTO curator_link ( user_id, asset_id ) VALUES ( ? )"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 88,
+            "name": "scala-execution-context-global-88"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:17:39.824Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "postgresql.query",
+        "parent_id": "13338891786349825980",
+        "resource_hash": "70a7dbbbdd8a5f3d",
+        "resource_name": "INSERT INTO curator_link ( user_id, asset_id ) VALUES ( ? )",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "10765338872901531216",
+        "start_timestamp": "2026-08-24T18:17:39.818Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "1224654f96ed352f7411d7b76bf31a40",
+        "type": "sql"
+      },
+      "id": "AaA0_hKZAACLhaGu_2EEmxF0",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 675879257,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "method": "PUT",
+            "request": {
+              "headers": {
+                "user-agent": "node"
+              }
+            },
+            "route": "/v3/items/{item-id}/name",
+            "scheme": "https",
+            "status_code": "500",
+            "target": "/v3/items/38681040-d50d-4a6b-bb16-a42a9d321951/name",
+            "useragent": "node",
+            "useragent_details": {
+              "browser": {
+                "family": "Other"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.autostrade"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "d155d4ca64f75cf548ab79631ca3fbc2"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "46a3f5c7-29a8-40ce-a166-012af08318b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 56,
+            "name": "scala-execution-context-global-56"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:16:59.68Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "6588919685284318115",
+        "resource_hash": "528049e5f1f9c064",
+        "resource_name": "PUT /v3/items/{item-id}/name",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "13280595177559885804",
+        "start_timestamp": "2026-08-24T18:16:59.005Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "d155d4ca64f75cf548ab79631ca3fbc2",
+        "type": "web"
+      },
+      "id": "AaA0_YPHAAAJ0cIxPcQ2-6tI",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 614073734,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "method": "GET",
+            "request": {
+              "headers": {
+                "user-agent": "node"
+              }
+            },
+            "route": "/v4/connections/{connection-id}/connector",
+            "scheme": "https",
+            "status_code": "500",
+            "target": "/v4/connections/44a12f5b-d669-4064-b164-625a501d8e9d/connector",
+            "useragent": "node",
+            "useragent_details": {
+              "browser": {
+                "family": "Other"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.autostrade"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "4ed34187654f8124fc13c9110b0d16b7"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "46a3f5c7-29a8-40ce-a166-012af08318b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 100,
+            "name": "scala-execution-context-global-100"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:16:59.677Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "5804001071783097037",
+        "resource_hash": "4f1f9b60060502ea",
+        "resource_name": "GET /v4/connections/{connection-id}/connector",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "16709677465269665500",
+        "start_timestamp": "2026-08-24T18:16:59.063Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "4ed34187654f8124fc13c9110b0d16b7",
+        "type": "web"
+      },
+      "id": "AaA0_YPHAABHKJjhIXTWExP8",
+      "type": "spans"
+    },
+    {
+      "attributes": {
+        "custom": {
+          "deployment": {
+            "environment": "prod"
+          },
+          "duration": 616653814,
+          "env": "prod",
+          "host": {
+            "arch": "aarch64",
+            "name": "plt-autostrade-0"
+          },
+          "http": {
+            "method": "GET",
+            "request": {
+              "headers": {
+                "user-agent": "node"
+              }
+            },
+            "route": "/v3/item-types/{item-type-id}/template",
+            "scheme": "https",
+            "status_code": "500",
+            "target": "/v3/item-types/5184eeb0-097c-3b6a-b449-102ad197d850/template",
+            "useragent": "node",
+            "useragent_details": {
+              "browser": {
+                "family": "Other"
+              },
+              "device": {
+                "category": "Other",
+                "family": "Other"
+              },
+              "os": {
+                "family": "Other"
+              }
+            }
+          },
+          "language": "java",
+          "net": {
+            "host": {
+              "name": "plt.autostrade"
+            },
+            "protocol": {
+              "name": "http",
+              "version": "1.1"
+            }
+          },
+          "os": {
+            "description": "Linux 6.12.92-122.166.amzn2023.aarch64",
+            "type": "linux"
+          },
+          "otel": {
+            "library": {
+              "name": "io.opentelemetry.pekko-http-1.0",
+              "version": "1.33.4-alpha"
+            },
+            "status_code": "Error",
+            "trace_id": "4ed34187654f8124fc13c9110b0d16b7"
+          },
+          "process": {
+            "command_args": "[\"/opt/java/openjdk/bin/java\",\"-Dzeenea.home=/app/zeenea-datacatalog\",\"-Dconfig.file=/app/zeenea-datacatalog/conf/application.conf\",\"-Dlog4j.configurationFile=file:/app/zeenea-datacatalog/conf/log4j.xml\",\"-Dcom.sun.management.jmxremote\",\"-Dconfig.override_with_env_vars=true\",\"-javaagent:/thirdparty/opentelemetry-javaagent.jar\",\"-Dotel.jmx.config=/thirdparty/jmx-metrics.yaml\",\"-Dotel.instrumentation.http-url-connection.enabled=false\",\"-Dotel.javaagent.extensions=/thirdparty/zeenea-remove-healthcheck-extension.jar\",\"-Dotel.logs.exporter=none\",\"-XX:ErrorFile=/data/hs_err.log\",\"-XX:+UseG1GC\",\"-Xmx2g\",\"-XX:MaxDirectMemorySize=512m\",\"-Dstorage.diskCache.bufferSize=512\",\"-Dsolr.fc.maxrammb=256\",\"-Dsolr.fvc.maxrammb=128\",\"-XX:ActiveProcessorCount=4\",\"-XX:+HeapDumpOnOutOfMemoryError\",\"-XX:HeapDumpPath=/data/last_hd.hprof\",\"-cp\"]",
+            "executable": {
+              "path": "/opt/java/openjdk/bin/java"
+            },
+            "pid": "1",
+            "runtime": {
+              "description": "Eclipse Adoptium OpenJDK 64-Bit Server VM 17.0.18+8",
+              "name": "OpenJDK Runtime Environment",
+              "version": "17.0.18+8"
+            }
+          },
+          "service": {
+            "instance": {
+              "id": "46a3f5c7-29a8-40ce-a166-012af08318b8"
+            }
+          },
+          "span": {
+            "kind": "server"
+          },
+          "telemetry": {
+            "auto": {
+              "version": "1.33.4"
+            },
+            "sdk": {
+              "language": "java",
+              "name": "opentelemetry",
+              "version": "1.39.0"
+            }
+          },
+          "thread": {
+            "id": 56,
+            "name": "scala-execution-context-global-56"
+          }
+        },
+        "end_timestamp": "2026-08-24T18:16:59.676Z",
+        "env": "prod",
+        "error": null,
+        "host": "plt-autostrade-0",
+        "ingestion_reason": "",
+        "operation_name": "http.server.request",
+        "parent_id": "5804001071783097037",
+        "resource_hash": "7291087502f97e86",
+        "resource_name": "GET /v3/item-types/{item-type-id}/template",
+        "retained_by": "diversity_sampling",
+        "service": "plt-autostrade",
+        "single_span": false,
+        "span_id": "7643439136600611201",
+        "start_timestamp": "2026-08-24T18:16:59.06Z",
+        "status": "error",
+        "tags": [
+          "issue_type:pod_like_gateway_mismatch",
+          "ingestion_reason:probabilistic",
+          "source:apm"
+        ],
+        "trace_id": "4ed34187654f8124fc13c9110b0d16b7",
+        "type": "web"
+      },
+      "id": "AaA0_YPHAADzMK5KLUokOhP8",
+      "type": "spans"
+    }
+  ],
+  "links": {
+    "next": "https://api.datadoghq.eu/api/v2/spans/events?filter%5Bfrom%5D=1787559834763&filter%5Bquery%5D=service%3Aplt-autostrade+status%3Aerror&filter%5Bto%5D=1787646234763&page%5Bcursor%5D=eyJhZnRlciI6IkF3QUFBYUEwX1hBY3pUVmJCQUFBQUJoQllVRXdYMWxRU0VGQlJIcE5TelZMVEZWdmEwOW9VRGdBQUFBa01ERmhNRE0xTVdJdE5ESTBaQzAwTmpNMUxUaGpZamt0TURobE5XUXpaR0l6T0Rka0FBWW9SUSIsInZhbHVlcyI6WyIyMDI2LTA4LTI0VDE4OjE2OjU5LjY3NloiLC04NTIxNDEzMDhdfQ%3D%3D&page%5Blimit%5D=20&sort=-timestamp"
+  },
+  "meta": {
+    "elapsed": 49,
+    "page": {
+      "after": "eyJhZnRlciI6IkF3QUFBYUEwX1hBY3pUVmJCQUFBQUJoQllVRXdYMWxRU0VGQlJIcE5TelZMVEZWdmEwOW9VRGdBQUFBa01ERmhNRE0xTVdJdE5ESTBaQzAwTmpNMUxUaGpZamt0TURobE5XUXpaR0l6T0Rka0FBWW9SUSIsInZhbHVlcyI6WyIyMDI2LTA4LTI0VDE4OjE2OjU5LjY3NloiLC04NTIxNDEzMDhdfQ=="
+    },
+    "request_id": "pddv1ChZCWVM4aWt0alRZNmZFYTN1MnpzTzdBIiwKHDxkIwq6MiMF1X5zht9ZRsk7zi5dYS8Kg7tca50SDEguDsnk2HIJOcqJWw",
+    "status": "done",
+    "traffic_type": "sampled"
+  }
+}

@@ -1,0 +1,569 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "total_count": 6344
+      },
+      "id": "482cc960-76ee-11f0-965e-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "482cc960-76ee-11f0-965e-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 5869
+      },
+      "id": "395eb060-7739-11f0-807a-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "395eb060-7739-11f0-807a-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 4009
+      },
+      "id": "3764445e-7758-11f0-a541-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "3764445e-7758-11f0-a541-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 850
+      },
+      "id": "35d1e5c4-7438-11f0-8ef6-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "35d1e5c4-7438-11f0-8ef6-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 835
+      },
+      "id": "e13bcc3e-7a33-11f1-baa2-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "e13bcc3e-7a33-11f1-baa2-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 650
+      },
+      "id": "c634275c-76eb-11f0-972b-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "c634275c-76eb-11f0-972b-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 435
+      },
+      "id": "efe93f14-9b8a-11f1-9eaa-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "efe93f14-9b8a-11f1-9eaa-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 200
+      },
+      "id": "8f7722fc-1cb6-11f1-8d53-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "8f7722fc-1cb6-11f1-8d53-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 29
+      },
+      "id": "e34b38f6-7747-11f0-b35d-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "e34b38f6-7747-11f0-b35d-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 15
+      },
+      "id": "31a46816-7afc-11f1-990e-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "31a46816-7afc-11f1-990e-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 4
+      },
+      "id": "6615995a-7704-11f0-9430-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "6615995a-7704-11f0-9430-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 2
+      },
+      "id": "2a15309e-9957-11f0-be88-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "2a15309e-9957-11f0-be88-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 2
+      },
+      "id": "26e61170-8549-11f1-bb37-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "26e61170-8549-11f1-bb37-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 2
+      },
+      "id": "7053abaa-7704-11f0-9929-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "7053abaa-7704-11f0-9929-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    },
+    {
+      "attributes": {
+        "total_count": 1
+      },
+      "id": "187e74c2-7afb-11f1-9d64-da7ad0900005",
+      "relationships": {
+        "issue": {
+          "data": {
+            "id": "187e74c2-7afb-11f1-9d64-da7ad0900005",
+            "type": "issue"
+          }
+        }
+      },
+      "type": "error_tracking_search_result"
+    }
+  ],
+  "included": [
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_property_by_id\u00bb with (id -> property:09a63b71-fa30-47fc-8a20-a8d4c8250c6b) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.mapping.Query.scala",
+        "first_seen": 1754942621778,
+        "first_seen_version": "",
+        "function_name": "load",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787636085098,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-systeme-u",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "482cc960-76ee-11f0-965e-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_contact_by_id\u00bb with (id -> contact:18af06bf-3d64-4d94-8882-7b813ca8d8c9) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754974805183,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787635226337,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-systeme-u-rec",
+        "state": "IGNORED"
+      },
+      "id": "395eb060-7739-11f0-807a-da7ad0900005",
+      "relationships": {
+        "case": {
+          "data": {
+            "id": "ec24c92f-1a57-44f4-9aea-90eaf7146342",
+            "type": "case"
+          }
+        }
+      },
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_inventory_item_by_path\u00bb with (id -> connection:11d3a43c-b70e-4179-93e8-ad87c13eab82, path -> ******************************************************************************************************************) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754988120671,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787636026504,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-autostrade",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "3764445e-7758-11f0-a541-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_user_by_email_read\u00bb with (email -> **************************) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754644517912,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787635706397,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-systeme-u",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "35d1e5c4-7438-11f0-8ef6-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_property_by_id_generic_mapper\u00bb with (id -> ec8a18a9-b24d-49e7-8aeb-bf85892d210a) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.mapping.Query.scala",
+        "first_seen": 1783449865143,
+        "first_seen_version": "",
+        "function_name": "load",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787635159410,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "regression": {
+          "regressed_at": "2026-08-18T16:28:24.57Z",
+          "regressed_at_version": "",
+          "resolved_at": "2026-07-22T03:56:30.127508Z"
+        },
+        "service": "plt-raiffeisen-uat",
+        "state": "OPEN"
+      },
+      "id": "e13bcc3e-7a33-11f1-baa2-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_property_by_id\u00bb with (id -> property:16e8a6e4-1a60-44ff-8531-65defaccbab6) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.mapping.Query.scala",
+        "first_seen": 1754941544577,
+        "first_seen_version": "",
+        "function_name": "load",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634469097,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-autostrade",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "c634275c-76eb-11f0-972b-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Cannot invoke \"com.orientechnologies.orient.core.record.OElement.getProperty(String)\" because the return value of \"zeenea.repository.orientdb.mapping.MandatoryReadOnlyProperty.owner()\" is null",
+        "error_type": "java.lang.NullPointerException",
+        "file_path": "zeenea.repository.orientdb.mapping.Property.scala",
+        "first_seen": 1787115642880,
+        "first_seen_version": "",
+        "function_name": "get",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634041505,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-dcggroupebpce-dev",
+        "state": "OPEN"
+      },
+      "id": "efe93f14-9b8a-11f1-9eaa-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "An Identifier cannot be empty",
+        "error_type": "java.lang.IllegalArgumentException",
+        "file_path": "zeenea.datacatalog.scanner.source.SourceItemIdentifier.scala",
+        "first_seen": 1773170580827,
+        "first_seen_version": "",
+        "function_name": "$anonfun$fromProperties$2",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634057059,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-absacdoaro-uat",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "8f7722fc-1cb6-11f1-8d53-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_contact_by_id\u00bb with (id -> contact:0093a1af-deb6-4c7c-aeef-5503b5ae0179) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754981104666,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787633223504,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-pon",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "e34b38f6-7747-11f0-b35d-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Mandatory property sourceName is empty",
+        "error_type": "zeenea.commons.exceptions.PropertyNotFoundException",
+        "file_path": "zeenea.repository.orientdb.mapping.OdbPropertyOfResult.scala",
+        "first_seen": 1783535898993,
+        "first_seen_version": "",
+        "function_name": "$anonfun$value$1",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634018008,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "regression": {
+          "regressed_at": "2026-08-04T05:00:51.767Z",
+          "regressed_at_version": "",
+          "resolved_at": "2026-07-23T02:22:43.253484Z"
+        },
+        "service": "plt-pon-uat",
+        "state": "OPEN"
+      },
+      "id": "31a46816-7afc-11f1-990e-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_inventory_item_by_path\u00bb with (id -> connection:ba03157a-5015-4bca-8296-e63b91405adb, path -> ***********************************************************) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754952121671,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634815885,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-pon-uat",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "6615995a-7704-11f0-9430-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error on retrieving record #51:987493 (cluster: fieldsourcedocumentation_1)\n\tDB name=\"datacatalog\"",
+        "error_type": "com.orientechnologies.orient.core.exception.ODatabaseException",
+        "file_path": "com.orientechnologies.orient.core.db.document.ODatabaseDocumentEmbedded.java",
+        "first_seen": 1758726004916,
+        "first_seen_version": "",
+        "function_name": "executeReadRecord",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634012176,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "regression": {
+          "regressed_at": "2026-08-05T05:00:23.641Z",
+          "regressed_at_version": "",
+          "resolved_at": "2026-07-05T04:34:49.805662Z"
+        },
+        "service": "plt-merck",
+        "state": "OPEN"
+      },
+      "id": "2a15309e-9957-11f0-be88-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error on retrieving record #51:142104 (cluster: fieldsourcedocumentation_1)\n\tDB name=\"datacatalog\"",
+        "error_type": "com.orientechnologies.orient.core.exception.ODatabaseException",
+        "file_path": "com.orientechnologies.orient.core.db.document.ODatabaseDocumentEmbedded.java",
+        "first_seen": 1784668461271,
+        "first_seen_version": "",
+        "function_name": "executeReadRecord",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634041828,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-gema",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "26e61170-8549-11f1-bb37-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "Error in query \u00abload_inventory_item_by_path\u00bb with (id -> connection:cf289f7a-ab6a-4ea0-a24c-a5c1376c1dc9, path -> ********************************************) : Not found",
+        "error_type": "zeenea.commons.exceptions.EntityNotFoundException",
+        "file_path": "zeenea.repository.orientdb.OdbClient.scala",
+        "first_seen": 1754952138686,
+        "first_seen_version": "",
+        "function_name": "$anonfun$load$6",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634969967,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-merck-qa",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "7053abaa-7704-11f0-9929-da7ad0900005",
+      "type": "issue"
+    },
+    {
+      "attributes": {
+        "error_message": "expected String but found null",
+        "error_type": "zeenea.commons.exceptions.PropertyClassCastException",
+        "file_path": "zeenea.repository.orientdb.mapper.ZeeneaValueMappers.scala",
+        "first_seen": 1783535427969,
+        "first_seen_version": "",
+        "function_name": "read",
+        "is_crash": false,
+        "languages": [
+          "JAVA"
+        ],
+        "last_seen": 1787634002461,
+        "last_seen_version": "",
+        "platform": "BACKEND",
+        "service": "plt-autostrade-noprod",
+        "state": "ACKNOWLEDGED"
+      },
+      "id": "187e74c2-7afb-11f1-9d64-da7ad0900005",
+      "type": "issue"
+    }
+  ]
+}

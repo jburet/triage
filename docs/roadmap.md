@@ -82,6 +82,36 @@ When it returns:
 - Outputs: immediate Slack notice, then a ticket via the core pipeline.
 - Generates the post-mortem draft from the ticket and timeline.
 
+## F2 — A recurring code exception becomes a report
+
+A second input beside F1, built as M8 (2026-08-25). Where F1 waits for a monitor to fire,
+F2 asks Datadog Error Tracking every hour which **code exceptions** are new or have
+regressed, and reports the ones that are loud enough to be worth a developer's hour.
+
+- Trigger: an Error Tracking issue first seen — or regressed — inside the tick's window, on a
+  service in a watched environment, once it clears a volume gate ([ADR-0025](adr/0025-code-exceptions-polled-hourly-and-gated-by-volume.md)).
+  The gate is occurrences rather than duration: an error issue does not recover, it
+  accumulates, so a per-tick floor is paired with a cumulative escalation that makes a slow
+  bleed visible and a cooldown that stops a loud one being reposted hourly.
+- The same exception in several tenants of the mono-tenant platform is **one** finding, keyed
+  on the repository the tenancy rule resolves ([ADR-0026](adr/0026-one-exception-across-tenants-is-one-finding.md)).
+  The per-tenant counts survive, because a defect that is 99% one customer is a fact about
+  that customer.
+- The issue names the exception type, the message, the file and the function, and the
+  versions it was first and last seen on — so F2 does not have to infer where to look. The
+  file and function are converted into repository paths and read ahead of the analysis's own
+  globs ([ADR-0028](adr/0028-a-class-name-is-not-a-path.md)); the version, where a repository
+  claims one, is the commit the code is read at.
+- Outputs: one threaded Slack report per group, in the owning team's channel, carrying the
+  nine ticket-spec sections plus the exception's own identity. Every later report about the
+  same group replies in the same thread, across ticks.
+- Evidence, when the sampler kept some: the occurrences are found by `service:<svc>
+  status:error` over raw spans and matched on the exception type inside the OpenTelemetry
+  span events, and the report then carries a real stack trace and the frames it names
+  ([ADR-0029](adr/0029-the-exception-is-in-the-otel-span-events.md)). The org's error-span
+  retention filter is still disabled, so for many groups nothing retained is this defect —
+  F2 says which kind of absence that is, names the filter, and reports anyway.
+
 ## F3 — Daily database review — postponed
 
 Not in the first release (ADR-0023); the plan of 2026-08-23 stands unstarted.
@@ -109,8 +139,11 @@ Not in the first release (ADR-0023); the plan of 2026-08-23 stands unstarted.
 1. **Ticket specification + Jira workflow** — the product definition; cheap, unblocks everything.
 2. **F0** — foundation.
 3. **F1** — self-collected telemetry plus the code/IaC layer.
-4. **F3** — independent daily job.
-5. Cross-cutting: alert coverage audit, self-evaluation.
+4. **F2** — a second input, cheap because Error Tracking already names the code. Built after
+   F1 and before F3, because it reuses F1's whole back half — the Analysis sub-graph, the
+   ticket pipeline, the service map — and adds only its own front end.
+5. **F3** — independent daily job.
+6. Cross-cutting: alert coverage audit, self-evaluation.
 
 Removed from scope: weak-signal detection (delegated to Datadog anomaly detection), post-release monitoring and automated ticket verification.
 
