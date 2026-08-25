@@ -26,6 +26,7 @@ from pydantic import ValidationError
 from triage.analysis.context import (
     APPLICATION,
     DEFAULT_BUDGET,
+    INVESTIGATION,
     TERRAFORM,
     ContextBudget,
     SelectionProfile,
@@ -62,7 +63,7 @@ ANALYSERS: dict[AnalysisKind, Analyser] = {
     # angle — the graph writes a different one per cause type — and two prompts
     # saying "answer the question from the tree" would drift apart for no reason.
     # What differs is which files are worth opening.
-    AnalysisKind.CODE_ANALYSIS: Analyser("investigate", APPLICATION, AnalysisFindings),
+    AnalysisKind.CODE_ANALYSIS: Analyser("investigate", INVESTIGATION, AnalysisFindings),
     AnalysisKind.IAC_ANALYSIS: Analyser("investigate", TERRAFORM, AnalysisFindings),
 }
 
