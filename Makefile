@@ -57,7 +57,7 @@ run-poller: env ## Tick the alert poller by hand, as the Platform cron would (re
 run-errors: env ## Tick the code-exception poller by hand (read-only; ARGS="--analyse" spends)
 	uv run python -m scripts.run_errors $(ARGS)
 
-cron: env ## Show, or with ARGS="--apply" create, the Platform cron that ticks the poller
+cron: env ## Show, or with ARGS="--apply" create, every Platform cron under deploy/platform
 	uv run python -m scripts.apply_cron $(ARGS)
 
 run-incident: env ## Run F1 end to end on one real alert: read-only Datadog, real models, fake Jira/Slack

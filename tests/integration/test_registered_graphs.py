@@ -90,3 +90,29 @@ def test_no_node_module_stringifies_its_config_annotation(module):
         f"{module.name} annotates config as a string, so its nodes will never be "
         f"given one — drop `from __future__ import annotations`"
     )
+
+
+CRONS = sorted((REPO_ROOT / "deploy" / "platform").glob("cron-*.yaml"))
+
+
+def test_there_is_a_cron_object_for_every_pass_that_runs_itself():
+    assert [path.name for path in CRONS] == [
+        "cron-alert-poller.yaml",
+        "cron-error-poller.yaml",
+        "cron-service-mapping.yaml",
+    ]
+
+
+@pytest.mark.parametrize("path", CRONS, ids=lambda path: path.stem)
+def test_a_cron_names_a_graph_the_platform_would_serve(path):
+    """A schedule on a graph `langgraph.json` does not register is a 404 at tick time.
+
+    The Platform resolves `assistant_id` against the registered graphs. Nothing
+    here has run against a Platform, so this is the half of it that can be
+    checked without one.
+    """
+    spec = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    assert spec["assistant_id"] in REGISTERED
+    assert isinstance(spec["schedule"], str)
+    assert len(spec["schedule"].split()) == 5

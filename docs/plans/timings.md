@@ -187,3 +187,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 gate correction | make test (967 passed) | 7 |
 | 2026-08-25 | M8 gate correction | 24 live hourly ticks replayed, read-only, no model call | 8 |
 | 2026-08-25 | M8 gate correction | the same day at six floors (1, 5, 10, 25, 50, 200) | 37 |
+| 2026-08-25 | M8 follow-up | make lint && make test (977 tests) | 14 |
+| 2026-08-25 | M8 follow-up | run-mapping --db, 71 tenants, default targets | 36 |
+| 2026-08-25 | M8 follow-up | run-errors --hours 24 --db --local --analyse (3 groups) | 333 |

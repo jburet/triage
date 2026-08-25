@@ -1,0 +1,39 @@
+# The pass that keeps the deployed commit current (M6, ADR-0019, ADR-0020).
+#
+# Not a Kubernetes object: a LangGraph Platform cron is a row inside the Platform,
+# created over its API. `make cron ARGS="--file deploy/platform/cron-service-mapping.yaml"`
+# prints what it would do, adding `--apply` does it. The file is the reviewable
+# form and the record of what the Platform was told.
+#
+# **Why this is scheduled at all.** The map answers one question — which commit is
+# this workload running — and the answer expires the next time anyone deploys.
+# Nothing announces that expiry: a stale row reads exactly like a fresh one, and
+# an analysis pointed at last week's commit reports on code the tenant stopped
+# running, with the same confidence it would have had if it were right. That is
+# the failure ADR-0020 exists to prevent, and a map refreshed by hand is how it
+# happens anyway.
+#
+# **Why :40.** The error poller ticks on the hour and reads this map to resolve
+# each group's commit. Running the two together would have F2 read a map mid
+# refresh; running this at :40 means the map F2 reads is at most twenty minutes
+# old, and the pass itself takes about forty seconds over seventy tenants
+# (measured 2026-08-25). The alert poller ticks every minute and reads the same
+# rows, so there is no window that avoids it entirely — twenty minutes is the
+# bound, not zero.
+#
+# **What one pass costs.** One Datadog event search per service, and no model call
+# anywhere on the graph — the derivation is a rule, not a tier call (ADR-0019).
+# GitHub is asked only when a digest moved: a pass over an unchanged digest
+# resolves its commit from the row it already has and asks nothing.
+#
+# **What it covers.** `input: {}` means the pass picks its own targets: every
+# service that alerted, and every service a code exception was seen in, over the
+# lookback. The second half is what makes this worth scheduling — F2's tenants
+# raise exceptions and never alert, so a pass reading only the signals table
+# covered none of them.
+assistant_id: service_mapping
+schedule: "40 * * * *"
+input: {}
+metadata:
+  owner: triage
+  source: deploy/platform/cron-service-mapping.yaml
