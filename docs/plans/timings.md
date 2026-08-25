@@ -156,3 +156,6 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 phase 2.3 | pytest tests/unit/test_error_gate.py (red, then green) | 1 |
 | 2026-08-25 | M8 phases 2.3-2.6 | pytest tests/integration/test_error_groups.py | 1 |
 | 2026-08-25 | M8 phases 2.3-2.6 | make lint + make test (854 passed) | 9 |
+| 2026-08-25 | M8 phase 3 (probe) | hand-run Datadog probes: exemplar/join/spans/logs/metrics/retention, 45 live read-only calls | 320 |
+| 2026-08-25 | M8 phase 3 | pytest tests/unit/test_error_collection.py | 1 |
+| 2026-08-25 | M8 phases 3.1-3.5 | make lint + make test (875 passed) | 10 |

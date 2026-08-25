@@ -39,6 +39,7 @@ can override it without touching code.
 | [0024](0024-no-kernel-boundary-for-a-job-that-executes-nothing.md) | No kernel boundary for a Job that executes nothing | Accepted |
 | [0025](0025-code-exceptions-polled-hourly-and-gated-by-volume.md) | Code exceptions are polled hourly and gated by volume | Proposed |
 | [0026](0026-one-exception-across-tenants-is-one-finding.md) | One exception across tenants is one finding | Proposed |
+| [0027](0027-an-absence-datadog-discards-is-a-finding.md) | An absence Datadog is discarding is a finding, not a gap | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

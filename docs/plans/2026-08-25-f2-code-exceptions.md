@@ -158,18 +158,88 @@ Done 2026-08-25. Three findings.
 
 ## Phase 3: the log, the trace, and the window
 
-- [ ] 3.1 A gated group collects a bounded sample of the error logs behind it, reduced to templates
+- [x] 3.1 A gated group collects a bounded sample of the error logs behind it, reduced to templates
       and counts, and the sample keeps at least one complete stack trace — the stack is the whole
       point, and the template reduction must not eat it.
-- [ ] 3.2 It collects the error spans behind it, so the report can name the operation and one trace
+- [x] 3.2 It collects the error spans behind it, so the report can name the operation and one trace
       to open. A service with no APM instrumentation is `not_instrumented`, not empty — the
-      distinction the collection schema already draws.
-- [ ] 3.3 The occurrences are re-found by a query built from the group's own fields, and the
+      distinction the collection schema already draws. **Amended:** a third outcome,
+      `sampled_away`, for evidence Datadog counted and discarded (ADR-0027).
+- [x] 3.3 The occurrences are re-found by a query built from the group's own fields, and the
       collection states that query verbatim, because it is a reconstruction and not the issue's own
       identity (see Open risks).
-- [ ] 3.4 The collection window runs back from the tick to the configured lookback, and the whole
+- [x] 3.4 The collection window runs back from the tick to the configured lookback, and the whole
       payload fits `collection.max_prompt_bytes`, stating every cut.
-- [ ] 3.5 A collector Datadog refuses is a stated failure and the run continues, exactly as F1's does.
+- [x] 3.5 A collector Datadog refuses is a stated failure and the run continues, exactly as F1's does.
+
+## What Phase 3 measured, and what it changes
+
+Done 2026-08-25. The phase opened with an investigation rather than code, because Phase 1
+had measured its premise broken. Everything below was probed by hand against the live org,
+read-only, over the reference window `2026-08-25T04:35Z`–`05:35Z`. The decision it produced
+is [ADR-0027](../adr/0027-an-absence-datadog-discards-is-a-finding.md).
+
+**There is no route to the occurrence-level evidence, and that is now measured rather than
+assumed.** Four candidate routes, all dead:
+
+1. *The issue's own sample event.* Nine endpoint shapes probed — `…/issues/{id}/events`,
+   `/latest-event`, `/sample-event`, `/sample`, `/occurrences` — all **404**. Four `include`
+   values — `sample_event`, `latest_event`, `event`, `issue,sample_event` — all **400
+   `invalid include`**. Datadog's own v2 spec allows exactly `issue`, `issue.assignee`,
+   `issue.case`, `issue.team_owners`, and `IssueAttributes` carries no stack, no `trace_id`
+   and no `span_id`. The plan's "obvious unprobed candidate" does not exist.
+2. *The stack already in the captured attributes.* Re-read in full: the detail payload is
+   `error_message`, `error_type`, `file_path`, `first_seen`, `first_seen_version`,
+   `function_name`, `is_crash`, `languages`, `last_seen`, `last_seen_version`, `platform`,
+   `service`, `state`, plus `relationships.case`. `file_path` + `function_name` is the top
+   frame and nothing more.
+3. *A different query shape.* `service:plt-systeme-u-rec` returns **211,179** spans in the
+   hour and **3,576,641** over seven days. `status:error` returns **0** in the hour and
+   **48** over seven days — and those 48 are OTel `503`s on `POST /agent/register`, carrying
+   no `@error.type`. `@error.type:*` returns **0** over both windows; the exact type returns
+   **0**; `@error.message:*load_contact_by_id*` returns **0**. `@error.stack:*` returns
+   **zero spans across the whole org**. Four issue-id join facets
+   (`@error.tracking.issue.id`, `@issue.id`, `@error.fingerprint`, `issue_id`) return zero
+   over seven days, and Datadog documents none of them — the only join key is
+   `error.fingerprint`, which the *application* sets and Datadog never echoes back.
+4. *A pre-sampling metric route.* `sum:trace.services_by_operation.hits{service:plt-systeme-u-rec}`
+   = **921,775** in the hour; every `.errors` metric for that service = **0**. The exceptions
+   are not flagged as span errors even in the metric stream, because the platform runs the
+   **OpenTelemetry** Java agent (`io.opentelemetry.pekko-http-1.0`), where Datadog's
+   100%-of-traffic guarantee for trace metrics does not hold.
+
+**The disjointness is total, and it is the finding.** Three services *do* have retained error
+spans in the reference hour — `gateway` (1,328), `scim-api` (836), `studio` (4) — and Error
+Tracking has **no issues at all** for any of them, at either persona. The twelve services
+that *do* have issues have no retained error spans. The two sets do not intersect.
+
+**And the switch is one line of Datadog configuration, on Zeenea's side.**
+`GET /api/v2/apm/config/retention-filters` says the org's **"Error Default" filter
+(`spans-errors-sampling-processor`, `status:error`, rate 1) is `enabled: false`**. Datadog
+documents the consequence exactly: *"Spans associated with the error need to be retained with
+a custom retention filter in order for samples of that error to show up."* Enabling it is
+what makes 3.1–3.3 return real evidence. Nothing in Triage can substitute for it.
+
+**So Phase 3 is built honest rather than built differently.** The collectors exist, run, and
+name which kind of nothing they found: `not_instrumented` when the control query is dead too,
+and a new `sampled_away` when the control is alive and the issue counted occurrences — a team
+can turn a retention filter on, and nobody turns one on for a report that only said "empty".
+The reconstruction is layered (`@error.type` → `status:error` → the control) because the
+layering is measured, and all three queries are stated verbatim beside the count the issue
+claims. The stack-preserving rule is tested against
+`tests/fixtures/datadog/errors/synthetic_stack/`, which is hand-written and labelled as such,
+because no real one can be captured today.
+
+**What an F2 report will contain in this org, today:** the exception type, its message, the
+file and function, the count over the window, the tenants it was seen in, the Datadog issue
+link — and a stated absence of logs and spans reading *"this query returned nothing, the
+issue counts 5,869 occurrences in the same window, and the same services returned 211,179
+spans with the error predicate dropped"*. Phase 4's report has to read well in that shape,
+because that is the shape it will have.
+
+One incidental fix: `Collector` now holds F2's three as well as F1's, so F1's follow-up loop
+refuses them by name. Left to fall through they would have run as an unscoped event search —
+an answer about the whole org, shaped like an answer about the incident.
 
 ## Phase 4: where in the code, and the report
 
@@ -210,8 +280,11 @@ Done 2026-08-25. Three findings.
   populated at all.**~~ **Closed by 1.1.** It is populated, and every issue names its file
   and function.
 - ~~**An occurrence cannot be traced back to its issue by identity.**~~ **Confirmed, and
-  worse than feared.** The reconstruction returns nothing at all, not merely the wrong
-  things. See "What Phase 1 measured" above; Phase 3 needs replanning.
+  worse than feared, and now closed as a decision rather than a risk.** The reconstruction
+  returns nothing at all, not merely the wrong things; no API route exists to the exemplar
+  either. See "What Phase 3 measured" and
+  [ADR-0027](../adr/0027-an-absence-datadog-discards-is-a-finding.md): F2 states the absence
+  and names the retention filter that would end it.
 - **The volume floor is a guess until there are numbers.** F1's 15 minutes came from 961
   measured cycles. The distribution is now measured (see above) but no *outcome* is: whether
   ten occurrences an hour is worth a developer's attention is the first week's question. A
