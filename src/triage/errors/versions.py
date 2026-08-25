@@ -91,16 +91,27 @@ async def commit_for_group(
             else f"no repository in config.yaml is declared at {group.repo_url}"
         )
 
-    deployment = await deployed_repo(config, repository, loudest_service(group))
+    service = loudest_service(group)
+    deployment = await deployed_repo(config, repository, service)
+    if deployment.commit is None:
+        return CommitChoice(
+            commit=None,
+            version=version,
+            claimed=False,
+            rung=(
+                f"nothing claims the version this exception was first seen on ({note}), and "
+                f"the service map knows no commit for `{service}` either — so no code was "
+                f"read at any commit"
+            ),
+        )
     return CommitChoice(
         commit=deployment.commit,
         version=version,
         claimed=False,
         rung=(
             f"nothing claims the version this exception was first seen on ({note}), so the "
-            f"commit read is the one the service map has for "
-            f"`{loudest_service(group)}` — what the workload is running, not the build the "
-            f"defect entered at"
+            f"commit read is the one the service map has for `{service}` — what the workload "
+            f"is running, not the build the defect entered at"
         ),
     )
 

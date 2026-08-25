@@ -4,13 +4,19 @@ Offline: the model is `FakeLLM` keyed on `Qualification`, GitHub is the fake tha
 answers only the tags a test configured, and no Datadog call happens here at all.
 """
 
+import json
 from datetime import UTC, datetime, timedelta
 
 from tests.conftest import a_qualification, a_workload, build_deps, declaring, run_config
 from triage.db.repo import InMemoryRepository
 from triage.integrations.github import FakeGitHubClient
 from triage.nodes.qualify_exception import qualify_exception
-from triage.schemas.collection import Collector, CollectorResult, CollectorStatus
+from triage.schemas.collection import (
+    Collector,
+    CollectorResult,
+    CollectorStatus,
+    Qualification,
+)
 from triage.schemas.common import Feature, TimeWindow
 from triage.schemas.errors import (
     ErrorCollection,
@@ -148,3 +154,23 @@ async def test_no_version_adds_no_deployment_hypothesis():
     result = await qualify(a_group())
 
     assert all(h.cause_type is not CauseType.DEPLOYMENT for h in result["hypotheses"])
+
+
+async def test_the_prompt_carries_the_exception_as_a_tagged_json_block():
+    """Inputs are model-adjacent prose; interpolating them into instructions is not done."""
+    deps = build_deps(
+        declaring(REPO, team="payments"),
+        repo=await a_repository(),
+        github=FakeGitHubClient(),
+    )
+    group = a_group()
+    await qualify_exception(
+        {"group": group, "collection": a_collection(group)},  # type: ignore[arg-type]
+        run_config(deps),
+    )
+
+    prompt = deps.llm.calls_for(Qualification)[0].prompt
+    block = json.loads(prompt.split("<exception>", 1)[1].split("</exception>", 1)[0])
+    assert block["error_type"] == group.error_type
+    assert block["method"] == "load"
+    assert block["occurrences_per_service"] == group.services

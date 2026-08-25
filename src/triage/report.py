@@ -438,8 +438,31 @@ def _exception_evidence(diagnosis: Diagnosis, collection: ErrorCollection) -> st
     )
 
 
+def _exception_repository(
+    diagnosis: Diagnosis, group: ErrorGroup, workload: WorkloadEntry | None
+) -> str:
+    """The repository, which F2 always knows even when no analysis selected one.
+
+    The diagnosis states where the analysis *read*, and an F2 run whose analyses
+    all failed states nothing. But the grouping rule already resolved these
+    tenants to one repository — that is what made them one group (ADR-0026) — and
+    a report that says "Unknown" about the one thing it is certain of teaches a
+    reader to stop believing the sections that are filled."""
+    stated = _repository_line(diagnosis.location, workload)
+    if not is_unknown(diagnosis.location.repo) or not group.repo_url:
+        return stated
+    return (
+        f"*Repository:* `{group.repo_url}`\n_The tenants raising this exception all run "
+        f"that repository, which is what made them one group; no analysis selected a "
+        f"location of its own, so nothing narrower than the repository is established._"
+    )
+
+
 def _exception_location(
-    diagnosis: Diagnosis, workload: WorkloadEntry | None, commit: CommitChoice
+    diagnosis: Diagnosis,
+    group: ErrorGroup,
+    workload: WorkloadEntry | None,
+    commit: CommitChoice,
 ) -> str:
     """As F1's, except the commit line is F2's own choice rather than the map's.
 
@@ -450,7 +473,7 @@ def _exception_location(
     """
     location = diagnosis.location
     lines = [
-        _repository_line(location, workload),
+        _exception_repository(diagnosis, group, workload),
         f"*Commit:* {commit.commit or '_none could be resolved_'} — _{commit.rung}_",
     ]
     infrastructure = _infrastructure_line(workload)
@@ -508,7 +531,7 @@ def render_code_exception(
         TicketSection.IMPACT: _impact(diagnosis),
         TicketSection.PROBABLE_CAUSE: _probable_cause(diagnosis),
         TicketSection.EVIDENCE: _exception_evidence(diagnosis, collection),
-        TicketSection.LOCATION: _exception_location(diagnosis, workload, commit),
+        TicketSection.LOCATION: _exception_location(diagnosis, group, workload, commit),
         TicketSection.EXPECTED_CHANGE: _expected_change(diagnosis),
         TicketSection.OUT_OF_SCOPE: _bullets(
             diagnosis.out_of_scope,

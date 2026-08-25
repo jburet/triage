@@ -10,7 +10,7 @@ from datetime import UTC, datetime, timedelta
 from tests.conftest import a_workload, load_diagnosis
 from triage.report import EXCEPTION_HEADING, render_code_exception
 from triage.schemas.collection import Collector, CollectorResult, CollectorStatus
-from triage.schemas.common import Confidence, TimeWindow
+from triage.schemas.common import Confidence, TimeWindow, Unknown
 from triage.schemas.errors import (
     CommitChoice,
     ErrorCollection,
@@ -192,3 +192,21 @@ def test_a_confident_report_leads_with_the_cause():
 
     assert report.leads_with_cause
     assert report.headline.startswith(":dart: *platform*")
+
+
+def test_the_repository_is_stated_even_when_no_analysis_selected_a_location():
+    """Measured on the live run of 2026-08-25: every analysis failed, and the report
+    said Unknown about the one thing the grouping rule was certain of."""
+    base = load_diagnosis("latency_low_confidence")
+    diagnosis = base.model_copy(
+        update={
+            "location": base.location.model_copy(
+                update={"repo": Unknown(reason="no analysed hypothesis was selected")}
+            )
+        }
+    )
+
+    location = body(render(diagnosis=diagnosis), "Location")
+
+    assert "github.com/zeenea/platform" in location
+    assert "all run that repository" in location

@@ -125,3 +125,12 @@ def test_a_recorded_version_produces_a_deployment_hypothesis_naming_both():
 
 def test_no_version_produces_no_deployment_hypothesis():
     assert deployment_hypothesis(a_group(), CommitChoice(rung="…")) is None
+
+
+async def test_a_fallback_that_found_no_commit_says_no_code_was_read():
+    choice = await commit_for_group(
+        FakeGitHubClient(), declaring(REPO), InMemoryRepository(), a_group()
+    )
+
+    assert choice.commit is None
+    assert "no code was read at any commit" in choice.rung
