@@ -75,7 +75,7 @@ async def poll_error_issues(
         "unchanged": 0,
     }
 
-    start, skipped_span = await _window(deps, now)
+    start, skipped_span = await _window(deps, now, state.get("since"))
     window = TimeWindow(start=start, end=now)
     result["window"] = window
     if skipped_span is not None:
@@ -153,8 +153,18 @@ def _sort(issue: ErrorIssue, window: TimeWindow, result: ErrorPollerState) -> No
     result["new" if why is Novelty.NEW else "regressed"].append(issue)
 
 
-async def _window(deps: Deps, now: datetime) -> tuple[datetime, str | None]:
-    """Where to read from, and what was skipped if the poller was down too long."""
+async def _window(deps: Deps, now: datetime, since: datetime | None) -> tuple[datetime, str | None]:
+    """Where to read from, and what was skipped if the poller was down too long.
+
+    ``since`` is an operator naming the window — ``make run-errors ARGS="--hours
+    24"`` — and it is neither clamped nor announced. The catch-up limit exists so
+    an hourly cron that was down does not report a weekend of backlog as if it
+    had just happened; somebody asking for a day is the opposite of that, and
+    clamping them silently is how a backfill reads six hours, misses 32 new
+    issues, and still says it succeeded (measured 2026-08-25).
+    """
+    if since is not None:
+        return since, None
     watermark = await deps.repo.get_watermark(POLLER_NAME)
     if watermark is None:
         return now - timedelta(minutes=deps.config.errors.lookback_minutes), None

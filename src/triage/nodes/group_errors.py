@@ -54,7 +54,12 @@ async def group_error_issues(
         return result
 
     resolved = await _repositories(deps, sorted({issue.service for issue in issues}))
-    groups = group_issues(issues, resolved.get, regressed={issue.issue_id for issue in regressed})
+    groups = group_issues(
+        issues,
+        resolved.get,
+        regressed={issue.issue_id for issue in regressed},
+        counted_over=state.get("window"),
+    )
     stored = [await deps.repo.upsert_error_group(group) for group in groups]
     decisions = gate(stored, deps.config.errors, now)
 

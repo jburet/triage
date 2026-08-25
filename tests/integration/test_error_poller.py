@@ -163,6 +163,33 @@ class TestTheWindow:
         assert posted[0].channel == deps.config.platform_channel()
         assert "48 hours" in posted[0].text or "2880 minutes" in posted[0].text
 
+    async def test_an_operator_named_window_is_not_truncated_by_the_catch_up_limit(
+        self, deps: Deps
+    ) -> None:
+        """A backfill someone asked for is not a poller that was down.
+
+        The clamp exists so the hourly cron never dumps a weekend of backlog as
+        if it had just happened. ``--hours 24`` is the opposite: it is somebody
+        saying which window they want. Measured on 2026-08-25, the clamp made
+        ``--hours 168`` read six hours and miss 32 new issues — among them a
+        PSQLException at 37,914 occurrences — while reporting success.
+        """
+        since = CAPTURE_END - timedelta(hours=24)
+
+        state = await graph.ainvoke({"now": CAPTURE_END, "since": since}, config=run_config(deps))
+
+        assert state["window"].start == since
+        assert state.get("skipped_span") is None
+        assert deps.slack.messages == []  # type: ignore[attr-defined]
+
+    async def test_an_operator_named_window_ignores_the_watermark(self, deps: Deps) -> None:
+        await deps.repo.set_watermark(POLLER_NAME, CAPTURE_END - timedelta(minutes=20))
+        since = CAPTURE_END - timedelta(hours=24)
+
+        state = await graph.ainvoke({"now": CAPTURE_END, "since": since}, config=run_config(deps))
+
+        assert state["window"].start == since
+
     async def test_a_tick_inside_the_limit_says_nothing(self, deps: Deps) -> None:
         await deps.repo.set_watermark(POLLER_NAME, CAPTURE_END - timedelta(minutes=20))
 

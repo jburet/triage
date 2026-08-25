@@ -32,6 +32,7 @@ from collections.abc import Callable, Collection, Sequence
 from dataclasses import dataclass
 from typing import TypeAlias
 
+from triage.schemas.common import TimeWindow
 from triage.schemas.errors import ErrorGroup, ErrorGroupStatus, ErrorIssue, Novelty
 
 
@@ -75,6 +76,7 @@ def group_issues(
     resolve: ResolveService,
     *,
     regressed: Collection[str] = (),
+    counted_over: TimeWindow | None = None,
 ) -> list[ErrorGroup]:
     """One group per defect, worst first, with the count in every service it was seen in.
 
@@ -91,7 +93,7 @@ def group_issues(
         key = group_key(error_type, file_path, issue.function_name, _name(where), issue.service)
         existing = groups.get(key)
         groups[key] = (
-            _started(key, error_type, file_path, issue, where)
+            _started(key, error_type, file_path, issue, where, counted_over)
             if existing is None
             else _extended(existing, issue)
         )
@@ -110,6 +112,7 @@ def _started(
     file_path: str,
     issue: ErrorIssue,
     where: ServiceRepository | None,
+    counted_over: TimeWindow | None,
 ) -> ErrorGroup:
     return ErrorGroup(
         key=key,
@@ -125,6 +128,7 @@ def _started(
         occurrences=issue.occurrences,
         issue_ids=[issue.issue_id],
         sample_message=issue.error_message,
+        counted_over=counted_over,
         first_seen=issue.first_seen,
         last_seen=issue.last_seen,
         first_seen_version=issue.first_seen_version,

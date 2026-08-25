@@ -39,6 +39,7 @@ def a_group(**overrides: object) -> ErrorGroup:
         "occurrences": 5909,
         "issue_ids": ["1e4f8c2a"],
         "sample_message": "Entity not found: load_contact_by_id",
+        "counted_over": WINDOW,
         "first_seen": NOW - timedelta(days=30),
         "last_seen": NOW,
     }
@@ -210,3 +211,92 @@ def test_the_repository_is_stated_even_when_no_analysis_selected_a_location():
 
     assert "github.com/zeenea/platform" in location
     assert "all run that repository" in location
+
+
+class TestOccurrenceWindow:
+    """The count is over the span the issue was seen, not the collection's hour.
+
+    Measured on 2026-08-25: a tick replaying six hours collected over the last
+    one, and the header read "126 occurrences between 06:24 and 07:24" for a
+    burst that ran 02:29 to 03:12. The count and the window came from different
+    clocks, which is the one thing a report may never do.
+    """
+
+    def test_dates_the_count_by_the_window_it_was_counted_over(self) -> None:
+        polled = TimeWindow(start=NOW - timedelta(hours=6), end=NOW)
+        report = render(a_group(counted_over=polled, occurrences=126))
+        header = next(s for s in report.sections if s.heading == EXCEPTION_HEADING)
+        dated = f"126 between {polled.start:%Y-%m-%d %H:%M} and {polled.end:%Y-%m-%d %H:%M} UTC"
+        assert dated in header.body
+
+    def test_never_dates_it_by_the_collection_hour(self) -> None:
+        """The collection looks for evidence in the last hour; the count is not from there."""
+        polled = TimeWindow(start=NOW - timedelta(hours=6), end=NOW)
+        assert polled.start != WINDOW.start
+        report = render(a_group(counted_over=polled, occurrences=126))
+        header = next(s for s in report.sections if s.heading == EXCEPTION_HEADING)
+        assert f"between {WINDOW.start:%Y-%m-%d %H:%M}" not in header.body
+
+    def test_never_dates_it_by_the_issue_lifetime(self) -> None:
+        """first_seen is when the defect appeared, not when these occurrences happened."""
+        polled = TimeWindow(start=NOW - timedelta(hours=6), end=NOW)
+        group = a_group(counted_over=polled, occurrences=126)
+        report = render(group)
+        header = next(s for s in report.sections if s.heading == EXCEPTION_HEADING)
+        assert f"between {group.first_seen:%Y-%m-%d %H:%M}" not in header.body
+
+    def test_names_the_day_at_both_ends_when_the_window_crosses_midnight(self) -> None:
+        """A 24-hour backfill printed "between 2026-08-24 07:33 and 07:33 UTC"."""
+        polled = TimeWindow(start=NOW - timedelta(hours=24), end=NOW)
+
+        header = body(render(a_group(counted_over=polled, occurrences=126)), EXCEPTION_HEADING)
+
+        assert f"{polled.start:%Y-%m-%d %H:%M}" in header
+        assert f"{polled.end:%Y-%m-%d %H:%M}" in header
+
+    def test_names_the_day_once_when_the_window_is_inside_it(self) -> None:
+        polled = TimeWindow(start=NOW - timedelta(hours=2), end=NOW)
+
+        header = body(render(a_group(counted_over=polled, occurrences=126)), EXCEPTION_HEADING)
+
+        assert f"between {polled.start:%Y-%m-%d %H:%M} and {polled.end:%H:%M} UTC" in header
+
+    def test_says_so_when_the_group_carries_no_window(self) -> None:
+        report = render(a_group(counted_over=None, occurrences=126))
+        header = next(s for s in report.sections if s.heading == EXCEPTION_HEADING)
+        assert "126 in this tick" in header.body
+
+
+class TestManyTenants:
+    """A group that spans the estate names its worst, and counts the rest.
+
+    Measured on 2026-08-25: one PSQLException grouped 66 tenants and 37,861
+    occurrences. Naming all 66 inline is a wall nobody reads; naming ten and
+    dropping 56 silently is the failure ADR-0026's per-service counts exist to
+    prevent. So the tail is summed and said out loud.
+    """
+
+    def _spread(self, tenants: int) -> ErrorGroup:
+        services = {f"plt-t{index:02d}": tenants - index for index in range(tenants)}
+        return a_group(services=services, occurrences=sum(services.values()))
+
+    def test_names_the_worst_tenants_in_order(self) -> None:
+        header = body(render(self._spread(66)), EXCEPTION_HEADING)
+
+        assert "`plt-t00` 66" in header
+        assert header.index("`plt-t00`") < header.index("`plt-t01`")
+
+    def test_counts_the_tail_rather_than_dropping_it(self) -> None:
+        group = self._spread(66)
+
+        header = body(render(group), EXCEPTION_HEADING)
+
+        assert "56 more" in header
+        named = sorted(group.services.values(), reverse=True)[:10]
+        assert f"{sum(group.services.values()) - sum(named):,}" in header
+
+    def test_a_small_group_names_every_tenant_and_summarises_nothing(self) -> None:
+        header = body(render(self._spread(4)), EXCEPTION_HEADING)
+
+        assert "`plt-t03` 1" in header
+        assert "more" not in header

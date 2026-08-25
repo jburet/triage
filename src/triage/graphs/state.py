@@ -298,6 +298,8 @@ class ErrorPollerState(TypedDict, total=False):
     """
 
     now: datetime | None
+    since: datetime | None
+    """An operator naming the window, bypassing the watermark and the catch-up clamp."""
 
     window: TimeWindow
     query: str

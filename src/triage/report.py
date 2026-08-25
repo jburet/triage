@@ -345,9 +345,28 @@ def issue_url(issue_id: str) -> str:
     return f"{DATADOG_APP}/apm/error-tracking/issue/{issue_id}"
 
 
+NAMED_SERVICES = 10
+"""How many tenants a report names before it starts counting them.
+
+One PSQLException grouped 66 tenants on 2026-08-25. Every one of them inline is
+a wall nobody reads; ten of them with the other fifty-six dropped is the failure
+the per-service counts exist to prevent (ADR-0026). So the tail is summed.
+"""
+
+
 def _seen_in(group: ErrorGroup) -> str:
     ordered = sorted(group.services.items(), key=lambda item: (-item[1], item[0]))
-    return " · ".join(f"`{service}` {count:,}" for service, count in ordered) or "_no service_"
+    if not ordered:
+        return "_no service_"
+    named, tail = ordered[:NAMED_SERVICES], ordered[NAMED_SERVICES:]
+    seen = " · ".join(f"`{service}` {count:,}" for service, count in named)
+    if not tail:
+        return seen
+    return (
+        f"{seen} · _and {len(tail)} more "
+        f"tenant{'' if len(tail) == 1 else 's'}, "
+        f"{sum(count for _, count in tail):,} occurrences between them_"
+    )
 
 
 def _versions(group: ErrorGroup) -> str:
@@ -387,16 +406,34 @@ def _recurrence(group: ErrorGroup) -> str | None:
     )
 
 
-def _exception_section(
-    group: ErrorGroup, collection: ErrorCollection, source_caveat: str | None
-) -> ReportSection:
-    window = collection.window
+def _counted_over(group: ErrorGroup) -> str:
+    """The clock this tick's count was measured on, or that it has none.
+
+    The end carries its own date whenever the window crosses midnight: a
+    backfill over a day rendered "between 2026-08-24 07:33 and 07:33 UTC",
+    which reads as no window at all.
+    """
+    window = group.counted_over
+    if window is None:
+        return "in this tick"
+    end = "%H:%M" if window.start.date() == window.end.date() else "%Y-%m-%d %H:%M"
+    return f"between {window.start:%Y-%m-%d %H:%M} and {window.end:{end}} UTC"
+
+
+def _exception_section(group: ErrorGroup, source_caveat: str | None) -> ReportSection:
+    """The exception's own identity (behaviour 4.4).
+
+    The occurrence span is the group's own ``first_seen``/``last_seen``, never
+    the collection's window: a tick replaying six hours collects over the last
+    one, and reading the count of the first against the clock of the second
+    dates a burst to an hour it did not happen in.
+    """
     lines = [
         f"*Type:* `{group.error_type}`",
         f"*Message:* {group.sample_message or '_the issue carried none_'}",
         f"*Raised at:* {_raised_at(group, source_caveat)}",
-        f"*Occurrences:* {group.occurrences:,} between {window.start:%Y-%m-%d %H:%M} and "
-        f"{window.end:%H:%M} UTC, across {len(group.services)} "
+        f"*Occurrences:* {group.occurrences:,} {_counted_over(group)}, across "
+        f"{len(group.services)} "
         f"service{'' if len(group.services) == 1 else 's'} of the same repository",
         f"*Seen in:* {_seen_in(group)}",
         f"*Versions:* {_versions(group)}",
@@ -548,7 +585,7 @@ def render_code_exception(
         ),
     }
     sections = (
-        _exception_section(group, collection, source_caveat),
+        _exception_section(group, source_caveat),
         *(ReportSection(section.heading, bodies[section]) for section in TicketSection),
     )
     return SlackReport(

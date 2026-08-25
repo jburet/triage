@@ -2,7 +2,7 @@
 
     make run-errors                          # one tick, in-memory, nothing persisted
     make run-errors ARGS="--db"              # one tick against Postgres, watermark and all
-    make run-errors ARGS="--hours 168"       # a week, to see what a backlog sweep would find
+    make run-errors ARGS="--hours 24"        # a day, to see what a backlog sweep would find
     make run-errors ARGS="--analyse"         # then drive every gated group end to end
 
 The sibling of ``scripts/run_poller``. F2 needs no Platform cron to be developed:
@@ -34,6 +34,7 @@ from triage.config import get_config, get_settings
 from triage.graphs.code_exception import run_code_exception
 from triage.graphs.error_poller import graph
 from triage.integrations.datadog import DatadogRestClient
+from triage.report import NAMED_SERVICES
 from triage.runtime import DEPS_KEY, Deps, build_deps, build_github
 from triage.schemas.errors import ErrorGroup
 
@@ -52,9 +53,19 @@ def parse(argv: list[str]) -> argparse.Namespace:
         "--hours",
         type=float,
         default=None,
-        help="override the window by pretending the watermark is this many hours old",
+        help="read this many hours back, ignoring the watermark and the catch-up limit",
     )
     return parser.parse_args(argv[1:])
+
+
+def _tenants(group: ErrorGroup) -> str:
+    """Worst first, and the tail counted — one group spanned 66 tenants."""
+    ordered = sorted(group.services.items(), key=lambda item: (-item[1], item[0]))
+    named, tail = ordered[:NAMED_SERVICES], ordered[NAMED_SERVICES:]
+    shown = ", ".join(f"{name} {count:,d}" for name, count in named)
+    if not tail:
+        return shown
+    return f"{shown}, and {len(tail)} more totalling {sum(c for _, c in tail):,d}"
 
 
 def report(state: dict) -> None:
@@ -90,7 +101,7 @@ def _groups(state: dict) -> None:
     print(f"  {DIM}groups{RESET}     {len(state.get('groups') or [])}")
     for decision in decisions:
         group = decision.group
-        services = ", ".join(f"{name} {count:,d}" for name, count in group.services.items())
+        services = _tenants(group)
         print(
             f"  {decision.outcome.value:<12} {group.occurrences:>8,d}  "
             f"{group.error_type.rsplit('.', 1)[-1]} at {group.source_location}"
@@ -123,14 +134,11 @@ async def main(argv: list[str]) -> int:
     else:
         print(f"{DIM}in-memory: no watermark survives this process (pass --db){RESET}")
 
+    tick: dict[str, object] = {}
     if options.hours is not None:
-        from triage.nodes.poll_errors import OVERLAP, POLLER_NAME
+        tick["since"] = datetime.now(UTC) - timedelta(hours=options.hours)
 
-        await deps.repo.set_watermark(
-            POLLER_NAME, datetime.now(UTC) - timedelta(hours=options.hours) + OVERLAP
-        )
-
-    state = await graph.ainvoke({}, config={"configurable": {DEPS_KEY: deps}})
+    state = await graph.ainvoke(tick, config={"configurable": {DEPS_KEY: deps}})
     report(state)
     if options.analyse:
         await analyse(deps, state.get("analysing") or [])

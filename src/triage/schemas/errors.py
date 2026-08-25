@@ -180,6 +180,15 @@ class ErrorGroup(BaseModel):
         ),
     )
 
+    counted_over: TimeWindow | None = Field(
+        default=None,
+        description=(
+            "The poll window ``occurrences`` was counted over. The issue's own "
+            "first_seen/last_seen is its lifetime and the collection's window is "
+            "the hour evidence was sought in; neither dates this tick's count."
+        ),
+    )
+
     first_seen: datetime
     last_seen: datetime
     first_seen_version: str | None = None
