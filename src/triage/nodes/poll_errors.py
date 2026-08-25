@@ -20,9 +20,11 @@ forbids — for *alerts*, where no usable tag exists. APM events carry one, and
 ADR-0025 records the departure.
 
 **Decide nothing else.** An issue that is neither new nor regressed in the
-window produces nothing, which over the reference hour was all fifteen of them.
-Grouping, the volume gate and the analysis are Phases 2 to 4; this node hands
-them a list and a count of what it held back.
+window produces no report, which over the reference hour was all fifteen of
+them — but it is kept rather than only counted, because a group held back below
+the floor is never new again and the cumulative escalation has nothing else to
+read (ADR-0030). Grouping, the volume gate and the analysis are Phases 2 to 4;
+this node hands them three lists and the counts that go with them.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -46,8 +48,10 @@ OVERLAP = timedelta(minutes=5)
 
 Larger than F1's two minutes for the same reason F1 has one at all: a cursor
 that has to be exact against a lag nobody has measured is a cursor that loses
-issues. Re-reading an issue is free — it is neither new nor regressed the second
-time, so it produces nothing.
+issues. Re-reading an issue costs a few percent of one group's count and no
+report: it is neither new nor regressed the second time, so it can only be
+counted again, and ``merged_error_group`` says why being wrong in that direction
+is the right way round.
 """
 
 CATCH_UP_LIMIT = timedelta(hours=6)
@@ -70,6 +74,7 @@ async def poll_error_issues(
         "issues_seen": {},
         "new": [],
         "regressed": [],
+        "occurring": [],
         "skipped": [],
         "failures": [],
         "unchanged": 0,
@@ -100,6 +105,7 @@ async def poll_error_issues(
         new=len(result["new"]),
         regressed=len(result["regressed"]),
         unchanged=result["unchanged"],
+        occurring=len(result["occurring"]),
         skipped=len(result["skipped"]),
     )
     return result
@@ -134,17 +140,25 @@ async def _read_track(
 
 
 def _sort(issue: ErrorIssue, window: TimeWindow, result: ErrorPollerState) -> None:
-    """New, regressed, skipped with a reason, or nothing — in that order.
+    """New, regressed, skipped with a reason, or merely occurring — in that order.
 
     Novelty is decided before the code-exception rule so that the fifteen issues
     of a quiet hour are counted as unchanged rather than reported as skipped: an
     issue nobody is going to look at is not worth a reason.
+
+    An issue that is neither new nor regressed is still counted *and kept*. It
+    produces no report — that is ADR-0025's rule and it stands — but it is the
+    only thing that can move the cumulative total of a group already known,
+    because Datadog marks an issue new exactly once and a group held back below
+    the floor would otherwise never be observed again (ADR-0030).
     """
     why = novelty(issue, window)
+    reason = not_a_code_exception(issue)
     if why is None:
         result["unchanged"] += 1
+        if reason is None:
+            result["occurring"].append(issue)
         return
-    reason = not_a_code_exception(issue)
     if reason is not None:
         result["skipped"].append(
             SkippedIssue(issue_id=issue.issue_id, service=issue.service, reason=reason)

@@ -307,6 +307,9 @@ class ErrorPollerState(TypedDict, total=False):
 
     new: list[ErrorIssue]
     regressed: list[ErrorIssue]
+    occurring: list[ErrorIssue]
+    """Neither new nor regressed, and kept anyway: the only material the
+    cumulative escalation has, since Datadog calls an issue new once (ADR-0030)."""
     unchanged: int
     skipped: list[SkippedIssue]
     failures: list[str]
@@ -319,6 +322,8 @@ class ErrorPollerState(TypedDict, total=False):
     groups: list[ErrorGroup]
     decisions: list[GateDecision]
     analysing: list[ErrorGroup]
+    seen_again: int
+    """Groups whose total this tick moved without seeing them arrive."""
     held_back: int
     deferred: list[str]
     unmapped: list[str]

@@ -76,6 +76,7 @@ def group_issues(
     resolve: ResolveService,
     *,
     regressed: Collection[str] = (),
+    seen_as: Novelty = Novelty.NEW,
     counted_over: TimeWindow | None = None,
 ) -> list[ErrorGroup]:
     """One group per defect, worst first, with the count in every service it was seen in.
@@ -83,6 +84,10 @@ def group_issues(
     ``regressed`` names the issue ids whose regression reopened them in this
     window. A group any of whose issues regressed is a regression: a fix that did
     not hold is a different report from a defect nobody has seen.
+
+    ``seen_as`` is what the tick was looking at: issues that went new by default,
+    or ``continuing`` for the pass over the ones that merely went on happening,
+    whose groups may move a total and nothing else (ADR-0030).
     """
     groups: dict[str, ErrorGroup] = {}
     for issue in issues:
@@ -93,7 +98,7 @@ def group_issues(
         key = group_key(error_type, file_path, issue.function_name, _name(where), issue.service)
         existing = groups.get(key)
         groups[key] = (
-            _started(key, error_type, file_path, issue, where, counted_over)
+            _started(key, error_type, file_path, issue, where, seen_as, counted_over)
             if existing is None
             else _extended(existing, issue)
         )
@@ -112,6 +117,7 @@ def _started(
     file_path: str,
     issue: ErrorIssue,
     where: ServiceRepository | None,
+    seen_as: Novelty,
     counted_over: TimeWindow | None,
 ) -> ErrorGroup:
     return ErrorGroup(
@@ -123,7 +129,7 @@ def _started(
         repo_url=where.repo_url if where else None,
         team=where.team if where else None,
         track=issue.track,
-        novelty=Novelty.NEW,
+        novelty=seen_as,
         services={issue.service: issue.occurrences},
         occurrences=issue.occurrences,
         issue_ids=[issue.issue_id],

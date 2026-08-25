@@ -96,6 +96,35 @@ class TestWhatTheTickDecides:
         assert state.get("regressed", []) == []
         assert state["unchanged"] == 15
 
+    async def test_but_the_issues_it_saw_are_kept_for_the_totals_they_move(
+        self, deps: Deps
+    ) -> None:
+        """Not a report and not nothing: the escalation's only material (ADR-0030)."""
+        state = await tick(deps)
+
+        assert len(state["occurring"]) == 15
+        total = sum(issue.occurrences for issue in state["occurring"])
+        assert total == 19247, "the reference hour's whole distribution, 6344 down to 1"
+
+    async def test_one_it_could_never_analyse_is_not_kept(self, config: Config) -> None:
+        """A count with no source location moves a total nothing can ever be done about."""
+        deps = build_deps(
+            config,
+            datadog=FakeDatadogClient(
+                responses={
+                    "error_issues": {
+                        "track:trace": _without_file_paths(),
+                        "track:logs": {"data": []},
+                    }
+                }
+            ),
+        )
+
+        state = await tick(deps)
+
+        assert state["unchanged"] == 15
+        assert state["occurring"] == []
+
     async def test_a_window_containing_a_regression_finds_it(self, deps: Deps) -> None:
         """Three of the fifteen regressed; the latest was 2026-08-18."""
         state = await tick(deps, now=datetime(2026, 8, 18, 17, tzinfo=UTC))
@@ -210,5 +239,15 @@ def _without_file_paths() -> dict:
     return payload
 
 
-def test_novelty_is_the_only_reason_a_tick_looks_at_an_issue() -> None:
-    assert set(Novelty) == {Novelty.NEW, Novelty.REGRESSED}
+def test_novelty_is_the_only_reason_a_tick_reports_an_issue() -> None:
+    """Two ways in, and one that is not a way in at all.
+
+    ``continuing`` is what a group was to a tick that only saw it go on
+    happening (ADR-0030). It moves a total and can never produce a report, so an
+    issue still arrives by exactly the two doors ADR-0025 named.
+    """
+    assert set(Novelty) == {Novelty.NEW, Novelty.REGRESSED, Novelty.CONTINUING}
+    assert {novelty for novelty in Novelty if novelty is not Novelty.CONTINUING} == {
+        Novelty.NEW,
+        Novelty.REGRESSED,
+    }

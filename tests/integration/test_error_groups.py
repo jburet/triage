@@ -23,7 +23,7 @@ from triage.errors.grouping import group_key
 from triage.graphs.error_poller import graph
 from triage.integrations.datadog import FakeDatadogClient
 from triage.nodes.poll_errors import POLLER_NAME
-from triage.schemas.errors import ErrorGroupStatus
+from triage.schemas.errors import ErrorGroupStatus, Novelty
 
 CAPTURE_END = datetime(2026, 8, 25, 5, 35, 24, tzinfo=UTC)
 TICK = datetime(2026, 8, 25, 6, 0, tzinfo=UTC)
@@ -52,20 +52,27 @@ def platform_config(**errors: int) -> Config:
     return config.model_copy(update={"errors": config.errors.model_copy(update=errors)})
 
 
-def news_at(now: datetime) -> FakeDatadogClient:
-    """The captured search with every issue first seen ten minutes before the tick.
+def new_at(first_seen: datetime) -> FakeDatadogClient:
+    """The captured search with every issue first seen at one fixed moment.
 
     The occurrence counts, services, types and source locations are untouched:
-    only the moment moves, so that a hour in which nothing was new can exercise
-    what a tick does with issues that are.
+    only the moment moves, so that an hour in which nothing was new can exercise
+    what a tick does with issues that are — and so that a *later* tick, whose
+    window that moment has fallen out of, meets the same issues as Datadog will
+    really present them: still occurring, and never new again.
     """
     payload = captured_errors("search_trace")
-    first_seen = int((now - timedelta(minutes=10)).timestamp() * 1000)
+    stamp = int(first_seen.timestamp() * 1000)
     for issue in payload["included"]:
-        issue["attributes"]["first_seen"] = first_seen
+        issue["attributes"]["first_seen"] = stamp
     return FakeDatadogClient(
         responses={"error_issues": {"track:trace": payload, "track:logs": {"data": []}}}
     )
+
+
+def news_at(now: datetime) -> FakeDatadogClient:
+    """Issues that all went new ten minutes before this tick."""
+    return new_at(now - timedelta(minutes=10))
 
 
 @pytest.fixture
@@ -73,9 +80,20 @@ def repo() -> InMemoryRepository:
     return InMemoryRepository()
 
 
-async def tick(repo: InMemoryRepository, now: datetime, config: Config | None = None) -> dict:
-    """One tick whose window ends at ``now``, on a poller that ran half an hour ago."""
-    deps = build_deps(config or platform_config(), datadog=news_at(now), repo=repo)
+async def tick(
+    repo: InMemoryRepository,
+    now: datetime,
+    config: Config | None = None,
+    first_seen: datetime | None = None,
+) -> dict:
+    """One tick whose window ends at ``now``, on a poller that ran half an hour ago.
+
+    ``first_seen`` fixes the moment every issue went new. Left out, it moves with
+    the tick and every issue is news; given once and reused across ticks, it is
+    the real shape — new in one window and merely occurring in all the others.
+    """
+    datadog = news_at(now) if first_seen is None else new_at(first_seen)
+    deps = build_deps(config or platform_config(), datadog=datadog, repo=repo)
     await repo.set_watermark(POLLER_NAME, now - timedelta(minutes=30))
     return await graph.ainvoke({"now": now}, config=run_config(deps))
 
@@ -198,14 +216,25 @@ class TestThePersistenceGate:
 
 
 class TestTheSlowBleed:
-    """2.4 — four an hour, every hour, never ten in one tick."""
+    """2.4 — four an hour, every hour, never ten in one tick.
+
+    Datadog marks an issue new exactly *once*, so every tick after the first
+    meets this defect as an issue that is neither new nor regressed. The
+    escalation is fed by those (ADR-0030) or it is fed by nothing: before that,
+    a group held back below the floor was never observed again and its
+    cumulative total never moved, so this behaviour could not fire at all.
+    """
+
+    FIRST_SEEN = TICK - timedelta(minutes=10)
 
     async def test_it_is_analysed_once_the_cumulative_count_crosses(
         self, repo: InMemoryRepository
     ) -> None:
         taken_at = None
         for hour in range(30):
-            state = await tick(repo, TICK + timedelta(hours=hour))
+            state = await tick(repo, TICK + timedelta(hours=hour), first_seen=self.FIRST_SEEN)
+            if hour:
+                assert state["new"] == [], "Datadog calls an issue new in one window only"
             if QUIETEST in [group.key for group in state["analysing"]]:
                 taken_at = hour
                 break
@@ -216,7 +245,7 @@ class TestTheSlowBleed:
         self, repo: InMemoryRepository
     ) -> None:
         for hour in range(25):
-            state = await tick(repo, TICK + timedelta(hours=hour))
+            state = await tick(repo, TICK + timedelta(hours=hour), first_seen=self.FIRST_SEEN)
             quiet = next(group for group in state["groups"] if group.key == QUIETEST)
             assert quiet.occurrences == 4
 
@@ -225,6 +254,31 @@ class TestTheSlowBleed:
         assert stored.cumulative_occurrences == 100
         assert stored.analysis_count == 1
         assert stored.analysed_at_cumulative == 100
+
+    async def test_the_later_ticks_saw_it_again_rather_than_saw_it_arrive(
+        self, repo: InMemoryRepository
+    ) -> None:
+        await tick(repo, TICK, first_seen=self.FIRST_SEEN)
+
+        state = await tick(repo, TICK + timedelta(hours=1), first_seen=self.FIRST_SEEN)
+
+        assert state["seen_again"] == 7, "every group of the hour, none of them news"
+        assert state["new"] == []
+        assert state["analysing"] == [], "seeing a group again is not reporting it"
+        quiet = next(group for group in state["groups"] if group.key == QUIETEST)
+        assert quiet.novelty is Novelty.CONTINUING
+        assert quiet.cumulative_occurrences == 8
+        assert state["held_back"] == 2
+
+    async def test_a_group_no_tick_ever_saw_arrive_is_not_created_by_one(
+        self, repo: InMemoryRepository
+    ) -> None:
+        """The org's whole backlog goes on occurring; a tick that rowed it would report it."""
+        state = await tick(repo, TICK, first_seen=TICK - timedelta(days=9))
+
+        assert state["unchanged"] == 15
+        assert state["groups"] == []
+        assert await repo.error_groups_open() == []
 
 
 class TestNotReportedTwice:

@@ -78,6 +78,7 @@ def report(state: dict) -> None:
     for track, count in (state.get("issues_seen") or {}).items():
         print(f"  {DIM}{track}{RESET}      {count} issues occurring")
     print(f"  {'unchanged':<12} {state.get('unchanged', 0)}")
+    print(f"  {'seen again':<12} {state.get('seen_again', 0)} known groups had their total moved")
     for label, key in (("new", "new"), ("regressed", "regressed")):
         for issue in state.get(key, []) or []:
             print(
