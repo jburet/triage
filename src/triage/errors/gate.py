@@ -96,6 +96,8 @@ def _decide(group: ErrorGroup, config: ErrorsConfig, now: datetime) -> tuple[Gat
         return GateOutcome.UNMAPPED, group.unanalysable_reason or "no repository resolves for it"
     if group.analysis_count:
         return _again(group, config, now)
+    if group.novelty is Novelty.CONTINUING:
+        return _seen_again(group, config)
     if group.occurrences >= config.min_occurrences:
         return (
             GateOutcome.ANALYSE,
@@ -115,6 +117,32 @@ def _decide(group: ErrorGroup, config: ErrorsConfig, now: datetime) -> tuple[Gat
         f"{group.occurrences} occurrences this tick and {group.cumulative_occurrences} in "
         f"total, below both the floor of {config.min_occurrences} and the escalation "
         f"threshold of {config.cumulative_occurrences}",
+    )
+
+
+def _seen_again(group: ErrorGroup, config: ErrorsConfig) -> tuple[GateOutcome, str]:
+    """A group that has never been reported and was not new or regressed this tick.
+
+    The floor is deliberately out of reach here. ADR-0025 says an issue that is
+    neither new nor regressed produces no report, and a tick that merely counted
+    a group again has not seen it arrive; what it did is move the total. So the
+    escalation — a statement about the group's whole life — is the only door
+    open, which is exactly the slow bleed ADR-0030 made reachable.
+    """
+    if group.cumulative_occurrences >= config.cumulative_occurrences:
+        return (
+            GateOutcome.ANALYSE,
+            f"{group.occurrences} more occurrences this tick, neither new nor regressed, so "
+            f"the floor does not apply — but {group.cumulative_occurrences} in total has "
+            f"crossed the escalation threshold of {config.cumulative_occurrences}: a bleed no "
+            f"single tick is large enough to show",
+        )
+    return (
+        GateOutcome.HELD_BACK,
+        f"{group.occurrences} more occurrences this tick, neither new nor regressed, and "
+        f"{group.cumulative_occurrences} in total — below the escalation threshold of "
+        f"{config.cumulative_occurrences}, and the floor of {config.min_occurrences} applies "
+        f"only to occurrences that arrived new or regressed",
     )
 
 

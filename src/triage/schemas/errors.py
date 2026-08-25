@@ -49,14 +49,21 @@ class ErrorPersona(StrEnum):
 class Novelty(StrEnum):
     """Why a tick is looking at an issue at all.
 
-    Kept apart because they are different reports: a defect nobody has seen and
-    a fix that did not hold are not the same news. It lives with the schema
-    rather than with the rule that decides it, because the group carries it too
-    and a schema may not import the rules that fill it.
+    ``new`` and ``regressed`` are kept apart because they are different reports:
+    a defect nobody has seen and a fix that did not hold are not the same news.
+
+    ``continuing`` is not an issue's novelty at all — Datadog marks an issue new
+    exactly once — it is what a *group* was to the tick that only saw it go on
+    happening. It exists because without it the cumulative escalation could never
+    fire (ADR-0030): a group held back below the floor is never new again, so
+    nothing would ever add to the total the escalation reads. A group carrying it
+    may be escalated on that total; it may never clear the floor, because
+    refreshing a count is not reporting.
     """
 
     NEW = "new"
     REGRESSED = "regressed"
+    CONTINUING = "continuing"
 
 
 class ErrorIssue(BaseModel):

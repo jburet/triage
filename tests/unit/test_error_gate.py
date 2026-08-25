@@ -245,3 +245,47 @@ def test_an_empty_tick_decides_nothing(errors: ErrorsConfig) -> None:
     """The common case: no issue in the reference hour was new or regressed."""
     assert gate([], errors, NOW) == []
     assert held_back([]) == 0
+
+
+class TestSeenAgainButNotNew:
+    """The escalation's material: a tick that only re-counted a group it already knew.
+
+    Datadog marks an issue new exactly once, so a group held back below the floor
+    is never *new* again — which is why the escalation had to be fed from the
+    issues that merely went on occurring (ADR-0030). What such a tick may do is
+    bounded: it moves the total, and the total is the only thing that can promote
+    the group.
+    """
+
+    def test_a_group_only_seen_again_cannot_clear_the_floor(self, errors: ErrorsConfig) -> None:
+        """Refreshing a count is not reporting. ADR-0025's rule, kept."""
+        seen = a_group(30, novelty=Novelty.CONTINUING, cumulative_occurrences=34)
+
+        decisions = gate([seen], errors, NOW)
+
+        assert decisions[0].outcome is GateOutcome.HELD_BACK
+        assert "neither new nor regressed" in decisions[0].reason
+
+    def test_but_the_total_it_moved_still_escalates(self, errors: ErrorsConfig) -> None:
+        """2.4, for the first time truthfully: four an hour, new in one tick only."""
+        bleeding = a_group(4, novelty=Novelty.CONTINUING, cumulative_occurrences=100)
+
+        decisions = gate([bleeding], errors, NOW)
+
+        assert decisions[0].outcome is GateOutcome.ANALYSE
+        assert "100 in total" in decisions[0].reason
+
+    def test_an_already_reported_group_is_still_going_on_its_continuing_count(
+        self, errors: ErrorsConfig
+    ) -> None:
+        """The other clause the same defect killed: "still at N a tick a week later"."""
+        stale = reported(
+            occurrences=50,
+            novelty=Novelty.CONTINUING,
+            last_analysed_at=NOW - timedelta(hours=errors.reanalyse_after + 1),
+        )
+
+        decisions = gate([stale], errors, NOW)
+
+        assert decisions[0].outcome is GateOutcome.ANALYSE
+        assert "still at 50" in decisions[0].reason
