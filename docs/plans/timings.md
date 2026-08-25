@@ -147,3 +147,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M7 merge | make lint + make test (698) on the four branches merged | 8 |
 | 2026-08-25 | M8 phase 1.1 | make capture-errors (13 live read-only calls, 1 throttle) | 8 |
 | 2026-08-25 | M8 phase 1.1 | make lint + make test (698 passed) | 15 |
+| 2026-08-25 | M8 phases 1.2/1.4/1.5/1.6 | make lint + make test (725 passed) | 14 |

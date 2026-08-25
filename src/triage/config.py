@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from triage.schemas.common import Confidence, Feature
+from triage.schemas.errors import ErrorPersona, ErrorTrack
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config.yaml"
 
@@ -185,6 +186,38 @@ class CollectionConfig(BaseModel):
     max_prompt_bytes: int = Field(default=60_000, ge=1_000)
 
 
+class ErrorsConfig(BaseModel):
+    """The hourly code-exception pass, and what it refuses to look at (ADR-0025).
+
+    ``min_occurrences`` is a floor per tick and ``cumulative_occurrences`` the
+    escalation that keeps a slow bleed from being invisible forever. Both are
+    starting points rather than measurements: over the reference hour fifteen
+    issues occurred with counts of 6344, 5869, 4009, 850, 835, 650, 435, 200,
+    29, 15, 4, 2, 2, 2 and 1, so a floor of ten holds back a third of them.
+    Correcting these against a week of real ticks is the first week's job, and a
+    floor set too low turns a team's channel into an error stream — the failure
+    mode ADR-0023 says to watch for.
+    """
+
+    tracks: list[ErrorTrack] = Field(
+        default_factory=lambda: [ErrorTrack.TRACE, ErrorTrack.LOGS],
+        description=(
+            "One search per track. The org's `logs` track answered empty at every "
+            "window and persona tried on 2026-08-25 — its Error Tracking is fed by "
+            "APM spans alone — and it is asked anyway, for eleven bytes an hour, "
+            "because an empty answer is evidence and a track nobody asks about is not."
+        ),
+    )
+    persona: ErrorPersona = ErrorPersona.BACKEND
+    min_occurrences: int = Field(default=10, ge=1)
+    cumulative_occurrences: int = Field(default=100, ge=1)
+    max_groups_per_tick: int = Field(default=5, ge=1)
+    lookback_minutes: int = Field(default=60, ge=1)
+    reanalyse_after: int = Field(
+        default=168, ge=1, description="Hours before an already-reported group is looked at again."
+    )
+
+
 class JobResources(BaseModel):
     """What one analysis may consume before the kubelet stops it.
 
@@ -244,6 +277,7 @@ class Config(BaseModel):
     thresholds: Thresholds
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     collection: CollectionConfig = Field(default_factory=CollectionConfig)
+    errors: ErrorsConfig = Field(default_factory=ErrorsConfig)
 
     @property
     def files_tickets(self) -> bool:

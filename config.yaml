@@ -69,6 +69,7 @@ thresholds:
   # F3 is proactive and noisier than F1, so it earns a higher bar.
   ticket_confidence:
     F1: medium
+    F2: medium
     F3: high
 
   # Re-alert Slack on an updated (deduplicated) ticket at this occurrence count,
@@ -119,3 +120,31 @@ collection:
   max_timeseries_series: 6
   max_timeseries_points: 60
   max_prompt_bytes: 60000
+
+# The hourly code-exception pass (F2, ADR-0025, ADR-0026). Read-only on Datadog
+# Error Tracking; the environments it watches come from the teams above and go
+# into the query, so an issue from an environment nobody configured is never
+# returned rather than returned and dropped.
+errors:
+  # One search per track. The org's `logs` track answered empty at every window
+  # and persona tried on 2026-08-25 — its Error Tracking is fed by APM spans
+  # alone — and it is asked anyway, for eleven bytes an hour, because an empty
+  # answer is evidence and a track nobody asks is not.
+  tracks: [trace, logs]
+  persona: BACKEND
+
+  # The volume gate. Measured over the reference hour, fifteen issues occurred
+  # with counts of 6344, 5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2,
+  # 2 and 1: a floor of ten holds back a third of them. It is a starting point,
+  # not a measurement — correcting it against a week of real ticks is the first
+  # week's job, and a floor set too low turns a team's channel into an error
+  # stream, which is the failure mode ADR-0023 says to watch for.
+  min_occurrences: 10
+  cumulative_occurrences: 100
+  max_groups_per_tick: 5
+
+  # The first tick has no watermark, and every collection runs back this far.
+  lookback_minutes: 60
+
+  # Hours before a group already reported is looked at again.
+  reanalyse_after: 168
