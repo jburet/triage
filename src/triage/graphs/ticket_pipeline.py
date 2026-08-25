@@ -33,6 +33,7 @@ from triage.nodes.publish import (
     create_ticket,
     notify_below_threshold,
     notify_review_exhausted,
+    publish_report,
 )
 from triage.nodes.self_review import self_review
 from triage.runtime import deps_from_runnable_config
@@ -49,8 +50,16 @@ def route_after_dedup(
 
 def route_after_gate(
     state: TicketPipelineState, config: RunnableConfig | None = None
-) -> Literal["compose_ticket", "notify_below_threshold"]:
+) -> Literal["publish_report", "compose_ticket", "notify_below_threshold"]:
+    """Report, or take the Jira path — and only then let the threshold route.
+
+    With ``writes: slack`` the threshold has nothing left to route between: both
+    of its destinations are the same channel, so it frames the report instead
+    (ADR-0023) and the gate is passed through.
+    """
     deps = deps_from_runnable_config(config)
+    if not deps.config.files_tickets:
+        return "publish_report"
     diagnosis = state["diagnosis"]
     if passes_gate(diagnosis.confidence, diagnosis.feature, deps.config):
         return "compose_ticket"
@@ -90,6 +99,7 @@ def build_graph() -> TicketPipelineGraph:
     builder.add_node("create_ticket", create_ticket)
     builder.add_node("notify_below_threshold", notify_below_threshold)
     builder.add_node("notify_review_exhausted", notify_review_exhausted)
+    builder.add_node("publish_report", publish_report)
 
     builder.add_edge(START, "record_diagnosis")
     builder.add_edge("record_diagnosis", "dedup_check")
@@ -101,6 +111,7 @@ def build_graph() -> TicketPipelineGraph:
     builder.add_conditional_edges("self_review", route_after_review)
     builder.add_edge("create_ticket", END)
     builder.add_edge("notify_review_exhausted", END)
+    builder.add_edge("publish_report", END)
 
     return builder
 

@@ -14,7 +14,7 @@ and produces a precise, evidence-backed work item.
   unknown, with the reason — enforced by the schemas, not by prompt instruction.
 
 See [`docs/roadmap.md`](docs/roadmap.md) for the product, [`docs/architecture.md`](docs/architecture.md)
-for the system, [`docs/ticket-spec.md`](docs/ticket-spec.md) for what a finished ticket
+for the system, [`docs/ticket-spec.md`](docs/ticket-spec.md) for what a finished report
 must contain, and [`docs/adr/`](docs/adr/) for the decisions behind both.
 
 ## Status

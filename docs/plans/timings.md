@@ -113,3 +113,13 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-24 | follow_up compose | make lint + make test (606) | 4 |
 | 2026-08-24 | model-name check | make lint + make test (611) | 4 |
 | 2026-08-24 | F1 end to end | make run-incident, proxy provider, 4 tier calls, no retries | 64 |
+| 2026-08-24 | M7 phase 1.1 | make lint + make test (614 passed) | 6 |
+| 2026-08-24 | M7 phase 1.2 | make lint + make test (616 passed) | 6 |
+| 2026-08-24 | M7 phase 1.3 | make lint + make test (617 passed) | 5 |
+| 2026-08-24 | M7 phase 1.4 | make lint + make test (618 passed) | 5 |
+| 2026-08-24 | M7 phase 1.5 | make lint + make test (618 passed) | 5 |
+| 2026-08-24 | M7 phase 2.1 | make lint + make test (620 passed) | 5 |
+| 2026-08-24 | M7 phase 2.2 | make lint + make test (621 passed) | 5 |
+| 2026-08-24 | M7 phase 2.3 | make lint + make test (623 passed) | 5 |
+| 2026-08-24 | M7 phase 2.4 | make lint + make test (625 passed) | 5 |
+| 2026-08-24 | M7 phase 2.5 | make lint + make test (628 passed) | 8 |

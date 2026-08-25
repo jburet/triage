@@ -32,7 +32,13 @@ from triage.schemas.ticket import PipelineOutcome
 
 log = structlog.get_logger(__name__)
 
-TICKETED_OUTCOMES = (PipelineOutcome.TICKET_CREATED, PipelineOutcome.TICKET_UPDATED)
+SETTLED_STATUS: dict[PipelineOutcome, SignalStatus] = {
+    PipelineOutcome.TICKET_CREATED: SignalStatus.TICKETED,
+    PipelineOutcome.TICKET_UPDATED: SignalStatus.TICKETED,
+    PipelineOutcome.REPORT_POSTED: SignalStatus.REPORTED,
+}
+"""How an incident ended, as the signal records it. Anything absent is a run that
+concluded nothing a human was shown, and is ``discarded``."""
 
 
 def _signal_for(alert: Alert, team: str | None, service: str) -> Signal:
@@ -111,7 +117,9 @@ async def settle_signal(
     if signal is None:
         return {}
     outcome = state.get("outcome")
-    status = SignalStatus.TICKETED if outcome in TICKETED_OUTCOMES else SignalStatus.DISCARDED
+    status = SignalStatus.DISCARDED
+    if outcome is not None:
+        status = SETTLED_STATUS.get(outcome, status)
     return {"signal": await deps.repo.update_signal(signal.model_copy(update={"status": status}))}
 
 

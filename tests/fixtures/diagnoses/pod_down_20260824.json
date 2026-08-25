@@ -1,0 +1,103 @@
+{
+  "diagnosis_id": "9c844611-5ee4-43bb-bd85-3b62c621332b",
+  "feature": "F1",
+  "service": "plt-hcl-software-uat",
+  "team": "platform",
+  "symptom": {
+    "description": "Pod plt-hcl-software-uat-0 (container_name:platform) was killed with exit code 137 at 02:43:04Z. The StatefulSet's ready_replicas dropped 1 to 0 at 02:42:52Z and recovered 0 to 1 at 02:45:41Z, about 2m49s of unavailability.",
+    "window": {"start": "2026-08-24T02:23:16Z", "end": "2026-08-24T03:03:16Z"}
+  },
+  "impact": {
+    "users": {
+      "unknown": true,
+      "reason": "No user-facing traffic, session or request-error metric was collected for this service, and the spans collector returned not_instrumented, so nobody can be counted."
+    },
+    "services": ["plt-hcl-software-uat"],
+    "slos": {
+      "unknown": true,
+      "reason": "No availability or latency objective is declared for this tenant in anything Triage reads, so the 2m49s cannot be measured against one."
+    }
+  },
+  "probable_cause": {
+    "unknown": true,
+    "reason": "Both ranked hypotheses (index 0, OOM or probe kill; index 1, application CPU runaway) were dry runs. No analysis Job was submitted for either, so neither the infrastructure configuration nor the application code was read, and the telemetry alone does not distinguish them."
+  },
+  "confidence": "low",
+  "confidence_rationale": "Probable cause is unknown, which forces low by rule. Beyond that, both analysable hypotheses ran as dry runs and produced no code- or config-level evidence, so there is no second independent line of support to raise confidence even if a cause were named. The telemetry establishes that a kill happened and how it looked, not why.",
+  "evidence": [
+    {
+      "kind": "k8s_event",
+      "description": "Containerd task 525b6e0b20b1d494c592c7c69dc3b7735515fadb1236e444127b7cbf2177ab26 for pod plt-hcl-software-uat-0 (container_name:platform) deleted with exit code 137 at 02:43:04Z; a new container started at 02:43:05Z on the same image digest."
+    },
+    {
+      "kind": "metric",
+      "description": "kubernetes.cpu.usage.total spiked to about 1.78e9 between 02:42:50 and 02:43:50, against a baseline of 10-25M, roughly two orders of magnitude higher, and was back at baseline by 02:44:30."
+    },
+    {
+      "kind": "metric",
+      "description": "kubernetes.memory.working_set was flat at about 1.565 GB (roughly 59% of the flat 2.68 GB limit) for the 20 minutes before the event, dropped from 02:43:30 to a low of about 1.05 GB (39.5%), then climbed back towards 1.26 GB by 03:02."
+    },
+    {
+      "kind": "metric",
+      "description": "kubernetes.containers.restarts rose from a flat 5 to a peak of 12.0 by about 02:43:50, then settled at 6.0 by about 02:44:50, consistent with one additional restart cycle around the kill."
+    },
+    {
+      "kind": "log",
+      "description": "37 error-level log lines aggregated in the window, and a steady stream of 'platform api authentication failed' warnings: 36 of the 89 warn-level lines sampled, recurring roughly once a minute from 02:51 through 03:03, continuing well after the pod recovered."
+    }
+  ],
+  "location": {
+    "repo": {
+      "unknown": true,
+      "reason": "no analysed hypothesis was selected as the cause, so no repository or commit could be resolved"
+    },
+    "commit": {
+      "unknown": true,
+      "reason": "no analysed hypothesis was selected as the cause, so no repository or commit could be resolved"
+    },
+    "paths": [],
+    "terraform_resource": null
+  },
+  "expected_change": {
+    "statement": "No further exit-137 termination of plt-hcl-software-uat-0, with kubernetes.containers.restarts flat across a full 24 hours.",
+    "how_to_verify": "The kubernetes.containers.restarts and kubernetes.memory.working_set series for service:plt-hcl-software-uat in Datadog, over the 24 hours after the change."
+  },
+  "out_of_scope": [],
+  "ruled_out": [
+    {
+      "hypothesis": "The recurring 'platform api authentication failed' warning (36 occurrences, roughly once per minute, continuing from 02:51 through 03:03) is the cause of the kill.",
+      "why": "Ranked 0.25, below the 0.30 floor for analysis."
+    },
+    {
+      "hypothesis": "Both StatefulSet update events (02:42:52 and 02:45:41) are explicitly verdicted as no specification change, only ready_replicas moved, so a deployment caused the kill.",
+      "why": "Ranked 0.05, below the 0.30 floor for analysis."
+    }
+  ],
+  "unknowns": [
+    {
+      "question": "Was the exit-137 kill an OOM-kill, a liveness or readiness probe-enforced restart, or an eviction?",
+      "why_unresolved": "Both ranked hypotheses (index 0 infra, index 1 app) were dry runs. No analysis Job was submitted, so the StatefulSet's probe timeouts and memory limits in the infrastructure repository were never read."
+    },
+    {
+      "question": "What is the mechanism behind the coincident CPU spike to about 1.78e9 at the moment of the kill?",
+      "why_unresolved": "No trace-level evidence exists: the spans collector returned not_instrumented for this scope over the window and over seven days, so this tenant emits no APM at all."
+    },
+    {
+      "question": "Are the recurring 'platform api authentication failed' warnings a cause, a consequence, or unrelated background noise?",
+      "why_unresolved": "This hypothesis ranked 0.25, below the 0.30 analysis floor, so it was never investigated; nothing in the collection distinguishes the three."
+    },
+    {
+      "question": "Who and how many users were affected during the roughly 2m49s of unavailability?",
+      "why_unresolved": "No user-facing traffic, session or request-error metric was collected for this service, and no APM spans exist to count requests from."
+    },
+    {
+      "question": "Was it caused by: Exit code 137 indicates the container was killed (SIGKILL), most consistent with an OOM-kill or a liveness probe restart?",
+      "why_unresolved": "The iac_analysis of this hypothesis did not run to completion: dry run, no analysis Job was submitted, so nothing was analysed."
+    },
+    {
+      "question": "Was it caused by: A CPU usage spike two orders of magnitude above baseline beginning at 02:42:50, coincident with the kill?",
+      "why_unresolved": "The code_analysis of this hypothesis did not run to completion: dry run, no analysis Job was submitted, so nothing was analysed."
+    }
+  ],
+  "created_at": "2026-08-24T17:06:56Z"
+}

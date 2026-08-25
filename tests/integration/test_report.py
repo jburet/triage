@@ -1,0 +1,416 @@
+"""The Slack-only release: what a diagnosis becomes when nothing writes to Jira.
+
+Assertions are on what the pipeline did — the messages posted, the Jira fake
+that must have recorded nothing — and on what the rendered report says, because
+under ADR-0023 the report *is* the product and there is no ticket behind it to
+carry the content instead.
+"""
+
+from tests.conftest import (
+    a_service_entry,
+    a_verdict,
+    a_workload,
+    build_deps,
+    fake_datadog,
+    load_diagnosis,
+    mapped,
+    pod_down_alert,
+    run_config,
+)
+from triage.db.repo import InMemoryRepository
+from triage.graphs.incident import build_graph
+from triage.graphs.ticket_pipeline import graph
+from triage.report import MAX_MESSAGE_CHARS
+from triage.schemas import (
+    DedupDecision,
+    PipelineOutcome,
+    ReviewVerdict,
+    TicketDraft,
+    TicketSection,
+)
+from triage.schemas.diagnosis import Evidence, EvidenceKind
+from triage.schemas.signal import SignalStatus
+
+
+async def run(diagnosis, deps):
+    return await graph.ainvoke({"diagnosis": diagnosis}, config=run_config(deps))
+
+
+async def test_a_confident_diagnosis_is_reported_and_never_filed(config, oom_diagnosis):
+    """The release writes only to Slack: the recording fake must record nothing."""
+    deps = build_deps(config)
+    state = await run(oom_diagnosis, deps)
+
+    assert state["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert deps.jira.created == []
+    assert deps.jira.comments == []
+    assert state["ticket_key"] is None
+    assert deps.slack.messages
+
+
+async def test_the_report_costs_no_model_call(config, oom_diagnosis):
+    """The renderer is a rule: nothing about the report is worth a tier call."""
+    deps = build_deps(config)
+    await run(oom_diagnosis, deps)
+    assert deps.llm.calls_for(TicketDraft) == []
+
+
+async def test_a_reported_incident_settles_as_reported_rather_than_discarded(config):
+    """F1 end to end under the release: nothing filed, and the signal says so.
+
+    ``discarded`` is what the signal said before this: the outcome table only knew
+    about tickets, so an incident whose whole report went to the team read, in
+    the database Triage evaluates itself from, as one it had thrown away.
+    """
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry("plt-hcl-software-uat")),
+        datadog=fake_datadog(),
+    )
+    result = (
+        await build_graph()
+        .compile()
+        .ainvoke({"alert": pod_down_alert(), "team": "platform"}, config=run_config(deps))
+    )
+
+    assert result["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert deps.jira.created == []
+    assert deps.jira.comments == []
+    assert result["signal"].status is SignalStatus.REPORTED
+
+
+async def test_one_line_of_yaml_puts_the_ticket_path_back(config, jira_config, oom_diagnosis):
+    """The same diagnosis, the same code, two destinations — decided by config alone.
+
+    ADR-0023 postpones Jira; it does not remove it. The composer, the
+    self-review and the client have to stay reachable, or "reversible by
+    configuration" is a claim nothing checks.
+    """
+    reported = build_deps(config)
+    filed = build_deps(jira_config)
+
+    release = await run(oom_diagnosis, reported)
+    reversed_ = await run(oom_diagnosis, filed)
+
+    assert release["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert reported.jira.created == []
+    assert reversed_["outcome"] is PipelineOutcome.TICKET_CREATED
+    assert filed.jira.created[0].project == "PAY"
+
+
+async def test_the_threshold_frames_the_report_instead_of_routing_it(
+    config, oom_diagnosis, low_confidence_diagnosis
+):
+    """Both diagnoses reach the same channel; only the first line differs (ADR-0023).
+
+    Above the bar the reader is told the cause, because that is what they act
+    on. Below it, leading with a cause Triage cannot stand behind is the one
+    thing the report may not do — so it leads with what is established and says
+    how much is still open.
+    """
+    confident = build_deps(config)
+    unsure = build_deps(config)
+    await run(oom_diagnosis, confident)
+    await run(low_confidence_diagnosis, unsure)
+
+    (loud,) = confident.slack.messages
+    (quiet,) = unsure.slack.messages
+    assert loud.channel == quiet.channel == "#payments-alerts"
+
+    lead, follow = loud.text.split("\n")[:2]
+    assert "unbounded" in lead.lower()
+    assert "at or above the *medium*" in follow
+
+    lead, follow = quiet.text.split("\n")[:2]
+    assert "p95 latency on GET /payments/{id} rose from 140 ms to 610 ms" in lead
+    assert "Latency rose across every handler" not in lead
+    assert "below the *medium*" in follow
+    assert "2 questions" in follow
+
+
+async def test_a_draft_that_could_never_pass_review_is_still_reported(
+    config, jira_config, oom_diagnosis
+):
+    """There is no filing decision left to exhaust, so nothing is handed back.
+
+    The retry budget exists to stop Triage filing a ticket its own reviewer
+    rejected. Nothing is being filed, so the same run that used to end as
+    "failed self-review three times; not filed" now ends as the report, and the
+    two expensive tiers it burned getting there are not spent at all.
+    """
+    always_fails = [a_verdict(False, "Cause is not supported by evidence.")]
+    reported = build_deps(config, verdicts=always_fails)
+    exhausted = build_deps(jira_config, verdicts=always_fails)
+
+    release = await run(oom_diagnosis, reported)
+    old = await run(oom_diagnosis, exhausted)
+
+    assert old["outcome"] is PipelineOutcome.REVIEW_EXHAUSTED
+    assert release["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert reported.llm.calls_for(TicketDraft) == []
+    assert reported.llm.calls_for(ReviewVerdict) == []
+
+    (message,) = reported.slack.messages
+    assert "failed self-review" not in message.text
+    assert oom_diagnosis.symptom.description in message.text
+    assert oom_diagnosis.probable_cause in message.text
+
+
+def posted(deps) -> str:
+    return "\n\n".join(message.text for message in deps.slack.messages)
+
+
+async def test_the_report_carries_all_nine_sections(config, oom_diagnosis):
+    """The report is the whole diagnosis, because nothing else carries it now.
+
+    Every section of docs/ticket-spec.md, with the numbers, the window, the
+    links and the reasons — the material both live runs on 2026-08-24 computed
+    and reduced to four lines.
+    """
+    deps = build_deps(config)
+    await run(oom_diagnosis, deps)
+    text = posted(deps)
+
+    for section in TicketSection:
+        assert f"*{section.heading}*" in text, f"{section.heading} is missing"
+
+    assert "2026-08-22T02:10:00" in text
+    assert oom_diagnosis.impact.users in text
+    assert oom_diagnosis.impact.slos in text
+    assert "checkout-web" in text
+    assert oom_diagnosis.evidence[0].description in text
+    assert oom_diagnosis.evidence[0].url in text
+    assert oom_diagnosis.expected_change.statement in text
+    assert oom_diagnosis.expected_change.how_to_verify in text
+    assert oom_diagnosis.out_of_scope[0] in text
+    assert oom_diagnosis.ruled_out[0].hypothesis in text
+    assert oom_diagnosis.ruled_out[0].why in text
+    assert oom_diagnosis.unknowns[0].question in text
+    assert oom_diagnosis.unknowns[0].why_unresolved in text
+
+
+async def test_a_section_with_nothing_in_it_says_so_rather_than_vanishing(config, oom_diagnosis):
+    """A missing section reads as an oversight; an empty one has to say it is not."""
+    bare = oom_diagnosis.model_copy(update={"out_of_scope": [], "ruled_out": [], "unknowns": []})
+    deps = build_deps(config)
+    await run(bare, deps)
+    text = posted(deps)
+
+    for section in TicketSection:
+        assert f"*{section.heading}*" in text
+    assert "N/A" not in text
+    assert "eliminated no hypothesis" in text
+    assert "left no question open" in text
+    assert "named nothing the fix must avoid" in text
+
+
+def _section(text: str, heading: str) -> str:
+    body = text.split(f"*{heading}*\n", 1)[1]
+    return body.split("\n\n", 1)[0]
+
+
+async def a_report_located_by(config, diagnosis, workload) -> str:
+    repo = InMemoryRepository()
+    await repo.upsert_workload(workload)
+    deps = build_deps(config, repo=repo)
+    await run(diagnosis, deps)
+    return posted(deps)
+
+
+async def test_an_observed_location_and_a_guessed_one_do_not_read_alike(config, oom_diagnosis):
+    """The rung travels with the location, or the report launders a guess.
+
+    A repository the running image named and one a `serves` glob picked out are
+    different facts (ADR-0019); so are a commit resolved through GitHub's tag and
+    no commit at all (ADR-0020). Rendered identically, a reader has no way to
+    tell which they are looking at.
+    """
+    observed = await a_report_located_by(
+        config,
+        oom_diagnosis,
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            deployed_commit="9f2c1ab7e4d3c2b1a0987654321fedcba0123456",
+            commit_source="github_tag",
+            iac_repo="infra",
+            iac_paths=["terraform/payments/*"],
+            source="image",
+        ),
+    )
+    guessed = await a_report_located_by(
+        config,
+        oom_diagnosis,
+        a_workload(
+            service="payments-api",
+            repository="payments-api",
+            repo_url="github.com/org/payments-api",
+            image=None,
+            image_digest=None,
+            deployed_commit={"unknown": True, "reason": "no image named a build for it"},
+            commit_source=None,
+            iac_repo=None,
+            iac_paths=[],
+            source="pattern",
+        ),
+    )
+
+    here, there = _section(observed, "Location"), _section(guessed, "Location")
+    assert here != there
+    assert "github.com/org/payments-api" in here
+    assert "9f2c1ab7e4d3c2b1a0987654321fedcba0123456" in here
+    assert "terraform/payments/*" in here
+    assert "image this service is running" in here
+    assert "GitHub" in here
+
+    assert "name pattern" in there
+    assert "nothing observed which build" in there
+    assert "image this service is running" not in there
+
+
+async def test_every_notice_about_one_incident_lands_in_one_thread(config):
+    """The channel is where the team already handles alerts (ADR-0023).
+
+    Which means Triage's several messages about one incident have to read as one
+    conversation, not as three unrelated alerts scattered between everyone
+    else's. The opening notice is the thread; everything after it replies into
+    it, including a report split into parts.
+    """
+    deps = build_deps(
+        config,
+        repo=mapped(a_service_entry("plt-hcl-software-uat")),
+        datadog=fake_datadog(),
+    )
+    result = await (
+        build_graph()
+        .compile()
+        .ainvoke({"alert": pod_down_alert(), "team": "platform"}, config=run_config(deps))
+    )
+
+    opening, *replies = deps.slack.messages
+    assert opening.thread_ts is None
+    assert "Investigating" in opening.text
+    assert replies
+    assert all(message.thread_ts == result["thread_ts"] for message in replies)
+    assert all(message.channel == "#platform-alerts" for message in deps.slack.messages)
+
+
+async def test_a_recurrence_escalation_replies_into_the_same_thread(jira_config, oom_diagnosis):
+    """ADR-0003's loud notice is still a notice about *this* incident.
+
+    Posted outside the thread it would read as a new problem, which is the one
+    thing an escalation saying "this is not going away" must not do.
+    """
+    repo = InMemoryRepository()
+    await repo.save_ticket(
+        jira_key="PAY-7",
+        jira_url="https://jira.invalid/browse/PAY-7",
+        project="PAY",
+        team="payments",
+        service="payments-api",
+        summary="payments-api OOM during settlement",
+        diagnosis_id=None,
+    )
+    await repo.bump_occurrence("PAY-7")  # at 2; this run makes it the 3rd, which escalates
+    deps = build_deps(
+        jira_config,
+        repo=repo,
+        dedup=[DedupDecision(matched=True, ticket_key="PAY-7", reasoning="Same cause.")],
+    )
+
+    await graph.ainvoke(
+        {"diagnosis": oom_diagnosis, "thread_ts": "1755000000.000100"}, config=run_config(deps)
+    )
+
+    (message,) = deps.slack.messages
+    assert "has now recurred 3 times" in message.text
+    assert message.thread_ts == "1755000000.000100"
+
+
+def a_long_incident(diagnosis):
+    """The same diagnosis with an evidence list no single Slack message can hold."""
+    evidence = [
+        Evidence(
+            kind=EvidenceKind.K8S_EVENT,
+            description=f"Restart {index} of payments-api-0: container killed with exit "
+            f"code 137 after the working set reached the 1 Gi limit, {index} minutes into "
+            f"the settlement window.",
+            url=f"https://app.datadoghq.example/events/restart-{index}",
+        )
+        for index in range(1, 61)
+    ]
+    return diagnosis.model_copy(update={"evidence": evidence})
+
+
+async def test_a_report_too_long_for_one_message_is_split_between_sections(config, oom_diagnosis):
+    """Slack splits a long message wherever it likes; we split where we choose.
+
+    Above about four thousand characters Slack breaks the text itself, and the
+    break lands mid-sentence — mid-evidence-item, mid-link. So the report is cut
+    at a section boundary before it gets there, and each part says which part it
+    is, so nobody reads part two as the whole report.
+    """
+    long_one = a_long_incident(oom_diagnosis)
+    deps = build_deps(config)
+    await run(long_one, deps)
+
+    parts = [message.text for message in deps.slack.messages]
+    assert len(parts) > 1
+    assert all(len(part) <= MAX_MESSAGE_CHARS for part in parts)
+    assert f"Part 1 of {len(parts)}" in parts[0]
+    assert f"Part {len(parts)} of {len(parts)}" in parts[-1]
+
+    lines = [line for part in parts for line in part.split("\n")]
+    for section in TicketSection:
+        heading = f"*{section.heading}*"
+        assert lines.count(heading) == 1, f"{section.heading} appears twice unmarked"
+
+    for item in long_one.evidence:
+        bullet = f"• [{item.kind.value}] {item.description} — {item.url}"
+        assert lines.count(bullet) == 1, "an evidence item was cut in half"
+
+    assert "*Evidence (continued)*" in lines, "the oversized section was truncated, not continued"
+
+
+async def test_a_report_that_fits_is_one_message_with_no_part_marker(config, oom_diagnosis):
+    deps = build_deps(config)
+    await run(oom_diagnosis, deps)
+
+    (message,) = deps.slack.messages
+    assert "Part 1 of" not in message.text
+
+
+async def test_the_2026_08_24_incident_reaches_the_channel_whole(config):
+    """The run this milestone exists for, asserted against what it actually produced.
+
+    On 2026-08-24 at 19:05, F1 ran end to end against a real alert for the first
+    time with no failed model call. It produced four ranked causes, two of them
+    ruled out at the 0.30 analysis floor, five pieces of evidence and six named
+    unknowns each with the reason it could not be settled — and posted four lines
+    saying "No ticket raised for `plt-hcl-software-uat` — confidence low". This
+    is that same diagnosis, and every part of it now arrives.
+    """
+    diagnosis = load_diagnosis("pod_down_20260824")
+    assert (len(diagnosis.ruled_out), len(diagnosis.unknowns), len(diagnosis.evidence)) == (2, 6, 5)
+
+    deps = build_deps(config)
+    state = await run(diagnosis, deps)
+    text = posted(deps)
+
+    assert state["outcome"] is PipelineOutcome.REPORT_POSTED
+    assert deps.slack.messages[0].channel == "#platform-alerts"
+    assert "No ticket raised" not in text
+
+    for item in diagnosis.ruled_out:
+        assert item.hypothesis in text
+        assert item.why in text
+    for item in diagnosis.unknowns:
+        assert item.question in text
+        assert item.why_unresolved in text
+    for item in diagnosis.evidence:
+        assert item.description in text
+
+    assert "0.30 floor for analysis" in text
+    assert "not_instrumented" in text
+    assert "2m49s" in text

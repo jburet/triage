@@ -9,7 +9,7 @@ deployment — never a particular repository, which is exactly the coupling the
 split removed.
 """
 
-from triage.config import DEFAULT_CONFIG_PATH, RepoKind, load_config
+from triage.config import DEFAULT_CONFIG_PATH, RepoKind, WriteTargets, load_config
 
 
 def test_the_shipped_config_parses():
@@ -43,3 +43,14 @@ def test_an_iac_analysis_has_a_terraform_repository_to_read():
     assert [repo.url for repo in config.repos if repo.kind is RepoKind.TERRAFORM], (
         "config.yaml declares no terraform repository, so iac_analysis has nothing to read"
     )
+
+
+def test_the_shipped_config_writes_only_to_slack():
+    """The release's one operational claim, stated in the file an operator edits.
+
+    ADR-0023's Jira gate is a default in code and a line of YAML here. The
+    default alone is not enough: an operator reading config.yaml must be able to
+    see which systems this deployment may write to without reading Python.
+    """
+    assert load_config(DEFAULT_CONFIG_PATH).writes is WriteTargets.SLACK
+    assert "writes:" in DEFAULT_CONFIG_PATH.read_text(encoding="utf-8")

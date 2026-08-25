@@ -26,6 +26,12 @@ from triage.schemas.signal import SignalStatus
 from triage.schemas.ticket import PipelineOutcome
 
 
+@pytest.fixture
+def config(jira_config: Config) -> Config:
+    """This module exercises the Jira path, which the release configures off."""
+    return jira_config
+
+
 def a_postmortem() -> Postmortem:
     return Postmortem(
         timeline="00:43 probe failures; 00:43:54 container killed, exit 137; 00:47 replicas 0.",

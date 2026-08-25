@@ -1,6 +1,13 @@
 # Static configuration, versioned. Discovered data (the system map) lives in
 # PostgreSQL and is never hand-edited here.
 
+# Which systems this deployment may write to (ADR-0023). `slack` is the first
+# release: the Jira client, the composer and the self-review stay in the tree and
+# stay tested, and no run calls them. `slack_and_jira` puts the ticket path back,
+# which is the whole reason the decision is a line of configuration rather than a
+# deletion — revisit it when someone asks to keep a report.
+writes: slack
+
 # An alert is matched to a team by pattern, never by enumeration: the firing
 # groups are per-customer tenants and a list here would be obsolete the day a
 # customer is provisioned (ADR-0017).

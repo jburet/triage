@@ -26,19 +26,19 @@ infra track, which this release is the first thing to actually need.
 
 ## Phase 1: nothing reaches Jira, and the gate stops routing
 
-- [ ] 1.1 With `writes: slack`, a diagnosis above the confidence threshold produces a Slack report and no Jira call is made — asserted against the recording fake, which must record nothing.
-- [ ] 1.2 With `writes: slack_and_jira`, today's behaviour is unchanged, so the decision is reversible by configuration and the Jira path stays covered.
-- [ ] 1.3 The confidence threshold selects the report's framing rather than its destination: at or above it the report leads with the probable cause, below it with what is established and what is missing.
-- [ ] 1.4 A run that would previously have ended at `notify_review_exhausted` now ends as a report carrying the same draft, because there is no filing decision left to exhaust.
-- [ ] 1.5 `docs/ticket-spec.md` is restated as the report spec, with the nine sections intact and the Jira workflow section marked postponed.
+- [x] 1.1 With `writes: slack`, a diagnosis above the confidence threshold produces a Slack report and no Jira call is made — asserted against the recording fake, which must record nothing.
+- [x] 1.2 With `writes: slack_and_jira`, today's behaviour is unchanged, so the decision is reversible by configuration and the Jira path stays covered.
+- [x] 1.3 The confidence threshold selects the report's framing rather than its destination: at or above it the report leads with the probable cause, below it with what is established and what is missing.
+- [x] 1.4 A run that would previously have ended at `notify_review_exhausted` now ends as a report carrying the same draft, because there is no filing decision left to exhaust.
+- [x] 1.5 `docs/ticket-spec.md` is restated as the report spec, with the nine sections intact and the Jira workflow section marked postponed.
 
 ## Phase 2: the report is the product
 
-- [ ] 2.1 The report renders every section the diagnosis carries — symptom with numbers and window, impact, probable cause with confidence, evidence with links, location as repository/commit/paths, expected change, out of scope, ruled out, unknowns — and omits nothing silently: a section with no content says why.
-- [ ] 2.2 The location names the repository, the deployed commit and the IaC path, and carries the mapping rung: an image-derived commit and a `serves`-pattern one must not read alike (ADR-0019, ADR-0020).
-- [ ] 2.3 Every message about one incident lands in the thread opened by `open_incident`, including the recurrence escalations (ADR-0003).
-- [ ] 2.4 A report longer than Slack accepts is split at a section boundary, never mid-evidence, and the split is stated.
-- [ ] 2.5 The four causes ruled out and the six unknowns produced by the 2026-08-24 run all appear in the rendered report — the fixture is that run, so the thing this milestone exists to deliver is what the test asserts.
+- [x] 2.1 The report renders every section the diagnosis carries — symptom with numbers and window, impact, probable cause with confidence, evidence with links, location as repository/commit/paths, expected change, out of scope, ruled out, unknowns — and omits nothing silently: a section with no content says why.
+- [x] 2.2 The location names the repository, the deployed commit and the IaC path, and carries the mapping rung: an image-derived commit and a `serves`-pattern one must not read alike (ADR-0019, ADR-0020).
+- [x] 2.3 Every message about one incident lands in the thread opened by `open_incident`, including the recurrence escalations (ADR-0003).
+- [x] 2.4 A report longer than Slack accepts is split at a section boundary, never mid-evidence, and the split is stated.
+- [x] 2.5 The two causes ruled out at the 0.30 analysis floor and the six unknowns produced by the 2026-08-24 19:05 run all appear in the rendered report — the fixture is that run, so the thing this milestone exists to deliver is what the test asserts. (The plan said four ruled out; the 19:05 run's own output shows four *ranked* causes, of which two were ruled out at the floor. Corrected to what the run printed.)
 
 ## Phase 3: the analysis image
 
