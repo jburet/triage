@@ -37,6 +37,8 @@ can override it without touching code.
 | [0022](0022-one-client-and-a-malformed-tool-call-rate.md) | One client for both paths, and strict tool use where a schema can say it | Proposed |
 | [0023](0023-the-first-release-writes-only-to-slack.md) | The first release writes only to Slack | Proposed |
 | [0024](0024-no-kernel-boundary-for-a-job-that-executes-nothing.md) | No kernel boundary for a Job that executes nothing | Accepted |
+| [0025](0025-code-exceptions-polled-hourly-and-gated-by-volume.md) | Code exceptions are polled hourly and gated by volume | Proposed |
+| [0026](0026-one-exception-across-tenants-is-one-finding.md) | One exception across tenants is one finding | Proposed |
 
 **Accepted, implemented** means M1 code depends on it. **Proposed** means it is
 recorded so work can start, and nothing yet depends on it being right.

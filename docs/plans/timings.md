@@ -151,3 +151,4 @@ One line per plan phase and per tool run. Append, never rewrite. Keep them going
 | 2026-08-25 | M8 phases 1.3/1.7 | make lint + make test (762 passed) | 14 |
 | 2026-08-25 | M8 phase 1.7 | make run-errors, live hourly tick (17 issues, none new) | 1 |
 | 2026-08-25 | M8 phase 1.7 | make run-errors ARGS="--hours 168", catch-up clamped to 6 h | 1 |
+| 2026-08-25 | M8 phase 1 (close) | make lint + make test (762 passed) | 8 |

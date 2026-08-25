@@ -56,13 +56,18 @@ in-memory. Secrets come from `.env` with the `TRIAGE_` prefix (`src/triage/confi
 
 **Graph wiring** — one `StateGraph` per graph in `src/triage/graphs/`, one state TypedDict
 each in `graphs/state.py` (all `total=False`), one module per node under `src/triage/nodes/`,
-routing functions in the graph module. `langgraph.json` registers six:
+routing functions in the graph module. `langgraph.json` registers seven:
 
 - `ticket_pipeline` — `record_diagnosis → dedup_check → (update_existing_ticket | confidence_gate) → (notify_below_threshold | compose_ticket → self_review → create_ticket | retry | notify_review_exhausted)`. The retry budget counts composes (`thresholds.max_compose_attempts`).
 - `cartography` — F0; see ADR-0006, ADR-0015.
 - `analysis` — `select_hypotheses → run_analyses → diagnose`. Shared by F1 and F3.
 - `incident` — F1: `open_incident → classify_alert → collect → follow_up ⟲ → qualify → [analysis] → [ticket_pipeline] → draft_postmortem? → settle_signal`. `IncidentState` inherits `AnalysisState` and `TicketPipelineState` so both compiled sub-graphs can be added as nodes.
 - `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
+- `error_poller` — M8/F2: one tick of `poll_error_issues`, hourly. Reads Datadog Error
+  Tracking, keeps only what was first seen or regressed in the window; see ADR-0025,
+  ADR-0026. A node module must **not** carry `from __future__ import annotations` — it
+  stringifies the `config` annotation, LangGraph then passes no config, and every node
+  silently falls back to `build_deps()`.
 - `service_mapping` — M6: `select_services → derive_workloads → persist_workloads → report_mapping`. No model call anywhere on it; see ADR-0019, ADR-0020.
 
 **Dependency injection** — nodes are plain async functions; collaborators arrive as a

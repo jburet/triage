@@ -19,7 +19,8 @@ be developed — `make run-errors` ticks it by hand, as `make run-poller` does f
 
 ## Decisions this plan needs recorded first
 
-Two ADRs, written before Phase 2 (`/adr`):
+Two ADRs, written before Phase 2 (`/adr`). **Both written 2026-08-25**, against what the
+capture showed rather than what the plan assumed:
 
 - **ADR-0025 — code exceptions are polled hourly and gated by volume.** ADR-0018's gate is
   duration, which an error issue has no equivalent of. The gate here is occurrences: a floor
@@ -62,22 +63,54 @@ should be revisited against it rather than against Jira.
 
 ## Phase 1: the input exists, and says what we think it says
 
-- [ ] 1.1 One real hour of the org's Error Tracking issues is captured under
+- [x] 1.1 One real hour of the org's Error Tracking issues is captured under
       `tests/fixtures/datadog/errors/<slug>/` by `make capture-errors`, and the capture states how
       many issues came back per track and how many of them name a file and a function. Everything
       after this phase is written against that capture, not against the OpenAPI spec.
-- [ ] 1.2 A tick asks for the `trace` and `logs` tracks with the `BACKEND` persona over one hour, in
+- [x] 1.2 A tick asks for the `trace` and `logs` tracks with the `BACKEND` persona over one hour, in
       one call per track, and gets back each issue's counts and its attributes together.
-- [ ] 1.3 The environments Triage watches are a filter in the query — an issue from an environment no
+- [x] 1.3 The environments Triage watches are a filter in the query — an issue from an environment no
       team configured is never returned, rather than returned and dropped.
-- [ ] 1.4 An issue that names an exception type *and* a source location is a code exception; one that
+- [x] 1.4 An issue that names an exception type *and* a source location is a code exception; one that
       names neither is recorded as skipped, with that as the reason, and never analysed.
-- [ ] 1.5 An issue whose `first_seen` falls in the tick window is new, and one whose regression
+- [x] 1.5 An issue whose `first_seen` falls in the tick window is new, and one whose regression
       reopened it in the window is new too — and the two are told apart, because a fix that did not
       hold is a different report from a defect nobody has seen before.
-- [ ] 1.6 An issue first seen before the window and not regressed produces nothing.
-- [ ] 1.7 A tick reads from its watermark minus an overlap; a poller that was down longer than the
+- [x] 1.6 An issue first seen before the window and not regressed produces nothing.
+- [x] 1.7 A tick reads from its watermark minus an overlap; a poller that was down longer than the
       catch-up limit replays only the limit and says in the platform channel what it skipped.
+
+## What Phase 1 measured, and what it changes
+
+Done 2026-08-25 against the real org; the capture is
+`tests/fixtures/datadog/errors/org_20260825_1h/`, and its `NOTES.md` is the record. Four
+findings change what comes next.
+
+- **Error Tracking is populated and names the code.** 15 issues in the reference hour, 202
+  over seven days, and *every one of them* names both a file and a function. The plan's
+  first open risk is closed and F2 has the input it was built on. The paths are
+  fully-qualified Scala class names (`zeenea.repository.orientdb.OdbClient.scala`,
+  `$anonfun$load$6`), not repository-relative paths, so 4.1 must map one to the other before
+  `AnalysisRequest.paths` gets them.
+- **The `logs` track is empty at every window and persona.** The org's issues come from APM
+  spans alone. Nothing downstream should be surprised by an empty track.
+- **`first_seen_version` is almost always blank** — 0 of 15 in the hour, 16 of 202 over a
+  week, 47 of 320 over a month. Behaviours 4.2 and 4.3 are built on that field, so they are
+  the minority path, not the normal one.
+- **Phase 3 does not work as written, and this is measured, not suspected.** A query rebuilt
+  from an issue's own fields (`service:X @error.type:"Y"`) returns **zero spans and zero
+  logs** against an issue claiming 6,344 occurrences in the same hour. `service:X` alone
+  returns 211,158 spans, so the service is instrumented; `status:error` and `@error.type:*`
+  both return nothing, because the error spans are not retained and the aggregate answers
+  `traffic_type: sampled`. Logs are barely shipped: 11 events for that service in the hour.
+  **Phase 3 should be re-planned before it is built** — either it states the absence the way
+  `not_instrumented` already does, or it finds another source. The issue's own sample event,
+  if Error Tracking exposes one, is the obvious unprobed candidate.
+
+Two numbers Phase 2 wants: 202 issues across 99 services collapse to **35** distinct (type,
+file, function) triples, 5.8 to one — ADR-0026's case, larger than guessed. And occurrences
+per issue in one hour ran 6344, 5869, 4009, 850, 835, 650, 435, 200, 29, 15, 4, 2, 2, 2, 1,
+which is where `min_occurrences: 10` comes from.
 
 ## Phase 2: one exception, however many tenants
 
@@ -145,21 +178,17 @@ should be revisited against it rather than against Jira.
 
 ## Open risks
 
-- **Nothing here has ever been read from the real org, and Error Tracking may not be
-  populated at all.** It requires `error.stack` on spans or logs; if the Scala platform's
-  exceptions do not carry one, the hourly pass returns nothing forever. Behaviour 1.1 exists
-  to find that out before anything else is built, and it is cheap. If the capture comes back
-  empty, this plan stops there.
-- **An occurrence cannot be traced back to its issue by identity.** Datadog documents no
-  attribute linking a log or span to the issue id it was grouped into, so Phase 3 rebuilds
-  the query from the issue's own fields (`service`, `@error.type`, message shape). That can
-  over-match — a different exception with the same type — and under-match, if Datadog's
-  fingerprint splits on stack frames the query cannot see. The capture in 1.1 is also the
-  test of this: compare what the reconstructed query returns against the issue's own count.
+- ~~**Nothing here has ever been read from the real org, and Error Tracking may not be
+  populated at all.**~~ **Closed by 1.1.** It is populated, and every issue names its file
+  and function.
+- ~~**An occurrence cannot be traced back to its issue by identity.**~~ **Confirmed, and
+  worse than feared.** The reconstruction returns nothing at all, not merely the wrong
+  things. See "What Phase 1 measured" above; Phase 3 needs replanning.
 - **The volume floor is a guess until there are numbers.** F1's 15 minutes came from 961
-  measured cycles. Nothing equivalent has been measured for exceptions, so the first floor is
-  arbitrary and the first week's job is to correct it. A floor set too low turns the team's
-  channel into an error stream, which is the failure mode ADR-0023 says to watch for.
+  measured cycles. The distribution is now measured (see above) but no *outcome* is: whether
+  ten occurrences an hour is worth a developer's attention is the first week's question. A
+  floor set too low turns the team's channel into an error stream, which is the failure mode
+  ADR-0023 says to watch for.
 - **Grouping across tenants can hide a tenant-specific defect.** An exception that only ever
   happens for one customer is a fact about that customer's data or configuration, and a group
   that reports "seen in 6 services" flattens it. The per-service counts in 2.1 are the
