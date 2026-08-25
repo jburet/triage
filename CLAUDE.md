@@ -77,8 +77,11 @@ routing functions in the graph module. `langgraph.json` registers eight:
 - `code_exception` — M8/F2: `open_group → collect_exception → qualify_exception → [analysis] → [ticket_pipeline] → settle_group`. `CodeExceptionState` inherits both sub-graph states, as `IncidentState` does. No `classify_alert` — the issue already names its type and its source location — and no post-mortem, which is an incident's write-up.
 - `alert_poller` — one tick of `poll_alerts`; the 60-second cron is a Platform object.
 - `error_poller` — M8/F2: `poll_error_issues → group_error_issues`, hourly. Reads Datadog
-  Error Tracking, keeps only what was first seen or regressed in the window, then collapses
-  those into groups and gates them on volume; see ADR-0025, ADR-0026. No model call anywhere
+  Error Tracking, reports only what was first seen or regressed in the window, then collapses
+  those into groups and gates them on volume; see ADR-0025, ADR-0026. An issue that is neither
+  is kept too and does exactly one thing: it adds its count to a group already known, which is
+  the only material the cumulative escalation has (ADR-0030) — it creates no group and clears
+  no floor. No model call anywhere
   on it. A node module must **not** carry `from __future__ import annotations` — it
   stringifies the `config` annotation, LangGraph then passes no config, and every node
   silently falls back to `build_deps()`.
@@ -153,8 +156,9 @@ tag, which no alert carries usefully (ADR-0017).
 same shape as `triage.collect`: `issues.py` (parse the envelope, the code-exception rule,
 new-or-regressed), `grouping.py` (the group key — exception type, source location and **the
 repository the mono-tenancy rule resolves**, never the message, ADR-0026), `gate.py` (the
-per-tick floor, the cumulative escalation, the per-tick cap, and the `reanalyse_after`
-cooldown that keeps a 10,000-an-hour group from being reposted every tick), `sweep.py` (the
+per-tick floor — measured over 24 live hourly ticks, not over one hour's occurring issues —
+the cumulative escalation the continuing counts feed, the per-tick cap, and the
+`reanalyse_after` cooldown that keeps a 10,000-an-hour group from being reposted every tick), `sweep.py` (the
 three collectors, the join, and which kind of nothing each found — ADR-0029), `otel.py` (the
 exception and its stack out of the JSON string Datadog calls `custom.events`, and the
 application frames out of the stack), `paths.py` (a real frame beats a guess: the stack's
@@ -170,7 +174,8 @@ anything. The one tier call on the F2 path is `qualify_exception`, which fills t
 the ORM; a `workloads` row is one running service joined to the repository whose code it
 runs (M6); an `error_groups` row is one code-exception defect across every tenant that raises it, keyed
 on the grouping rule's own output so a later tick finds it by recomputing the key, and
-carrying the cumulative count the escalation reads and the Slack thread every message about
+carrying the cumulative count the escalation reads — moved by every tick that sees the group,
+not only by the one that saw it arrive — and the Slack thread every message about
 it replies under (M8, ADR-0026: `open → analysing → reported`, plus `unmapped` for a service
 no repository claims); a `signals` row is one alert *cycle* (monitor, firing group, duration,
 recovery) and its status carries the persistence gate — `received → waiting → analysing → diagnosed →
