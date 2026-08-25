@@ -283,11 +283,12 @@ Discovered data (system map) lives in PostgreSQL and is never hand-edited.
 Everything runs in the production cluster, namespace `triage`, with a read-only ServiceAccount and NetworkPolicy.
 
 Components:
-- ~~`langgraph-platform`~~ — **not deployed.** There is no Enterprise licence for an on-prem deployment (2026-08-25), so
-  [ADR-0011](adr/0011-langgraph-platform-licence.md)'s in-process fallback is the design: one long-lived
-  `triage-poller` process runs the graphs, `langgraph-checkpoint-postgres` provides durability, and a
-  Kubernetes schedule replaces the Platform crons. The graphs, nodes and schemas are unchanged, which is
-  what that ADR was buying. Its Postgres and Redis are not needed.
+- `langgraph-platform` — **self-hosted Hybrid**: Zeenea's own control plane at
+  `langsmith-dev.infra.zeenea.app`, data plane in Zeenea's EKS ([ADR-0011](adr/0011-langgraph-platform-licence.md)).
+  Hosts all graphs and crons. Already standing and already serving `data-intelligence-assistant` and
+  `agent-classification`; Triage gets its own deployment beside them — `langgraph build` → ECR in
+  eu-west-3 for linux/arm64 (Graviton) → a `langsmith_deployment` Terraform resource. Worker count per
+  ADR-0001.
 - `triage-ingress` — thin FastAPI deployment: GitHub and Jira (closure feedback) webhook validation, run creation on the Platform. No business logic. Datadog does not reach it: F1 polls ([ADR-0017](adr/0017-alert-ingestion-by-polling.md)).
 - `litellm-proxy` — holds the Anthropic key, enforces budgets, centralises logs; aliases `triage` / `analysis` / `diagnosis`.
 - `analysis-job` template — gVisor runtime class, Claude Agent SDK image; one Job per analysis, created by graph nodes through the Kubernetes API (the Platform's ServiceAccount needs create/get/delete on Jobs in the `triage` namespace only).
@@ -314,7 +315,7 @@ reasoning and, more usefully, the condition that would make each one wrong.
 | 8 | Databases declared in config, Secret refs, `pg_read_all_stats` only | [0008](adr/0008-f3-database-access.md) |
 | 9 | Jobs return results via `triage.analysis_results`; 15 min, depth 1 | [0009](adr/0009-analysis-job-result-channel.md) |
 | 10 | Post-mortem draft as a Jira comment, linked from Slack | [0010](adr/0010-postmortem-destination.md) |
-| 11 | Platform Enterprise licence, with an in-process fallback — **fallback taken, 2026-08-25** | [0011](adr/0011-langgraph-platform-licence.md) |
+| 11 | Platform tier — **hybrid taken, 2026-08-25**; the in-process fallback stays documented | [0011](adr/0011-langgraph-platform-licence.md) |
 | 12 | Nightly full dump, 30 d; payloads 90 d; product memory kept | [0012](adr/0012-backup-and-retention.md) |
 | 16 | Triage collects Datadog telemetry itself: fixed sweep, then a bounded follow-up loop | [0016](adr/0016-datadog-collected-by-triage.md) |
 | 17 | Alerts polled from the Datadog event stream every 60 s; scope matched by pattern | [0017](adr/0017-alert-ingestion-by-polling.md) |

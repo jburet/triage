@@ -1,15 +1,35 @@
 # 0011 — LangGraph Platform tier, and the fallback
 
-Status: Accepted **on the fallback**, 2026-08-25. There is no Enterprise licence for an
-on-prem deployment, so the branch this ADR wrote is the one taken. Resolves architecture
-open item 11.
+Status: Accepted **on the Platform**, 2026-08-25, in the **self-hosted Hybrid** flavour:
+Zeenea's own control plane at `langsmith-dev.infra.zeenea.app`, data planes in Zeenea's EKS.
+Resolves architecture open item 11.
+
+Briefly recorded as "fallback taken" earlier the same day, on the reading that no licence
+meant no Platform. The licence question is settled by fact rather than by procurement: that
+control plane is already standing and already serves two agents. Triage joins it.
 
 ## Decision
 
-Target the self-hosted LangGraph Platform, which needs an Enterprise licence key.
-Treat that as a **procurement dependency, not a code dependency**: keep every
-Platform-specific surface behind `langgraph.json` and the Platform SDK client in
-the ingress, so no graph or node imports it.
+Target the LangGraph Platform in the **Hybrid** flavour — LangSmith's managed control
+plane, a data plane in Zeenea's AWS — and keep every Platform-specific surface behind
+`langgraph.json` and one client, so no graph or node imports it.
+
+Two agents already deploy this way, and between them they answer every mechanical question.
+`data-intelligence-assistant`'s `scripts/deploy-ecr.sh` runs `langgraph build` and pushes to
+ECR in **eu-west-3** for **linux/arm64** — the data plane runs on Graviton — then the image
+path goes into *Create Deployment*, and `scripts/register_crons.py` registers schedules
+through `langgraph-sdk`'s `crons.search` / `crons.create`. `agent-classification` does the
+same deployment **as Terraform**: a `langsmith_deployment` resource on the `zeenea/langsmith`
+provider pointed at the control plane, with its scale and resource spec declared. That is the
+better path for Triage — a reviewable resource rather than a console field.
+
+Triage gets its **own deployment**, not a share of another. Nothing leaves the perimeter:
+the control plane is Zeenea's, the data plane is Zeenea's EKS (`langgraph-dataplane-*`), and
+LiteLLM is reached at in-cluster service DNS, as DIA reaches it at
+`http://litellm-proxy.litellm-proxy:4000/v1`.
+
+Treat the *fully* self-hosted flavour as a procurement dependency, not a code dependency.
+The fallback below stands as the documented answer if the hybrid one is ever withdrawn.
 
 If the licence does not arrive: run the same graphs in-process in the FastAPI
 service with `langgraph-checkpoint-postgres` for durability and Kubernetes
@@ -30,9 +50,10 @@ either way.
 The M1 code already runs on plain `langgraph dev`, so the fallback is not a
 contingency plan to be written later; it is the path currently exercised.
 
-## What the fallback actually costs, now that it is the design
+## What the fallback would cost, which is why the Platform is worth having
 
-The three replacements above are not equal, and two of them were understated.
+Measured while the fallback was briefly assumed. The three replacements are not equal, and
+two of them were understated — which is the argument for the Platform rather than against it.
 
 - **The queue is the one that bites.** With no Platform, `_launch` *awaits*
   `run_incident` inside the poller tick, one signal at a time: `create_run`
@@ -53,18 +74,13 @@ The three replacements above are not equal, and two of them were understated.
   needs an image that does not exist, and the same registry that blocks the
   analysis image blocks this one.
 
-`deploy/platform/cron-alert-poller.yaml`, `scripts/apply_cron.py` and the cron
-methods on `PlatformRestClient` are unreachable under this decision. They are kept,
-not deleted, because that is the property this ADR bought: if a licence ever
-arrives, deployment changes and nothing else does.
+`deploy/platform/cron-alert-poller.yaml`, `scripts/apply_cron.py` and the cron methods on
+`PlatformRestClient` are the live path under this decision, not a contingency: they do for
+Triage what `register_crons.py` does for DIA.
 
 ## Revisit when
 
-A licence becomes available — at which point deployment changes and nothing else
-does. That is the property this decision was buying, and taking the fallback is
-what proves it was worth buying: no graph, node or schema changes today.
-
-Revisit sooner if the poller's own supervision turns out to be the thing that
-breaks — a stuck `analysing` row nobody reclaims, or ticks skipped while an
-incident runs. That is the queue being missed, and it is an argument for a real
-work queue rather than for the Platform specifically.
+The hybrid flavour stops being available, or the data plane may no longer run in Zeenea's
+AWS — at which point the fallback above is the design and its three costs become work. The
+half-day this ADR spent on the fallback and back is the evidence that the separation holds:
+no graph, node or schema changed in either direction.

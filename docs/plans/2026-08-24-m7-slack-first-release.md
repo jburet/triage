@@ -46,7 +46,7 @@ infra track, which this release is the first thing to actually need.
 - [x] 3.2 The image clones over https at the requested commit and refuses a ref it was not given.
 - [x] 3.3 Running the image locally against the 2026-08-24 hypotheses produces a `code_analysis` and an `iac_analysis` result — the first time either has ever run.
 - [x] 3.4 `diff_analysis` still has no entrypoint and still fails as a stated failure naming the kind; the diagnosis records it as an unknown and caps confidence (ADR-0014). This release does not add it.
-- [ ] 3.5 The image is published to the infra account's registry and named in `config.analysis.job`. **Blocked**: no credentials for the infra account (097607883991), no ECR repository exists for this image, and what was built is `linux/arm64` — the cluster needs `linux/amd64`, so publishing means a buildx cross-build as well as a login.
+- [ ] 3.5 The image is published to the infra account's registry and named in `config.analysis.job`. **Blocked on credentials and a repository**, and nothing else: `data-intelligence-assistant`'s `scripts/deploy-ecr.sh` is the worked example — ECR in **eu-west-3**, `linux/arm64` **because the data plane runs on Graviton**. The arm64 build this milestone produced is therefore the right architecture, not the wrong one; the earlier note claiming a cross-build to amd64 was needed is withdrawn.
 
 What the first two live analyses showed (2026-08-24, one `analysis` call each, through the
 proxy). The `iac_analysis` on `platform-infra` at `68648d21` answered `high` and *eliminated*
@@ -93,36 +93,30 @@ name reaches `low` because nothing worth reading was opened. The fix belongs to
 
 ## Phase 5: it runs itself
 
-**There is no Enterprise licence for an on-prem deployment (2026-08-25), so ADR-0011's
-fallback is the design.** The graphs, nodes and schemas are unchanged — that is the property
-ADR-0011 bought — but three things this phase assumed the Platform would provide now have to
-be built, and 5.1 and 5.2 are rewritten to say what they are.
+**Triage gets its own LangGraph Platform deployment** on the self-hosted Hybrid platform
+Zeenea already runs — control plane `langsmith-dev.infra.zeenea.app`, data plane in Zeenea's
+EKS (ADR-0011, decided 2026-08-25 after a half-day on the fallback and back). Two agents are
+already on it: `data-intelligence-assistant` (`langgraph build` → ECR eu-west-3 `linux/arm64`
+→ *Create Deployment* → crons via the SDK) and `agent-classification` (the same, declared as
+a `langsmith_deployment` Terraform resource). So the Platform provides the queue, the
+checkpointer and the schedule, and none of those is Triage's code to write.
 
-- [ ] 5.1 Triage runs its own graphs in one long-lived process against the shared Postgres, with its tables in the `triage` schema and `langgraph-checkpoint-postgres` wired so a restart resumes rather than loses an incident.
-      The checkpointer is a declared dependency and is used **nowhere**: durability today is zero,
-      and a process that dies mid-incident leaves a signal in `analysing` that nothing resumes and
-      nothing reclaims. Checked offline so far: `tests/integration/test_registered_graphs.py`
-      compiles all six entries in `langgraph.json`, and `tests/unit/test_migrations.py` holds every
-      table to the `triage` schema.
-- [ ] 5.1b The poller launches an incident as a supervised task with a concurrency cap, and keeps polling while it runs.
-      New, and the real cost of losing the Platform: `_launch` *awaits* `run_incident` inside the
-      tick, so a signal that opens the gate stops polling for the length of the analysis — 64s
-      measured — and two signals in one tick run serially. ADR-0011 said the queue would be replaced
-      by "the graph's own concurrency limits"; nothing limits concurrency, it simply runs to
-      completion in the caller.
-- [ ] 5.1c Triage has a runtime image.
-      M7 built the *analysis* image; the poller has only ever run from a checkout. Whatever
-      schedules it needs one, and the registry that blocks the analysis image blocks this too.
-- [ ] 5.2 A Kubernetes schedule ticks the poller every 60 seconds, and a cycle that has not persisted for its gate creates no run (ADR-0018).
-      `deploy/platform/cron-alert-poller.yaml`, `scripts/apply_cron.py` and the cron methods on
-      `PlatformRestClient` are now **unreachable** — kept, not deleted, because if a licence ever
-      arrives deployment changes and nothing else does (ADR-0011). What replaces them is a
-      Kubernetes object over `scripts/run_poller.py`, which already takes `--every 60`. Deployment
-      or CronJob is undecided: a CronJob is self-healing per tick but `concurrencyPolicy: Forbid`
-      would *skip* ticks while an in-process incident runs, and a Deployment keeps a warm process
-      but needs a liveness probe on watermark progress to catch a wedge. 5.1b decides it, because a
-      poller that does not block changes the answer. The second half is verified live: one tick against the real Datadog org over a
-      25-minute window read 20 monitor-alert events — 4 cycles opened, 12 out of scope, 2
+- [ ] 5.1 Triage's own Platform deployment serves the six registered graphs against the shared Postgres, with its tables in the `triage` schema and the Platform's checkpoints beside them.
+      *Blocked on the deployment being created.* Checked offline:
+      `tests/integration/test_registered_graphs.py` compiles all six entries in `langgraph.json`,
+      and `tests/unit/test_migrations.py` holds every table to the `triage` schema.
+- [ ] 5.1b Triage has a deploy image, built the way DIA's is.
+      `langgraph build` against `langgraph.json`, pushed to an ECR repository in eu-west-3 for
+      `linux/arm64`, carrying no secrets — creds arrive from the control plane at runtime. DIA's
+      `scripts/deploy-ecr.sh` hard-fails if a `.env` is baked into the image; copy that check. The same
+      registry access blocks this and the analysis image (3.5), and it is the only thing that does.
+- [ ] 5.2 The 60-second `alert_poller` cron creates runs, and a cycle that has not persisted for its gate creates none (ADR-0018).
+      The cron object exists — `deploy/platform/cron-alert-poller.yaml`, created by
+      `make cron ARGS=--apply` through `scripts/apply_cron.py`, whose requests are pinned in
+      `tests/integration/test_platform_client.py`. It does for Triage what DIA's
+      `scripts/register_crons.py` does for DIA, and has never been created because the deployment
+      does not exist yet. The second half is verified live: one tick against the real Datadog org
+      over a 25-minute window read 20 monitor-alert events — 4 cycles opened, 12 out of scope, 2
       self-recovered with their durations, 1 in scope with no cartography and told about, **0
       launched**. The gate, holding, against real alerts.
 - [x] 5.3 Two alerts for the same monitor and firing group inside one cycle produce one run, not two.
